@@ -9,6 +9,7 @@ import ProfilePage from "views/ProfilePage/ProfilePage.js";
 import LoginPage from "views/LoginPage/LoginPage.js";
 import GamePage from "views/GamePage/GamePage.js";
 import Dashboard from "views/Dashboard/Dashboard.js";
+import Communications from "views/Communications/Communications.js";
 import WorldSettings from "views/WorldSettings/WorldSettings.js"
 import UserSettings from "views/UserSettings/UserSettings.js"
 import MapEditor from "views/MapEditor/MapEditor.js"
@@ -26,6 +27,7 @@ export default () => (
       <Route path="/profile-page" component={ProfilePage} />
       <Route path="/login-page" component={LoginPage} />
       <Route path="/dashboard" component={Dashboard}></Route>
+      <Route path="/coms" component={Communications}></Route>
       <Route path="/world_settings" component={WorldSettings}></Route>
       <Route path="/user_settings" component={UserSettings}></Route>
       <Route path="/map_editor" component={MapEditor}></Route>

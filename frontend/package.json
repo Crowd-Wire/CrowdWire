@@ -7,6 +7,7 @@
   "dependencies": {
     "@material-ui/core": "4.10.0",
     "@material-ui/icons": "4.9.1",
+    "babel-loader": "^8.1.0",
     "bootstrap": "^4.6.0",
     "classnames": "2.2.6",
     "history": "4.10.1",
@@ -24,6 +25,7 @@
     "react-scripts": "3.4.1",
     "react-slick": "0.26.1",
     "react-swipeable-views": "0.13.9",
+    "react-toastify": "^7.0.3",
     "redux": "^4.0.5"
   },
   "devDependencies": {
