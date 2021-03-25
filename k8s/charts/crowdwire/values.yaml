@@ -1,0 +1,37 @@
+# Global Values, if any is required
+global: 
+  frontend:
+      exposePort: 80
+  api:
+      exposePort: 80
+
+postgresql:
+  enabled: true
+
+redis:
+  enabled: true
+
+rabbitmq:
+  enabled: true
+
+api:
+  enabled: true 
+
+frontend:
+  enabled: true
+
+
+#I'll use my own ingress  with the routing to all microservices that will be exposed  and not make it part of this helm chart,
+
+ingress:
+  enabled: true
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
