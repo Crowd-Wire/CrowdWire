@@ -37,7 +37,6 @@ const routes = (isAuth) => [
 		children: [
             { path: "/", element: <LandingPage /> },
             { path: "/login", element: <LoginPage /> },
-            { path: "/dashboard", element: <Dashboard /> },
             { path: "/contacts", element: <ContactUs /> },
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
@@ -45,6 +44,7 @@ const routes = (isAuth) => [
             { path: "/template-components", element: <ComponentsPage /> },
 		],
 	},
+    { path: "/dashboard", element: <Dashboard /> },
     {
 		path: "/user",
 		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
