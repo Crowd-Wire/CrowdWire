@@ -26,23 +26,10 @@ const dashboardRoutes = [];
 
 const useStyles = makeStyles(styles);
 
-export default function LandingPage(props) {
+export default function LandingPage() {
   const classes = useStyles();
-  const { ...rest } = props;
   return (
     <div>
-      <Header
-        color="transparent"
-        routes={dashboardRoutes}
-        brand="Material Kit React"
-        rightLinks={<HeaderLinks />}
-        fixed
-        changeColorOnScroll={{
-          height: 400,
-          color: "white"
-        }}
-        {...rest}
-      />
       <Parallax filter image={require("assets/img/landing-bg.jpg")}>
         <div className={classes.container}>
           <GridContainer>
