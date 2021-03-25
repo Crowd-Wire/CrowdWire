@@ -148,8 +148,8 @@ export default function MiniDrawer() {
             </ListItem>
         </List>
       </Drawer>
-      {/* <DashboardContent/> */}
-      <SearchAllMaps/>
+      <DashboardContent/>
+      {/* <SearchAllMaps/> */}
     </div>
   );
 }

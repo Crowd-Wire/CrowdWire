@@ -36,7 +36,7 @@ class DashboardContent extends Component{
                             </div>
                         </Col>
                         <Col xs={1} sm={1} md={1}></Col>
-                        <Col xs={1} sm={1} md={1}><CancelIcon style={{width:"40px", height:"40px"}}/></Col>
+                        <Col xs={1} sm={1} md={1}><CancelIcon style={{fontSize:"2rem"}}/></Col>
                     </Row>
 
                     <Row style={{minHeight:"39%", marginTop:"1%", width:"100%"}}>
@@ -47,4 +47,3 @@ class DashboardContent extends Component{
     }
 }
 export default DashboardContent;
-// backgroundColor: '#5BC0BE',
