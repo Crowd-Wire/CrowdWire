@@ -1,16 +1,11 @@
 import React from "react";
-import classNames from "classnames";
 import { makeStyles } from "@material-ui/core/styles";
 import { Typography } from "@material-ui/core";
 import Container from 'react-bootstrap/Container';
-import GroupIcon from '@material-ui/icons/Group';
-import PeopleOutlinedIcon from '@material-ui/icons/PeopleOutlined';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import Grid from '@material-ui/core/Grid';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 import TextField from '@material-ui/core/TextField';
 
 const useStyles = makeStyles((theme) => ({

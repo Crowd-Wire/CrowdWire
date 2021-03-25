@@ -5,7 +5,6 @@ import Drawer from '@material-ui/core/Drawer';
 
 import List from '@material-ui/core/List';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -15,7 +14,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { MapOutlined, Public, Settings } from '@material-ui/icons';
 import DashboardContent from 'views/Dashboard/sections/DashboardContent.js';
-import SearchAllMaps from 'views/Dashboard/sections/SearchAllMaps.js';
 
 const drawerWidth = 240;
 

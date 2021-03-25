@@ -1,9 +1,6 @@
 import React, { Component } from "react";
-import classNames from "classnames";
-import { makeStyles } from "@material-ui/core/styles";
+
 import { Typography } from "@material-ui/core";
-import Container from 'react-bootstrap/Container';
-import GroupIcon from '@material-ui/icons/Group';
 import CancelIcon from '@material-ui/icons/Cancel';
 import PeopleOutlinedIcon from '@material-ui/icons/PeopleOutlined';
 import Row from 'react-bootstrap/Row';
