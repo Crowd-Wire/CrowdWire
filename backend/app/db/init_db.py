@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
-
+from sqlalchemy import event
 import app.crud, app.schemas
 from app.core.config import settings
 from .base import Base
@@ -16,11 +16,19 @@ def init_db(db: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
     # the tables un-commenting the next line
-    # TODO: change this so that tables are created with alembic
-    engine.execute(CreateSchema(settings.SCHEMA_NAME))
+    # TODO: change this so that tables are created with alembic 
+
+    #Check Database Schema Creation
+    if not engine.dialect.has_schema(engine, schema=settings.SCHEMA_NAME):
+        event.listen(Base.metadata, 'before_create', CreateSchema(settings.SCHEMA_NAME))
+
+    Base.metadata.reflect(bind=engine, schema=settings.SCHEMA_NAME)
+    Base.metadata.create_all(engine, checkfirst=True)
+
+    #engine.execute(CreateSchema(settings.SCHEMA_NAME))
 
 
-    Base.metadata.create_all(bind=engine)
+    #Base.metadata.create_all(bind=engine)
 
 
     """
