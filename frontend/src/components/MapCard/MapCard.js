@@ -6,13 +6,8 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
-
-
 import Typography from '@material-ui/core/Typography';
 import Col from 'react-bootstrap/Col';
-
-import InputAdornment from '@material-ui/core/InputAdornment';
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -31,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
       },
 }));
 
-export default function MapCard(){
+export default function MapCard(props){
     const classes = useStyles();
     return(
         <>
@@ -53,7 +48,7 @@ export default function MapCard(){
                 </CardContent>
                 </CardActionArea>
                 <CardActions>
-                <Button size="small" color="primary">
+                <Button onClick={() => props.focusMap()} size="small" color="primary">
                     Enter
                 </Button>
                 <Button size="small" color="primary">

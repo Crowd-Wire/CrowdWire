@@ -5,8 +5,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import TextField from '@material-ui/core/TextField';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const useStyles = makeStyles((theme) => ({
     actionButtons:{
@@ -47,14 +47,14 @@ export default function DashboardContent(){
                         <Container style={{height:"60%",overflowY:"scroll"}}>
                             <Row style={{marginBottom:"2%", borderRadius:"10% / 50%" ,alignContent:"center", background:"linear-gradient(to right, rgba(255,255,255,1),transparent", height:"33%",width:"95%"}}>
                                 <Col xs={2} sm={2} md={2} lg={2} style={{alignSelf:"initial",height:"100%", alignContent:"initial"}}>
-                                    <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
+                                    <img alt="" src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
                                 </Col>
                                 <Col xs={1} sm={1} md={1} lg={1}></Col>
                                 <Col xs={8} sm={8} md={8} lg={8}><Typography>Mateus Silva</Typography></Col>
                             </Row>
                             <Row style={{marginBottom:"2%", borderRadius:"10% / 50%" ,alignContent:"center", background:"linear-gradient(to right, rgba(255,255,255,1),transparent", height:"33%",width:"95%"}}>
                                 <Col xs={2} sm={2} md={2} lg={2} style={{alignSelf:"initial",height:"100%", alignContent:"initial"}}>
-                                    <img src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
+                                    <img alt="" src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
                                 </Col>
                                 <Col xs={1} sm={1} md={1} lg={1}></Col>
                                 <Col xs={8} sm={8} md={8} lg={8}><Typography>Mateus Silva</Typography></Col>
