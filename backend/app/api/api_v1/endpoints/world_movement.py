@@ -2,6 +2,8 @@ from typing import Dict, List, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, APIRouter
 
+
+
 """
 Class used to Manage the WebSocket Connections, to each World
 """
@@ -18,7 +20,6 @@ class ConnectionManager:
 
     async def connect(self, world_id: int, websocket: WebSocket):
         await websocket.accept()
-        print("teste", self.active_connections)
 
         if world_id not in self.active_connections:
             self.active_connections[world_id] = [websocket]
@@ -42,12 +43,12 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@router.websocket('/{world_id}')
+@router.websocket('/{world_id}',)
 async def world_movement(websocket: WebSocket, world_id: int) -> Any:
     await manager.connect(world_id,websocket)
     try:
         while True:
-            data = await websocket.receive_text()
+            data = await websocket.receive_json()
             await manager.send_personal_message(f"You wrote: {data}", websocket)
             await manager.broadcast(world_id, f"World id #{websocket} says: {data}")
     except WebSocketDisconnect:

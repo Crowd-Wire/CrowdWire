@@ -5,7 +5,7 @@ from app.crud import crud_users
 from app.api import dependencies as deps
 from typing import Any
 from fastapi import HTTPException
-
+from loguru import  logger
 router = APIRouter()
 
 @router.get("/", tags=["users"])
