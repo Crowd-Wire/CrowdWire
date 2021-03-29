@@ -9,7 +9,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -26,7 +26,14 @@ const useStyles = makeStyles((theme) => ({
       },
 }));
 
+
 export default function MapCard(props){
+    const history = useHistory();
+    
+    const routeChange = () =>{ 
+      let path = `App`; 
+      history.push(path);
+    }
     const classes = useStyles();
     return(
         <>
@@ -48,10 +55,10 @@ export default function MapCard(props){
                 </CardContent>
                 </CardActionArea>
                 <CardActions>
-                <Button onClick={() => props.focusMap()} size="small" color="primary">
+                <Button  to="/App" size="small" color="primary" onClick={routeChange}>
                     Enter
                 </Button>
-                <Button size="small" color="primary">
+                <Button onClick={() => props.focusMap()} size="small" color="primary">
                     More Details
                 </Button>
                 </CardActions>
