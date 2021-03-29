@@ -1,7 +1,7 @@
 import { useState } from "react";
 import videoCall from "../consts/videoCall";
 
-function useCheckMediaAccess() {
+export function useCheckMediaAccess() {
     const [access, setAccess] = useState(false);
 
     navigator.mediaDevices.enumerateDevices().then(devices => {
@@ -38,12 +38,11 @@ function useCheckMediaAccess() {
     return access;
 }
 
-function getVideoAudioStream(video=true, audio=true) {
+export function getVideoAudioStream(video=true, audio=true) {
     let quality = videoCall.VIDEO_QUALITY;
     if (quality) quality = parseInt(quality);
     // @ts-ignore
-    const myNavigator = navigator.mediaDevices.getUserMedia || navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia || navigator.mediaDevices.msGetUserMedia;
-    return myNavigator({
+    return navigator.mediaDevices.getUserMedia({
         video: video ? {
             frameRate: quality ? quality : 12,
             noiseSuppression: true,
