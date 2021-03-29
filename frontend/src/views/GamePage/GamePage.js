@@ -1,8 +1,10 @@
 import React from "react";
 
+import classNames from 'classnames';
+
 import { connect } from "react-redux";
 
-import gameUI from "consts/gameUI";
+import gameUITypes from "consts/gameUITypes";
 // import { toggleGameUI } from "redux/store";
 
 import Phaser from "./Sections/Phaser";
@@ -17,28 +19,23 @@ const gameUIStyle = {
   zIndex: 2,
 }
 
-class Game extends React.Component {
+
+class GamePage extends React.Component {
 
   constructor(props) {
     super(props);
   }
 
-  componentDidMount() {
-    const uiRoot = document.getElementById('uiRoot');
-    for (const eventName of ['mousedown', 'mouseup']){
-        uiRoot.addEventListener(eventName, e => e.stopPropagation());
-    }
-  }
-  
   render() {
+    const { classes } = this.props;
     let componentUI = <MapUI />;
 
     if (this.props) {
-      switch(this.props.activeUI) {
-        case gameUI.MAP:
+      switch (this.props.activeUI) {
+        case gameUITypes.MAP:
           componentUI = <MapUI />;
           break;
-        case gameUI.MAP_EDITOR:
+        case gameUITypes.MAP_EDITOR:
           componentUI = <MapEditorUI />;
           break;
       }
@@ -71,5 +68,5 @@ const mapStateToProps = (state) => ({
 //   toggleGameUI: () => dispatch(toggleGameUI),
 // });
 
-export default connect(mapStateToProps)(Game);
+export default connect(mapStateToProps)(GamePage);
 

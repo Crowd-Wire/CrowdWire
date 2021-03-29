@@ -11,6 +11,9 @@ class Phaser extends React.Component {
   
   componentDidMount() {
     Game.setupGame();
+    // window.addEventListener('resize', () => {
+    //   game.resize(window.innerWidth, window.innerHeight);
+    // });
   }
 
   shouldComponentUpdate() {
@@ -19,7 +22,8 @@ class Phaser extends React.Component {
 
   render() {
     return (
-      <div id="game-container"></div>
+      <div id="game-container" style={{
+       }}>{/*style={{pointerEvents: "none", display: "none"}}>*/}</div>
     );
   }
 }

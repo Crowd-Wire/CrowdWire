@@ -1,7 +1,7 @@
-import gameUI from "consts/gameUI";
+import gameUITypes from "consts/gameUITypes";
 import { createStore } from "redux";
 
-const initState = { activeUI: gameUI.MAP };
+const initState = { activeUI: gameUITypes.MAP };
 
 // action types
 const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
