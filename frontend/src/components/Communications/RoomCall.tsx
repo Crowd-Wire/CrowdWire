@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, createRef, useState } from 'react';
 
 import { ToastContainer } from 'react-toastify';
 // Icons imports
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Button } from '@material-ui/core';
 import CallIcon from '@material-ui/icons/CallEnd';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -14,8 +14,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import videoCall from "../../consts/videoCall";
 import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
-import { VoiceSettings } from "./VoiceSettings.js";
 import { useCheckMediaAccess } from "../../utils/checkMediaAccess.js";
+import { DeviceSettings } from "./DeviceSettings";
 
 interface State {
   micStatus: boolean;
@@ -37,7 +37,7 @@ export default class RoomCall extends React.Component<{}, State> {
       chatToggle: false,
       displayStream: false,
       messages: [],
-      numberUsers: 9
+      numberUsers: 4
     }
     this.chatHandle = this.chatHandle.bind(this);
     this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
@@ -211,7 +211,8 @@ export default class RoomCall extends React.Component<{}, State> {
       this.videoRef.current.play()
     }
   }
-    
+
+  
   render () {
     return (
       <React.Fragment>
@@ -233,7 +234,7 @@ export default class RoomCall extends React.Component<{}, State> {
           <ChatIcon></ChatIcon>
         </div>
 
-        <button onClick={this.setNavigatorToStream}>PRess me</button>
+        <Button onClick={this.setNavigatorToStream}>Add Component</Button>
 
           <Carousel
             justify-content={"center"}
@@ -241,25 +242,23 @@ export default class RoomCall extends React.Component<{}, State> {
             rows={this.state.numberUsers > 6 ? 2 : 1}
             gap={2}
             loop={false}
-            showDots={true}
-            responsiveLayout={[
-              {
-                breakpoint: 800,
-                cols: this.state.numberUsers > 3 ? 3 : this.state.numberUsers,
-                rows: this.state.numberUsers > 3 ? 2 : 1,
-                gap: 2,
-                loop: false,
-                autoplay: 1000
-              }
-            ]}
+            showDots={this.state.numberUsers > 12 ? true : false}
+            // responsiveLayout={[
+            //   {
+            //     breakpoint: 800,
+            //     cols: this.state.numberUsers > 3 ? 3 : this.state.numberUsers,
+            //     rows: this.state.numberUsers > 3 ? 2 : 1,
+            //     gap: 2,
+            //     loop: false,
+            //     autoplay: 1000
+            //   }
+            // ]}
             mobileBreakpoint={600}
           >
 
             { this.state.numberUsers > 0 && Object.keys(this.users).map((key, index) => ( 
               <Carousel.Item key={index}>
-                <div>
-                  <video width="100%" id={key} ref={this.videoRef}></video>
-                </div>
+                <video width="100%" id={key} ref={this.videoRef}/>
               </Carousel.Item>
             ))}
 
@@ -276,8 +275,8 @@ export default class RoomCall extends React.Component<{}, State> {
               <img width="100%" src="https://picsum.photos/800/600?random=4" />
             </Carousel.Item>
           </Carousel>
-        <VoiceSettings />
 
+        <DeviceSettings />
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 
