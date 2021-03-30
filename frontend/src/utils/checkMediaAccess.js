@@ -1,25 +1,10 @@
-import { useState } from "react";
 import videoCall from "../consts/videoCall";
 
-export function useCheckMediaAccess() {
-    const [access, setAccess] = useState(false);
-
-    navigator.mediaDevices.enumerateDevices().then(devices => {
-        let audio = false, video = false;
-        devices.forEach(device => {
-            if (device.kind === 'audioinput' && device.deviceId) audio = true;
-            if (device.kind === 'videoinput' && device.deviceId) video = true;
-        });
-        if (audio && video) {
-            setAccess(true);
-            return;
-        }
-        if (!audio) getMedia('audio').then(() => {audio = true; if(audio && video) setAccess(true)});
-        if (!video) getMedia('video').then(() => {video = true; if(audio && video) setAccess(true)});
-    });
+export async function useCheckMediaAccess() {
+    var accessVideo = false, accessMic = false;
 
     const getMedia = (mediaType='') => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             navigator.getUserMedia({[mediaType]: true}, 
                 (stream) => {
                     stream.getTracks().map((track) => {
@@ -29,16 +14,33 @@ export function useCheckMediaAccess() {
                     console.log(mediaType, ' access granted');
                 }, 
                 (err) => {
-                    reject();
+                    resolve(false);
                     console.log('Error', err);
                 });
         })
     }
 
-    return access;
+    return new Promise((resolve, reject) => {
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+            devices.forEach(device => {
+                if (device.kind === 'videoinput' && device.deviceId) accessVideo = true;
+                if (device.kind === 'audioinput' && device.deviceId) accessMic = true;
+            });
+            if (!accessVideo) getMedia('video').then((access) => accessVideo = access ).then(() => {
+                if (!accessMic) {
+                    getMedia('audio').then((access) => {
+                        accessMic = access;
+                        resolve([accessVideo, accessMic]);
+                    } ) 
+                } else {
+                    resolve([accessVideo, accessMic])
+                }
+            })
+        })
+    })
 }
 
-export function getVideoAudioStream(video=true, audio=true) {
+function getVideoAudioStream(video=true, audio=true) {
     let quality = videoCall.VIDEO_QUALITY;
     if (quality) quality = parseInt(quality);
     // @ts-ignore

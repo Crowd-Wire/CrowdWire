@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, createRef, useState } from 'react';
 
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 // Icons imports
 import { CircularProgress, Button } from '@material-ui/core';
 import CallIcon from '@material-ui/icons/CallEnd';
@@ -17,10 +17,14 @@ import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
 
+import logo from '../../assets/crowdwire_white_logo.png';
+
 interface State {
   micStatus: boolean;
   camStatus: boolean;
   streaming: boolean;
+  accessMic: boolean;
+  accessVideo: boolean;
   chatToggle: boolean;
   displayStream: boolean;
   messages: Array<string>;
@@ -36,6 +40,8 @@ export default class RoomCall extends React.Component<{}, State> {
       streaming: false,
       chatToggle: false,
       displayStream: false,
+      accessMic: false,
+      accessVideo: false,
       messages: [],
       numberUsers: 4
     }
@@ -195,7 +201,41 @@ export default class RoomCall extends React.Component<{}, State> {
   }
 
   componentDidMount() {
-    this.setNavigatorToStream();
+    useCheckMediaAccess().then( (data) => {
+      this.setState({
+        accessVideo: data[0],
+        accessMic: data[1]
+      })
+      console.log(data)
+      if (this.state.accessMic) {
+        toast.dark(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          Microphone Access Granted
+        </span>
+        ,{
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          pauseOnHover: false,
+          progress: undefined,
+        });
+      }
+      if (this.state.accessVideo) {
+        toast.dark('Video Access Granted', {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+          pauseOnHover: false,
+          progress: undefined,
+        });
+      }
+      this.setNavigatorToStream();
+    });
   }
 
   componentDidUpdate() {
@@ -244,8 +284,8 @@ export default class RoomCall extends React.Component<{}, State> {
             loop={false}
             showDots={this.state.numberUsers > 12 ? true : false}
             // responsiveLayout={[
-            //   {
-            //     breakpoint: 800,
+              //   {
+                //     breakpoint: 800,
             //     cols: this.state.numberUsers > 3 ? 3 : this.state.numberUsers,
             //     rows: this.state.numberUsers > 3 ? 2 : 1,
             //     gap: 2,
@@ -294,7 +334,7 @@ export default class RoomCall extends React.Component<{}, State> {
           rtl={false}
           pauseOnFocusLoss
           draggable
-          pauseOnHover
+          pauseOnHover={false}
         />
       </React.Fragment>
     );

@@ -45,58 +45,62 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 			<Card>
         <CardBody>
           <h4>Device's Settings</h4>
-          <p>
-           
-            <span>Video Devices:</span>
-              {optionsCamera.length === 0 ? <div>no cameras available</div> : null}
-              {optionsCamera.length ? (
-                <select
-                  value={micId}
-                  onChange={(e) => {
-                    const id = e.target.value;
-                    setCamId(id);
-                  }}
-                >
-                  {optionsCamera.map((x) =>
-                    !x ? null : (
-                      <option key={x.id} value={x.id}>
-                        {x.label}
-                      </option>
-                    )
-                  )}
-                </select>
-              ) : null}
+          
+          <br/>
+          
+          <span>Video Devices:</span>
+            {optionsCamera.length === 0 ? <div>no cameras available</div> : null}
+            {optionsCamera.length ? (
+              <select
+                value={micId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  setCamId(id);
+                }}
+              >
+                {optionsCamera.map((x) =>
+                  !x ? null : (
+                    <option key={x.id} value={x.id}>
+                      {x.label}
+                    </option>
+                  )
+                )}
+              </select>
+            ) : null}
 
-            <br />
+          <br />
 
-              <span>Audio Devices:</span>
-              {optionsMic.length === 0 ? <div>no mics available</div> : null}
-              {optionsMic.length ? (
-                <select
-                  value={micId}
-                  onChange={(e) => {
-                    const id = e.target.value;
-                    setMicId(id);
-                  }}
-                >
-                  {optionsMic.map((x) =>
-                    !x ? null : (
-                      <option key={x.id} value={x.id}>
-                        {x.label}
-                      </option>
-                    )
-                  )}
-                </select>
-              ) : null}
+          <span>Audio Devices:</span>
+          {optionsMic.length === 0 ? <div>no mics available</div> : null}
+          {optionsMic.length ? (
+            <select
+              value={micId}
+              onChange={(e) => {
+                const id = e.target.value;
+                setMicId(id);
+              }}
+            >
+              {optionsMic.map((x) =>
+                !x ? null : (
+                  <option key={x.id} value={x.id}>
+                    {x.label}
+                  </option>
+                )
+              )}
+            </select>
+          ) : null}
 
-              <div className={`mt-8 mb-2`}>
-                Microphone Volume
-              </div>
-              <div className={`mb-8`}>
-                <VolumeSlider volume={volume} onVolume={(n) => setVolume(n)} />
-              </div>
+          <br />
 
-            </p>
+          <div className={`mt-8 mb-2`}>
+            Microphone Volume
+          </div>
+          <div className={`mb-8`}>
+            <VolumeSlider volume={volume} onVolume={(n) => setVolume(n)} />
+          </div>
+
+          <br />
+
           <Button color="primary">Save</Button>
         </CardBody>
       </Card>
