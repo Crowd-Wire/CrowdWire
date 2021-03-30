@@ -1,7 +1,6 @@
 """
 Source : https://gist.github.com/nkhitrov/a3e31cfcc1b19cba8e1b626276148c49
-Configure handlers and formats for application loggers.
-"""
+Configure handlers and formats for application loggers."""
 import logging
 import sys
 from pprint import pformat
