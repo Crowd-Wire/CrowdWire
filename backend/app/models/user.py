@@ -8,10 +8,6 @@ from .friend import friends
 from .friend_request import friend_request
 
 
-
-#TODO: datetime, default values..
-
-
 class User(Base):
 
     user_id = Column(Integer, primary_key=True, index=True)
@@ -26,7 +22,7 @@ class User(Base):
     # Many to Many relation with itself
     # TODO: might need schema name before user
     friends = relationship(
-        'user',
+        'User',
         secondary=friends,
         primaryjoin=user_id == friends.c.user1_id,
         secondaryjoin=user_id == friends.c.user2_id,
@@ -34,7 +30,7 @@ class User(Base):
 
     # Many to Many relation with itself
     friend_request = relationship(
-        'user',
+        'User',
         secondary=friend_request,
         primaryjoin=user_id == friend_request.c.sender,
         secondaryjoin=user_id == friend_request.c.receiver,
