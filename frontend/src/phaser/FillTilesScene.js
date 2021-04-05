@@ -7,7 +7,8 @@ const sceneConfig = {
 //     backgroundColor: '#2d2d2d',
 //     parent: 'phaser-example',
 //     pixelArt: true,
-    key: 'FillTilesScene'
+    key: 'FillTilesScene',
+    autoResize: true,//n faz nasda
 };
 
 class FillTilesScene extends Phaser.Scene {
@@ -17,21 +18,18 @@ class FillTilesScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('tiles', 'assets/tilemaps/tiles/wall-tiles.png');
-        this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/mymap3.json');
+        this.load.image('tiles2',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wall-tiles.png`)
+        this.load.tilemapTiledJSON('map2', `${process.env.PUBLIC_URL}/assets/tilemaps/maps/mymap3.json`);
     }
 
     create() {
-        this.map = this.add.tilemap('map');
-        let tiles = this.map.addTilesetImage('wall-tiles', 'tiles');
+        
+        this.map = this.add.tilemap('map2');
+        let tiles = this.map.addTilesetImage('wall-tiles', 'tiles2');
 
         let layer = this.map.createLayer('Tile Layer 1', tiles, 0, 0);
 
-
-        this.marker = this.add.graphics();
-        this.marker.lineStyle(2, 0x000000, 1);
-        this.marker.strokeRect(0, 0, 6 * this.map.tileWidth, 6 * this.map.tileHeight);
-
+        
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
 
         let cursors = this.input.keyboard.createCursorKeys();
@@ -74,9 +72,11 @@ class FillTilesScene extends Phaser.Scene {
         // Snap to tile coordinates, but in world space
         this.marker.x = this.map.tileToWorldX(pointerTileX);
         this.marker.y = this.map.tileToWorldY(pointerTileY);
-
-        if (this.input.manager.activePointer.isDown)
+        
+        // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
+        if (this.input.manager.activePointer.isDown && this.input.isOver)
         {
+            console.log("clicou-me primeiro")
             // Fill the tiles within an area with sign posts (tile id = 46)
             this.map.fill(1, pointerTileX, pointerTileY, 6, 6);
         }
