@@ -1,16 +1,10 @@
 import React from "react";
 
-<<<<<<< HEAD
-import { connect } from "react-redux";
-
-import gameUI from "consts/gameUI";
-=======
 import classNames from 'classnames';
 
 import { connect } from "react-redux";
 
 import gameUITypes from "consts/gameUITypes";
->>>>>>> aaeec242d2c54edef72e0dd157061f0979d18e53
 // import { toggleGameUI } from "redux/store";
 
 import Phaser from "./Sections/Phaser";
@@ -74,9 +68,5 @@ const mapStateToProps = (state) => ({
 //   toggleGameUI: () => dispatch(toggleGameUI),
 // });
 
-<<<<<<< HEAD
-export default connect(mapStateToProps)(Game);
-=======
 export default connect(mapStateToProps)(GamePage);
->>>>>>> aaeec242d2c54edef72e0dd157061f0979d18e53
 

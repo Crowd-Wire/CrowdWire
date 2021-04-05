@@ -53,11 +53,7 @@ class MapEditor extends React.Component {
         </div>
         <div style={{backgroundColor: "blue", height: "300px", width: "300px"}}>
           Map Editor
-<<<<<<< HEAD
-          <button onClick={() => this.props.toggleGameUI(gameUI.MAP)}>X CLOSE</button>
-=======
           <button onClick={() => this.props.toggleGameUI(gameUITypes.MAP)}>X CLOSE</button>
->>>>>>> aaeec242d2c54edef72e0dd157061f0979d18e53
         </div>
       </div>
     );
