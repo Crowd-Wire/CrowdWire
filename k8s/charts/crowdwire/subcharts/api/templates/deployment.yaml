@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api.fullname" . }}
+  labels:
+    {{- include "api.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "api.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      #Check out the changes to the Secrets in the Redis, Postgres Charts!
+      #Change this later to a for loop, puting here the values destroys the idea of templating
+      {{- if and .Values.postgresql.enabled .Values.rabbitmq.enabled }}
+        - env:
+          - name: POSTGRES_USER
+            valueFrom:
+              secretKeyRef:
+                key: postgresql-user
+                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: postgresql-password
+                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+          - name: POSTGRES_DB
+            valueFrom:
+              secretKeyRef:
+                key: postgresql-db
+                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+          - name: RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-username
+                name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+          - name: RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                  key: rabbitmq-password
+                  name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+          - name: RABBITMQ_ERL_COOKIE
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-erlang-cookie
+                name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}  
+
+      {{- end }}   
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
