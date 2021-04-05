@@ -16,6 +16,8 @@ import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
+import { changeMicID } from "../../redux/store.js";
+import store from "../../redux/store.js";
 
 import logo from '../../assets/crowdwire_white_logo.png';
 
@@ -43,7 +45,7 @@ export default class RoomCall extends React.Component<{}, State> {
       accessMic: false,
       accessVideo: false,
       messages: [],
-      numberUsers: 4
+      numberUsers: 0
     }
     this.chatHandle = this.chatHandle.bind(this);
     this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
@@ -54,6 +56,7 @@ export default class RoomCall extends React.Component<{}, State> {
     this.checkAndAddClass = this.checkAndAddClass.bind(this);
     this.replaceStream = this.replaceStream.bind(this);
     this.updateVideoStream = this.updateVideoStream.bind(this);
+    this.getMyVideo = this.getMyVideo.bind(this);
   }
   myID: string = '12';
   users: { [key: string]: CreateVideo } = {};
@@ -69,45 +72,46 @@ export default class RoomCall extends React.Component<{}, State> {
     this.getVideoAudioStream().then((stream:MediaStream) => {
       if (stream) {
         this.setState({streaming: true});
-        this.createVideo({ id: this.myID + this.state.numberUsers.toString(), stream });
+        if (this.state.numberUsers == 0) this.createVideo({ id: this.myID, stream });
+        else this.createVideo({ id: this.myID + this.state.numberUsers.toString(), stream });
       }
     })
   }
   
   getVideoAudioStream = (video:boolean=true, audio:boolean=true) => {
-      let quality = videoCall.quality;
-      if (quality) quality = parseInt(quality);
+    let quality = videoCall.quality;
+    if (quality) quality = parseInt(quality);
 
-      return navigator.mediaDevices.getUserMedia({
-          video: video ? {
-              frameRate: quality ? quality : 12,
-              noiseSuppression: true,
-              width: {min: 640, ideal: 1280, max: 1920},
-              height: {min: 480, ideal: 720, max: 1080}
-          } : false,
-          audio: audio,
-      });
+    return navigator.mediaDevices.getUserMedia({
+      video: video ? {
+        frameRate: quality ? quality : 12,
+        noiseSuppression: true,
+        width: {min: 640, ideal: 1280, max: 1920},
+        height: {min: 480, ideal: 720, max: 1080}
+      } : false,
+      audio: audio,
+    });
   }
   
   
   reInitializeStream = (video:boolean, audio:boolean, type:string='userMedia') => {
     // @ts-ignore
-      const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : window.navigator.mediaDevices.getDisplayMedia();
-      return new Promise((resolve) => {
-        media.then((stream:MediaStream) => {
-              // @ts-ignore
-              const myVideo = getMyVideo();
-              if (type === 'displayMedia') {
-                this.toggleVideoTrack({audio, video});
-                this.listenToEndStream(stream, {video, audio});
-                //socket.emit('display-media', true);
-              }
-              this.checkAndAddClass(myVideo, type);
-              this.createVideo({ id: this.myID, stream });
-              this.replaceStream(stream);
-              resolve(true);
-            });
+    const media = type === 'userMedia' ? this.getVideoAudioStream(video, audio) : window.navigator.mediaDevices.getDisplayMedia();
+    return new Promise((resolve) => {
+      media.then((stream:MediaStream) => {
+            // @ts-ignore
+            const myVideo = this.getMyVideo();
+            if (type === 'displayMedia') {
+              this.toggleVideoTrack({audio, video});
+              this.listenToEndStream(stream, {video, audio});
+              //socket.emit('display-media', true);
+            }
+            this.checkAndAddClass(myVideo, type);
+            this.createVideo({ id: this.myID, stream });
+            this.replaceStream(stream);
+            resolve(true);
           });
+        });
   }
   
   removeVideo = (id:string) => {
@@ -192,7 +196,6 @@ export default class RoomCall extends React.Component<{}, State> {
       };
       this.setState({numberUsers: this.state.numberUsers + 1});
     } else {
-        console.log("here")
         //@ts-ignore
         document.getElementById(createObj.id).srcObject = createObj.stream;
         //@ts-ignore
@@ -201,6 +204,11 @@ export default class RoomCall extends React.Component<{}, State> {
   }
 
   componentDidMount() {
+
+    store.subscribe((changeMicID) => {
+      console.log("store subscription worked")
+    })
+
     useCheckMediaAccess().then( (data) => {
       this.setState({
         accessVideo: data[0],
@@ -224,7 +232,12 @@ export default class RoomCall extends React.Component<{}, State> {
         });
       }
       if (this.state.accessVideo) {
-        toast.dark('Video Access Granted', {
+        toast.dark(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Video Access Granted
+          </span>
+          , {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -235,6 +248,8 @@ export default class RoomCall extends React.Component<{}, State> {
         });
       }
       this.setNavigatorToStream();
+    }).catch((err)=> {
+      console.log(err)
     });
   }
 
@@ -273,14 +288,19 @@ export default class RoomCall extends React.Component<{}, State> {
         <div onClick={() => this.chatHandle(!this.state.chatToggle)} title="Chat">
           <ChatIcon></ChatIcon>
         </div>
-
         <Button onClick={this.setNavigatorToStream}>Add Component</Button>
+        <Button onClick={() => this.reInitializeStream(true, true)}>Re-initialize Stream</Button>
+        <Button onClick={() => this.toggleAudioTrack({video:true, audio:true})}>Re-initialize Stream</Button>
+        <Button onClick={() => this.toggleVideoTrack({video:!this.state.camStatus, audio:this.state.micStatus})}>Re-initialize Stream</Button>
 
+
+        { this.state.numberUsers > 0 ?
+          (
           <Carousel
             justify-content={"center"}
             cols={this.state.numberUsers > 6 ? 6 : this.state.numberUsers}
             rows={this.state.numberUsers > 6 ? 2 : 1}
-            gap={2}
+            gap={10}
             loop={false}
             showDots={this.state.numberUsers > 12 ? true : false}
             // responsiveLayout={[
@@ -296,26 +316,14 @@ export default class RoomCall extends React.Component<{}, State> {
             mobileBreakpoint={600}
           >
 
-            { this.state.numberUsers > 0 && Object.keys(this.users).map((key, index) => ( 
+            { Object.keys(this.users).map((key, index) => ( 
               <Carousel.Item key={index}>
                 <video width="100%" id={key} ref={this.videoRef}/>
               </Carousel.Item>
             ))}
-
-            <Carousel.Item>
-              <img width="100%" src="https://picsum.photos/800/600?random=1" />
-            </Carousel.Item>
-            <Carousel.Item>
-              <img width="100%" src="https://picsum.photos/800/600?random=2" />
-            </Carousel.Item>
-            <Carousel.Item>
-              <img width="100%" src="https://picsum.photos/800/600?random=3" />
-            </Carousel.Item>
-            <Carousel.Item>
-              <img width="100%" src="https://picsum.photos/800/600?random=4" />
-            </Carousel.Item>
+            
           </Carousel>
-
+          ) : '' }
         <DeviceSettings />
 
         <ChatBox 
@@ -336,6 +344,7 @@ export default class RoomCall extends React.Component<{}, State> {
           draggable
           pauseOnHover={false}
         />
+        
       </React.Fragment>
     );
   }

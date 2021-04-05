@@ -1,5 +1,6 @@
 import videoCall from "../consts/videoCall";
 
+
 export async function useCheckMediaAccess() {
     var accessVideo = false, accessMic = false;
 
@@ -26,7 +27,18 @@ export async function useCheckMediaAccess() {
                 if (device.kind === 'videoinput' && device.deviceId) accessVideo = true;
                 if (device.kind === 'audioinput' && device.deviceId) accessMic = true;
             });
-            if (!accessVideo) getMedia('video').then((access) => accessVideo = access ).then(() => {
+            if (!accessVideo){
+                getMedia('video').then((access) => accessVideo = access ).then(() => {
+                    if (!accessMic) {
+                        getMedia('audio').then((access) => {
+                            accessMic = access;
+                            resolve([accessVideo, accessMic]);
+                        } ) 
+                    } else {
+                        resolve([accessVideo, accessMic])
+                    }
+                })
+            } else {
                 if (!accessMic) {
                     getMedia('audio').then((access) => {
                         accessMic = access;
@@ -35,7 +47,7 @@ export async function useCheckMediaAccess() {
                 } else {
                     resolve([accessVideo, accessMic])
                 }
-            })
+            }
         })
     })
 }
