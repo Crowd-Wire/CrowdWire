@@ -26,7 +26,9 @@
     "react-scripts": "3.4.1",
     "react-slick": "0.26.1",
     "react-swipeable-views": "0.13.9",
-    "redux": "^4.0.5"
+    "redux": "^4.0.5",
+    "socket.io": "^4.0.1",
+    "socket.io-client": "^4.0.1"
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",

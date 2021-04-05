@@ -3,7 +3,6 @@ from typing import Dict, List, Any
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, APIRouter
 from loguru import logger
 
-
 """
 Class used to Manage the WebSocket Connections, to each World
 """

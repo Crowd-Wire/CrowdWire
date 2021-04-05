@@ -1,28 +1,36 @@
 import gameUITypes from "consts/gameUITypes";
 import { createStore } from "redux";
 
-const initState = { activeUI: gameUITypes.MAP };
+const initState = { activeUI: gameUITypes.MAP, playerPos: [0, 0] };
 
-// action types
-const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
+/* Action Types */
+export const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
+export const SEND_PLAYER_POS = "SEND_PLAYER_POS";
 
-// action creators
+
+/* Action Creators */
 export const toggleGameUI = (activeUI) => ({
   type: TOGGLE_GAME_UI,
   activeUI
 });
+export const sendPlayerPosition = (playerPos) => ({
+  type: SEND_PLAYER_POS,
+  playerPos
+});
 
-// reducer
+/* Reducer */
 const reducer = (state = initState, action) => {
   switch (action.type) {
     case TOGGLE_GAME_UI:
       return { ...state, activeUI: action.activeUI };
+    case SEND_PLAYER_POS:
+      return { ...state, playerPos: action.playerPos };
     default:
       return state;
   }
 };
 
-// store
+/* Store */
 const store = createStore(
   reducer,
   initState

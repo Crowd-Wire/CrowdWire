@@ -2,7 +2,9 @@ import * as Phaser from 'phaser';
 
 import logoImg from '../assets/logo.png';
 
+import {socket} from "services/socket";
 
+var player;
 const sceneConfig = {
     active: false,
     visible: false,
@@ -11,6 +13,7 @@ const sceneConfig = {
 
 class GameScene extends Phaser.Scene {
     flag = 0;
+    PLAYER_NUM = 4;
     
     constructor() {
         super(sceneConfig);
@@ -20,6 +23,29 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+
+        // var Bodies = Phaser.Physics.Matter.Matter.Bodies;
+
+        // var rect = Bodies.rectangle(0, 0, 98, 98);
+        // var circleA = Bodies.circle(-70, 0, 24, { isSensor: true, label: 'left' });
+        // var circleB = Bodies.circle(70, 0, 24, { isSensor: true, label: 'right' });
+        // var circleC = Bodies.circle(0, -70, 24, { isSensor: true, label: 'top' });
+        // var circleD = Bodies.circle(0, 70, 24, { isSensor: true, label: 'bottom' });
+
+        // var compoundBody = Phaser.Physics.Matter.Matter.Body.create({
+        //     parts: [ rect, circleA, circleB, circleC, circleD ],
+        //     inertia: Infinity
+        // });
+
+        // player = this.matter.add.image(0, 0, 'block');
+
+        // player.setExistingBody(compoundBody);
+        // player.setPosition(100, 300);
+
+
+
+
+
         this.add.text(50, 70, "Key D to change scene.")
         this.text = this.add.text(50, 50, `${this.count}`)
 
@@ -33,9 +59,9 @@ class GameScene extends Phaser.Scene {
         obstacles.setCollisionByExclusion([-1]);
 
         this.otherPlayers = [];
-        for (let i = 0; i < 32; i++) {
+        for (let i = 0; i < this.PLAYER_NUM; i++) {
             this.otherPlayers[i] = new OnlinePlayerSprite(this, 50, 60);
-            this.otherPlayers[i].alpha = (i+1)/32;
+            this.otherPlayers[i].alpha = (i+1)/this.PLAYER_NUM;
         }
         this.player = new PlayerSprite(this, 50, 60);
 
@@ -68,8 +94,8 @@ class GameScene extends Phaser.Scene {
         this.flag++;
         this.player.updateMovement();
         
-        this.otherPlayers[31].updateMovement({x: this.player.x, y: this.player.y}, this.flag)
-        for (let i=30; i >= 0; i--) {
+        this.otherPlayers[this.PLAYER_NUM-1].updateMovement({x: this.player.x, y: this.player.y}, this.flag)
+        for (let i=this.PLAYER_NUM-2; i >= 0; i--) {
             this.otherPlayers[i].updateMovement({x: this.otherPlayers[i+1].x, y: this.otherPlayers[i+1].y}, this.flag)
         }
     }
@@ -90,6 +116,20 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         // add sprite to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
+
+        // scene.matter.add.gameObject(this.gameObject, { shape: { type: 'polygon', sides: 8, radius: 64 } })
+
+        let Bodies = Phaser.Physics.Matter.Matter.Bodies;
+        let circle = Bodies.circle(x, y, 32, { isSensor: true, label: 'circle' });
+
+        var compoundBody = Phaser.Physics.Matter.Matter.Body.create({
+            parts: [ circle ],
+            inertia: Infinity
+        });
+
+        console.log(this.body)
+
+        // this.setExistingBody(compoundBody);
 
         // set some default physics properties
         this.setScale(3);
@@ -115,6 +155,8 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
             frameRate: 10,
             repeat: -1
         });
+
+        setInterval(()=>{console.log('a enviar'); socket.send(JSON.stringify(this.body.position));}, 1000)
     }
 
     updateMovement() {
@@ -155,6 +197,10 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
+
+        if (direction.y || direction.x) {
+            
+        }
     }
 }
 

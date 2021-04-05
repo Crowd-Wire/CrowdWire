@@ -381,7 +381,7 @@ class GamePage extends React.Component {
         {/* Game UI */}
         {/* <div id="uiRoot">
           {React.cloneElement(
-            componentUI,cdfds
+            componentUI,
             {style: gameUIStyle}
           )}
         </div> */}
