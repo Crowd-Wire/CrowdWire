@@ -3,12 +3,14 @@ import { createStore } from "redux";
 
 const initState = {
   activeUI: gameUI.MAP,
-  micID: '' 
+  micId: '',
+  camId: ''
 };
 
 // action types
 const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
 const CHANGE_MIC_ID = "CHANGE_MIC_ID";
+const CHANGE_CAM_ID = "CHANGE_CAM_ID";
 
 // action creators
 export const toggleGameUI = (activeUI) => ({
@@ -17,9 +19,15 @@ export const toggleGameUI = (activeUI) => ({
 });
 
 // action change mic ID
-export const changeMicID = (micID) => ({
+export const changeMicId = (micId) => ({
   type: CHANGE_MIC_ID,
-  micID
+  micId
+});
+
+// action change cam ID
+export const changeCamId = (camId) => ({
+  type: CHANGE_CAM_ID,
+  camId
 });
 
 // reducer
@@ -28,7 +36,9 @@ const reducer = (state = initState, action) => {
     case TOGGLE_GAME_UI:
       return { ...state, activeUI: action.activeUI };
     case CHANGE_MIC_ID:
-      return { ...state, micID: action.micID };
+      return { ...state, micId: action.micId };
+    case CHANGE_MIC_ID:
+      return { ...state, camId: action.camId };
     default:
       return state;
   }

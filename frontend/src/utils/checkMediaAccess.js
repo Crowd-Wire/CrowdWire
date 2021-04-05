@@ -1,4 +1,5 @@
 import videoCall from "../consts/videoCall";
+import store from "../redux/store.js";
 
 
 export async function useCheckMediaAccess() {
@@ -52,7 +53,7 @@ export async function useCheckMediaAccess() {
     })
 }
 
-function getVideoAudioStream(video=true, audio=true) {
+export function getVideoAudioStream(video=true, audio=true, camId='', micId=store.getState().micId) {
     let quality = videoCall.VIDEO_QUALITY;
     if (quality) quality = parseInt(quality);
     // @ts-ignore
@@ -60,9 +61,10 @@ function getVideoAudioStream(video=true, audio=true) {
         video: video ? {
             frameRate: quality ? quality : 12,
             noiseSuppression: true,
+            deviceId: camId,
             width: {min: 640, ideal: 1280, max: 1920},
             height: {min: 480, ideal: 720, max: 1080}
         } : false,
-        audio: audio,
+        audio: audio ? {deviceId: micId} : false,
     });
 }
