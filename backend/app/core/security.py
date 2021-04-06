@@ -16,6 +16,10 @@ ALGORITHM = "HS256"
 def create_access_token(
     subject: Union[str, Any], expires_delta: timedelta = None
 ) -> str:
+    """
+    Creates jwt token with expiration date declared in settings
+    """
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -28,8 +32,14 @@ def create_access_token(
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Checks if password matches it's hash
+    """
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
+    """
+    Returns the hash of a password
+    """
     return pwd_context.hash(password)

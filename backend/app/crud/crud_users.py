@@ -13,13 +13,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
+    # Override
     def get(self, db: Session, id: Any) -> Optional[User]:
+        """
+        Retrieve user by user_id
+        """
         return db.query(User).filter(User.user_id == id).first()
 
     def create(self, db: Session, *, new_user: UserCreate) -> User:
         """
-            @param: Session, schemas.user.UserCreate
-            return: models.user.User
+        Creates an User
         """
 
         db_user = User(
@@ -37,6 +40,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     def update(
         self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
     ) -> User:
+        """
+        Updates a given user
+        """
+
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -48,12 +55,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
     def authenticate(self, db: Session, *, email: str, password: str) -> Optional[User]:
-        user = self.get_by_email(db, email=email)
-        if not user:
+        """
+        Authenticates user by comparing password with saved hashed
+        """
+        db_user = self.get_by_email(db, email=email)
+        if not db_user:
             return None
         if not verify_password(password, user.hashed_password):
             return None
-        return user
+        return db_user
 
 
 user = CRUDUser(User)
