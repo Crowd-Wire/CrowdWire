@@ -4,7 +4,7 @@ dependencies:
   version: 10.3.11
 - name: redis
   repository: file://subcharts/redis
-  version: 12.8.3
+  version: 12.9.0
 - name: rabbitmq
   repository: file://subcharts/rabbitmq
   version: 8.11.3
@@ -14,5 +14,5 @@ dependencies:
 - name: frontend
   repository: file://subcharts/frontend
   version: 0.1.0
-digest: sha256:95d7af82daf1b9152250cc86f932a9628a98d525225d7dd64bd342861c311b39
-generated: "2021-03-20T19:11:57.906545002Z"
+digest: sha256:6b055f8896da18f497f9fcbaf2e7fac935514015bde3c9027483dce9ab8e00b0
+generated: "2021-04-02T18:47:29.098800651+01:00"
