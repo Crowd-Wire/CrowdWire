@@ -2,15 +2,15 @@ import gameUITypes from "consts/gameUITypes";
 import { createStore } from "redux";
 
 const initState = {
-  activeUI: gameUI.MAP,
+  activeUI: gameUITypes.MAP,
   micId: '',
-  camId: ''
+  camId: '',
+  playerPos: [0, 0]
 };
 
 /* Action Types */
 const CHANGE_MIC_ID = "CHANGE_MIC_ID";
 const CHANGE_CAM_ID = "CHANGE_CAM_ID";
-const initState = { activeUI: gameUITypes.MAP, playerPos: [0, 0] };
 export const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
 export const SEND_PLAYER_POS = "SEND_PLAYER_POS";
 
