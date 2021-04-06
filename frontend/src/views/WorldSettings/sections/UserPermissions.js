@@ -8,16 +8,10 @@ import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import Favorite from '@material-ui/icons/Favorite';
 import FavoriteBorder from '@material-ui/icons/FavoriteBorder';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
-const GreenCheckbox = withStyles({
-  root: {
-    color: green[400],
-    '&$checked': {
-      color: green[600],
-    },
-  },
-  checked: {},
-})((props) => <Checkbox color="default" {...props} />);
+
 
 export default function UserPermissions() {
   const [state, setState] = React.useState({
@@ -30,13 +24,65 @@ export default function UserPermissions() {
   };
 
   return (
-    <FormGroup row>
-      
-      <FormControlLabel
-        control={<GreenCheckbox checked={state.checkedG} onChange={handleChange} name="checkedG" />}
-        label="Custom color"
-        labelPlacement="start"
-      />
+    <FormGroup style={{height:"100%"}}>
+      <Row style={{height:"100%"}}>
+        <Col md={6}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Deafen"
+              labelPlacement="start"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+          />
+                <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Mute"
+              labelPlacement="start"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+          />
+        </Col>
+        <Col md={6} style={{backgroundColor:"red"}}>
+        <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Global Chat"
+              labelPlacement="start"
+              style={{color:"black", margin:"auto"}}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Edit World Settings"
+              labelPlacement="start"
+              style={{color:"black", margin:"auto"}}
+          />
+        </Col>
+      </Row>
     </FormGroup>
   );
 }

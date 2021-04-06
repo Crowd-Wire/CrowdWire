@@ -7,7 +7,7 @@ import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 
 
 
-export default function TabPanel(props){
+export default function RolePanel(props){
 	const { children, value, index, ...other } = props;
 	console.log(index+","+value+children);
 	return(
@@ -19,7 +19,7 @@ export default function TabPanel(props){
 		{...other}
 		>
 			{value === index && (
-				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", minHeight:"100%", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
+				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", minHeight:"400px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
 					<Col md={3} style = {{borderRight:"1px solid black"}}>
 						<Row style={{ height:"10%"}}>
 							<Typography variant="h5" style={{marginTop:"10px"}}>Roles:</Typography>
@@ -31,7 +31,7 @@ export default function TabPanel(props){
 									<Typography variant="h6">{children}</Typography>
 								</Row>
 								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h6">Speaker</Typography>
+									<Typography variant="h6">Speaker1</Typography>
 								</Row>
 								<Row style={{marginTop:"5px"}}> 
 									<Typography variant="h6">Staff</Typography>
@@ -40,19 +40,25 @@ export default function TabPanel(props){
 									<Typography variant="h6">Admin</Typography>
 								</Row>
 								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h6">Speaker</Typography>
+									<Typography variant="h6">Speaker2</Typography>
+								</Row>
+								<Row style={{marginTop:"5px"}}> 
+									<Typography variant="h6">Speaker3</Typography>
+								</Row>
+								<Row style={{marginTop:"5px"}}> 
+									<Typography variant="h6">Speaker4</Typography>
+								</Row>
+								<Row style={{marginTop:"5px"}}> 
+									<Typography variant="h6">Speaker5</Typography>
 								</Row>
 							</Col>
 						</Row>
-						<hr/>
-						<Row style={{position:"absolute", bottom:"0", height:"15%", width:"100%"}}>
+						<Row style={{position:"absolute", bottom:"0", height:"15%", width:"100%",borderTop:"1px solid black"}}>
 							<Typography variant="h5" style={{margin:"auto"}}><AddIcon/>Add Role</Typography>
 						</Row>
 					</Col>
-					<Col>
-						<Row>
-							<UserPermissions/>				
-						</Row>
+					<Col md={6}>
+						<UserPermissions/>				
 					</Col>
 					<Col>
 						

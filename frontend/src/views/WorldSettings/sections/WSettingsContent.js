@@ -4,7 +4,9 @@ import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import TabPanel from 'views/WorldSettings/sections/TabPanel.js';
+import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
+import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
+import WorldSettingsPanel from 'views/WorldSettings/sections/WorldSettingsPanel.js';
 
 
 class WSettingsContent extends Component {
@@ -33,15 +35,17 @@ class WSettingsContent extends Component {
 					<Row style={{height:"10%"}}>
 						<Typography variant="h5" style={{color:"white"}}>Map: Jungle</Typography>
 					</Row>
-					<Tabs value={this.state.value} onChange={this.changeTab} aria-label="simple tabs example">
-						<Tab label="Item One" {...this.a11yProps(0)} />
-						<Tab label="Item Two" {...this.a11yProps(1)} />
-						<Tab label="Item Three" {...this.a11yProps(2)} />
-					</Tabs>
-					<div>
-						<TabPanel value={this.state.value} index={0}>CHEFAO</TabPanel>
-						<TabPanel value={this.state.value} index={1}>ADMIN</TabPanel>
-						<TabPanel value={this.state.value} index={2}>Boss</TabPanel>	
+					<Row style={{borderTopRightRadius:"10px",borderTopLeftRadius:"10px"}}>
+						<Tabs value={this.state.value} onChange={this.changeTab} style={{fontColor:"white", borderTopRightRadius:"10px",borderTopLeftRadius:"10px", border:"solid 1px black", backgroundColor:"black"}} aria-label="simple tabs example">
+							<Tab label="Role" style={{color:"white"}} {...this.a11yProps(0)} />
+							<Tab label="Kicks/Bans" style={{color:"white"}} {...this.a11yProps(1)} />
+							<Tab label="World Settings" style={{color:"white"}} {...this.a11yProps(2)} />
+						</Tabs>
+					</Row>
+					<div style={{minHeight:"400px", backgroundColor:"red"}}>
+						<RolePanel style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
+						<KickBanPanel value={this.state.value} index={1}>ADMIN</KickBanPanel>
+						<WorldSettingsPanel value={this.state.value} index={2}>Boss</WorldSettingsPanel>	
 					</div>
 			</div>
 		);
