@@ -7,11 +7,8 @@
   "dependencies": {
     "@material-ui/core": "4.10.0",
     "@material-ui/icons": "4.9.1",
-    "@types/react-router": "^5.1.13",
-    "babel-loader": "^8.1.0",
     "bootstrap": "^4.6.0",
     "classnames": "2.2.6",
-    "history": "^5.0.0",
     "moment": "2.26.0",
     "node-sass": "4.14.1",
     "nouislider": "14.5.0",
@@ -23,15 +20,15 @@
     "react-dnd": "^14.0.1",
     "react-dnd-html5-backend": "^14.0.0",
     "react-dom": "16.13.1",
-    "react-grid-carousel": "^1.0.1",
     "react-redux": "^7.2.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
     "react-scripts": "3.4.1",
     "react-slick": "0.26.1",
     "react-swipeable-views": "0.13.9",
-    "react-toastify": "^7.0.3",
-    "redux": "^4.0.5"
+    "redux": "^4.0.5",
+    "socket.io": "^4.0.1",
+    "socket.io-client": "^4.0.1"
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",
@@ -46,7 +43,7 @@
     "prettier": "2.0.5"
   },
   "optionalDependencies": {
-    "typescript": "^3.9.3"
+    "typescript": "3.9.3"
   },
   "scripts": {
     "start": "react-scripts start",

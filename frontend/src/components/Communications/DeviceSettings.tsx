@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 import { VolumeSlider } from "./VolumeSlider";
 import { Button, Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
+import { changeMicId, changeCamId } from "../../redux/store.js";
+import { storeDevice } from "../../redux/store.js";
 
 interface DeviceSettingsProps {}
 
 export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
-  // const { micId, setMicId } = useMicIdStore();
-  const [micId, setMicId] = useState('');
-	const [camId, setCamId] = useState('');
+
+  const [micId, setMicId] = useState(storeDevice.getState().micId);
+	const [camId, setCamId] = useState(storeDevice.getState().camId);
+
   const [optionsMic, setOptionsMic] = useState<
     Array<{ id: string; label: string } | null>
   >([]);
@@ -39,7 +42,6 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
       );
   }, []);
 
-
   return (
     <>
 			<Card>
@@ -52,9 +54,10 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
             {optionsCamera.length === 0 ? <div>no cameras available</div> : null}
             {optionsCamera.length ? (
               <select
-                value={micId}
+                value={storeDevice.getState().camId}
                 onChange={(e) => {
                   const id = e.target.value;
+                  storeDevice.dispatch(changeCamId(id))
                   setCamId(id);
                 }}
               >
@@ -74,16 +77,17 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
           {optionsMic.length === 0 ? <div>no mics available</div> : null}
           {optionsMic.length ? (
             <select
-              value={micId}
+              value={storeDevice.getState().micId}
               onChange={(e) => {
                 const id = e.target.value;
-                setMicId(id);
+                storeDevice.dispatch(changeMicId(id))
+                setMicId(id)
               }}
             >
               {optionsMic.map((x) =>
                 !x ? null : (
                   <option key={x.id} value={x.id}>
-                    {x.label}
+                    {x.label} - {x.id}
                   </option>
                 )
               )}
@@ -101,7 +105,6 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 
           <br />
 
-          <Button color="primary">Save</Button>
         </CardBody>
       </Card>
     </>

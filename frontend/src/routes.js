@@ -18,7 +18,7 @@ import MapEditor from "views/MapEditor/MapEditor.js"
 import FAQs from "views/FAQs/FAQs.js";
 import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
-import NotFound from "views/NotFound/NotFound.js";
+import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 
 /**
