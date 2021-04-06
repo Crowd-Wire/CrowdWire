@@ -19,6 +19,7 @@ import FAQs from "views/FAQs/FAQs.js";
 import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
+import Communications from "views/Communications/Communications";
 
 /**
  * @author Leandro Silva
@@ -40,7 +41,7 @@ const routes = (isAuth) => [
             { path: "/contacts", element: <ContactUs /> },
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
-
+			{ path: "/comms", element: <Communications /> },
             { path: "/template-components", element: <ComponentsPage /> },
 		],
 	},
