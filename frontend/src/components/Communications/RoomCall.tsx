@@ -17,7 +17,7 @@ import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
 import { storeDevice } from "../../redux/store.js";
-
+import { VideoBox } from "./VideoBox"
 import logo from '../../assets/crowdwire_white_logo.png';
 
 interface State {
@@ -45,7 +45,7 @@ export default class RoomCall extends React.Component<{}, State> {
     this.updateVideoStream = this.updateVideoStream.bind(this);
     this.getMyVideo = this.getMyVideo.bind(this);
   }
-  myID: string = '12';
+  myId: string = '12';
   users: { [key: string]: CreateVideo } = {};
   peers: any = {};
   videoRef = createRef<HTMLVideoElement>();
@@ -60,8 +60,8 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
-        if (this.state.numberUsers == 0) this.createVideo({ id: this.myID, stream });
-        else this.createVideo({ id: this.myID + this.state.numberUsers.toString(), stream });
+        if (this.state.numberUsers == 0) this.createVideo({ id: this.myId, stream });
+        else this.createVideo({ id: this.myId + this.state.numberUsers.toString(), stream });
       }
     })
   }
@@ -79,7 +79,7 @@ export default class RoomCall extends React.Component<{}, State> {
               this.listenToEndStream(stream, {video, audio});
               //socket.emit('display-media', true);
             }
-            this.createVideo({ id: this.myID, stream });
+            this.createVideo({ id: this.myId, stream });
             this.replaceStream(stream);
             resolve(true);
           });
@@ -92,7 +92,7 @@ export default class RoomCall extends React.Component<{}, State> {
       if (video) video.remove();
   }
   
-  getMyVideo = (id:string=this.myID) => {
+  getMyVideo = (id:string=this.myId) => {
     return document.getElementById(id);
   }
   
@@ -115,8 +115,8 @@ export default class RoomCall extends React.Component<{}, State> {
       if (myVideo) myVideo.srcObject?.getVideoTracks().forEach((track:any) => {
         if (track.kind === 'video') {
           track.enabled = status.video;
-          // this.socket.emit('user-video-off', {id: this.myID, status: true});
-          // changeMediaView(this.myID, true);
+          // this.socket.emit('user-video-off', {id: this.myId, status: true});
+          // changeMediaView(this.myId, true);
         }
       });
   }
@@ -220,7 +220,7 @@ export default class RoomCall extends React.Component<{}, State> {
     // might cause problems when state changes while doing this function
     if (this.videoRef.current && this.videoRef.current.srcObject !== this.users[this.videoRef.current.id].stream) {
       this.videoRef.current.srcObject = this.users[this.videoRef.current.id].stream
-      if (this.myID === this.videoRef.current.id) this.videoRef.current.muted = true;
+      if (this.myId === this.videoRef.current.id) this.videoRef.current.muted = true;
       this.videoRef.current.play()
     }
   }
@@ -276,7 +276,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
             { Object.keys(this.users).map((key, index) => ( 
               <Carousel.Item key={index}>
-                <video width="100%" id={key} ref={this.videoRef}/>
+                <VideoBox username="user1" videoId={key} stream={this.users[key].stream} muted={key == this.myId ? true : false}/>
               </Carousel.Item>
             ))}
             
