@@ -1,24 +1,18 @@
 import gameUITypes from "consts/gameUITypes";
 import { createStore } from "redux";
 
-<<<<<<< HEAD
 const initState = {
   activeUI: gameUI.MAP,
   micId: '',
   camId: ''
 };
 
-// action types
-const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
+/* Action Types */
 const CHANGE_MIC_ID = "CHANGE_MIC_ID";
 const CHANGE_CAM_ID = "CHANGE_CAM_ID";
-=======
 const initState = { activeUI: gameUITypes.MAP, playerPos: [0, 0] };
-
-/* Action Types */
 export const TOGGLE_GAME_UI = "TOGGLE_GAME_UI";
 export const SEND_PLAYER_POS = "SEND_PLAYER_POS";
->>>>>>> 30d423bd83c4bfb1ee08d45d9cbb6af8923c86ad
 
 
 /* Action Creators */
@@ -31,7 +25,6 @@ export const sendPlayerPosition = (playerPos) => ({
   playerPos
 });
 
-<<<<<<< HEAD
 // action change mic ID
 export const changeMicId = (micId) => ({
   type: CHANGE_MIC_ID,
@@ -45,35 +38,25 @@ export const changeCamId = (camId) => ({
 });
 
 // reducer
-=======
-/* Reducer */
->>>>>>> 30d423bd83c4bfb1ee08d45d9cbb6af8923c86ad
 const reducer = (state = initState, action) => {
   switch (action.type) {
     case TOGGLE_GAME_UI:
       return { ...state, activeUI: action.activeUI };
-<<<<<<< HEAD
-    case CHANGE_MIC_ID:
-      return { ...state, micId: action.micId };
-    case CHANGE_CAM_ID:
-      return { ...state, camId: action.camId };
+    case SEND_PLAYER_POS:
+      return { ...state, playerPos: action.playerPos };
     default:
       return state;
   }
 };
 
 
-// reducer
+// reducer devices
 const reducerDevice = (state = initState, action) => {
   switch (action.type) {
     case CHANGE_MIC_ID:
       return { ...state, micId: action.micId };
     case CHANGE_CAM_ID:
       return { ...state, camId: action.camId };
-=======
-    case SEND_PLAYER_POS:
-      return { ...state, playerPos: action.playerPos };
->>>>>>> 30d423bd83c4bfb1ee08d45d9cbb6af8923c86ad
     default:
       return state;
   }
@@ -85,7 +68,7 @@ const store = createStore(
   initState
 );
 
-// store
+// store devices
 export const storeDevice = createStore(
   reducerDevice,
   initState
