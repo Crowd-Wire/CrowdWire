@@ -84,7 +84,7 @@ sentinel:
   port: 26379
 
   ## Delay seconds when cleaning nodes IPs
-  ## When starting it will clean the sentiles IP (RESET "*") in all the nodes
+  ## When starting it will clean the sentinels IP (RESET "*") in all the nodes
   ## This is the delay time before sending the command to the next node
   ##
   cleanDelaySeconds: 5
@@ -165,7 +165,9 @@ sentinel:
   ##      fieldRef:
   ##        fieldPath: fieldPath
   ##
-  extraEnvVars: []
+  extraEnvVars:
+  - name: REDIS_WHATEVER
+    value: value
 
   ## ConfigMap with extra env vars:
   ##
@@ -248,12 +250,12 @@ containerSecurityContext:
 
 ## Use password authentication
 ##
-usePassword: false
+usePassword: true
 ## Redis(TM) password (both master and slave)
 ## Defaults to a random 10-character alphanumeric string if not set and usePassword is true
 ## ref: https://github.com/bitnami/bitnami-docker-redis#setting-the-server-password-on-first-run
 ##
-password: ""
+password: "password"
 ## Use existing secret (ignores previous password)
 # existingSecret:
 ## Password key to be retrieved from Redis(TM) secret
