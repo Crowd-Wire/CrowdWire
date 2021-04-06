@@ -2,7 +2,7 @@ import React from "react";
 
 import { connect } from "react-redux";
 
-import gameUI from "consts/gameUI";
+import gameUITypes from "consts/gameUITypes";
 import { toggleGameUI } from "redux/store";
 
 
@@ -12,8 +12,6 @@ import { toggleGameUI } from "redux/store";
 import DragHandleIcon from '@material-ui/icons/DragHandle';
 
 // core components
-
-import styles from "assets/jss/material-kit-react/views/landingPage.js";
 
 
 
@@ -55,7 +53,7 @@ class MapEditor extends React.Component {
         </div>
         <div style={{backgroundColor: "blue", height: "300px", width: "300px"}}>
           Map Editor
-          <button onClick={() => this.props.toggleGameUI(gameUI.MAP)}>X CLOSE</button>
+          <button onClick={() => this.props.toggleGameUI(gameUITypes.MAP)}>X CLOSE</button>
         </div>
       </div>
     );

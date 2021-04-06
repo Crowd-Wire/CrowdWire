@@ -40,6 +40,7 @@ uvicorn = "0.13.4"
 uvloop = "0.15.2"
 watchgod = "0.7"
 websockets = "8.1"
+loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 
