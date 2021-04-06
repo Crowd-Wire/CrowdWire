@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
-from app import schemas
-from app.crud import crud_users
+from app import schemas,crud
 from app.api import dependencies as deps
 from typing import Any
 from fastapi import HTTPException
@@ -19,10 +18,11 @@ def create_user(
     user: schemas.UserCreate, 
     db: Session = Depends(deps.get_db)
 ) -> Any:
-    user = crud_users.get_by_email(db, email=user.email)
-    if user:
+    db_user = crud.user.get_by_email(db=db, email=user.email)
+
+    if db_user:
         raise HTTPException(
             status_code=400,
             detail="The user with this email already exists in the system.",
         )
-    return crud_users.create_user(db=db, user=user)
+    return crud.user.create(db=db, new_user=user)
