@@ -16,8 +16,7 @@ import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
-import { changeMicId, changeCamId } from "../../redux/store.js";
-import store from "../../redux/store.js";
+import { storeDevice } from "../../redux/store.js";
 
 import logo from '../../assets/crowdwire_white_logo.png';
 
@@ -166,12 +165,7 @@ export default class RoomCall extends React.Component<{}, State> {
   }
 
   componentDidMount() {
-
-    store.subscribe((changeMicId) => {
-      this.reInitializeStream()
-    })
-
-    store.subscribe((changeCamId) => {
+    storeDevice.subscribe((changeMicId) => {
       this.reInitializeStream()
     })
 

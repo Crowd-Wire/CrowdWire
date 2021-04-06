@@ -37,7 +37,20 @@ const reducer = (state = initState, action) => {
       return { ...state, activeUI: action.activeUI };
     case CHANGE_MIC_ID:
       return { ...state, micId: action.micId };
+    case CHANGE_CAM_ID:
+      return { ...state, camId: action.camId };
+    default:
+      return state;
+  }
+};
+
+
+// reducer
+const reducerDevice = (state = initState, action) => {
+  switch (action.type) {
     case CHANGE_MIC_ID:
+      return { ...state, micId: action.micId };
+    case CHANGE_CAM_ID:
       return { ...state, camId: action.camId };
     default:
       return state;
@@ -47,6 +60,12 @@ const reducer = (state = initState, action) => {
 // store
 const store = createStore(
   reducer,
+  initState
+);
+
+// store
+export const storeDevice = createStore(
+  reducerDevice,
   initState
 );
 

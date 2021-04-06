@@ -1,5 +1,5 @@
 import videoCall from "../consts/videoCall";
-import store from "../redux/store.js";
+import { storeDevice } from "../redux/store.js";
 
 
 export async function useCheckMediaAccess() {
@@ -53,7 +53,7 @@ export async function useCheckMediaAccess() {
     })
 }
 
-export function getVideoAudioStream(video=true, audio=true, camId='', micId=store.getState().micId) {
+export function getVideoAudioStream(video=true, audio=true, camId=storeDevice.getState().camId, micId=storeDevice.getState().micId) {
     let quality = videoCall.VIDEO_QUALITY;
     if (quality) quality = parseInt(quality);
     // @ts-ignore
