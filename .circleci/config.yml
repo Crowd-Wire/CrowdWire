@@ -1,14 +1,8 @@
 version: 2.1
 
-workflows:
-  test_my_app:
-    jobs:
-      - build-docker-api-frontend
-
 jobs:
-  build-docker-api-frontend:
-    build:
-      machine: true
+  build:
+    machine: true
     steps:
       - checkout
       - run: docker build -t ubuntu-test:latest api/
