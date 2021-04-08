@@ -35,4 +35,5 @@ jobs:
           poetry install
       - name: Run linter
         run: |
+          cd api/
           poetry run flake8 app --count --show-source --statistics
