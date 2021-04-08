@@ -29,6 +29,11 @@ class Settings(BaseSettings):
                         f"{RABBITMQ_USER}:{RABBITMQ_PASSWORD}" \
                         f"@{RABBITMQ_HOST}:5672/"
 
+    REDIS_SENTINEL_HOST: str = 'localhost'
+    REDIS_SENTINEL_PORT: int = 26379
+    REDIS_SENTINEL_PASSWORD: str = 'password'
+    REDIS_MASTER: str = 'mymaster'
+
     # searches this file to find the variables
     class Config:
         env_file = ".env"
