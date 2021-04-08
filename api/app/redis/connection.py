@@ -1,23 +1,32 @@
 import aioredis
+from app.core.config import settings
 
 
+class RedisConnector:
 
-async def sentinel_connection():
+    def __init__(self):
+        self.sentinel_pool = None
+        self.master = None
 
-    sentinel_pool = await aioredis.sentinel.create_sentinel_pool(
-        [('localhost', 26379)], password='password')
+    async def sentinel_connection(self):
 
-    redis = sentinel_pool.master_for('mymaster')
-    test = await redis.execute('get', 'key') == b'value'
-    print(test)
-    #await redis.set('key1', 'value1')
-    #assert await redis.get('key1', encoding='utf-8') == 'value1'
+        self.sentinel_pool = await aioredis.sentinel.create_sentinel_pool(
+            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+            password=settings.REDIS_SENTINEL_PASSWORD)
+
+        self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
+
+    async def get(self, key: str) -> any:
+
+        return await self.master.execute('get', key)
+
+    async def set(self, key: str, value: str) -> any:
+
+        return await self.master.execute('set', key, value)
+
+    async def execute(self, *args, **kwargs) -> any:
+
+        return await self.master.execute(*args, **kwargs)
 
 
-    """
-    sentinel = await aioredis.create_sentinel(
-        [('localhost', 26379)], password='password')
-    redis = sentinel.master_for('mymaster')
-    assert await redis.set('key', 'value')
-    assert await redis.get('key', encoding='utf-8') == 'value'
-    """
+redis_connector = RedisConnector()

@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = ""
     SQLALCHEMY_DATABASE_URI: Optional[PostgresDsn] = "postgresql://postgres:1234@localhost:5432/postgres"
 
+    REDIS_SENTINEL_HOST: str = 'localhost'
+    REDIS_SENTINEL_PORT: int = 26379
+    REDIS_SENTINEL_PASSWORD: str = 'password'
+    REDIS_MASTER: str = 'mymaster'
+
     # searches this file to find the variables
     class Config:
         env_file = ".env"
