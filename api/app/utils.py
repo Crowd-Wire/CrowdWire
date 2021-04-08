@@ -1,12 +1,8 @@
-import logging
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, Optional
-
-#import emails
-#from emails.template import JinjaTemplate
+from typing import Optional
+# import emails
+# from emails.template import JinjaTemplate
 from jose import jwt
-
 from app.core.config import settings
 
 """
@@ -87,13 +83,16 @@ def send_new_account_email(email_to: str, username: str, password: str) -> None:
     )
 """
 
+
 def generate_password_reset_token(email: str) -> str:
     delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
     now = datetime.utcnow()
     expires = now + delta
     exp = expires.timestamp()
     encoded_jwt = jwt.encode(
-        {"exp": exp, "nbf": now, "sub": email}, settings.SECRET_KEY, algorithm="HS256",
+        {"exp": exp, "nbf": now, "sub": email},
+        settings.SECRET_KEY,
+        algorithm="HS256",
     )
     return encoded_jwt
 

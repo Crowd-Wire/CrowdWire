@@ -10,8 +10,6 @@ class World(Base):
     creation_date = Column(DateTime, nullable=False)
     update_date = Column(DateTime)
     description = Column(String(300))
-    creator_id = Column(Integer, ForeignKey(settings.SCHEMA_NAME+".user.user_id"))
+    creator_id = Column(Integer, ForeignKey(settings.SCHEMA_NAME + ".user.user_id"))
 
-    tags = relationship('Tag', secondary='world_tag')
-
-
+    tags = relationship("Tag", secondary="world_tag")
