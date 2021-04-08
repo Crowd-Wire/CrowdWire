@@ -22,7 +22,7 @@ class User(Base):
     # Many to Many relation with itself
     # TODO: might need schema name before user
     friends = relationship(
-        'User',
+        "User",
         secondary=friends,
         primaryjoin=user_id == friends.c.user1_id,
         secondaryjoin=user_id == friends.c.user2_id,
@@ -30,9 +30,9 @@ class User(Base):
 
     # Many to Many relation with itself
     friend_request = relationship(
-        'User',
+        "User",
         secondary=friend_request,
         primaryjoin=user_id == friend_request.c.sender,
         secondaryjoin=user_id == friend_request.c.receiver,
-        backref=backref('received_requests')
+        backref=backref("received_requests"),
     )

@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, APIRouter
+from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 from loguru import logger
 
 """
@@ -35,10 +35,9 @@ class ConnectionManager:
         await websocket.send_text(message)
 
     async def broadcast(self, world_id: int, message: str):
-        logger.info(f"Broadcasting to"
-                    f" World with id {world_id} the message:"
-                    f"{message}"
-                    )
+        logger.info(
+            f"Broadcasting to" f" World with id {world_id} the message:" f"{message}"
+        )
         if world_id in self.active_connections:
             for connection in self.active_connections[world_id]:
                 await connection.send_text(message)
@@ -47,9 +46,11 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@router.websocket('/{world_id}',)
+@router.websocket(
+    "/{world_id}",
+)
 async def world_movement(websocket: WebSocket, world_id: int) -> Any:
-    await manager.connect(world_id,websocket)
+    await manager.connect(world_id, websocket)
     try:
         while True:
             data = await websocket.receive_json()

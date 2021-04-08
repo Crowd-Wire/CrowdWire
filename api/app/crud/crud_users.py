@@ -9,7 +9,6 @@ from app.schemas.users import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
-
     def get_by_email(self, db: Session, *, email: str) -> Optional[User]:
         return db.query(User).filter(User.email == email).first()
 
@@ -30,7 +29,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password=get_password_hash(new_user.hashed_password),
             name=new_user.name,
             birth=new_user.birth,
-            register_date=new_user.register_date
+            register_date=new_user.register_date,
         )
         db.add(db_user)
         db.commit()
@@ -67,19 +66,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
 
 user = CRUDUser(User)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 """

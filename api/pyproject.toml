@@ -41,6 +41,7 @@ uvloop = "0.15.2"
 watchgod = "0.7"
 websockets = "8.1"
 loguru = "^0.5.3"
+flake8 = "^3.9.0"
 
 [tool.poetry.dev-dependencies]
 

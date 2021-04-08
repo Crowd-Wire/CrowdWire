@@ -1,11 +1,13 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
-from app import schemas,crud
+from app import schemas, crud
 from app.api import dependencies as deps
 from typing import Any
 from fastapi import HTTPException
 from loguru import logger
+
 router = APIRouter()
+
 
 @router.get("/", tags=["users"])
 async def read_users():
@@ -14,10 +16,7 @@ async def read_users():
 
 
 @router.post("/")
-def create_user(
-    user: schemas.UserCreate, 
-    db: Session = Depends(deps.get_db)
-) -> Any:
+def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     db_user = crud.user.get_by_email(db=db, email=user.email)
 
     if db_user:
