@@ -1,8 +1,8 @@
-import React, { useEffect, useLayoutEffect, createRef, useState } from 'react';
+import React, { createRef } from 'react';
 
 import { ToastContainer, toast } from 'react-toastify';
 // Icons imports
-import { CircularProgress, Button } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import CallIcon from '@material-ui/icons/CallEnd';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -11,7 +11,6 @@ import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 
-import videoCall from "../../consts/videoCall";
 import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
@@ -24,7 +23,7 @@ interface State {
   chatToggle: boolean;
   displayStream: boolean;
   messages: Array<string>;
-  numberUsers: integer;
+  users: { [key: string]: CreateVideo };
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -34,7 +33,7 @@ export default class RoomCall extends React.Component<{}, State> {
       chatToggle: false,
       displayStream: false,
       messages: [],
-      numberUsers: 0
+      users: {}
     }
     this.chatHandle = this.chatHandle.bind(this);
     this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
@@ -42,17 +41,15 @@ export default class RoomCall extends React.Component<{}, State> {
     this.toggleVideoTrack = this.toggleVideoTrack.bind(this);
     this.listenToEndStream = this.listenToEndStream.bind(this);
     this.replaceStream = this.replaceStream.bind(this);
-    this.updateVideoStream = this.updateVideoStream.bind(this);
     this.getMyVideo = this.getMyVideo.bind(this);
   }
   myId: string = '12';
-  users: { [key: string]: CreateVideo } = {};
+  //users: { [key: string]: CreateVideo } = {};
   peers: any = {};
-  videoRef = createRef<HTMLVideoElement>();
   accessMic: boolean = false;
   accessVideo: boolean = false;
+  numberUsers = 0;
 
-  
   chatHandle = (bool:boolean=false) => {
     this.setState({chatToggle:bool});
   }
@@ -60,8 +57,8 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
-        if (this.state.numberUsers == 0) this.createVideo({ id: this.myId, stream });
-        else this.createVideo({ id: this.myId + this.state.numberUsers.toString(), stream });
+        if (this.numberUsers == 0) this.createVideo({ id: this.myId, stream });
+        else this.createVideo({ id: this.myId + this.numberUsers.toString(), stream });
       }
     })
   }
@@ -87,7 +84,7 @@ export default class RoomCall extends React.Component<{}, State> {
   }
   
   removeVideo = (id:string) => {
-      delete this.users[id];
+      //delete this.state.users[id];
       const video = document.getElementById(id);
       if (video) video.remove();
   }
@@ -109,12 +106,23 @@ export default class RoomCall extends React.Component<{}, State> {
     };
     
   toggleVideoTrack = (status:MediaStatus={video:!this.accessVideo, audio: this.accessMic}) => {
-    const myVideo = this.getMyVideo();
+    const myVideo = this.getMyVideo() as HTMLVideoElement;
     this.accessVideo = status.video;
     // @ts-ignore
       if (myVideo) myVideo.srcObject?.getVideoTracks().forEach((track:any) => {
         if (track.kind === 'video') {
           track.enabled = status.video;
+          if (!status.video) {
+            track.stop()
+          } else {
+            getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
+              if (stream) {
+                myVideo.srcObject = stream;
+                myVideo.play();
+              }
+            })
+            return;
+          }
           // this.socket.emit('user-video-off', {id: this.myId, status: true});
           // changeMediaView(this.myId, true);
         }
@@ -151,11 +159,16 @@ export default class RoomCall extends React.Component<{}, State> {
   }
 
   createVideo = (createObj:CreateVideo) => {
-    if (!this.users[createObj.id]) {
-      this.users[createObj.id] = {
+    if (!this.state.users[createObj.id]) {
+      this.numberUsers +=1;
+
+      this.setState(state => {
+        const users = state.users;
+        users[createObj.id] = {
           ...createObj,
-      };
-      this.setState({numberUsers: this.state.numberUsers + 1});
+        };
+        return {users};
+      });
     } else {
         //@ts-ignore
         document.getElementById(createObj.id).srcObject = createObj.stream;
@@ -163,6 +176,7 @@ export default class RoomCall extends React.Component<{}, State> {
         document.getElementById(createObj.id).play();
     }
   }
+
 
   componentDidMount() {
     storeDevice.subscribe((changeMicId) => {
@@ -211,31 +225,35 @@ export default class RoomCall extends React.Component<{}, State> {
     });
   }
 
-  componentDidUpdate() {
-    this.updateVideoStream();
-  }
-
-  updateVideoStream() {
-    // maybe just iterate over them and get video by id
-    // might cause problems when state changes while doing this function
-    if (this.videoRef.current && this.videoRef.current.srcObject !== this.users[this.videoRef.current.id].stream) {
-      this.videoRef.current.srcObject = this.users[this.videoRef.current.id].stream
-      if (this.myId === this.videoRef.current.id) this.videoRef.current.muted = true;
-      this.videoRef.current.play()
-    }
-  }
-
   
   render () {
+    const gridSettings = {
+      cols: this.numberUsers > 6 ? 6 : this.numberUsers == 4 ? 2 : this.numberUsers > 4 ? 3 : this.numberUsers,
+      rows: this.numberUsers > 3 ? 2 : 1,
+      gap: 10,
+      loop: true,
+      hideArrow: this.numberUsers > 12 ? false : true,
+      showDots: this.numberUsers > 12 ? true : false,
+      responsiveLayout: [
+        {
+          breakpoint: 1200,
+          cols: this.numberUsers > 3 ? 3 : this.numberUsers,
+          rows: this.numberUsers > 3 ? 2 : 1,
+          gap: 5,
+          loop: true,
+          autoplay: false,
+          hideArrow: this.numberUsers > 6 ? false : true
+        }
+      ],
+      mobileBreakpoint: 600
+    }
     return (
       <React.Fragment>
       <MicIcon></MicIcon>
       <MicOffIcon></MicOffIcon>
-              
-        <CallIcon></CallIcon>
-          
-        <VideocamIcon></VideocamIcon>
-        <VideocamOffIcon></VideocamOffIcon>
+      <CallIcon></CallIcon>
+      <VideocamIcon></VideocamIcon>
+      <VideocamOffIcon></VideocamOffIcon>
 
         <div>
           <h4>
@@ -251,39 +269,17 @@ export default class RoomCall extends React.Component<{}, State> {
         <Button color="primary" onClick={() => this.toggleAudioTrack()}>Toggle Audio</Button>
         <Button color="primary" onClick={() => this.toggleVideoTrack()}>Toggle Video</Button>
 
-
-        { this.state.numberUsers > 0 ?
-          (
-          <Carousel
-            justify-content={"center"}
-            cols={this.state.numberUsers > 6 ? 6 : this.state.numberUsers}
-            rows={this.state.numberUsers > 6 ? 2 : 1}
-            gap={10}
-            loop={false}
-            showDots={this.state.numberUsers > 12 ? true : false}
-            // responsiveLayout={[
-              //   {
-                //     breakpoint: 800,
-            //     cols: this.state.numberUsers > 3 ? 3 : this.state.numberUsers,
-            //     rows: this.state.numberUsers > 3 ? 2 : 1,
-            //     gap: 2,
-            //     loop: false,
-            //     autoplay: 1000
-            //   }
-            // ]}
-            mobileBreakpoint={600}
-          >
-
-            { Object.keys(this.users).map((key, index) => ( 
+        { this.numberUsers > 0 ? (
+          <Carousel {...gridSettings}>
+            { Object.keys(this.state.users).map((key, index) => (
               <Carousel.Item key={index}>
-                <VideoBox username="user1" videoId={key} stream={this.users[key].stream} muted={key == this.myId ? true : false}/>
+                  <VideoBox username="user1" videoId={key} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
               </Carousel.Item>
             ))}
-            
           </Carousel>
-          ) : '' }
+        ) : '' }
+
         <DeviceSettings />
-          
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 

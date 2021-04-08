@@ -22,6 +22,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 	const [volume, setVolume] = useState(100);
 
   useEffect(() => {
+    console.log("dsadasdsadsadasdasdasdsadas")
     navigator.mediaDevices
       .enumerateDevices()
       .then((x) =>

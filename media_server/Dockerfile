@@ -1,6 +1,8 @@
+FROM node:14.15.1
 
-FROM node:12
+EXPOSE 3001
 
+# set working directory
 WORKDIR /usr/src/app
 
 COPY package.json package-lock.json ./

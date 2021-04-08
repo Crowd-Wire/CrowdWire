@@ -8,7 +8,7 @@ export const config = {
   // http server ip, port, and peer timeout constant
   //
   httpIp: "0.0.0.0",
-  httpPort: 3000,
+  httpPort: 3001,
   httpPeerStale: 360000,
 
   mediasoup: {
