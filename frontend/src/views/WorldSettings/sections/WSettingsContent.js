@@ -6,7 +6,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
 import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
-import WorldSettingsPanel from 'views/WorldSettings/sections/WorldSettingsPanel.js';
 
 
 class WSettingsContent extends Component {
@@ -39,13 +38,11 @@ class WSettingsContent extends Component {
 						<Tabs value={this.state.value} onChange={this.changeTab} style={{fontColor:"white", borderTopRightRadius:"10px",borderTopLeftRadius:"10px", border:"solid 1px black", backgroundColor:"black"}} aria-label="simple tabs example">
 							<Tab label="Role" style={{color:"white"}} {...this.a11yProps(0)} />
 							<Tab label="Kicks/Bans" style={{color:"white"}} {...this.a11yProps(1)} />
-							<Tab label="World Settings" style={{color:"white"}} {...this.a11yProps(2)} />
 						</Tabs>
 					</Row>
-					<div style={{minHeight:"400px", backgroundColor:"red"}}>
+					<div style={{height:"400px", backgroundColor:"red"}}>
 						<RolePanel style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
 						<KickBanPanel value={this.state.value} index={1}>ADMIN</KickBanPanel>
-						<WorldSettingsPanel value={this.state.value} index={2}>Boss</WorldSettingsPanel>	
 					</div>
 			</div>
 		);

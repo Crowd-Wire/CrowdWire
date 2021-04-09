@@ -54,7 +54,7 @@ export default function UserPermissions() {
               style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
           />
         </Col>
-        <Col md={6} style={{backgroundColor:"red"}}>
+        <Col md={6}>
         <FormControlLabel
             control={
               <Checkbox
