@@ -9,6 +9,13 @@ import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
 
 
 class WSettingsContent extends Component {
+	roles = {'Admin':[0,1,2,3,4,5,6,7], 'Speaker':[0,1,2,4,5,7],'Member':[0,1,2,7]};
+	users = ['Silvia','Marco','Teixeira'];
+	reports = [
+		{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
+		{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
+		{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
+	];
 	state = {value: 0};
 	constructor(props){
 		super(props);
@@ -41,8 +48,8 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
-						<KickBanPanel value={this.state.value} index={1}>ADMIN</KickBanPanel>
+						<RolePanel roles={this.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
+						<KickBanPanel users={this.users} reports={this.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>
 		);

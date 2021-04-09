@@ -10,8 +10,28 @@ import Button from 'react-bootstrap/Button';
 
 
 export default function KickBanPanel(props){
-	const { children, value, index, ...other } = props;
+	const { children, users, reports, value, index, ...other } = props;
+	let rows = [];
+	let reportBoxes = [];
 	console.log(index+","+value+children);
+	for(let i=0; i<users.length; i++){
+		rows.push(
+			<Row style={{height:"50px"}}>
+				<Typography variant="h5" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
+			</Row>
+		);
+	}
+	for(let i=0; i<reports.length; i++){
+		console.log(reports[i]['Message']);
+		reportBoxes.push(
+			<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
+				<Typography style={{marginTop:"auto"}} variant="h5">{reports[i]['Reporter']}</Typography>
+				<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
+					<Typography variant="body1" style={{color:"white"}}>{reports[i]['Message']}</Typography>
+				</Row>
+			</Row>
+		);
+	}
 	return(
 		<div
 		role="tabpanel"
@@ -30,30 +50,7 @@ export default function KickBanPanel(props){
 						<hr/>
 						<Row style={{overflowY:"auto", height:"80%"}}>
 							<Col>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px",  marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px",  marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px",  marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px",  marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h5" style={{marginLeft:"10px",  marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-								</Row>
+								{rows}
 							</Col>
 						</Row>
 					</Col>
@@ -64,24 +61,7 @@ export default function KickBanPanel(props){
 						<hr/>
 							<Row style={{height:"70%"}}>
 								<Col style={{height:"100%", width:"100%", overflowY:"auto"}}>
-									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
-										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
-										</Row>
-									</Row>
-									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
-										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
-										</Row>
-									</Row>
-									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
-										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
-										</Row>
-									</Row>
+									{reportBoxes}
 								</Col>
 							</Row>
 							<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B"}}>

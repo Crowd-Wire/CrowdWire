@@ -8,8 +8,26 @@ import AddIcon from '@material-ui/icons/Add';
 import CheckIcon from '@material-ui/icons/Check';
 
 export default function RolePanel(props){
-	const { children, value, index, ...other } = props;
+	const { children, users, roles,value, index, ...other } = props;
 	console.log(index+","+value+children);
+	let rows = [];
+	let rolekeys = [];
+    for(let i=0; i<users.length; i++){
+      rows.push(
+		<Row style={{height:"50px"}}>
+			<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
+			<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
+		</Row>
+	  );
+    }
+	Object.keys(roles).forEach(function(key) {
+		console.log(key,roles[key]);
+		rolekeys.push(
+			<Row style={{marginTop:"5px"}}>
+				<Typography variant="h5">{key}</Typography>
+			</Row>
+		);
+	});
 	return(
 		<div
 		role="tabpanel"
@@ -27,30 +45,7 @@ export default function RolePanel(props){
 						<hr/>
 						<Row style={{overflowY:"auto", height:"65%"}}>
 							<Col style={{marginLeft:"10px"}}>
-								<Row style={{marginTop:"5px"}}>
-									<Typography variant="h5">{children}</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Speaker1</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Staff</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}>
-									<Typography variant="h5">Admin</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Speaker2</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Speaker3</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Speaker4</Typography>
-								</Row>
-								<Row style={{marginTop:"5px"}}> 
-									<Typography variant="h5">Speaker5</Typography>
-								</Row>
+								{rolekeys}
 							</Col>
 						</Row>
 						<Row style={{position:"absolute", bottom:"0", height:"15%", width:"100%",borderTop:"1px solid black"}}>
@@ -68,40 +63,7 @@ export default function RolePanel(props){
 						<hr/>
 						<Row style={{overflowY:"auto", height:"80%"}}>
 							<Col>
-								<Row style={{height:"50px"}}>
-									<div>
-										<Typography variant="h4" style={{marginLeft:"10px", float:"left",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-										<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-									</div>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
-								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-								</Row>
+								{rows}
 							</Col>
 						</Row>
 					</Col>
