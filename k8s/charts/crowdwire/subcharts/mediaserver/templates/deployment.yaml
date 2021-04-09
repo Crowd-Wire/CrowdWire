@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mediaserver.fullname" . }}
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mediaserver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "mediaserver.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mediaserver.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+      - name: check-rabbitmq-ready
+        image: busybox
+        env:
+          - name: RABBITMQ_SERVICE_NAME
+            value: {{ include "mediaserver.rabbitmqservicename" . }}
+          - name: RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-username
+                name: {{ include "mediaserver.rabbitmqservicename" . }}
+          - name: RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-password
+                name: {{ include "mediaserver.rabbitmqservicename" . }}
+        command: [ 'sh', '-c',
+            'until wget http://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_SERVICE_NAME):15672/api/aliveness-test/%2F;
+            do echo waiting for rabbitmq; sleep 2; done;' ]
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          env:
+          - name: RABBITMQ_SERVICE_NAME
+            value: {{ include "mediaserver.rabbitmqservicename" . }}
+          - name: RABBITMQ_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-username
+                name: {{ include "mediaserver.rabbitmqservicename" . }}
+          - name: RABBITMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: rabbitmq-password
+                name: {{ include "mediaserver.rabbitmqservicename" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

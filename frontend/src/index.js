@@ -13,9 +13,9 @@ import "assets/scss/global-styles.scss";
 
 ReactDOM.render(
   <Provider store={store}>
-      <Router>
-        <App />
-      </Router>
+    <Router>
+      <App />
+    </Router>
   </Provider>,
   document.getElementById("root")
 );
