@@ -30,7 +30,7 @@ class WSettingsContent extends Component {
 	render() {
 		const { classes } = this.props;
 		return(
-			<div style={{width:"75%", marginLeft:"5%", marginTop:"5%"}}>
+			<div style={{width:"75%", minWidth:"650px", marginLeft:"5%", marginTop:"5%"}}>
 					<Row style={{height:"10%"}}>
 						<Typography variant="h5" style={{color:"white"}}>Map: Jungle</Typography>
 					</Row>

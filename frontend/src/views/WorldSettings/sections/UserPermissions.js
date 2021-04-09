@@ -26,7 +26,7 @@ export default function UserPermissions() {
   return (
     <FormGroup style={{height:"100%"}}>
       <Row style={{height:"100%"}}>
-        <Col md={6}>
+        <Col xs={6} sm={6} md={6}>
           <FormControlLabel
             control={
               <Checkbox
@@ -36,11 +36,11 @@ export default function UserPermissions() {
                 color="primary"
                 />
               }
-              label="Deafen"
-              labelPlacement="start"
+              label="Object Interaction"
+              labelPlacement="end"
               style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
           />
-                <FormControlLabel
+          <FormControlLabel
             control={
               <Checkbox
                 checked={state.checkedB}
@@ -49,24 +49,50 @@ export default function UserPermissions() {
                 color="primary"
                 />
               }
-              label="Mute"
-              labelPlacement="start"
+              label="Walk"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Talk"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+                />
+              }
+              label="Invite Users"
+              labelPlacement="end"
               style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
           />
         </Col>
-        <Col md={6}>
-        <FormControlLabel
+        <Col Col xs={6} sm={6} md={6}>
+          <FormControlLabel
             control={
               <Checkbox
                 checked={state.checkedB}
                 onChange={handleChange}
                 name="checkedB"
                 color="primary"
-                />
-              }
-              label="Global Chat"
-              labelPlacement="start"
-              style={{color:"black", margin:"auto"}}
+              />
+            }
+            label="Talk Conference"
+            labelPlacement="end"
+            style={{color:"black", margin:"auto"}}
           />
           <FormControlLabel
             control={
@@ -75,11 +101,37 @@ export default function UserPermissions() {
                 onChange={handleChange}
                 name="checkedB"
                 color="primary"
-                />
-              }
-              label="Edit World Settings"
-              labelPlacement="start"
-              style={{color:"black", margin:"auto"}}
+              />
+            }
+            label="Conference Manage"
+            labelPlacement="end"
+            style={{color:"black", margin:"auto"}}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+              />
+            }
+            label="Role Manage"
+            labelPlacement="end"
+            style={{color:"black", margin:"auto"}}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={state.checkedB}
+                onChange={handleChange}
+                name="checkedB"
+                color="primary"
+              />
+            }
+            label="Write in Chat"
+            labelPlacement="end"
+            style={{color:"black", margin:"auto"}}
           />
         </Col>
       </Row>

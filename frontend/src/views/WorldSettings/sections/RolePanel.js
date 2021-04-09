@@ -20,7 +20,7 @@ export default function RolePanel(props){
 		>
 			{value === index && (
 				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
-					<Col md={3} style = {{borderRight:"1px solid black",height:"100%"}}>
+					<Col xs={3} sm={3} md={3} style = {{borderRight:"1px solid black",height:"100%"}}>
 						<Row style={{ height:"10%"}}>
 							<Typography variant="h5" style={{marginTop:"10px", marginLeft:"10px"}}>Roles:</Typography>
 						</Row>
@@ -57,10 +57,10 @@ export default function RolePanel(props){
 							<Typography variant="h5" style={{margin:"auto"}}><AddIcon/>Add Role</Typography>
 						</Row>
 					</Col>
-					<Col md={6}>
+					<Col xs={6} sm={6} md={6}>
 						<UserPermissions/>				
 					</Col>
-					<Col md={3} style={{height:"100%"}}>
+					<Col xs={3} sm={3} md={3} style={{height:"100%", borderLeft:"solid 1px black"}}>
 						<Row style={{ height:"10%"}}>
 							<TextField id="filled-search" label="Search field" type="search" variant="filled" style={{width:"100%"}}/>
 							{/* <Typography variant="h5" style={{marginLeft:"10px", marginTop:"10px"}}>Users:</Typography> */}
@@ -69,29 +69,38 @@ export default function RolePanel(props){
 						<Row style={{overflowY:"auto", height:"80%"}}>
 							<Col>
 								<Row style={{height:"50px"}}>
-									<Typography variant="h4" style={{marginLeft:"10px", float:"left",backgroundColor:"red",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
-									<CheckIcon style={{backgroundColor:"grey",marginTop:"auto", marginBottom:"auto", float:"right"}}/>
+									<div>
+										<Typography variant="h4" style={{marginLeft:"10px", float:"left",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+										<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
+									</div>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<AddIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 								<Row style={{height:"50px"}}>
 									<Typography variant="h4" style={{marginLeft:"10px", fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{children}</Typography>
+									<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
 								</Row>
 							</Col>
 						</Row>

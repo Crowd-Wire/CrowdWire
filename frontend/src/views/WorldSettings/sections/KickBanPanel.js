@@ -66,25 +66,25 @@ export default function KickBanPanel(props){
 								<Col style={{height:"100%", width:"100%", overflowY:"auto"}}>
 									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
 										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"blue", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
+										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
+											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
 										</Row>
 									</Row>
 									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
 										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"blue", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
+										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
+											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
 										</Row>
 									</Row>
 									<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
 										<Typography style={{marginTop:"auto"}} variant="h5">Sílvia</Typography>
-										<Row style={{backgroundColor:"blue", height:"130px", width:"100%", margin:"auto"}}>
-											<Typography variant="body1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
+										<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
+											<Typography variant="body1" style={{color:"white"}}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim. Cras eu sem sit amet est hendrerit tempor. Duis lectus ipsum, auctor ac ultrices ac, egestas at velit.</Typography>
 										</Row>
 									</Row>
 								</Col>
 							</Row>
-							<Row style={{marginTop:"3px", height:"12%", backgroundColor:"red"}}>
+							<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B"}}>
 								<Button variant="success" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginLeft:"15px", marginTop:"auto",marginBottom:"auto"}}>Dismiss</Button>{' '}
 								<Button variant="warning" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto"}}>Kick</Button>{' '}
 								<Button variant="danger" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto"}}>Ban</Button>{' '}
