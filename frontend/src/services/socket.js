@@ -1,5 +1,18 @@
-import io from "socket.io-client";
-import { SOCKET_URL } from "config";
+import { WS_BASE } from "config";
 
-export const socket = new WebSocket("ws://localhost:8000/position/1");
+let socket;
+let commSocket;
+
+export const getSocket = () => {
+    if (!socket)
+        socket = new WebSocket(`${WS_BASE}/position/1`)
+    return socket
+}
+
+export const getCommSocket = () => {
+    if (!commSocket)
+        commSocket = new WebSocket(`${WS_BASE}/?`)
+    return commSocket
+}
+
 // export const socket =  io("ws://localhost:8000/ws/1", {  cors: {    origin: "*",    methods: ["GET", "POST"]  }});
