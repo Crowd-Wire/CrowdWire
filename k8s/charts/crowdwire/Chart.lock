@@ -14,5 +14,8 @@ dependencies:
 - name: frontend
   repository: file://subcharts/frontend
   version: 0.1.0
-digest: sha256:6b055f8896da18f497f9fcbaf2e7fac935514015bde3c9027483dce9ab8e00b0
-generated: "2021-04-02T18:47:29.098800651+01:00"
+- name: mediaserver
+  repository: file://subcharts/mediaserver
+  version: 0.1.0
+digest: sha256:51efd602faba044904aa5cb56deead99b310f8b6d05f499edc693e30131c9d4a
+generated: "2021-04-09T19:24:01.825082834+01:00"

@@ -46,3 +46,7 @@ dependencies:
   repository: file://subcharts/frontend
   version: 0.1.0
   condition: frontend.enabled
+- name: mediaserver
+  repository: file://subcharts/mediaserver
+  version: 0.1.0
+  condition: mediaserver.enabled

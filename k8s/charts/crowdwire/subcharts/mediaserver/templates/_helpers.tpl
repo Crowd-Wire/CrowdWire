@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "api.name" -}}
+{{- define "mediaserver.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "api.fullname" -}}
+{{- define "mediaserver.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,33 +26,21 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "api.chart" -}}
+{{- define "mediaserver.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
-{{- define "api.rabbitmqservicename" -}}
+{{- define "mediaserver.rabbitmqservicename" -}}
 {{- $test:= include "rabbitmq.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
 {{- printf "%s" $test }}
 {{- end }}
-
-{{- define "api.postgresservicename" -}}
-{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
-{{- printf "%s" $test }}
-{{- end }}
-
-{{- define "api.rediservicename" -}}
-{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
-{{- printf "%s" $test }}
-{{- end }}
-
-
 {{/*
 Common labels
 */}}
-{{- define "api.labels" -}}
-helm.sh/chart: {{ include "api.chart" . }}
-{{ include "api.selectorLabels" . }}
+{{- define "mediaserver.labels" -}}
+helm.sh/chart: {{ include "mediaserver.chart" . }}
+{{ include "mediaserver.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -62,25 +50,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "api.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "api.name" . }}
+{{- define "mediaserver.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "mediaserver.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "api.serviceAccountName" -}}
+{{- define "mediaserver.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "api.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "mediaserver.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-
-
-{/* NAME OF THE SERVICE MANIFEST */}}
-{{- define "api.servicename" -}}
-  {{- printf "%s-service" (include "api.fullname" .) -}}
-{{- end -}}

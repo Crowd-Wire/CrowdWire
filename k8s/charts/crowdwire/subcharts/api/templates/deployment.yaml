@@ -36,32 +36,32 @@ spec:
             valueFrom:
               secretKeyRef:
                 key: postgresql-user
-                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+                name: {{ include "api.postgresservicename" . }}
           - name: POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
                 key: postgresql-password
-                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+                name: {{ include "api.postgresservicename" . }}
           - name: POSTGRES_DB
             valueFrom:
               secretKeyRef:
                 key: postgresql-db
-                name: {{ template "common.names.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
+                name: {{ include "api.postgresservicename" . }}
           - name: RABBITMQ_USERNAME
             valueFrom:
               secretKeyRef:
                 key: rabbitmq-username
-                name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+                name: {{ include "api.rabbitmqservicename" . }}
           - name: RABBITMQ_PASSWORD
             valueFrom:
               secretKeyRef:
                   key: rabbitmq-password
-                  name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+                  name: {{ include "api.rabbitmqservicename" . }}
           - name: RABBITMQ_ERL_COOKIE
             valueFrom:
               secretKeyRef:
                 key: rabbitmq-erlang-cookie
-                name: {{ template "common.names.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}  
+                name: {{ include "api.rabbitmqservicename" . }}
 
       {{- end }}   
           name: {{ .Chart.Name }}
