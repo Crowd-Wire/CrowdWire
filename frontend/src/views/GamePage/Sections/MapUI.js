@@ -2,8 +2,10 @@ import React from "react";
 
 import { connect } from "react-redux";
 
-import gameUI from "consts/gameUI";
+import gameUITypes from "consts/gameUITypes";
 import { toggleGameUI } from "redux/store";
+
+import Button from "components/CustomButtons/Button.js";
 
 
 // @material-ui/core components
@@ -12,7 +14,6 @@ import { toggleGameUI } from "redux/store";
 
 // core components
 
-
 class Map extends React.Component {
 
   constructor(props) {
@@ -20,18 +21,21 @@ class Map extends React.Component {
     this.state = {
 
     };
-    
   }
+
   
   render() {
     return (
-      <div style={{...this.props.style, left: 0, top: 0}}>
-        <div style={{backgroundColor: "green", height: "300px", width: "300px"}}>
-          Map
-          <button onClick={() => this.props.toggleGameUI(gameUI.MAP_EDITOR)}>Edit map</button>
-        </div>
 
+      <div style={{...this.props.style, left: 0, top: 0}}>
+        <div style={{ height: "300px", width: "300px"}}>
+          Map
+          <button onClick={() => this.props.toggleGameUI(gameUITypes.MAP_EDITOR)}>Edit map</button>
+          <Button color="github" onClick={this.handleClick1}>Default</Button>
+        </div>
+        <Button color="primary" onClick={this.handleClick2}>Default</Button>
       </div>
+      
     );
   }
 }

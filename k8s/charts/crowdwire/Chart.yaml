@@ -32,7 +32,7 @@ dependencies:
   condition: postgresql.enabled
 - name: redis
   repository: file://subcharts/redis
-  version: 12.8.3
+  version: 12.9.0
   condition: redis.enabled
 - name: rabbitmq
   repository: file://subcharts/rabbitmq
@@ -46,3 +46,7 @@ dependencies:
   repository: file://subcharts/frontend
   version: 0.1.0
   condition: frontend.enabled
+- name: mediaserver
+  repository: file://subcharts/mediaserver
+  version: 0.1.0
+  condition: mediaserver.enabled

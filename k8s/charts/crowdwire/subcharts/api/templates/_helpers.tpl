@@ -30,6 +30,23 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+
+{{- define "api.rabbitmqservicename" -}}
+{{- $test:= include "rabbitmq.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+{{- printf "%s" $test }}
+{{- end }}
+
+{{- define "api.postgresservicename" -}}
+{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+{{- printf "%s" $test }}
+{{- end }}
+
+{{- define "api.rediservicename" -}}
+{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+{{- printf "%s" $test }}
+{{- end }}
+
+
 {{/*
 Common labels
 */}}

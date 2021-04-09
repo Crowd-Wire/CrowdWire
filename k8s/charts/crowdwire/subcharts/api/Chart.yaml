@@ -28,14 +28,14 @@ appVersion: "1.16.0"
 #as well as the RabbitMQ Broker
 dependencies: 
 - name: postgresql
-  version: 0.1.0
+  version: 10.3.11
   condition: postgresql.enabled
   repository: file://../postgresql
 - name: redis
-  version: 0.1.0
+  version: 12.9.0
   condition: redis.enabled
   repository: file://../redis
 - name: rabbitmq
-  version: 0.1.0
+  version: 8.11.3
   condition: rabbitmq.enabled
   repository: file://../rabbitmq
