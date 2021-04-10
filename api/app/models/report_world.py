@@ -4,6 +4,10 @@ from app.core.config import settings
 
 
 class Report_World(Base):
+    """
+    A user can report a given world.
+    """
+
 
     reported = Column(Integer,
                       ForeignKey(settings.SCHEMA_NAME+'.world.world_id'),

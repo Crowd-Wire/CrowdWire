@@ -4,6 +4,9 @@ from app.core.config import settings
 
 
 class Report_User(Base):
+    """
+    A user can report another user in a given world.
+    """
 
     reported = Column(Integer, ForeignKey(settings.SCHEMA_NAME+'.user.user_id'), nullable=False, primary_key=True)
     reporter = Column(Integer, ForeignKey(settings.SCHEMA_NAME+'.user.user_id'), nullable=False, primary_key=True)

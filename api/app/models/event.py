@@ -4,6 +4,9 @@ from app.core.config import settings
 
 
 class Event(Base):
+    """
+    Used to keep track of events of a user in a given world.
+    """
 
     event_id = Column(Integer, primary_key=True, autoincrement=True)
     world_id = Column(Integer, ForeignKey(settings.SCHEMA_NAME+'.world.world_id'), nullable=False)

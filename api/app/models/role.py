@@ -4,6 +4,9 @@ from app.core.config import settings
 
 
 class Role(Base):
+    """
+    A world can have multiple roles.
+    """
 
     role_id = Column(Integer, primary_key=True, autoincrement=True)
     world_id = Column(

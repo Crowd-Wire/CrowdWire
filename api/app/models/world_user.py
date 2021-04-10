@@ -2,6 +2,10 @@ from app.db.base_class import Base
 from sqlalchemy import ForeignKey, Integer, Column, String, TIMESTAMP, Table
 from app.core.config import settings
 
+"""
+Many to Many between world and user. Keeps information about a user in a world.
+"""
+
 world_user = Table(
     "world_user",
     Base.metadata,

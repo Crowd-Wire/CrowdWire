@@ -4,6 +4,9 @@ from app.db.base_class import Base
 
 
 class User(Base):
+    """
+    User of the platform.
+    """
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, index=True)

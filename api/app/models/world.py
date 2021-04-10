@@ -5,6 +5,9 @@ from app.core.config import settings
 
 
 class World(Base):
+    """
+    A world is made by a user.
+    """
 
     world_id = Column(Integer, primary_key=True, autoincrement=True)
     creator = Column(Integer, ForeignKey(settings.SCHEMA_NAME + ".user.user_id"))
