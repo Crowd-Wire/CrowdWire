@@ -1,15 +1,20 @@
 from app.db.base_class import Base
-from sqlalchemy import ForeignKey, Integer, Column, String, DateTime
+from sqlalchemy import ForeignKey, Integer, Column, String, TIMESTAMP, LargeBinary, Boolean
 from sqlalchemy.orm import relationship
 from app.core.config import settings
 
 
 class World(Base):
-    world_id = Column(Integer, primary_key=True, index=True)
+
+    world_id = Column(Integer, primary_key=True, autoincrement=True)
+    creator = Column(Integer, ForeignKey(settings.SCHEMA_NAME + ".user.user_id"))
     name = Column(String(30), nullable=False)
-    creation_date = Column(DateTime, nullable=False)
-    update_date = Column(DateTime)
+    creation_date = Column(TIMESTAMP, nullable=False)
+    update_date = Column(TIMESTAMP)
     description = Column(String(300))
-    creator_id = Column(Integer, ForeignKey(settings.SCHEMA_NAME + ".user.user_id"))
+    max_users = Column(Integer)
+    public = Column(Boolean, nullable=False)
+    world_map = Column(LargeBinary, nullable=False)
+    status = Column(Integer, nullable=False)
 
     tags = relationship("Tag", secondary="world_tag")

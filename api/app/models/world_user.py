@@ -1,5 +1,5 @@
 from app.db.base_class import Base
-from sqlalchemy import ForeignKey, Integer, Column, String, DateTime, Table
+from sqlalchemy import ForeignKey, Integer, Column, String, TIMESTAMP, Table
 from app.core.config import settings
 
 world_user = Table(
@@ -20,12 +20,16 @@ world_user = Table(
         index=True,
     ),
     Column(
-        "role_name",
-        String(30),
-        ForeignKey(settings.SCHEMA_NAME + ".role.name"),
-        nullable=False,
+        "role_id",
+        Integer,
+        ForeignKey(settings.SCHEMA_NAME + ".role.role_id"),
+        nullable=False
     ),
     Column("avatar", String(50)),
-    Column("avatar", DateTime),
+    Column("join_date", TIMESTAMP),
+    Column("n_joins", Integer, nullable=False),
+    Column("last_join", TIMESTAMP, nullable=False),
+    Column("status", Integer, nullable=False),
+    Column("username", String(50), nullable=False),
     schema=settings.SCHEMA_NAME,
 )
