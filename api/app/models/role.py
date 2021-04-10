@@ -13,7 +13,7 @@ class Role(Base):
         Integer, ForeignKey(settings.SCHEMA_NAME + ".world.world_id"),
         nullable=False
     )
-    name = Column(String(30),  nullable=False)
+    name = Column(String(30), nullable=False)
     interact = Column(Boolean)
     walk = Column(Boolean)
     talk = Column(Boolean)
@@ -24,4 +24,3 @@ class Role(Base):
     chat = Column(Boolean)
     invite = Column(Boolean)
     ban = Column(Boolean)
-

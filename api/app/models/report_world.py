@@ -8,13 +8,12 @@ class Report_World(Base):
     A user can report a given world.
     """
 
-
     reported = Column(Integer,
-                      ForeignKey(settings.SCHEMA_NAME+'.world.world_id'),
+                      ForeignKey(settings.SCHEMA_NAME + '.world.world_id'),
                       nullable=False, primary_key=True
                       )
     reporter = Column(Integer,
-                      ForeignKey(settings.SCHEMA_NAME+'.user.user_id'),
+                      ForeignKey(settings.SCHEMA_NAME + '.user.user_id'),
                       nullable=False, primary_key=True
                       )
     timestamp = Column(TIMESTAMP, nullable=False)
