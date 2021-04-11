@@ -12,7 +12,9 @@ COPY . ./
 RUN npm run build
 
 FROM nginx:stable-alpine
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
 # Specify port
 EXPOSE 80
 
