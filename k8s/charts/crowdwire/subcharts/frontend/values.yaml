@@ -7,7 +7,7 @@ replicaCount: 1
 image:
   repository: dagomes/frontend
   #for now the pull policy is "Never" since the Docker Images are being tested locally and not pushed to any remote repo!
-  pullPolicy: Never
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 

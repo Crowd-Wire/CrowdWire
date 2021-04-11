@@ -21,7 +21,7 @@ frontend:
   enabled: true
   
 mediaserver:
-  enable: true
+  enabled: true
 
 
 #I'll use my own ingress  with the routing to all microservices that will be exposed  and not make it part of this helm chart,
