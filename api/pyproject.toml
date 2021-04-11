@@ -43,6 +43,7 @@ websockets = "8.1"
 loguru = "^0.5.3"
 flake8 = "^3.9.0"
 aio-pika = "^6.8.0"
+alembic = "^1.5.8"
 
 [tool.poetry.dev-dependencies]
 
