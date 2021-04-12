@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
@@ -15,5 +15,6 @@ class User(Base):
     birth = Column(Date)
     register_date = Column(DateTime, nullable=False)
     status = Column(Integer, nullable=False)
+    is_superuser = Column(Boolean, nullable=False)
 
     world = relationship("World")
