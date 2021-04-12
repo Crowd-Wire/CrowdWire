@@ -30,7 +30,7 @@ For that it is necessary to import in the env.py file our Base class that is use
 to create all the models. This allows alembic to know which models to create.
 
 Note: Because we are using a schema it is necessary to change the code in the revision file.
-Use so.execute("create schema fastapi") and so.execute("drop schema fastapi") in the functions
+Use op.execute("create schema fastapi") and op.execute("drop schema fastapi") in the functions
 upgrade and downgrade respectively.
 
 Run the first migration:
