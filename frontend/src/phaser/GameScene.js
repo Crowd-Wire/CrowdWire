@@ -1,9 +1,11 @@
 import * as Phaser from 'phaser';
 
+import { useSelector } from "react-redux";
 import { getSocket } from "services/socket";
+import store from "redux/playerStore";
 
 
-var socket = getSocket();
+var ws = getSocket(1);
 
 const sceneConfig = {
     active: false,
@@ -14,7 +16,8 @@ const sceneConfig = {
 
 class GameScene extends Phaser.Scene {
     flag = 0;
-    PLAYER_NUM = 10;
+    PLAYER_NUM = 0;
+    players = {};
 
     constructor() {
         super(sceneConfig);
@@ -33,7 +36,7 @@ class GameScene extends Phaser.Scene {
         // -1 makes all tiles on this layer collidable
         obstacles.setCollisionByExclusion([-1]);
 
-        /* create the map borders */
+        // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
         this.physics.world.bounds.height = this.map.heightInPixels;
 
@@ -41,11 +44,11 @@ class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
 
-        /* static player for range test */
-        new OnlinePlayerSprite(this, 100, 250);
+        // static players for range test
+        new OnlinePlayerSprite(this, 0, 0);
         new OnlinePlayerSprite(this, 500, 600);
 
-        /* players for follow test */
+        // players for follow test
         this.otherPlayers = [];
         for (let i = 0; i < this.PLAYER_NUM; i++) {
             this.otherPlayers[i] = new OnlinePlayerSprite(this, 50, 60);
@@ -55,8 +58,7 @@ class GameScene extends Phaser.Scene {
         // main player
         this.player = new PlayerSprite(this, 50, 60);
 
-        
-        /* make camera follow player */
+        // make camera follow player
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(this.player);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
@@ -66,26 +68,64 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-D', () => {
             this.scene.start('FillTilesScene');
         }, this);
+
+
+        this.onlinePlayers = [];
+        this.unsubscribe = store.subscribe(this.handleJoinNLeavePlayer);
+
+        this.physics.add.collider(this.onlinePlayers, obstacles);
+
+    }
+
+    handleJoinNLeavePlayer = () => {
+        let previousPlayers = this.players;
+        this.players = store.getState().players;
+        
+        let previousPlayersIds = Object.keys(previousPlayers);
+        let playersIds = Object.keys(this.players);
+
+        if (previousPlayersIds.length !== playersIds.length) {
+
+            // players updated
+            if (previousPlayersIds.length > playersIds.length) {
+                // left
+                
+                previousPlayersIds.forEach(playerId => {
+                    if (!(playerId in this.players))
+                    return; //apagar sprite
+                });
+            } else {
+                // joined
+
+                playersIds.forEach(playerId => {
+                    if (!(playerId in previousPlayers))
+                        this.onlinePlayers.push(new OnlinePlayerSprite(this, 50, 50, playerId));
+                });
+            }
+        }
     }
 
     update(time, delta) {
         this.flag++;
         this.player.updateMovement();
 
-        /* detect surrounding players */
+        this.onlinePlayers.forEach(p => {
+            p.updateMovement();
+        })
+
+        // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
         if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            if (socket.readyState === WebSocket.OPEN) {
-                console.log('sending proximity to', bodies[0].gameObject.id)
-                socket.send(JSON.stringify(bodies[0].gameObject.id));
+            if (ws.socket.readyState === WebSocket.OPEN) {
+                // ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
             }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
 
-        /* follow player test */
+        // follow player test
         if (this.PLAYER_NUM > 0)
             this.otherPlayers[this.PLAYER_NUM-1].updateMovementByPosition({x: this.player.x, y: this.player.y}, this.flag)
         for (let i=this.PLAYER_NUM-2; i >= 0; i--) {
@@ -162,25 +202,24 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
 
-        if (direction.x || direction.y) 
-            if (socket.readyState === WebSocket.OPEN) {
-                console.log('sending velocity', this.body.velocity)
-                socket.send(JSON.stringify(this.body.velocity));
+        // if (this.body.velocity.x || this.body.velocity.y) 
+            if (ws.socket.readyState === WebSocket.OPEN) {
+                ws.sendPosition(1, this.body.velocity);
             }
     }
 
     updateAnimation(direction) {
-        if (direction.y > 0) {
+        if (this.body.facing == Phaser.Physics.Arcade.FACING_DOWN) {
             this.anims.play('down', true);
         }
-        else if (direction.y < 0) {
+        else if (this.body.facing == Phaser.Physics.Arcade.FACING_UP) {
             this.anims.play('up', true);
         }
-        else if (direction.x > 0) {
+        else if (this.body.facing == Phaser.Physics.Arcade.FACING_RIGHT) {
             this.flipX = false;
             this.anims.play('horizontal', true);
         }
-        else if (direction.x < 0) {
+        else if (this.body.facing == Phaser.Physics.Arcade.FACING_LEFT) {
             this.flipX = true;
             this.anims.play('horizontal', true);
         }
@@ -201,41 +240,59 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
  * @param {number} y - The start vertical position in the scene.
  */
 class OnlinePlayerSprite extends PlayerSprite {
-    static id = 0;
     speed = 500; // 900 is the upperbound ig
+    direction;
     
-    constructor(scene, x, y) {
+    constructor(scene, x, y, id) {
         super(scene, x, y);
-        this.id = OnlinePlayerSprite.id++;
+        this.id = id;
+
+        this.unsubscribe = store.subscribe(this.handlePlayerMovement);
     }
 
-    updateMovementByPosition(position, flag) {
-        // simulate delay
-        if (flag % 6 != 0)
+    handlePlayerMovement = () => {
+        let previousDirection = this.direction;
+        this.direction = store.getState().players[this.id];
+          
+        if (previousDirection !== this.direction) {
+            // direction updated
+
+            this.updateMovementByDirection(this.direction);
+        }
+    }
+
+    updateMovement() {
+        // this.updateMovementByPosition(this.direction);
+        // this.updateMovementByDirection(this.direction);
+    }
+
+    updateMovementByPosition(position) {
+
+        if (!position)
             return;
 
-        var distance = Phaser.Math.Distance.Between(this.x, this.y, position.x, position.y);
+        this.updateAnimation({x: position.x - this.body.center.x, y: position.y - this.body.center.y});
 
-        //  4 is our distance tolerance, i.e. how close the source can get to the target
-        //  before it is considered as being there. The faster it moves, the more tolerance is required.
-        // console.log(distance,  this.speed * 2/100)
-        if (distance < this.speed * 2/100)
+        var distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, position.x, position.y);
+        // console.log(distance)
+        // if (distance < 32) {
+        //     speed = distance*15;
+        // }
+
+
+        if (distance < 8)
         {
             this.body.reset(position.x, position.y);
             this.anims.stop();
             return;
         }
 
-        let direction;
-        direction = {x: position.x - this.x, y: position.y - this.y};
-
-        this.updateAnimation(direction);
-
-        // this.setPosition(position.x, position.y);
         this.scene.physics.moveToObject(this, position, this.speed);
     }
 
     updateMovementByDirection(direction) {
+        if (!direction)
+            return;
         this.updateAnimation(direction);
 
         this.body.setVelocityX(direction.x * this.speed);

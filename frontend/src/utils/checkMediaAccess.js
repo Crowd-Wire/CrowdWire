@@ -1,5 +1,5 @@
 import videoCall from "../consts/videoCall";
-import { storeDevice } from "../redux/store.js";
+import storeDevice from "redux/commStore.js";
 
 
 export async function useCheckMediaAccess() {

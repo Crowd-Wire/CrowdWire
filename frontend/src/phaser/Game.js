@@ -12,6 +12,10 @@ const gameConfig = {
   pixelArt: true, 
   zoom: 2,
 
+  fps: {
+    target: 15,
+  },
+
   // width: window.innerWidth,
   // height: window.innerHeight,
 

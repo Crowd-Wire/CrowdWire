@@ -3,8 +3,7 @@ import React, { useEffect, useState } from "react";
 import { VolumeSlider } from "./VolumeSlider";
 import { Button, Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
-import { changeMicId, changeCamId } from "../../redux/store.js";
-import { storeDevice } from "../../redux/store.js";
+import storeDevice, { changeMicId, changeCamId } from "redux/commStore.js";
 
 interface DeviceSettingsProps {}
 

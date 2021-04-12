@@ -15,7 +15,7 @@ import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
-import { storeDevice } from "../../redux/store.js";
+import storeDevice from "redux/commStore.js";
 import { VideoBox } from "./VideoBox"
 import logo from '../../assets/crowdwire_white_logo.png';
 
