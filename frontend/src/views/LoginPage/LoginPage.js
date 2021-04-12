@@ -6,10 +6,9 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 import Email from "@material-ui/icons/Email";
-import People from "@material-ui/icons/People";
 // core components
-import Header from "components/Header/Header.js";
-import HeaderLinks from "components/Header/HeaderLinks.js";
+// import Header from "components/Header/Header.js";
+// import HeaderLinks from "components/Header/HeaderLinks.js";
 import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -37,7 +36,6 @@ export default function LoginPage(props) {
   const navigate = useNavigate();
   const goToRegister = () => navigate('/register');
   const classes = useStyles();
-  const { ...rest } = props;
   return (
     <div>
       <div
