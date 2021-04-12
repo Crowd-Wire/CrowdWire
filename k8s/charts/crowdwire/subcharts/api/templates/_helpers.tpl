@@ -37,12 +37,12 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{- define "api.postgresservicename" -}}
-{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+{{- $test:= include "api.fullname" (dict "Values" $.Values.postgresql "Chart" (dict "Name" "postgresql") "Release" $.Release) }}
 {{- printf "%s" $test }}
 {{- end }}
 
 {{- define "api.rediservicename" -}}
-{{- $test:= include "api.fullname" (dict "Values" $.Values.rabbitmq "Chart" (dict "Name" "rabbitmq") "Release" $.Release) }}
+{{- $test:= include "api.fullname" (dict "Values" $.Values.redis "Chart" (dict "Name" "redis") "Release" $.Release) }}
 {{- printf "%s" $test }}
 {{- end }}
 
