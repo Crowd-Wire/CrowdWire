@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict, Optional, Union
 
 from sqlalchemy.orm import Session
@@ -19,17 +20,22 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         """
         return db.query(User).filter(User.user_id == id).first()
 
-    def create(self, db: Session, *, new_user: UserCreate) -> User:
+    def create(self, db: Session, *, user_data: UserCreate) -> User:
         """
         Creates an User
         """
 
+        if self.get_by_email(db=db, email=user_data.email):
+            return None
+
         db_user = User(
-            email=new_user.email,
-            hashed_password=get_password_hash(new_user.hashed_password),
-            name=new_user.name,
-            birth=new_user.birth,
-            register_date=new_user.register_date,
+            email=user_data.email,
+            hashed_password=get_password_hash(user_data.hashed_password),
+            name=user_data.name,
+            birth=user_data.birth,
+            register_date=datetime.datetime.now(),
+            status="0",
+            is_superuser=False
         )
         db.add(db_user)
         db.commit()
@@ -63,6 +69,17 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if not verify_password(password, user.hashed_password):
             return None
         return db_user
+
+    # TODO: change imports to be models.User
+    def is_active(self, db: Session, *, user: User) -> bool:
+        """
+        A user is active if it's status is 0
+        """
+
+        if user.status == 0:
+            return True
+        else:
+            return False
 
 
 user = CRUDUser(User)

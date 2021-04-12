@@ -20,6 +20,30 @@ from app.core.config import settings
 router = APIRouter()
 
 
+@router.post("/register", response_model=schemas.Token)
+def register(
+        db: Session = Depends(dependencies.get_db),
+        user_data: schemas.UserCreate = Depends()
+) -> Any:
+    """
+    Register a user, returns an access token for that user
+    """
+
+    user = crud.user.create(db=db, user_data=user_data)
+
+    if not user:
+        raise HTTPException(status_code=400, detail="A user with that email already exists")
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return {
+        "access_token": security.create_access_token(
+            user.user_id, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+    }
+
+
+
 @router.post("/login/access-token", response_model=schemas.Token)
 def login_access_token(
         db: Session = Depends(dependencies.get_db),
@@ -34,8 +58,8 @@ def login_access_token(
 
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    # elif not crud.user.is_active(user):
-    #    raise HTTPException(status_code=400, detail="Inactive user")
+    elif not crud.user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": security.create_access_token(
