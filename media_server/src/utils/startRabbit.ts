@@ -98,6 +98,7 @@ type OutgoingMessageDataMap = {
   "you-are-now-a-speaker": {
     sendTransportOptions: TransportOptions;
     roomId: string;
+    peerId: string;
   };
   "you-joined-as-peer": {
     roomId: string;
@@ -120,11 +121,11 @@ type OutgoingMessageDataMap = {
   };
 
 type OutgoingMessage<Key extends keyof OutgoingMessageDataMap> = {
-  op: Key;
+  topic: Key;
   d: OutgoingMessageDataMap[Key];
 } & ({ uid: string } | { rid: string });
 interface IncomingChannelMessageData<Key extends keyof HandlerMap> {
-  op: Key;
+  topic: Key;
   d: HandlerDataMap[Key];
   uid: string;
 }
@@ -146,21 +147,17 @@ export const startRabbit = async (handler: HandlerMap) => {
     setTimeout(async () => await startRabbit(handler), retryInterval);
     return;
   }
-  const id = process.env.QUEUE_ID || "";
-  console.log("rabbit connected " + id);
+  console.log("rabbit connected");
   conn.on("close", async function (err: Error) {
     console.error("Rabbit connection closed with error: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
   });
   const channel = await conn.createChannel();
-  const sendQueue = "rest_api_queue" + id;
-  const onlineQueue = "rest_api_online_queue" + id;
-  const receiveQueue = "shawarma_queue" + id;
-  console.log(sendQueue, onlineQueue, receiveQueue);
+  const sendQueue = "rest_api_queue";
+  const receiveQueue = "media_server_queue";
   await Promise.all([
     channel.assertQueue(receiveQueue),
     channel.assertQueue(sendQueue),
-    channel.assertQueue(onlineQueue),
   ]);
   send = <Key extends keyof OutgoingMessageDataMap>(
     obj: OutgoingMessage<Key>
@@ -175,11 +172,12 @@ export const startRabbit = async (handler: HandlerMap) => {
       if (m) {
         let data: IncomingChannelMessageData<any> | undefined;
         try {
+          console.log(m)
           data = JSON.parse(m);
-        } catch {}
-        // console.log(data.op);
-        if (data && data.op && data.op in handler) {
-          const { d: handlerData, op: operation, uid } = data;
+        } catch {console.log('n entrei')}
+        // console.log(data.topic);
+        if (data && data.topic && data.topic in handler) {
+          const { d: handlerData, topic: operation, uid } = data;
           try {
             console.log(operation);
             await handler[operation as keyof HandlerMap](
@@ -189,7 +187,7 @@ export const startRabbit = async (handler: HandlerMap) => {
               () => {
                 console.log(operation);
                 send({
-                  op: "error",
+                  topic: "error",
                   d:
                     "The voice server is probably redeploying, it should reconnect in a few seconds. If not, try refreshing.",
                   uid: uid,
@@ -198,15 +196,11 @@ export const startRabbit = async (handler: HandlerMap) => {
             );
           } catch (err) {
             console.log(operation, err);
-            Sentry.captureException(err, { extra: { op: operation } });
+            Sentry.captureException(err, { extra: { topic: operation } });
           }
         }
       }
     },
     { noAck: true }
-  );
-  channel.sendToQueue(
-    onlineQueue,
-    Buffer.from(JSON.stringify({ op: "online" }))
   );
 };

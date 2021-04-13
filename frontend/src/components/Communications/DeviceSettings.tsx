@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { VolumeSlider } from "./VolumeSlider";
 import { Button, Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
-import { changeMicId, changeCamId } from "../../redux/store.js";
-import { storeDevice } from "../../redux/store.js";
+import { changeMicId, changeCamId } from "../../redux/commStore.js";
+import storeDevice from "../../redux/commStore.js";
 
 interface DeviceSettingsProps {}
 
@@ -22,7 +22,6 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 	const [volume, setVolume] = useState(100);
 
   useEffect(() => {
-    console.log("dsadasdsadsadasdasdasdsadas")
     navigator.mediaDevices
       .enumerateDevices()
       .then((x) =>

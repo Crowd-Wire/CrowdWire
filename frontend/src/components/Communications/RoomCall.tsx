@@ -15,25 +15,34 @@ import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
-import { storeDevice } from "../../redux/store.js";
+import storeDevice from "../../redux/commStore.js";
 import { VideoBox } from "./VideoBox"
 import logo from '../../assets/crowdwire_white_logo.png';
+
+import { getSocket } from "../../services/socket.js";
+import { WebRtcApp } from "../../webrtc/WebRtcApp";
+import { Consumer } from "mediasoup-client/lib/types";
+import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 
 interface State {
   chatToggle: boolean;
   displayStream: boolean;
   messages: Array<string>;
   users: { [key: string]: CreateVideo };
+  consumerMap: { [key: string]: { consumer: Consumer; volume: number; debug?: boolean } };
 }
 
 export default class RoomCall extends React.Component<{}, State> {
   constructor(props) {
     super(props);
+    const { consumerMap } = useConsumerStore.getState();
     this.state = {
       chatToggle: false,
       displayStream: false,
       messages: [],
-      users: {}
+      users: {},
+      consumerMap: consumerMap
     }
     this.chatHandle = this.chatHandle.bind(this);
     this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
@@ -42,6 +51,7 @@ export default class RoomCall extends React.Component<{}, State> {
     this.listenToEndStream = this.listenToEndStream.bind(this);
     this.replaceStream = this.replaceStream.bind(this);
     this.getMyVideo = this.getMyVideo.bind(this);
+    this.sendMsg = this.sendMsg.bind(this);
   }
   myId: string = '12';
   //users: { [key: string]: CreateVideo } = {};
@@ -49,6 +59,7 @@ export default class RoomCall extends React.Component<{}, State> {
   accessMic: boolean = false;
   accessVideo: boolean = false;
   numberUsers = 0;
+  socket = getSocket(1).socket;
 
   chatHandle = (bool:boolean=false) => {
     this.setState({chatToggle:bool});
@@ -57,6 +68,10 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
+        useVoiceStore.getState().set({
+          micStream: stream,
+          mic: stream.getAudioTracks()[0]
+        })
         if (this.numberUsers == 0) this.createVideo({ id: this.myId, stream });
         else this.createVideo({ id: this.myId + this.numberUsers.toString(), stream });
       }
@@ -76,6 +91,7 @@ export default class RoomCall extends React.Component<{}, State> {
               this.listenToEndStream(stream, {video, audio});
               //socket.emit('display-media', true);
             }
+            useVoiceStore.getState().set({ mic: stream.getAudioTracks()[0] });
             this.createVideo({ id: this.myId, stream });
             this.replaceStream(stream);
             resolve(true);
@@ -92,6 +108,8 @@ export default class RoomCall extends React.Component<{}, State> {
   getMyVideo = (id:string=this.myId) => {
     return document.getElementById(id);
   }
+
+
   
   listenToEndStream = (stream:MediaStream, status:MediaStatus) => {
     const videoTrack = stream.getVideoTracks();
@@ -177,8 +195,17 @@ export default class RoomCall extends React.Component<{}, State> {
     }
   }
 
+  sendMsg = (topic, d) => {
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(
+        { topic: topic, d: d }
+      ));
+    }
+  }
 
   componentDidMount() {
+    useVoiceStore.getState().set({ roomId: 'test_group' });
+
     storeDevice.subscribe((changeMicId) => {
       this.reInitializeStream()
     })
@@ -241,7 +268,7 @@ export default class RoomCall extends React.Component<{}, State> {
           rows: this.numberUsers > 3 ? 2 : 1,
           gap: 5,
           loop: true,
-          autoplay: false,
+          autoplay: 0,
           hideArrow: this.numberUsers > 6 ? false : true
         }
       ],
@@ -269,6 +296,18 @@ export default class RoomCall extends React.Component<{}, State> {
         <Button color="primary" onClick={() => this.toggleAudioTrack()}>Toggle Audio</Button>
         <Button color="primary" onClick={() => this.toggleVideoTrack()}>Toggle Video</Button>
 
+        <div className="row">
+          <Button color="primary" onClick={() => this.sendMsg("join-as-new-peer", { roomId: 1 })}>
+            {/* This will join a room and then create a Transport that allows to Receive data */}
+            Join Room 1 and only Receive Audio
+          </Button>
+          <Button color="primary" onClick={() => this.sendMsg("join-as-speaker", { roomId: 1 })}>
+            {/* This will join a room and then create a Transport
+            that allows to Receive data and another Transport to send data*/}
+            Join Room 1 and Receive and Send Audio
+          </Button>
+        </div>
+
         { this.numberUsers > 0 ? (
           <Carousel {...gridSettings}>
             { Object.keys(this.state.users).map((key, index) => (
@@ -276,10 +315,41 @@ export default class RoomCall extends React.Component<{}, State> {
                   <VideoBox username="user1" videoId={key} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
               </Carousel.Item>
             ))}
+
+            {/* { Object.keys(this.state.consumerMap).map((k, index) => {
+              const { consumer, volume: userVolume, debug } = this.state.consumerMap[k];
+              return (
+                <div></div>
+                // <Carousel.Item key={index}>
+                //   <VideoBox username="user1" volume={(userVolume / 200) * (globalVolume / 100)} videoId={consumer.id} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
+                // </Carousel.Item>
+                  // onRef={(a) => {
+                  //   audioRefs.current.push([k, a]);
+                  //   a.srcObject = new MediaStream([consumer.track]);
+                  //   // prevent modal from showing up more than once in a single render cycle
+                  //   const notAllowedErrorCount =
+                  //     notAllowedErrorCountRef.current;
+                  //   a.play().catch((error) => {
+                  //     if (
+                  //       error.name === "NotAllowedError" &&
+                  //       notAllowedErrorCountRef.current === notAllowedErrorCount
+                  //     ) {
+                  //       notAllowedErrorCountRef.current++;
+                  //       setShowAutoPlayModal(true);
+                  //     }
+                  //     console.warn("audioElem.play() failed:%o", error);
+                  //   });
+                  // }}
+              )
+            })} */}
+
           </Carousel>
         ) : '' }
 
         <DeviceSettings />
+        
+
+        <WebRtcApp/>
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 

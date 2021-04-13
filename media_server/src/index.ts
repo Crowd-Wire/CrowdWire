@@ -10,8 +10,8 @@ import { deleteRoom } from "./utils/deleteRoom";
 import { startMediasoup } from "./utils/startMediasoup";
 import { HandlerMap, startRabbit } from "./utils/startRabbit";
 
-const log = debugModule("shawarma:index");
-const errLog = debugModule("shawarma:ERROR");
+const log = debugModule("crowdwire:index");
+const errLog = debugModule("crowdwire:ERROR");
 
 const rooms: MyRooms = {};
 
@@ -74,7 +74,7 @@ async function main() {
         if (Object.keys(rooms[roomId].state).length === 0) {
           deleteRoom(roomId, rooms);
         }
-        send({ uid, op: "you_left_room", d: { roomId, kicked: !!kicked } });
+        send({ uid, topic: "you_left_room", d: { roomId, kicked: !!kicked } });
       }
     },
     ["@get-recv-tracks"]: async (
@@ -121,7 +121,7 @@ async function main() {
       }
 
       send({
-        op: "@get-recv-tracks-done",
+        topic: "@get-recv-tracks-done",
         uid,
         d: { consumerParametersArr, roomId },
       });
@@ -163,7 +163,7 @@ async function main() {
           // @todo give some time for frontends to get update, but this can be removed
           send({
             rid: roomId,
-            op: "close_consumer",
+            topic: "close_consumer",
             d: { producerId: previousProducer.id, roomId },
           });
         }
@@ -195,7 +195,7 @@ async function main() {
             );
             send({
               uid: theirPeerId,
-              op: "new-peer-speaker",
+              topic: "new-peer-speaker",
               d: { ...d, roomId },
             });
           } catch (e) {
@@ -203,7 +203,7 @@ async function main() {
           }
         }
         send({
-          op: `@send-track-${direction}-done` as const,
+          topic: `@send-track-${direction}-done` as const,
           uid,
           d: {
             id: producer.id,
@@ -212,7 +212,7 @@ async function main() {
         });
       } catch (e) {
         send({
-          op: `@send-track-${direction}-done` as const,
+          topic: `@send-track-${direction}-done` as const,
           uid,
           d: {
             error: e.message,
@@ -220,7 +220,7 @@ async function main() {
           },
         });
         send({
-          op: "error",
+          topic: "error",
           d: "error connecting to voice server | " + e.message,
           uid,
         });
@@ -255,19 +255,19 @@ async function main() {
       } catch (e) {
         console.log(e);
         send({
-          op: `@connect-transport-${direction}-done` as const,
+          topic: `@connect-transport-${direction}-done` as const,
           uid,
           d: { error: e.message, roomId },
         });
         send({
-          op: "error",
+          topic: "error",
           d: "error connecting to voice server | " + e.message,
           uid,
         });
         return;
       }
       send({
-        op: `@connect-transport-${direction}-done` as const,
+        topic: `@connect-transport-${direction}-done` as const,
         uid,
         d: { roomId },
       });
@@ -276,7 +276,7 @@ async function main() {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
-      send({ op: "room-created", d: { roomId }, uid });
+      send({ topic: "room-created", d: { roomId }, uid });
     },
     ["add-speaker"]: async ({ roomId, peerId }, uid, send, errBack) => {
       if (!rooms[roomId]?.state[peerId]) {
@@ -291,10 +291,11 @@ async function main() {
       rooms[roomId].state[peerId].sendTransport = sendTransport;
 
       send({
-        op: "you-are-now-a-speaker",
+        topic: "you-are-now-a-speaker",
         d: {
           sendTransportOptions: transportToOptions(sendTransport),
           roomId,
+          peerId,
         },
         uid,
       });
@@ -321,7 +322,7 @@ async function main() {
       };
 
       send({
-        op: "you-joined-as-speaker",
+        topic: "you-joined-as-speaker",
         d: {
           roomId,
           peerId,
@@ -351,7 +352,7 @@ async function main() {
       };
 
       send({
-        op: "you-joined-as-peer",
+        topic: "you-joined-as-peer",
         d: {
           roomId,
           peerId,

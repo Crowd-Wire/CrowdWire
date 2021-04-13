@@ -3,8 +3,7 @@ import * as Phaser from 'phaser';
 import { getSocket } from "services/socket";
 
 
-var socket = getSocket();
-
+var socket = getSocket(1).socket;
 const sceneConfig = {
     active: false,
     visible: false,

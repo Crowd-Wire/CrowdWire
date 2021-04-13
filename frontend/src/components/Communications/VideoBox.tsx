@@ -16,19 +16,13 @@ export const VideoBox: React.FC<VideoBoxProps> = ({
       const video = (document.getElementById(videoId)! as HTMLVideoElement);
       if (stream) video.srcObject = stream;
       video.muted = muted;
-      var playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.then(_ => {})
-        .catch(error => {
-        });
-      }
     }
   }, [])
 
   return (
     <div>
         {username}
-        <video width="100%" id={videoId}/>
+        <video width="100%" autoPlay id={videoId}/>
     </div>
   );
 };
