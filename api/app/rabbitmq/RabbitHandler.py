@@ -5,25 +5,25 @@ from app.core.config import settings
 from app.api.api_v1.endpoints.connection_manager import manager
 import json
 
+
 # Message Receiving format
 async def on_message(message: IncomingMessage) -> None:
     async with message.process():
-        #logger.info(" [x] Received message %r" % message)
+        # logger.info(" [x] Received message %r" % message)
         msg = message.body.decode()
         logger.info("Message body is: %r" % msg)
         logger.info("Users Websockets: %r" % manager.users_ws)
         msg = json.loads(msg)
-        
+
         if msg['topic'] == 'you-joined-as-peer' or msg['topic'] == 'you-joined-as-speaker':
             user_id = msg['d']['peerId']
-            
+
             if user_id in manager.users_ws:
                 user_ws = manager.users_ws[user_id]
 
                 # redirect message to user with transport options
                 await manager.send_personal_message(msg, user_ws)
-            
-        
+
 
 class RabbitHandler:
     def __init__(self):

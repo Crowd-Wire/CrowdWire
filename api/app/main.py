@@ -6,7 +6,7 @@ from app.api.api_v1.api import api_router
 from app.core.logging import init_logging
 from fastapi.middleware.cors import CORSMiddleware
 from app.rabbitmq import rabbit_handler
-from app.redis import redis_connector
+# from app.redis import redis_connector
 
 app = FastAPI(debug=True)
 origins = [
@@ -29,5 +29,5 @@ app.include_router(api_router)
 if __name__ == "__main__":
     init_logging()
     app.add_event_handler("startup", rabbit_handler.start_pool)
-    #app.add_event_handler('startup', redis_connector.sentinel_connection)
+    # app.add_event_handler('startup', redis_connector.sentinel_connection)
     uvicorn.run(app, host="0.0.0.0", port=8000)

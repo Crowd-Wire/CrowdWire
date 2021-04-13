@@ -1,8 +1,6 @@
-from typing import Dict, List, Any, Tuple
-
-from fastapi import WebSocket, WebSocketDisconnect, APIRouter
+from typing import Dict, List, Tuple
+from fastapi import WebSocket
 from loguru import logger
-import json
 
 
 class ConnectionManager:
@@ -14,15 +12,15 @@ class ConnectionManager:
         value
         """
         self.connections: Dict[int, Dict[int, List[WebSocket]]] = {}
-        
+
         self.users_ws: Dict[int, WebSocket] = {}
 
     async def connect(self, world_id: int, websocket: WebSocket) -> Tuple[int, int]:
         await websocket.accept()
-        
+
         payload = await websocket.receive_json()
         room_id = payload['room_id']
-        token = payload['token']
+        # token = payload['token']
         # futurely, get token from message and retrieve it's id??? guests will have a G prepended, ig
         user_id = self.count
         self.count += 1
@@ -34,7 +32,7 @@ class ConnectionManager:
             .setdefault(world_id, {}) \
             .setdefault(room_id, []) \
             .append(user_id)
-            
+
         logger.info(
             f"New connection added to World {world_id}, Room {room_id}"
         )
