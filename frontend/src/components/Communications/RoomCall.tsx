@@ -44,14 +44,6 @@ export default class RoomCall extends React.Component<{}, State> {
       users: {},
       consumerMap: consumerMap
     }
-    this.chatHandle = this.chatHandle.bind(this);
-    this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
-    this.toggleAudioTrack = this.toggleAudioTrack.bind(this);
-    this.toggleVideoTrack = this.toggleVideoTrack.bind(this);
-    this.listenToEndStream = this.listenToEndStream.bind(this);
-    this.replaceStream = this.replaceStream.bind(this);
-    this.getMyVideo = this.getMyVideo.bind(this);
-    this.sendMsg = this.sendMsg.bind(this);
   }
   myId: string = '12';
   //users: { [key: string]: CreateVideo } = {};
@@ -312,7 +304,7 @@ export default class RoomCall extends React.Component<{}, State> {
           <Carousel {...gridSettings}>
             { Object.keys(this.state.users).map((key, index) => (
               <Carousel.Item key={index}>
-                  <VideoBox username="user1" videoId={key} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
+                  <VideoBox username="user1" volume={0.01} videoId={key} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
               </Carousel.Item>
             ))}
 
@@ -321,25 +313,30 @@ export default class RoomCall extends React.Component<{}, State> {
               return (
                 <div></div>
                 // <Carousel.Item key={index}>
-                //   <VideoBox username="user1" volume={(userVolume / 200) * (globalVolume / 100)} videoId={consumer.id} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
+                //   <VideoBox
+                      // username="user1"
+                      // volume={(userVolume / 200) * (globalVolume / 100)}
+                      // videoId={consumer.id} stream={this.state.users[key].stream}
+                      // muted={key == this.myId ? true : false}
+                      // onRef={(a) => {
+                      //   audioRefs.current.push([k, a]);
+                      //   a.srcObject = new MediaStream([consumer.track]);
+                      //   // prevent modal from showing up more than once in a single render cycle
+                      //   const notAllowedErrorCount =
+                      //     notAllowedErrorCountRef.current;
+                      //   a.play().catch((error) => {
+                      //     if (
+                      //       error.name === "NotAllowedError" &&
+                      //       notAllowedErrorCountRef.current === notAllowedErrorCount
+                      //     ) {
+                      //       notAllowedErrorCountRef.current++;
+                      //       setShowAutoPlayModal(true);
+                      //     }
+                      //     console.warn("audioElem.play() failed:%o", error);
+                      //   });
+                      // }}
+                      // />
                 // </Carousel.Item>
-                  // onRef={(a) => {
-                  //   audioRefs.current.push([k, a]);
-                  //   a.srcObject = new MediaStream([consumer.track]);
-                  //   // prevent modal from showing up more than once in a single render cycle
-                  //   const notAllowedErrorCount =
-                  //     notAllowedErrorCountRef.current;
-                  //   a.play().catch((error) => {
-                  //     if (
-                  //       error.name === "NotAllowedError" &&
-                  //       notAllowedErrorCountRef.current === notAllowedErrorCount
-                  //     ) {
-                  //       notAllowedErrorCountRef.current++;
-                  //       setShowAutoPlayModal(true);
-                  //     }
-                  //     console.warn("audioElem.play() failed:%o", error);
-                  //   });
-                  // }}
               )
             })} */}
 
