@@ -46,140 +46,42 @@ const useStyles = theme => ({
 });
 
 class SearchAllMaps extends Component{
-	// state ={
-		// 	typeAccess: '',
-		// 	typeFormat: '',
-		// 	typeTopic: '',
-		// }
-		
-    
-    // handleChange = (prop) => (event) => {
-			//     setValues({ ...values, [prop]: event.target.value });
-			//   };
-			
-			// deleteFilters() {
-				//     setFormat('');
-				//     setAccess('');
-				// }
-				// handleAccessibility = (event) => {
-					// 	setAccess(event.target.value);
-					// };
-					
-					// handleTopic = (event) => {
-						// 	setTopic(event.target.value);
-						// };
-						
-						// handleFormat = (event) => {
-							//     setFormat(event.target.value);
-							// };
-							// [values, setValues] = React.useState({
-								// amount: '',
-								// });
-		focusMap = () => {
-			this.props.handler(false)
-		}
-		render() {
-			const { classes } = this.props;
-			return(
-					<>
-						<Container style={{overflowX: "hidden"}}>
-							<MapFilters/>
-							{/* <Row style={{alignContent:"center", marginBottom:"30px"}}>
-								<Col xs={12} sm={12} md={6}>
-										<FormControl fullWidth className={classes.margin} variant="outlined" >
-											<InputLabel htmlFor="outlined-margin-normal">Search Map</InputLabel>
-											<OutlinedInput
-												id="outlined-adornment-amount"
-												value={values.amount}
-												onChange={handleChange('amount')}
-												startAdornment={<InputAdornment position="start"><SearchIcon/></InputAdornment>}
-												labelWidth={90}
-											/>
-										</FormControl>
-								</Col>
-								<Col xs={12} sm={12} md={6} className={classes.filter}>
-									<Row>
-										<Col xs={10} sm={10} md={10}></Col>
-											<Col xs={2} sm={2} md={1} style={{float:"right"}}>
-												<TuneIcon className={classes.filterIcon} onClick={toggleFilter} style={{float:"right"}}/>
-											</Col>
-											<Col xs={0} sm={0} md={1}></Col>
-									</Row>
-								</Col>
-							</Row>
-							<Row>                                
-								{isOpened ?
-									<Col xs={12} sm={12} md={12} lg={12} style={{alignContent:"center"}}>
-										<Container style={{marginLeft:"auto", marginRight:"auto"}}>
-												<FormControl className={classes.formControl} >
-													<Select
-														value={typeAccess}
-														onChange={handleAccessibility}
-														displayEmpty
-														className={classes.selectEmpty}
-														inputProps={{ 'aria-label': 'Without label' }}
-													>
-													<MenuItem value="">
-														<em>Accessibility</em>
-													</MenuItem>
-													<MenuItem value={'public'}>Public</MenuItem>
-													<MenuItem value={'private'}>Private</MenuItem>
-													</Select>
-												</FormControl>
-												<FormControl className={classes.formControl}>
-													<Select
-														value={typeFormat}
-														onChange={handleFormat}
-														displayEmpty
-														className={classes.selectEmpty}
-														inputProps={{ 'aria-label': 'Without label' }}
-													>
-													<MenuItem value="">
-														<em>Typology</em>
-													</MenuItem>
-													<MenuItem value={'Leisure'}>Leisure</MenuItem>
-													<MenuItem value={'Meetings'}>Meetings</MenuItem>
-													<MenuItem value={'Classes'}>Classes</MenuItem>
-													<MenuItem value={'Conferences'}>Conferences</MenuItem>
-													</Select>
-												</FormControl>
-												<FormControl className={classes.formControl}>
-													<Select
-														value={typeTopic}
-														onChange={handleTopic}
-														displayEmpty
-														className={classes.selectEmpty}
-														inputProps={{ 'aria-label': 'Without label' }}
-													>
-													<MenuItem value="">
-														<em>Topic</em>
-													</MenuItem>
-													<MenuItem value={'General'}>General</MenuItem>
-													<MenuItem value={'Technology'}>Technology</MenuItem>
-													<MenuItem value={'Biology'}>Biology</MenuItem>
-													<MenuItem value={'Philosophy'}>Philosophy</MenuItem>
-													<MenuItem value={'Geology'}>Geology</MenuItem>
-													</Select>
-												</FormControl>
-											<HighlightOffIcon title="Delete Filters" className={classes.filterIcon} onClick={deleteFilters}/>
-										</Container>
-									</Col>
-									:          
-									<Col xs={10} sm={10} md={10}></Col>
-								}
-							</Row> */}
-							<hr/>
-							<Row>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
-							</Row>
-						</Container>
-					</>
-					);
+	constructor(props){
+		super(props);
+		this.cards=[];
+	}
+	maps=[
+		{"Title":"City","description":"This map was created with the purpose of gathering people to explore a beautiful city and convey a near life-like experience to users."},
+		{"Title":"Junle","description":"This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users."},
+		{"Title":"Mountains","description":"It is really cold up here."}
+	]
+	componentDidMount(){
 
+		this.setState();
+	}
+
+	focusMap = () => {
+		this.props.handler(true)
+	}
+	render() {
+		const { classes } = this.props;
+		for(let i = 0;i<this.maps.length;i++){
+			console.debug(this.maps[i]["Title"]);
+			this.cards.push(<MapCard title={this.maps[i]["Title"]} desc={this.maps[i]["description"]} focusMap={this.focusMap}/>);
 		}
+		return(
+			<>
+				<Container style={{overflowX: "hidden"}}>
+					<MapFilters/>
+					<hr/>
+					<Row>
+						{this.cards}
+					</Row>
+				</Container>
+			</>
+		);
+
+	}
 }
 
 export default withStyles(useStyles)(SearchAllMaps);

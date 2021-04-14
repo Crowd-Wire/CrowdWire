@@ -2,7 +2,7 @@ import React from "react";
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-
+import ExploreIcon from '@material-ui/icons/Explore';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -11,7 +11,7 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { MapOutlined, Public, Settings } from '@material-ui/icons';
+import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons';
 
 
 const drawerWidth = 240;
@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-
+    maxHeight:"50px",
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
@@ -69,7 +69,7 @@ export default function DashDrawer(){
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-
+  const addWorld = theme.spacing.unit*2+50;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -119,10 +119,21 @@ export default function DashDrawer(){
             <ListItem 
             button key={text}
             >
-            <ListItemIcon>{index % 2 === 0 ? <MapOutlined className={classes.iconDrawer}/> : <Public className={classes.iconDrawer}/>}</ListItemIcon>
+            <ListItemIcon>{index % 2 === 0 ? <Explore className={classes.iconDrawer}/> : <Public className={classes.iconDrawer}/>}</ListItemIcon>
             <ListItemText style={{ color: '#FFFFFF' }} primary={text} />
             </ListItem>
         ))}
+            <ListItem className={clsx(classes.drawer, {
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: addWorld}}>
+              <ListItemIcon>
+                  <AddCircleOutlined className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS" className={classes.toolbar}
+                  className={clsx(classes.menuButton, {
+                      [classes.hide]: !open,
+                  })}/>
+            </ListItem>
             <ListItem className={clsx(classes.drawer, {
             [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
