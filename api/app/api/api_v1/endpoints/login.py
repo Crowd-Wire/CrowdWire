@@ -36,8 +36,8 @@ def register(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token, expires = security.create_access_token(
-            user.user_id, expires_delta=access_token_expires
-        )
+        user.user_id, expires_delta=access_token_expires
+    )
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -65,9 +65,9 @@ def login_access_token(
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token, expires = security.create_access_token(
-            user.user_id, expires_delta=access_token_expires
-        )
-    
+        user.user_id, expires_delta=access_token_expires
+    )
+
     return {
         "access_token": access_token,
         "token_type": "bearer",

@@ -8,5 +8,6 @@ class Token(BaseModel):
     token_type: str
     expire_date: str
 
+
 class TokenPayload(BaseModel):
     sub: Optional[int] = None
