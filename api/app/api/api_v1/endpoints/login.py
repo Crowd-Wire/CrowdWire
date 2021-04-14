@@ -20,7 +20,32 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=schemas.Token)
+@router.post("/register", response_model=schemas.Token)
+def register(
+        user_data: schemas.UserCreate,
+        db: Session = Depends(dependencies.get_db)
+) -> Any:
+    """
+    Register a user, returns an access token for that user
+    """
+
+    user = crud.user.create(db=db, user_data=user_data)
+
+    if not user:
+        raise HTTPException(status_code=400, detail="A user with that email already exists")
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token, expires = security.create_access_token(
+        user.user_id, expires_delta=access_token_expires
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires)
+    }
+
+
+@router.post("/login", response_model=schemas.Token)
 def login_access_token(
         db: Session = Depends(dependencies.get_db),
         form_data: OAuth2PasswordRequestForm = Depends(),
@@ -28,20 +53,25 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
+
     user = crud.user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    # elif not crud.user.is_active(user):
-    #    raise HTTPException(status_code=400, detail="Inactive user")
+    elif not crud.user.is_active(db=db, user=user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token, expires = security.create_access_token(
+        user.user_id, expires_delta=access_token_expires
+    )
+
     return {
-        "access_token": security.create_access_token(
-            user.user_id, expires_delta=access_token_expires
-        ),
+        "access_token": access_token,
         "token_type": "bearer",
+        "expire_date": str(expires)
     }
 
 

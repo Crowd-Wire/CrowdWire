@@ -3,6 +3,8 @@ from sqlalchemy import ForeignKey, Integer, Column, String, TIMESTAMP, LargeBina
 from sqlalchemy.orm import relationship
 from app.core.config import settings
 
+from .world_tag import world_tag
+
 
 class World(Base):
     """
@@ -20,4 +22,4 @@ class World(Base):
     world_map = Column(LargeBinary, nullable=False)
     status = Column(Integer, nullable=False)
 
-    tags = relationship("Tag", secondary="world_tag")
+    tags = relationship("Tag", secondary=world_tag)

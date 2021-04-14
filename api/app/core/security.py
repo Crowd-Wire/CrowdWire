@@ -14,7 +14,7 @@ ALGORITHM = "HS256"
 
 def create_access_token(
     subject: Union[str, Any], expires_delta: timedelta = None
-) -> str:
+) -> Union[str, any]:
     """
     Creates jwt token with expiration date declared in settings
     """
@@ -27,7 +27,7 @@ def create_access_token(
         )
     to_encode = {"exp": expire, "sub": str(subject)}
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return encoded_jwt, expire
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
