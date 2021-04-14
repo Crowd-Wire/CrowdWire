@@ -22,4 +22,5 @@ world_tag = Table(
         ForeignKey(settings.SCHEMA_NAME + ".tag.name"),
         primary_key=True,
     ),
+    schema=settings.SCHEMA_NAME
 )

@@ -33,10 +33,11 @@ def create_world(
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
-    logger.debug(user.user_id)
-    if user.user_id != world_in.creator:
+    world_in.creator = user.user_id
+    obj = crud.world.create(db=db, obj_in=world_in)
+    if not obj:
         raise HTTPException(
             status_code=400,
-            detail="Cannot create worlds for other Users"
+            detail="Invalid Tag. Tag Does not exist."
         )
-    return crud.world.create(db=db, obj_in=world_in)
+    return obj

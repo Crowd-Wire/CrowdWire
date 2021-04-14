@@ -40,7 +40,7 @@ def get_current_user_optional(
 
 
 def get_current_user(
-        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2_optional)
+        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.User:
     try:
         payload = jwt.decode(

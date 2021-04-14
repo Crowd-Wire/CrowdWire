@@ -3,20 +3,20 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class TagsBase(BaseModel):
+class TagBase(BaseModel):
     name: Optional[str]
 
 
-class TagsCreate(TagsBase):
+class TagCreate(TagBase):
     name: str
 
 
-class TagsUpdate(TagsBase):
+class TagUpdate(TagBase):
     pass
 
 
 # properties to return to Client
-class TagsInDB(BaseModel):
+class TagInDB(BaseModel):
     name: str
 
     class Config:
