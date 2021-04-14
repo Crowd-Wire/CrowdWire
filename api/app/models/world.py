@@ -17,6 +17,7 @@ class World(Base):
     description = Column(String(300))
     max_users = Column(Integer)
     public = Column(Boolean, nullable=False)
+    allow_guests = Column(Boolean, nullable=False)
     world_map = Column(LargeBinary, nullable=False)
     status = Column(Integer, nullable=False)
 
