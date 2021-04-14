@@ -22,8 +22,8 @@ router = APIRouter()
 
 @router.post("/register", response_model=schemas.Token)
 def register(
-        db: Session = Depends(dependencies.get_db),
-        user_data: schemas.UserCreate = Depends()
+        user_data: schemas.UserCreate,
+        db: Session = Depends(dependencies.get_db)
 ) -> Any:
     """
     Register a user, returns an access token for that user
