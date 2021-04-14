@@ -21,7 +21,8 @@ class AuthenticationService {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({name:name, email:email, birth:birth, password:password})
+                // TODO: change hashed_password to password after backend update
+                body: JSON.stringify({name:name, email:email, hashed_password:password, birth:birth})
             })
 }
 

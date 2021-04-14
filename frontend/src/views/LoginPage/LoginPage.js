@@ -34,7 +34,6 @@ class LoginPage extends React.Component {
     super(props);
     this.state = { cardAnimaton: "", navigate: false }
       
-    this.state = {}
   }
 
 
