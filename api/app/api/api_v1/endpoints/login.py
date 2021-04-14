@@ -1,4 +1,3 @@
-from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -8,7 +7,6 @@ from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security
-from app.core.config import settings
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -34,10 +32,8 @@ def register(
     if not user:
         raise HTTPException(status_code=400, detail="A user with that email already exists")
 
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token, expires = security.create_access_token(
-        user.user_id, expires_delta=access_token_expires
-    )
+    access_token, expires = security.create_access_token(user.user_id)
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
@@ -63,10 +59,7 @@ def login_access_token(
     elif not crud.user.is_active(db=db, user=user):
         raise HTTPException(status_code=400, detail="Inactive user")
 
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token, expires = security.create_access_token(
-        user.user_id, expires_delta=access_token_expires
-    )
+    access_token, expires = security.create_access_token(user.user_id)
 
     return {
         "access_token": access_token,
