@@ -37,3 +37,7 @@ jobs:
         run: |
           cd api/
           poetry run flake8 app --count --show-source --statistics
+      - name: Run Tests
+        run: |
+          cd api/
+          peotry run pytest
