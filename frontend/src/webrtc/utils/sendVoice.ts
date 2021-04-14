@@ -14,6 +14,7 @@ export const sendVoice = async () => {
   try {
     micStream = await navigator.mediaDevices.getUserMedia({
       audio: micId ? { deviceId: micId } : true,
+      video: false
     });
   } catch (err) {
     set({ mic: null, micStream: null });

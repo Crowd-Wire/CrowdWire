@@ -1,10 +1,12 @@
 import { WS_BASE } from "config";
 import { createTransport } from "../webrtc/utils/createTransport";
 import { sendVoice } from "../webrtc/utils/sendVoice";
+import { sendVideo } from "../webrtc/utils/sendVideo";
 import { joinRoom } from "../webrtc/utils/joinRoom";
 import { consumeAudio } from "../webrtc/utils/consumeAudio";
 import { receiveVoice } from "../webrtc/utils/receiveVoice";
 import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
+import { useVideoStore } from "../webrtc/stores/useVideoStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
 import store, {
@@ -41,7 +43,6 @@ async function consumeAll(consumerParametersArr) {
   try {
     for (const { peerId, consumerParameters } of consumerParametersArr) {
       if (!(await consumeAudio(consumerParameters, peerId))) {
-        alert("afinal tou aqui")
         break;
       }
     }
@@ -121,14 +122,15 @@ export const getSocket = (worldId) => {
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+                receiveVideo(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                 sendVoice();
+                sendVideo();
               });
           })
           break;
         case "@get-recv-tracks-done":
-          console.log(data)
           consumeAll(data.d.consumerParametersArr);
           break;
         case "new-peer-speaker":

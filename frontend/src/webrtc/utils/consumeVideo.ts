@@ -1,10 +1,10 @@
 import { useConsumerStore } from "../stores/useConsumerStore";
 import { useVoiceStore } from "../stores/useVoiceStore";
 
-export const consumeAudio = async (consumerParameters: any, peerId: string) => {
+export const consumeVideo = async (consumerParameters: any, peerId: string) => {
   const { recvTransport } = useVoiceStore.getState();
   if (!recvTransport) {
-    console.log("skipping consumeAudio because recvTransport is null");
+    console.log("skipping consumeVideo because recvTransport is null");
     return false;
   }
   console.log("novo consumer" + peerId)
@@ -13,8 +13,8 @@ export const consumeAudio = async (consumerParameters: any, peerId: string) => {
     appData: {
       peerId,
       producerId: consumerParameters.producerId,
-      mediaTag: "cam-audio",
-      kind: "audio",
+      mediaTag: "cam-video",
+      kind: "video",
     },
   });
   useConsumerStore.getState().add(consumer, peerId);
