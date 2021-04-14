@@ -24,16 +24,18 @@ import AuthenticationService from "services/AuthenticationService.js";
 import styles from "assets/jss/material-kit-react/views/loginPage.js";
 import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
-
-
-
+import Typography from "@material-ui/core/Typography"
 
 class LoginPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { cardAnimaton: "", navigate: false }
-      
+    this.state = { 
+      cardAnimaton: "",
+      navigate: false,
+      emailSt:"",
+      passwSt:"",
+    }
   }
 
 
@@ -60,23 +62,26 @@ class LoginPage extends React.Component {
     .then(
       (res) => {
         localStorage.setItem("auth",JSON.stringify(
-                    {"token":res.access_token,
-                     "expire_date":res.expire_date}
-                    ));
-        console.log(res);
+          {"token":res.access_token,
+            "expire_date":res.expire_date}
+          ));
+        if(res.access_token!==undefined)
+          this.setState({loggedIn:true})
+        else if(res.detail==="Incorrect email or password")
+          this.setState({passwSt: res.detail,emailSt: res.detail});
+        else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="username")
+          this.setState({passwSt:"", emailSt:"Email Required"});
+        else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="password")
+          this.setState({passwSt:"Password Required", emailSt:""});
+        else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
+          this.setState({passwSt:"Password Required", emailSt:"Email Required"});
       }
-    )
-    .catch(
-      (error) => {
-        // TODO: change state to show error;
-      }
-    );
-    
+    )    
   }
 
   render() {
     if (this.state.loggedIn) {
-      return <Navigate to="" />
+      return <Navigate to="../dashboard" />
     }
 
     return (
@@ -110,7 +115,13 @@ class LoginPage extends React.Component {
                     </CardHeader>
                     <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
+                      {this.state.passwSt==="Incorrect email or password" && this.state.emailSt==="Incorrect email or password"?
+                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>Incorrect email or password*</Typography>
+                        :
+                        <></>
+                      }
                       <CustomInput
+                        st = {this.state.emailSt}
                         labelText="Email..."
                         id="email"
                         formControlProps={{
@@ -126,6 +137,7 @@ class LoginPage extends React.Component {
                         }}
                       />
                       <CustomInput
+                        st = {this.state.passwSt}
                         labelText="Password"
                         id="pass"
                         formControlProps={{
