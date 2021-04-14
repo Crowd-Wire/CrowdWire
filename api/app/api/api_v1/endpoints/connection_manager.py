@@ -11,18 +11,18 @@ class ConnectionManager:
         Dictionary with the World_id as key and the List of Active Connections as
         value
         """
-        self.connections: Dict[int, Dict[int, List[WebSocket]]] = {}
+        self.connections: Dict[int, Dict[str, List[WebSocket]]] = {}
 
         self.users_ws: Dict[int, WebSocket] = {}
 
-    async def connect(self, world_id: int, websocket: WebSocket) -> Tuple[int, int]:
+    async def connect(self, world_id: int, websocket: WebSocket) -> Tuple[int, str]:
         await websocket.accept()
 
         payload = await websocket.receive_json()
         room_id = payload['room_id']
         # token = payload['token']
         # futurely, get token from message and retrieve it's id??? guests will have a G prepended, ig
-        user_id = self.count
+        user_id = str(self.count)
         self.count += 1
 
         # store user's corresponding websocket

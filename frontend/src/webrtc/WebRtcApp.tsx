@@ -124,7 +124,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
           console.log("error creating recv transport | ", err);
           return;
         }
-        receiveVoice(() => flushConsumerQueue(d.roomId));
+        // receiveVoice(() => flushConsumerQueue(d.roomId));
       },
       "you-joined-as-speaker": async (d) => {
         closeVoiceConnections(null);
@@ -152,7 +152,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
           return;
         }
         await createTransport(d.roomId, "recv", d.recvTransportOptions);
-        receiveVoice(() => flushConsumerQueue(d.roomId));
+        // receiveVoice(() => flushConsumerQueue(d.roomId));
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

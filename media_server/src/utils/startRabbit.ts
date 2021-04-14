@@ -83,6 +83,7 @@ type OutgoingMessageDataMap = {
   "@get-recv-tracks-done": {
     consumerParametersArr: Consumer[];
     roomId: string;
+    peerId: string;
   };
   close_consumer: {
     producerId: string;
@@ -90,6 +91,7 @@ type OutgoingMessageDataMap = {
   };
   "new-peer-speaker": {
     roomId: string;
+    peerId: string;
   } & Consumer;
   you_left_room: {
     roomId: string;
@@ -111,12 +113,14 @@ type OutgoingMessageDataMap = {
     error?: string;
     id?: string;
     roomId: string;
+    peerId?: string;
   };
 } &
   {
     [Key in ConnectTransportDoneOperationName]: {
       error?: string;
       roomId: string;
+      peerId?: string;
     };
   };
 
@@ -172,14 +176,14 @@ export const startRabbit = async (handler: HandlerMap) => {
       if (m) {
         let data: IncomingChannelMessageData<any> | undefined;
         try {
-          console.log(m)
           data = JSON.parse(m);
-        } catch {console.log('n entrei')}
+        } catch {console.log('error parsing json')}
         // console.log(data.topic);
         if (data && data.topic && data.topic in handler) {
           const { d: handlerData, topic: operation, uid } = data;
           try {
             console.log(operation);
+            
             await handler[operation as keyof HandlerMap](
               handlerData,
               uid,

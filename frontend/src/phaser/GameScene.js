@@ -3,7 +3,6 @@ import * as Phaser from 'phaser';
 import { getSocket } from "services/socket";
 
 
-var socket = getSocket(1).socket;
 const sceneConfig = {
     active: false,
     visible: false,
@@ -14,6 +13,7 @@ const sceneConfig = {
 class GameScene extends Phaser.Scene {
     flag = 0;
     PLAYER_NUM = 10;
+    socket = getSocket(1).socket;
 
     constructor() {
         super(sceneConfig);
@@ -76,9 +76,9 @@ class GameScene extends Phaser.Scene {
         if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            if (socket.readyState === WebSocket.OPEN) {
+            if (this.socket.readyState === WebSocket.OPEN) {
                 console.log('sending proximity to', bodies[0].gameObject.id)
-                socket.send(JSON.stringify(bodies[0].gameObject.id));
+                this.socket.send(JSON.stringify(bodies[0].gameObject.id));
             }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
@@ -162,9 +162,9 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         this.body.velocity.normalize().scale(this.speed);
 
         if (direction.x || direction.y) 
-            if (socket.readyState === WebSocket.OPEN) {
+            if (this.socket.readyState === WebSocket.OPEN) {
                 console.log('sending velocity', this.body.velocity)
-                socket.send(JSON.stringify(this.body.velocity));
+                this.socket.send(JSON.stringify(this.body.velocity));
             }
     }
 

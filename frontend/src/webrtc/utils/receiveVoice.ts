@@ -1,32 +1,14 @@
 import { getSocket } from "../../services/socket";
 import { useVoiceStore } from "../stores/useVoiceStore";
-import { useWsHandlerStore } from "../stores/useWsHandlerStore";
-import { consumeAudio } from "./consumeAudio";
 
-export const receiveVoice = (flushQueue: () => void) => {
-  useWsHandlerStore
-    .getState()
-    .addWsListenerOnce(
-      "@get-recv-tracks-done",
-      async ({ consumerParametersArr }) => {
-        try {
-          for (const { peerId, consumerParameters } of consumerParametersArr) {
-            if (!(await consumeAudio(consumerParameters, peerId))) {
-              break;
-            }
-          }
-        } catch (err) {
-          console.log(err);
-        } finally {
-          flushQueue();
-        }
-      }
-    );
-  var socket = getSocket();
-  socket.send({
-    op: "@get-recv-tracks",
+export const receiveVoice = (roomId) => {
+  var socket = getSocket(1).socket;
+
+  socket.send(JSON.stringify({
+    topic: "@get-recv-tracks",
     d: {
+      roomId: roomId,
       rtpCapabilities: useVoiceStore.getState().device!.rtpCapabilities,
     },
-  });
+  }));
 };

@@ -88,7 +88,7 @@ export const AudioRender: React.FC<AudioRenderProps> = () => {
           >
             okay
             {Object.keys(consumerMap).map((k) => {
-              const { consumer, volume: userVolume, debug } = consumerMap[k];
+              const { consumer, volume: userVolume } = consumerMap[k];
               return (
                 <MyAudio
                   volume={(userVolume / 200) * (globalVolume / 100)}
@@ -96,7 +96,6 @@ export const AudioRender: React.FC<AudioRenderProps> = () => {
                   playsInline
                   controls={false}
                   key={consumer.id}
-                  debug={debug}
                   onRef={(a) => {
                     audioRefs.current.push([k, a]);
                     a.srcObject = new MediaStream([consumer.track]);

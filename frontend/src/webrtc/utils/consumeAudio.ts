@@ -7,6 +7,7 @@ export const consumeAudio = async (consumerParameters: any, peerId: string) => {
     console.log("skipping consumeAudio because recvTransport is null");
     return false;
   }
+  console.log("novo consumer" + peerId)
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {
@@ -16,6 +17,6 @@ export const consumeAudio = async (consumerParameters: any, peerId: string) => {
     },
   });
   useConsumerStore.getState().add(consumer, peerId);
-
+  console.log(useConsumerStore.getState())
   return true;
 };

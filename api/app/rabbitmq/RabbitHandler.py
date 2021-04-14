@@ -11,18 +11,31 @@ async def on_message(message: IncomingMessage) -> None:
     async with message.process():
         # logger.info(" [x] Received message %r" % message)
         msg = message.body.decode()
-        logger.info("Message body is: %r" % msg)
-        logger.info("Users Websockets: %r" % manager.users_ws)
+        # logger.info("Message body is: %r" % msg)
         msg = json.loads(msg)
+        topic = msg['topic']
 
-        if msg['topic'] == 'you-joined-as-peer' or msg['topic'] == 'you-joined-as-speaker':
+        if topic == 'you-joined-as-peer'\
+                or topic == 'you-joined-as-speaker'\
+                or topic == "@get-recv-tracks-done"\
+                or topic == "@send-track-send-done"\
+                or topic == "@connect-transport-recv-done"\
+                or topic == "@connect-transport-send-done":
             user_id = msg['d']['peerId']
 
             if user_id in manager.users_ws:
                 user_ws = manager.users_ws[user_id]
-
-                # redirect message to user with transport options
                 await manager.send_personal_message(msg, user_ws)
+        elif topic == "new-peer-speaker":
+            # uid identifies to whom the message is suppost to be sent to
+            # peerId identifies the new peerId that joined
+            user_id = msg['uid']
+
+            if user_id in manager.users_ws:
+                user_ws = manager.users_ws[user_id]
+                await manager.send_personal_message(msg, user_ws)
+        else:
+            logger.error(f"Unknown topic \"{topic}\"")
 
 
 class RabbitHandler:

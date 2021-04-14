@@ -51,11 +51,16 @@ async def world_movement(websocket: WebSocket, world_id: int) -> Any:
             # this does the same as above, except it allows
             # the user to speak, so, it returns two kinds of transport,
             # one for receiving and other for sending
-            elif topic == "join-as-new-peer" or "join-as-speaker":
+            elif topic == "join-as-new-peer"\
+                    or topic == "join-as-speaker"\
+                    or topic == "@connect-transport"\
+                    or topic == "@get-recv-tracks"\
+                    or topic == "@connect-transport-send-done"\
+                    or topic == "@send-track":
                 room_id = payload['d']['roomId']
                 payload['d']['peerId'] = user_id
 
-                if room_id in manager.connections[world_id][room_id]:
+                if user_id in manager.connections[world_id][room_id]:
                     manager.connections[world_id][room_id].append(user_id)
                 else:
                     manager.connections[world_id][room_id] = [user_id]

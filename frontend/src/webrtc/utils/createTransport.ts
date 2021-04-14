@@ -25,15 +25,12 @@ export async function createTransport(
   // start flowing for the first time. send dtlsParameters to the
   // server, then call callback() on success or errback() on failure.
   transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
-    socket.onmessage = (event) => {
-      var data = JSON.parse(event.data);
-      
-      console.info(`[message] Data received for topic ${data.topic}`);
-
-      if (data.topic == `@connect-transport-${direction}-done`) {
-        if (data.d.error) {
-          console.log(`connect-transport ${direction} failed`, data.d.error);
-          if (data.d.error.includes("already called")) {
+    useWsHandlerStore
+      .getState()
+      .addWsListener(`@connect-transport-${direction}-done`, (d) => {
+        if (d.error) {
+          console.log(`connect-transport ${direction} failed`, d.error);
+          if (d.error.includes("already called")) {
             callback();
           } else {
             errback();
@@ -42,8 +39,26 @@ export async function createTransport(
           console.log(`connect-transport ${direction} success`);
           callback();
         }
-      }
-    }
+      });
+    // socket.onmessage = (event) => {
+    //   var data = JSON.parse(event.data);
+      
+    //   console.info(`[message] Data received for topic ${data.topic}`);
+
+    //   if (data.topic == `@connect-transport-${direction}-done`) {
+    //     if (data.d.error) {
+    //       console.log(`connect-transport ${direction} failed`, data.d.error);
+    //       if (data.d.error.includes("already called")) {
+    //         callback();
+    //       } else {
+    //         errback();
+    //       }
+    //     } else {
+    //       console.log(`connect-transport ${direction} success`);
+    //       callback();
+    //     }
+    //   }
+    // }
       
     if (socket.readyState === WebSocket.OPEN) {
       console.log('sending connect-transport')
@@ -64,28 +79,39 @@ export async function createTransport(
         console.log("transport produce event", appData.mediaTag);
         
         // check this paused option
-        let paused = false
+        let paused = false;
 
-
-        socket.onmessage = (event) => {
-          var data = JSON.parse(event.data);
-          
-          console.info(`[message] Data received for topic ${data.topic}`);
-    
-          if (data.topic == `@send-track-${direction}-done`) {
-            if (data.d.error) {
-              console.log(`send-track ${direction} failed`, data.d.error);
+        useWsHandlerStore
+          .getState()
+          .addWsListener(`@send-track-${direction}-done`, (d) => {
+            if (d.error) {
+              console.log(`send-track ${direction} failed`, d.error);
               errback();
             } else {
               console.log(`send-track-transport ${direction} success`);
-              callback({ id: data.d.id });
+              callback({ id: d.id });
             }
-          }
-        }
+          });
+        // socket.onmessage = (event) => {
+        //   var data = JSON.parse(event.data);
+          
+        //   console.info(`[message] Data received for topic ${data.topic}`);
+    
+        //   if (data.topic == `@send-track-${direction}-done`) {
+        //     if (data.d.error) {
+        //       console.log(`send-track ${direction} failed`, data.d.error);
+        //       errback();
+        //     } else {
+        //       console.log(`send-track-transport ${direction} success`);
+        //       callback({ id: data.d.id });
+        //     }
+        //   }
+        // }
         if (socket.readyState === WebSocket.OPEN) {
           socket.send(JSON.stringify({
             topic: "@send-track",
             d: {
+              roomId: _roomId,
               transportId: transportOptions.id,
               kind,
               rtpParameters,

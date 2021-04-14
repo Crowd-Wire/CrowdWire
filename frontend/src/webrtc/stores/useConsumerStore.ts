@@ -7,28 +7,10 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { consumer: Consumer; volume: number; debug?: boolean }
+        { consumer: Consumer; volume: number; }
       >,
     },
     (set) => ({
-      startDebugging: (userId: string) => {
-        set((s) => {
-          if (userId in s.consumerMap) {
-            return {
-              consumerMap: {
-                ...s.consumerMap,
-                [userId]: {
-                  ...s.consumerMap[userId],
-                  debug: true,
-                },
-              },
-            };
-          }
-
-          console.log("could not find consumer for ", userId);
-          return s;
-        });
-      },
       setVolume: (userId: string, volume: number) => {
         set((s) =>
           userId in s.consumerMap

@@ -83,6 +83,7 @@ async function main() {
       send,
       errBack
     ) => {
+
       if (!rooms[roomId]?.state[myPeerId]?.recvTransport) {
         errBack();
         return;
@@ -123,7 +124,7 @@ async function main() {
       send({
         topic: "@get-recv-tracks-done",
         uid,
-        d: { consumerParametersArr, roomId },
+        d: { consumerParametersArr, roomId, peerId: myPeerId },
       });
     },
     ["@send-track"]: async (
@@ -151,7 +152,7 @@ async function main() {
         myPeerId
       ];
       const transport = sendTransport;
-
+      
       if (!transport) {
         errBack();
         return;
@@ -167,14 +168,14 @@ async function main() {
             d: { producerId: previousProducer.id, roomId },
           });
         }
-
+        
         const producer = await transport.produce({
           kind,
           rtpParameters,
           paused,
           appData: { ...appData, peerId: myPeerId, transportId },
         });
-
+        
         rooms[roomId].state[myPeerId].producer = producer;
         for (const theirPeerId of Object.keys(state)) {
           if (theirPeerId === myPeerId) {
@@ -193,10 +194,11 @@ async function main() {
               myPeerId,
               state[theirPeerId]
             );
+
             send({
               uid: theirPeerId,
               topic: "new-peer-speaker",
-              d: { ...d, roomId },
+              d: { ...d, roomId, peerId: myPeerId },
             });
           } catch (e) {
             errLog(e.message);
@@ -208,6 +210,7 @@ async function main() {
           d: {
             id: producer.id,
             roomId,
+            peerId: myPeerId,
           },
         });
       } catch (e) {
@@ -217,6 +220,7 @@ async function main() {
           d: {
             error: e.message,
             roomId,
+            peerId: myPeerId,
           },
         });
         send({
@@ -269,7 +273,7 @@ async function main() {
       send({
         topic: `@connect-transport-${direction}-done` as const,
         uid,
-        d: { roomId },
+        d: { roomId, peerId: peerId },
       });
     },
     ["create-room"]: async ({ roomId }, uid, send) => {

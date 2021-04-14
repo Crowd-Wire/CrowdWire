@@ -12,6 +12,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 
   const [micId, setMicId] = useState(storeDevice.getState().micId);
 	const [camId, setCamId] = useState(storeDevice.getState().camId);
+	const [globalVolume, setGlobalVolume] = useState(storeDevice.getState().globalVolume);
 
   const [optionsMic, setOptionsMic] = useState<
     Array<{ id: string; label: string } | null>
@@ -19,7 +20,6 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 	const [optionsCamera, setOptionsCamera] = useState<
     Array<{ id: string; label: string } | null>
   >([]);
-	const [volume, setVolume] = useState(100);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -100,7 +100,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
             Microphone Volume
           </div>
           <div className={`mb-8`}>
-            <VolumeSlider volume={volume} onVolume={(n) => setVolume(n)} />
+            <VolumeSlider volume={globalVolume} onVolume={(n) => setGlobalVolume(n)} />
           </div>
 
           <br />
