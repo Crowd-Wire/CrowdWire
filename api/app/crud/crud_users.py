@@ -30,6 +30,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             name=new_user.name,
             birth=new_user.birth,
             register_date=new_user.register_date,
+            status=0
         )
         db.add(db_user)
         db.commit()
@@ -60,7 +61,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_user = self.get_by_email(db, email=email)
         if not db_user:
             return None
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, db_user.hashed_password):
             return None
         return db_user
 
