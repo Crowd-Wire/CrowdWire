@@ -35,13 +35,14 @@ def register(
         raise HTTPException(status_code=400, detail="A user with that email already exists")
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": security.create_access_token(
+    access_token, expires = security.create_access_token(
             user.user_id, expires_delta=access_token_expires
-        ),
+        )
+    return {
+        "access_token": access_token,
         "token_type": "bearer",
+        "expire_date": str(expires)
     }
-
 
 
 @router.post("/login", response_model=schemas.Token)
@@ -52,21 +53,25 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    print(form_data)
+
     user = crud.user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not crud.user.is_active(db=db,user=user):
+    elif not crud.user.is_active(db=db, user=user):
         raise HTTPException(status_code=400, detail="Inactive user")
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return {
-        "access_token": security.create_access_token(
+    access_token, expires = security.create_access_token(
             user.user_id, expires_delta=access_token_expires
-        ),
+        )
+    
+    return {
+        "access_token": access_token,
         "token_type": "bearer",
+        "expire_date": str(expires)
     }
 
 

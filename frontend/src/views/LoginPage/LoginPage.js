@@ -59,7 +59,11 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
-        localStorage.setItem("token",JSON.stringify(res.access_token));
+        localStorage.setItem("auth",JSON.stringify(
+                    {"token":res.access_token,
+                     "expire_date":res.expire_date}
+                    ));
+        console.log(res);
       }
     )
     .catch(
