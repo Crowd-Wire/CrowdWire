@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Button, Card } from '@material-ui/core';
+import { Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
+import volumeStore from "../../redux/globalVolumeStore.js";
+import { UserVolumeSlider } from "./UserVolumeSlider";
 
 interface VideoAudioBoxProps {
   username?: string;
@@ -19,7 +21,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
   useEffect(() => {
     if (myRef.current) {
-      myRef.current.volume = volume;
+      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
     }
   }, [volume]);
 
@@ -30,10 +32,15 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
       video.muted = true;
 
     } else {
+      volumeStore.subscribe(() => {
+        myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
+      })
+
+
       const audioStream = new MediaStream();
       audioStream.addTrack(track);
       myRef.current.srcObject = audioStream;
-      myRef.current.volume = volume;
+      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
       myRef.current.muted = muted
     }
   }, [])
@@ -50,6 +57,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                 <audio autoPlay id={id+"_audio"} ref={myRef}/>
               )}
           </div>
+          <UserVolumeSlider userId={id} />
         </CardBody>
       </Card>
     </div>

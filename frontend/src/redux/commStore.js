@@ -3,14 +3,12 @@ import { createStore } from "redux";
 const initState = {
     micId: '',
     camId: '',
-    globalVolume: 100,
 };
 
 
 /* Action Types */
 const CHANGE_MIC_ID = "CHANGE_MIC_ID";
 const CHANGE_CAM_ID = "CHANGE_CAM_ID";
-const CHANGE_GLOBAL_VOLUME = "CHANGE_GLOBAL_VOLUME";
 
 
 /* Action Creators */
@@ -27,11 +25,6 @@ export const changeCamId = (camId) => ({
     camId
 });
 
-// action change global Volume
-export const changeGlobalVolume = (globalVolume) => ({
-    type: CHANGE_GLOBAL_VOLUME,
-    globalVolume
-});
 
 // reducer
 const reducer = (state = initState, action) => {
@@ -40,8 +33,6 @@ const reducer = (state = initState, action) => {
             return { ...state, micId: action.micId };
         case CHANGE_CAM_ID:
             return { ...state, camId: action.camId };
-        case CHANGE_GLOBAL_VOLUME:
-            return { ...state, globalVolume: action.globalVolume };
         default:
             return state;
     }

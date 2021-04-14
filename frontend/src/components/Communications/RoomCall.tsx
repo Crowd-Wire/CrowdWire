@@ -202,6 +202,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.reInitializeStream()
     })
 
+
     useCheckMediaAccess().then( (data) => {
       this.accessVideo = data[0]
       this.accessMic = data[1]
@@ -320,7 +321,7 @@ export default class RoomCall extends React.Component<{}, State> {
                     track={consumer._track}
                     // stream={this.state.consumerMap[k].stream}
                     // muted={consumer._appData.peerId == this.myId ? true : false}
-                    volume={(userVolume / 200) * (storeDevice.getState().globalVolume / 100)}
+                    volume={(userVolume / 200)}
                   />
                 </Carousel.Item>
               )
