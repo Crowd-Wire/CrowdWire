@@ -35,7 +35,6 @@ class LoginPage extends React.Component {
     this.state = { cardAnimaton: "", navigate: false }
       
     this.state = {}
-    this.token = "";
   }
 
 
@@ -49,13 +48,26 @@ class LoginPage extends React.Component {
   );
 
   handleSubmit = () => {
-    
+
     AuthenticationService.login(
       document.getElementById("email").value,
-      document.getElementById("pass").value)
-      .then((res) => {
+      document.getElementById("pass").value
+    )
+    .then(
+      (res) => {
         return res.json();
-      }).then((res) => {this.token=res.access_token; console.log(this.token)}).catch((error) => {console.log(error)});
+      }
+    )
+    .then(
+      (res) => {
+        localStorage.setItem("token",JSON.stringify(res.access_token));
+      }
+    )
+    .catch(
+      (error) => {
+        // TODO: change state to show error;
+      }
+    );
     
   }
 
