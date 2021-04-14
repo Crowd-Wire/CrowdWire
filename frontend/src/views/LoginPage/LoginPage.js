@@ -66,15 +66,15 @@ class LoginPage extends React.Component {
             "expire_date":res.expire_date}
           ));
         if(res.access_token!==undefined)
-          this.props.history.push("../dashboard");
+          this.setState({loggedIn:true})
         else if(res.detail==="Incorrect email or password")
           this.setState({passwSt: res.detail,emailSt: res.detail});
         else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="username")
-          this.setState({passwSt:"", emailSt:"Mail Required"});
+          this.setState({passwSt:"", emailSt:"Email Required"});
         else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="password")
           this.setState({passwSt:"Password Required", emailSt:""});
         else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
-          this.setState({passwSt:"Password Required", emailSt:"Mail Required"});
+          this.setState({passwSt:"Password Required", emailSt:"Email Required"});
       }
     )    
   }
