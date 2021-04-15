@@ -59,62 +59,67 @@ class CreateWorld extends Component {
                       </Row>
                       <br/>
                       <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                          <TextField id="outlined-basic" label="Name" style={{maxWidth:"70%", marginLeft:"30px"}}/>
+                          <TextField id="outlined-basic" label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
                       </Row>
                       <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
                           <Col style={{width:"100%"}}>
                               <Row style={{marginLeft:"30px", marginTop:"20px"}}>
-                                  <Typography>Accessibility</Typography>
                               </Row>
-                              <Row style={{marginLeft:"30px", marginTop:"20px"}}>
-                                  <RadioGroup row>
-                                      <FormControlLabel value="female" control={<Radio />} label="Private" />
-                                      <FormControlLabel value="male" control={<Radio />} label="Public" />
+                              <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
+                                <div style={{marginLeft:"auto", marginRight:"auto"}}>
+                                  <Typography style={{marginTop:"auto", marginBottom:"auto"}}>Accessibility</Typography>
+                                  <RadioGroup row style={{marginTop:"auto", marginBottom:"auto"}}>
+                                      <FormControlLabel value="female" style={{margin:"auto"}} control={<Radio />} label="Private" />
+                                      <FormControlLabel value="male" style={{margin:"auto"}} control={<Radio />} label="Public" />
                                   </RadioGroup>
+                                </div>
                               </Row>
                           </Col>
                       </Row>
                       <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
-                        <Col md={6} style={{backgroundColor:"yellow"}}>
-                          <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
-                            <InputLabel htmlFor="age-native-helper">Typology</InputLabel>
-                              <NativeSelect
-                                //value={state.age}
-                                onChange={this.handleChange}
-                                inputProps={{
-                                  name: 'age',
-                                  id: 'age-native-helper',
-                                }}
-                              >
-                              <option aria-label="None" value="" />
-                              <option value={10}>Classes</option>
-                              <option value={20}>Meetings</option>
-                              <option value={30}>Conference</option>
-                              <option value={40}>Leisure</option>
+                        <Col md={6}>
+                          <Row>
+                            <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
+                              <InputLabel htmlFor="age-native-helper">Typology</InputLabel>
+                                <NativeSelect
+                                  //value={state.age}
+                                  onChange={this.handleChange}
+                                  inputProps={{
+                                    name: 'age',
+                                    id: 'age-native-helper',
+                                  }}
+                                >
+                                <option aria-label="None" value="" />
+                                <option value={10}>Classes</option>
+                                <option value={20}>Meetings</option>
+                                <option value={30}>Conference</option>
+                                <option value={40}>Leisure</option>
 
-                            </NativeSelect>
-                          </FormControl>
+                              </NativeSelect>
+                            </FormControl>
+                          </Row>
                         </Col>
-                        <Col md={6} style={{backgroundColor:"blue"}}>
-                          <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
-                            <InputLabel htmlFor="age-native-helper">Topic</InputLabel>
-                              <NativeSelect
-                                //value={state.age}
-                                onChange={this.handleChange}
-                                inputProps={{
-                                  name: 'age',
-                                  id: 'age-native-helper',
-                                }}
-                              >
-                              <option aria-label="None" value="" />
-                              <option value={10}>General</option>
-                              <option value={20}>Technology</option>
-                              <option value={30}>Biology</option>
-                              <option value={40}>Philosophy</option>
-                              <option value={50}>Geology</option>
-
-                            </NativeSelect>
-                          </FormControl>
+                        <Col md={6}>
+                          <Row>
+                            <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
+                              <InputLabel htmlFor="age-native-helper">Topic</InputLabel>
+                                <NativeSelect
+                                  //value={state.age}
+                                  onChange={this.handleChange}
+                                  inputProps={{
+                                    name: 'age',
+                                    id: 'age-native-helper',
+                                  }}
+                                >
+                                <option aria-label="None" value="" />
+                                <option value={10}>General</option>
+                                <option value={20}>Technology</option>
+                                <option value={30}>Biology</option>
+                                <option value={40}>Philosophy</option>
+                                <option value={50}>Geology</option>
+                              </NativeSelect>
+                            </FormControl>
+                          </Row>
                         </Col>
                       </Row>
                       <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
