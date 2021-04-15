@@ -26,14 +26,36 @@ def get_world(
         )
 
 
-@router.get("/join/{world_id}", response_model=schemas.World_UserInDB)
+@router.get("/join/{world_id}")
 def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
+
+    lixo = schemas.World_UserInDB
+    lixo.username = ""
+    lixo.avatar = ""
+    # registered user
     if user:
-        crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
+        # checks if the world is available for him
+        world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
+
+        world_user = crud.crud_world_user.join_world(db, _world=world, _user=user)
+
+        if not world_user.avatar or not world_user.username:
+            # Return something that says he does not have any of these
+            logger.debug("User does not have avatar")
+            return world_user
+
+        logger.debug("User has avatar")
+        # make a schema with this data
+        # return world_user
+        return world_user
+
+    else:
+        logger.debug("User is not registered")
+        return {"lixo": "lixo"}
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)

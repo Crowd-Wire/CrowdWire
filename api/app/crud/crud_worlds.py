@@ -30,7 +30,12 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if user_id:
             world_user = crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user_id)
 
-        if not world_obj or world_obj.status != 0 or (not world_obj.public and not world_user):
+        if not world_obj or world_obj.status != 0 \
+                or (not world_obj.public and not world_user)\
+                or (world_user and world_user.status != 0):
+            # checks if world exists, is not banned. If the world is private user has to have entered it before.
+            # In case he has entered it before, check if he was banned in that world
+
             raise Exception(f"World with id {world_id} Not Found or is not currently available.")
         return world_obj
 

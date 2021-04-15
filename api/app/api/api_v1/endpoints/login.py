@@ -56,7 +56,7 @@ def login_access_token(
 
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not crud.user.is_active(db=db, user=user):
+    elif not crud.crud_user.is_active(db=db, user=user):
         raise HTTPException(status_code=400, detail="Inactive user")
 
     access_token, expires = security.create_access_token(user.user_id)
