@@ -1,9 +1,11 @@
 import { WS_BASE } from "config";
 
-import store, { 
-    connectPlayer, disconnectPlayer, movePlayer, 
-    JOIN_PLAYER, LEAVE_PLAYER, PLAYER_MOVEMENT 
-} from "redux/playerStore.js";
+// import store, { 
+//     connectPlayer, disconnectPlayer, movePlayer, 
+//     JOIN_PLAYER, LEAVE_PLAYER, PLAYER_MOVEMENT 
+// } from "redux/playerStore.js";
+
+import playerStore from "stores/usePlayerStore.ts";
 
 let commSocket;
 let socket;
@@ -20,25 +22,27 @@ export const getSocket = (worldId) => {
 
     const joinRoom = async (roomId, position) => {
         const payload = {
-            topic: JOIN_PLAYER,
+            topic: "JOIN_PLAYER",
             room_id: roomId,
             position
         }
         if (socket.readyState === WebSocket.OPEN)
             await socket.send(JSON.stringify(payload));
-        //dispatch();
+        else
+            console.error(`[error] socket closed before joinRoom`);
     }
 
-    const sendMovement = async (roomId, velocity, position) => {
+    const sendMovement = async (roomId, position, velocity) => {
         const payload = {
-            topic: PLAYER_MOVEMENT,
+            topic: "PLAYER_MOVEMENT",
             room_id: roomId,
+            position,
             velocity,
-            position
         }
         if (socket.readyState === WebSocket.OPEN)
             await socket.send(JSON.stringify(payload));
-        //dispatch();
+        else
+            console.error(`[error] socket closed before sendMovement`);
     }
 
     if (!socket) {
@@ -46,23 +50,22 @@ export const getSocket = (worldId) => {
 
         socket.onopen = (event) => {
             console.info("[open] Connection established");
-            socket.send(JSON.stringify({token: '', room_id: 1}));
+            socket.send(JSON.stringify({token: ''}));
         };
           
         socket.onmessage = (event) => {
             var data = JSON.parse(event.data);
-
-            // console.info(`[message] Data received for topic ${data.topic}`);
+            console.info(`[message] Data received for topic ${data.topic}`);
 
             switch (data.topic) {
-                case JOIN_PLAYER:
-                    store.dispatch(connectPlayer(data.user_id, data.position));
+                case "JOIN_PLAYER":
+                    playerStore.getState().connectPlayer(data.user_id, data.position);
                     break;
-                case LEAVE_PLAYER:
-                    store.dispatch(disconnectPlayer(data.user_id));
+                case "LEAVE_PLAYER":
+                    playerStore.getState().disconnectPlayer(data.user_id);
                     break;
-                case PLAYER_MOVEMENT:
-                    store.dispatch(movePlayer(data.user_id, data.velocity, data.position));
+                case "PLAYER_MOVEMENT":
+                    playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
                     break;
             }
         };

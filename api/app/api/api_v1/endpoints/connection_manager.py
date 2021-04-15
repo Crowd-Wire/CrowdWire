@@ -13,17 +13,17 @@ class ConnectionManager:
         Dictionary with the World_id as key and the List of Active Connections as
         value
         """
-        self.connections: Dict[int, Dict[int, List[WebSocket]]] = {}
+        self.connections: Dict[str, Dict[str, List[WebSocket]]] = {}
         
-        self.users_ws: Dict[int, WebSocket] = {}
+        self.users_ws: Dict[str, WebSocket] = {}
 
-    async def connect(self, world_id: int, websocket: WebSocket) -> Tuple[int, int]:
+    async def connect(self, world_id: str, websocket: WebSocket) -> str:
         await websocket.accept()
         
         payload = await websocket.receive_json()
         token = payload['token']
         # futurely, get token and retrieve it's id??? guests will have a G prepended, ig
-        user_id = self.count
+        user_id = str(self.count)
         self.count += 1
 
         # store user's corresponding websocket
@@ -34,13 +34,13 @@ class ConnectionManager:
         )
         return user_id
 
-    def disconnect(self, world_id: int, user_id: int):
+    def disconnect(self, world_id: str, user_id: str):
         del self.users_ws[user_id]
         logger.info(
             f"Disconnected User {user_id} from World {world_id}"
         )
 
-    async def connect_room(self, world_id: int, room_id: int, user_id: int, joiner_position: dict):
+    async def connect_room(self, world_id: str, room_id: str, user_id: str, joiner_position: dict):
 
         if world_id in self.connections and room_id in self.connections[world_id]:
             for other_id in self.connections[world_id][room_id]:
@@ -83,7 +83,7 @@ class ConnectionManager:
     async def send_personal_message(self, message: str, websocket: WebSocket):
         await websocket.send_json(message)
 
-    async def broadcast(self, world_id: int, room_id: int, payload: dict, sender_id: int):
+    async def broadcast(self, world_id: str, room_id: str, payload: dict, sender_id: str):
         try:
             for user_id in self.connections[world_id][room_id]:
                 if user_id != sender_id:

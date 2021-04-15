@@ -31,7 +31,8 @@
     "react-swipeable-views": "0.13.9",
     "react-toastify": "^7.0.3",
     "redux": "^4.0.5",
-    "toastify": "^2.0.1"
+    "toastify": "^2.0.1",
+    "zustand": "^3.4.1"
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",

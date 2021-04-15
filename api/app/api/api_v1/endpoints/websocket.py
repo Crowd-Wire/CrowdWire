@@ -16,7 +16,7 @@ router = APIRouter()
 @router.websocket(
     "/{world_id}",
 )
-async def world_movement(websocket: WebSocket, world_id: int) -> Any:
+async def world_movement(websocket: WebSocket, world_id: str) -> Any:
     user_id = await manager.connect(world_id, websocket)
     
     try:

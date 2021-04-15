@@ -1,11 +1,10 @@
 import * as Phaser from 'phaser';
 
-import { useSelector } from "react-redux";
 import { getSocket } from "services/socket";
-import store from "redux/playerStore";
 
+import usePlayerStore from "stores/usePlayerStore.ts";
 
-var ws = getSocket(1);
+var ws = getSocket('1');
 
 const sceneConfig = {
     active: false,
@@ -16,8 +15,10 @@ const sceneConfig = {
 var globalVar = false;
 
 
+
 class GameScene extends Phaser.Scene {
-    players = {};
+    playerSprites = {};
+    count = 0;
 
     constructor() {
         super(sceneConfig);
@@ -52,7 +53,7 @@ class GameScene extends Phaser.Scene {
         // main player
         this.player = new PlayerSprite(this, 50, 50);
         // connect to room
-        ws.joinRoom(1, {x: 50, y: 50});
+        ws.joinRoom('1', {x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -67,54 +68,37 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-Q', () => {
             globalVar = !globalVar;
         }, this);
-
-
-        this.onlinePlayers = {};
-        this.unsubscribe = store.subscribe(this.handleJoinNLeavePlayer);
         
+        this.onlinePlayers = {};
+
+        this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
+
         this.physics.add.collider(Object.values(this.onlinePlayers), this.obstacles);
         
     }
-    
-    handleJoinNLeavePlayer = () => {
+
+    handlePlayerConnection = (players, prevPlayers) => {
+        const storePlayers = usePlayerStore.getState().players;
         
-        let previousPlayers = this.players;
-        console.log('handleJoinNLeavePlayer 1 ',previousPlayers, this.players, JSON.stringify(previousPlayers), JSON.stringify(this.players) )
-        
-        this.players = store.getState().players;
-        console.log('handleJoinNLeavePlayer 1.2 ',previousPlayers, this.players, JSON.stringify(previousPlayers), JSON.stringify(this.players) )
-
-        
-        let previousPlayersIds = Object.keys(previousPlayers);
-        let playersIds = Object.keys(this.players);
-
-        console.log('handleJoinNLeavePlayer 2 ',previousPlayersIds, playersIds )
-
-        if (previousPlayersIds.length !== playersIds.length) {
-
-            // players updated
-            if (previousPlayersIds.length > playersIds.length) {
-                // left
-                console.log('left')
-                previousPlayersIds.forEach(playerId => {
-                    if (!(playerId in this.players)) {
-                        this.onlinePlayers[playerId].destroy();
-                        console.log('removed')
-                    }
-                });
-            } else {
-                // joined
-                console.log('joined')
-                playersIds.forEach(playerId => {
-                    console.log(playerId)
-                    if (!(playerId in previousPlayers)) {
-                        this.onlinePlayers[playerId] = new OnlinePlayerSprite(this, 50, 50, playerId);
-                        // this.physics.add.collider(this.onlinePlayers, this.obstacles);
-                    }
-                });
+        if (players.length > prevPlayers.length) {
+            // connection
+            for (const id of players) {
+                if (!(id in this.playerSprites)) {
+                    let position = usePlayerStore.getState().players[id].position;
+                    this.playerSprites[id] = new OnlinePlayerSprite(this, position.x, position.y, id);
+                }
+            }
+        } else {
+            // disconnection
+            for (const id of prevPlayers) {
+                if (!(id in storePlayers)) {
+                    this.playerSprites[id].destroy();
+                    delete  this.playerSprites[id];
+                }
             }
         }
     }
+
 
     update(time, delta) {
         this.player.updateMovement();
@@ -124,9 +108,9 @@ class GameScene extends Phaser.Scene {
         if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            if (ws.socket.readyState === WebSocket.OPEN) {
-                // ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
-            }
+            // if (ws.socket.readyState === WebSocket.OPEN) {
+            //     ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
+            // }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
@@ -204,27 +188,10 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         this.updateAnimation();
 
         // send movement one more time after stopping
-        if (!this.stopped || this.body.speed) 
-            ws.sendMovement(1, this.body.velocity, this.body.center);
+        if (!this.stopped || this.body.speed)
+            ws.sendMovement('1', this.body.center, this.body.velocity);
         this.stopped = this.body.speed === 0;
         
-        if (globalVar)
-        console.log((direction.x ||direction.y) ? "KEY" : "", 
-            this.body.velocity,
-            {x: this.body.x, y: this.body.y},
-            this.body.newVelocity,
-            this.body.position,
-            this.body.prev,
-            this.body.prevFrame,
-            this.body.speed
-        )
-
-        /* body.newVelocity The Body's change in position (due to velocity) at the last step, in pixels.
-            The size of this value depends on the simulation's step rate.*/
-
-        /* body.prev The position of this Body during the previous step. */
-
-        /* body.prevFrame The position of this Body during the previous frame. */
     }
 
     updateAnimation() {
@@ -260,8 +227,6 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
  */
 class OnlinePlayerSprite extends PlayerSprite {
     speed = 500; // 900 is the upperbound ig
-    velocity;
-    player;
     numUpdates = 0;
     
     constructor(scene, x, y, id) {
@@ -269,72 +234,30 @@ class OnlinePlayerSprite extends PlayerSprite {
         this.id = id;
 
         if (this.id)
-            this.unsubscribe = store.subscribe(this.handlePlayerMovement);
+            this.unsubscribe = usePlayerStore.subscribe(
+                this.handlePlayerMovement, state => state.players[this.id]);
+    }
+
+    handlePlayerMovement = ({position, velocity}) => {
+        console.log(position, velocity);
+        if (this.numUpdates++ > 15) {
+            this.body.reset(position.x, position.y);
+            this.numUpdates = 0;
+        }
+        this.updateMovement(velocity);
     }
 
     /**
      * Destroys the object cleanly.
      */
     destroy = () => {
-        console.log('unsub')
         this.unsubscribe();
         this.body.destroy();
     }
 
-    handlePlayerMovement = () => {
-        let previousVelocity = this.velocity;
-        console.log('handlePlayerMovement', this.id, store.getState().players[this.id])
-        const player = store.getState().players[this.id];
-        if (!player)
-            return;
-        this.velocity = player.velocity;
-
-        if (previousVelocity !== this.velocity) {
-            // velocity updated
-            if (this.numUpdates++ > 15) {
-                let position = player.position;
-                this.body.reset(position.x, position.y);
-            }
-            this.updateMovementByDirection(this.velocity);
-        }
-    }
-
-    updateMovementByPosition(position) {
-
-        if (!position)
-            return;
-
-            
-            var distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, position.x, position.y);
-            // console.log(distance)
-            // if (distance < 32) {
-                //     speed = distance*15;
-                // }
-                
-                
-                /* body.newVelocity The Body's change in position (due to velocity) at the last step, in pixels.
-                The size of this value depends on the simulation's step rate.*/
-                
-                /* body.prev The position of this Body during the previous step. */
-                
-                /* body.prevFrame The position of this Body during the previous frame. */
-                
-                
-                if (distance < 8)
-                {
-                    this.body.reset(position.x, position.y);
-                    this.anims.stop();
-                    return;
-                }
-                
-            this.scene.physics.moveToObject(this, position, this.speed);
-
-            this.updateAnimation();
-    }
-
-    updateMovementByDirection(direction) {
-        this.body.setVelocityX(direction.x * this.speed);
-        this.body.setVelocityY(direction.y * this.speed);
+    updateMovement(velocity) {
+        this.body.setVelocityX(velocity.x * this.speed);
+        this.body.setVelocityY(velocity.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
 
         this.updateAnimation();
