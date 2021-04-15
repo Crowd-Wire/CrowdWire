@@ -29,22 +29,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None
 
         db_user = User(
-<<<<<<< HEAD
-            email=user_data.email,
-            hashed_password=get_password_hash(user_data.hashed_password),
-            name=user_data.name,
-            birth=user_data.birth,
-            register_date=datetime.datetime.now(),
-            status="0",
-            is_superuser=False
-=======
             email=new_user.email,
             hashed_password=get_password_hash(new_user.hashed_password),
             name=new_user.name,
             birth=new_user.birth,
             register_date=new_user.register_date,
-            status=0
->>>>>>> f1167149b60b79a038877220145c0f753f9504cc
+            status=0,
+            is_superuser=False
         )
         db.add(db_user)
         db.commit()
