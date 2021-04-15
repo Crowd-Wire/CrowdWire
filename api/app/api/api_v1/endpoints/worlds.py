@@ -9,21 +9,33 @@ from loguru import logger
 router = APIRouter()
 
 
-@router.get("/join/{world_id}", response_model=schemas.WorldMapInDB)
-def join_world(
+@router.get("/{world_id}", response_model=schemas.WorldMapInDB)
+def get_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
     if user:
         logger.debug(f"Registered User {user.name} joining in")
-        db_world = crud.world.get(db, world_id)
+        db_world = crud.crud_world.get(db, world_id)
         return db_world
     else:
         raise HTTPException(
             status_code=400,
             detail="Guest User cant join yet. Not Implemented.",
         )
+
+
+@router.get("/join/{world_id}", response_model=schemas.World_UserInDB)
+def join_world(
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
+) -> Any:
+
+    if user:
+        crud.crud_world.get_available(db, world_id=world_id, user_id= user.)
+    e
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)
@@ -35,7 +47,7 @@ def create_world(
 ) -> Any:
     try:
         world_in.creator = user
-        obj = crud.world.create(db=db, obj_in=world_in, user=user)
+        obj = crud.crud_world.create(db=db, obj_in=world_in, user=user)
         return obj
     except Exception as e:
         logger.exception(str(e))

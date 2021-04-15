@@ -82,7 +82,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return False
 
 
-user = CRUDUser(User)
+crud_user = CRUDUser(User)
 
 
 """

@@ -27,7 +27,7 @@ def register(
     Register a user, returns an access token for that user
     """
 
-    user = crud.user.create(db=db, user_data=user_data)
+    user = crud.crud_user.create(db=db, user_data=user_data)
 
     if not user:
         raise HTTPException(status_code=400, detail="A user with that email already exists")
@@ -50,7 +50,7 @@ def login_access_token(
     OAuth2 compatible token login, get an access token for future requests
     """
 
-    user = crud.user.authenticate(
+    user = crud.crud_user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
