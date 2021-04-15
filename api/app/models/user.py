@@ -17,4 +17,4 @@ class User(Base):
     status = Column(Integer, nullable=False)
     is_superuser = Column(Boolean, nullable=False)
 
-    world = relationship("World")
+    worlds = relationship("World_User", back_populates="user")

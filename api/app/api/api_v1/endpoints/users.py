@@ -4,18 +4,16 @@ from app import schemas, crud
 from app.api import dependencies as deps
 from typing import Any
 from fastapi import HTTPException
-from loguru import logger
 
 router = APIRouter()
 
 
-@router.get("/", tags=["users"])
+@router.get("/")
 async def read_users():
-    logger.debug("a new rquest")
     return [{"username": "Rick"}, {"username": "Morty"}]
 
 
-@router.post("/")
+@router.post("/", response_model=schemas.UserInDB)
 def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
     db_user = crud.user.get_by_email(db=db, email=user.email)
 
