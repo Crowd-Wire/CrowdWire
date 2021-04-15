@@ -129,7 +129,7 @@ export default function DashDrawer(){
               <ListItemIcon>
                   <AddCircleOutlined className={classes.iconDrawer}/>
               </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS" className={classes.toolbar}
+              <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
                   className={clsx(classes.menuButton, {
                       [classes.hide]: !open,
                   })}/>
