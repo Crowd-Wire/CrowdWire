@@ -6,6 +6,7 @@ import store, {
 } from "redux/playerStore.js";
 
 let commSocket;
+let socket;
 
 export const getCommSocket = () => {
     if (!commSocket)
@@ -15,21 +16,33 @@ export const getCommSocket = () => {
 
 
 export const getSocket = (worldId) => {
-    let socket;
 
-    const sendPosition = (roomId, direction) => {
-        console.log(direction)
+
+    const joinRoom = async (roomId, position) => {
+        const payload = {
+            topic: JOIN_PLAYER,
+            room_id: roomId,
+            position
+        }
+        if (socket.readyState === WebSocket.OPEN)
+            await socket.send(JSON.stringify(payload));
+        //dispatch();
+    }
+
+    const sendMovement = async (roomId, velocity, position) => {
         const payload = {
             topic: PLAYER_MOVEMENT,
             room_id: roomId,
-            direction,
+            velocity,
+            position
         }
-        socket.send(JSON.stringify(payload));
+        if (socket.readyState === WebSocket.OPEN)
+            await socket.send(JSON.stringify(payload));
         //dispatch();
     }
 
     if (!socket) {
-        socket = new WebSocket(`${WS_BASE}/position/${worldId}`);
+        socket = new WebSocket(`${WS_BASE}/ws/${worldId}`);
 
         socket.onopen = (event) => {
             console.info("[open] Connection established");
@@ -39,17 +52,17 @@ export const getSocket = (worldId) => {
         socket.onmessage = (event) => {
             var data = JSON.parse(event.data);
 
-            console.info(`[message] Data received for topic ${data.topic}`);
+            // console.info(`[message] Data received for topic ${data.topic}`);
 
             switch (data.topic) {
                 case JOIN_PLAYER:
-                    store.dispatch(connectPlayer(data.user_id));
+                    store.dispatch(connectPlayer(data.user_id, data.position));
                     break;
                 case LEAVE_PLAYER:
                     store.dispatch(disconnectPlayer(data.user_id));
                     break;
                 case PLAYER_MOVEMENT:
-                    store.dispatch(movePlayer(data.user_id, data.direction));
+                    store.dispatch(movePlayer(data.user_id, data.velocity, data.position));
                     break;
             }
         };
@@ -69,7 +82,7 @@ export const getSocket = (worldId) => {
         };
     }
 
-    return {socket, sendPosition};
+    return {socket, sendMovement, joinRoom};
 }
 
 

@@ -22,11 +22,11 @@ export const disconnectPlayer = (playerId) => ({
     playerId,
 });
 
-export const movePlayer = (playerId, position) => ({
+export const movePlayer = (playerId, velocity, position) => ({
     type: PLAYER_MOVEMENT,
     playerId,
     position,
-    // velocity
+    velocity
 });
 
 
@@ -36,15 +36,20 @@ const reducer = (state = initState, action) => {
     switch (action.type) {
         case JOIN_PLAYER:
             players = state.players;
-            players[action.playerId] = [0, 0];
+            players[action.playerId] = {
+                position: action.position, velocity: {x: 0, y: 0}
+            };
             return { ...state, players };
         case LEAVE_PLAYER:
             players = state.players;
             delete players[action.playerId];
+            console.log('no wayt')
             return { ...state, players };
         case PLAYER_MOVEMENT:
             players = state.players;
-            players[action.playerId] = action.position;
+            console.log(action.playerId, players[action.playerId], players)
+            players[action.playerId].position = action.position;
+            players[action.playerId].velocity = action.velocity;
             return { ...state, players };
         default:
             return state;

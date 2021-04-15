@@ -13,10 +13,10 @@ const sceneConfig = {
     key: 'GameScene',
 };
 
+var globalVar = false;
+
 
 class GameScene extends Phaser.Scene {
-    flag = 0;
-    PLAYER_NUM = 0;
     players = {};
 
     constructor() {
@@ -24,6 +24,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+
         this.add.text(50, 70, "Key D to change scene.")
         this.text = this.add.text(50, 50, `${this.count}`)
 
@@ -31,10 +32,10 @@ class GameScene extends Phaser.Scene {
         let tiles = this.map.addTilesetImage('wall-tiles', 'tiles');
 
         let ground = this.map.createLayer('Ground', tiles, 0, 0);
-        let obstacles = this.map.createLayer('Objects', tiles, 0, 0);
+        this.obstacles = this.map.createLayer('Objects', tiles, 0, 0);
 
         // -1 makes all tiles on this layer collidable
-        obstacles.setCollisionByExclusion([-1]);
+        this.obstacles.setCollisionByExclusion([-1]);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -45,73 +46,78 @@ class GameScene extends Phaser.Scene {
 
 
         // static players for range test
-        new OnlinePlayerSprite(this, 0, 0);
+        new OnlinePlayerSprite(this, 0, 500);
         new OnlinePlayerSprite(this, 500, 600);
 
-        // players for follow test
-        this.otherPlayers = [];
-        for (let i = 0; i < this.PLAYER_NUM; i++) {
-            this.otherPlayers[i] = new OnlinePlayerSprite(this, 50, 60);
-            this.otherPlayers[i].alpha = (i+1)/this.PLAYER_NUM;
-        }
-
         // main player
-        this.player = new PlayerSprite(this, 50, 60);
+        this.player = new PlayerSprite(this, 50, 50);
+        // connect to room
+        ws.joinRoom(1, {x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(this.player);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        this.physics.add.collider(this.player, obstacles);
+        this.physics.add.collider(this.player, this.obstacles);
 
         this.input.keyboard.on('keydown-D', () => {
             this.scene.start('FillTilesScene');
         }, this);
+        this.input.keyboard.on('keydown-Q', () => {
+            globalVar = !globalVar;
+        }, this);
 
 
-        this.onlinePlayers = [];
+        this.onlinePlayers = {};
         this.unsubscribe = store.subscribe(this.handleJoinNLeavePlayer);
-
-        this.physics.add.collider(this.onlinePlayers, obstacles);
-
+        
+        this.physics.add.collider(Object.values(this.onlinePlayers), this.obstacles);
+        
     }
-
+    
     handleJoinNLeavePlayer = () => {
+        
         let previousPlayers = this.players;
+        console.log('handleJoinNLeavePlayer 1 ',previousPlayers, this.players, JSON.stringify(previousPlayers), JSON.stringify(this.players) )
+        
         this.players = store.getState().players;
+        console.log('handleJoinNLeavePlayer 1.2 ',previousPlayers, this.players, JSON.stringify(previousPlayers), JSON.stringify(this.players) )
+
         
         let previousPlayersIds = Object.keys(previousPlayers);
         let playersIds = Object.keys(this.players);
+
+        console.log('handleJoinNLeavePlayer 2 ',previousPlayersIds, playersIds )
 
         if (previousPlayersIds.length !== playersIds.length) {
 
             // players updated
             if (previousPlayersIds.length > playersIds.length) {
                 // left
-                
+                console.log('left')
                 previousPlayersIds.forEach(playerId => {
-                    if (!(playerId in this.players))
-                    return; //apagar sprite
+                    if (!(playerId in this.players)) {
+                        this.onlinePlayers[playerId].destroy();
+                        console.log('removed')
+                    }
                 });
             } else {
                 // joined
-
+                console.log('joined')
                 playersIds.forEach(playerId => {
-                    if (!(playerId in previousPlayers))
-                        this.onlinePlayers.push(new OnlinePlayerSprite(this, 50, 50, playerId));
+                    console.log(playerId)
+                    if (!(playerId in previousPlayers)) {
+                        this.onlinePlayers[playerId] = new OnlinePlayerSprite(this, 50, 50, playerId);
+                        // this.physics.add.collider(this.onlinePlayers, this.obstacles);
+                    }
                 });
             }
         }
     }
 
     update(time, delta) {
-        this.flag++;
         this.player.updateMovement();
-
-        this.onlinePlayers.forEach(p => {
-            p.updateMovement();
-        })
 
         // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
@@ -123,13 +129,6 @@ class GameScene extends Phaser.Scene {
             }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
-        }
-
-        // follow player test
-        if (this.PLAYER_NUM > 0)
-            this.otherPlayers[this.PLAYER_NUM-1].updateMovementByPosition({x: this.player.x, y: this.player.y}, this.flag)
-        for (let i=this.PLAYER_NUM-2; i >= 0; i--) {
-            this.otherPlayers[i].updateMovementByPosition({x: this.otherPlayers[i+1].x, y: this.otherPlayers[i+1].y}, this.flag)
         }
     }
 }
@@ -146,6 +145,7 @@ class GameScene extends Phaser.Scene {
  */
 class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     speed = 500;
+    stopped = true;
 
     constructor(scene, x, y) {
         super(scene, x, y, 'player', 6);
@@ -195,36 +195,55 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         if (this.scene.cursors.down.isDown)
             direction.y += 1;
 
-        this.updateAnimation(direction);
-
+            
         // set normalized velocity (player doesn't move faster on diagonals)
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
+        
+        this.updateAnimation();
 
-        // if (this.body.velocity.x || this.body.velocity.y) 
-            if (ws.socket.readyState === WebSocket.OPEN) {
-                ws.sendPosition(1, this.body.velocity);
-            }
+        // send movement one more time after stopping
+        if (!this.stopped || this.body.speed) 
+            ws.sendMovement(1, this.body.velocity, this.body.center);
+        this.stopped = this.body.speed === 0;
+        
+        if (globalVar)
+        console.log((direction.x ||direction.y) ? "KEY" : "", 
+            this.body.velocity,
+            {x: this.body.x, y: this.body.y},
+            this.body.newVelocity,
+            this.body.position,
+            this.body.prev,
+            this.body.prevFrame,
+            this.body.speed
+        )
+
+        /* body.newVelocity The Body's change in position (due to velocity) at the last step, in pixels.
+            The size of this value depends on the simulation's step rate.*/
+
+        /* body.prev The position of this Body during the previous step. */
+
+        /* body.prevFrame The position of this Body during the previous frame. */
     }
 
-    updateAnimation(direction) {
-        if (this.body.facing == Phaser.Physics.Arcade.FACING_DOWN) {
-            this.anims.play('down', true);
+    updateAnimation() {
+        if (this.body.speed === 0) {
+            this.anims.stop();
         }
-        else if (this.body.facing == Phaser.Physics.Arcade.FACING_UP) {
+        else if (this.body.velocity.y < 0) {
             this.anims.play('up', true);
         }
-        else if (this.body.facing == Phaser.Physics.Arcade.FACING_RIGHT) {
-            this.flipX = false;
-            this.anims.play('horizontal', true);
+        else if (this.body.velocity.y > 0) {
+            this.anims.play('down', true);
         }
-        else if (this.body.facing == Phaser.Physics.Arcade.FACING_LEFT) {
+        else if (this.body.velocity.x < 0) {
             this.flipX = true;
             this.anims.play('horizontal', true);
         }
-        else {
-            this.anims.stop();
+        else if (this.body.velocity.x > 0) {
+            this.flipX = false;
+            this.anims.play('horizontal', true);
         }
     }
 }
@@ -241,29 +260,43 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
  */
 class OnlinePlayerSprite extends PlayerSprite {
     speed = 500; // 900 is the upperbound ig
-    direction;
+    velocity;
+    player;
+    numUpdates = 0;
     
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
 
-        this.unsubscribe = store.subscribe(this.handlePlayerMovement);
+        if (this.id)
+            this.unsubscribe = store.subscribe(this.handlePlayerMovement);
+    }
+
+    /**
+     * Destroys the object cleanly.
+     */
+    destroy = () => {
+        console.log('unsub')
+        this.unsubscribe();
+        this.body.destroy();
     }
 
     handlePlayerMovement = () => {
-        let previousDirection = this.direction;
-        this.direction = store.getState().players[this.id];
-          
-        if (previousDirection !== this.direction) {
-            // direction updated
+        let previousVelocity = this.velocity;
+        console.log('handlePlayerMovement', this.id, store.getState().players[this.id])
+        const player = store.getState().players[this.id];
+        if (!player)
+            return;
+        this.velocity = player.velocity;
 
-            this.updateMovementByDirection(this.direction);
+        if (previousVelocity !== this.velocity) {
+            // velocity updated
+            if (this.numUpdates++ > 15) {
+                let position = player.position;
+                this.body.reset(position.x, position.y);
+            }
+            this.updateMovementByDirection(this.velocity);
         }
-    }
-
-    updateMovement() {
-        // this.updateMovementByPosition(this.direction);
-        // this.updateMovementByDirection(this.direction);
     }
 
     updateMovementByPosition(position) {
@@ -271,33 +304,40 @@ class OnlinePlayerSprite extends PlayerSprite {
         if (!position)
             return;
 
-        this.updateAnimation({x: position.x - this.body.center.x, y: position.y - this.body.center.y});
+            
+            var distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, position.x, position.y);
+            // console.log(distance)
+            // if (distance < 32) {
+                //     speed = distance*15;
+                // }
+                
+                
+                /* body.newVelocity The Body's change in position (due to velocity) at the last step, in pixels.
+                The size of this value depends on the simulation's step rate.*/
+                
+                /* body.prev The position of this Body during the previous step. */
+                
+                /* body.prevFrame The position of this Body during the previous frame. */
+                
+                
+                if (distance < 8)
+                {
+                    this.body.reset(position.x, position.y);
+                    this.anims.stop();
+                    return;
+                }
+                
+            this.scene.physics.moveToObject(this, position, this.speed);
 
-        var distance = Phaser.Math.Distance.Between(this.body.center.x, this.body.center.y, position.x, position.y);
-        // console.log(distance)
-        // if (distance < 32) {
-        //     speed = distance*15;
-        // }
-
-
-        if (distance < 8)
-        {
-            this.body.reset(position.x, position.y);
-            this.anims.stop();
-            return;
-        }
-
-        this.scene.physics.moveToObject(this, position, this.speed);
+            this.updateAnimation();
     }
 
     updateMovementByDirection(direction) {
-        if (!direction)
-            return;
-        this.updateAnimation(direction);
-
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
+
+        this.updateAnimation();
     }
 }
 
