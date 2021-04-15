@@ -36,7 +36,6 @@ def create_world(
     try:
         world_in.creator = user
         obj = crud.world.create(db=db, obj_in=world_in, user=user)
-
         return obj
     except Exception as e:
         logger.exception(str(e))

@@ -11,15 +11,3 @@ router = APIRouter()
 @router.get("/")
 async def read_users():
     return [{"username": "Rick"}, {"username": "Morty"}]
-
-
-@router.post("/", response_model=schemas.UserInDB)
-def create_user(user: schemas.UserCreate, db: Session = Depends(deps.get_db)) -> Any:
-    db_user = crud.user.get_by_email(db=db, email=user.email)
-
-    if db_user:
-        raise HTTPException(
-            status_code=400,
-            detail="The user with this email already exists in the system.",
-        )
-    return crud.user.create(db=db, new_user=user)

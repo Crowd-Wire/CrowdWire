@@ -20,7 +20,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         """
         return db.query(User).filter(User.user_id == id).first()
 
-    def create(self, db: Session, *, user_data: UserCreate) -> User:
+    def create(self, db: Session, user_data: UserCreate, *args, **kwargs) -> Any:
         """
         Creates an User
         """
@@ -29,11 +29,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None
 
         db_user = User(
-            email=new_user.email,
-            hashed_password=get_password_hash(new_user.hashed_password),
-            name=new_user.name,
-            birth=new_user.birth,
-            register_date=new_user.register_date,
+            email=user_data.email,
+            hashed_password=get_password_hash(user_data.hashed_password),
+            name=user_data.name,
+            birth=user_data.birth,
+            register_date=user_data.register_date,
             status=0,
             is_superuser=False
         )
