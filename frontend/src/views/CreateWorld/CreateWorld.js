@@ -14,6 +14,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import NativeSelect from '@material-ui/core/NativeSelect';
 import Button from '@material-ui/core/Button'
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import img from 'assets/img/bg8.png';
 const useStyles = theme => ({
   root: {
@@ -28,6 +29,19 @@ class CreateWorld extends Component {
   constructor(props){
     super(props);
   }
+  allLabels=[
+    {name:"Classes"},
+    {name:"Meetings"},
+    {name:"Leisure"},
+    {name:"Conferences"},
+    {name:"Biology"},
+    {name:"Physics"},
+    {name:"Philosophy"},
+    {name:"Medicine"},
+    {name:"Maths"},
+    {name:"Sociology"},
+    {name:"Literature"},
+  ]
   handler = (focused) => {
     this.setState({
       focus: focused
@@ -77,50 +91,21 @@ class CreateWorld extends Component {
                           </Col>
                       </Row>
                       <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
-                        <Col md={6}>
-                          <Row>
-                            <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
-                              <InputLabel htmlFor="age-native-helper">Typology</InputLabel>
-                                <NativeSelect
-                                  //value={state.age}
-                                  onChange={this.handleChange}
-                                  inputProps={{
-                                    name: 'age',
-                                    id: 'age-native-helper',
-                                  }}
-                                >
-                                <option aria-label="None" value="" />
-                                <option value={10}>Classes</option>
-                                <option value={20}>Meetings</option>
-                                <option value={30}>Conference</option>
-                                <option value={40}>Leisure</option>
-
-                              </NativeSelect>
-                            </FormControl>
-                          </Row>
-                        </Col>
-                        <Col md={6}>
-                          <Row>
-                            <FormControl className={classes.formControl} style={{marginLeft:"auto", marginRight:"auto"}}>
-                              <InputLabel htmlFor="age-native-helper">Topic</InputLabel>
-                                <NativeSelect
-                                  //value={state.age}
-                                  onChange={this.handleChange}
-                                  inputProps={{
-                                    name: 'age',
-                                    id: 'age-native-helper',
-                                  }}
-                                >
-                                <option aria-label="None" value="" />
-                                <option value={10}>General</option>
-                                <option value={20}>Technology</option>
-                                <option value={30}>Biology</option>
-                                <option value={40}>Philosophy</option>
-                                <option value={50}>Geology</option>
-                              </NativeSelect>
-                            </FormControl>
-                          </Row>
-                        </Col>
+                      <Autocomplete
+                        limitTags={3}
+                        style={{width:"90%", marginLeft:"auto",marginRight:"auto"}}
+                        multiple
+                        id="tags-standard"
+                        options={this.allLabels}
+                        getOptionLabel={(option) => option.name}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            variant="standard"
+                            label="Labels"
+                          />
+                        )}
+                      />
                       </Row>
                       <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
                         <TextField
@@ -128,7 +113,7 @@ class CreateWorld extends Component {
                           id="outlined-multiline-static"
                           multiline
                           rows={3}
-                          defaultValue="Description..."
+                          placeholder="Description..."
                           variant="outlined"
                         />
                       </Row>
