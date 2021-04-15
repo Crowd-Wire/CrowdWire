@@ -22,6 +22,8 @@ import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 
+import { useNavigate } from 'react-router-dom';
+
 /**
  * @author Leandro Silva
  * 
