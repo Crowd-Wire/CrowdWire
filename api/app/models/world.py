@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship
 from app.core.config import settings
 from .world_tag import world_tag
 
+
 class World(Base):
     """
     A world is made by a user.
@@ -20,5 +21,5 @@ class World(Base):
     allow_guests = Column(Boolean, nullable=False)
     world_map = Column(LargeBinary, nullable=False)
     status = Column(Integer, nullable=False)
-
     tags = relationship("Tag", secondary=world_tag, back_populates="worlds")
+    users = relationship("World_User", back_populates="world")

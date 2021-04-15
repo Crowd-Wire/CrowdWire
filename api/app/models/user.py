@@ -15,5 +15,4 @@ class User(Base):
     birth = Column(Date)
     register_date = Column(DateTime, nullable=False)
     status = Column(Integer, nullable=False)
-
-    world = relationship("World")
+    worlds = relationship("World_User", back_populates="user")

@@ -1,6 +1,6 @@
 from typing import Optional, List
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 from .tags import TagInDB
 
@@ -10,15 +10,21 @@ class BaseWorld(BaseModel):
     description: Optional[str] = None
     max_users: Optional[int] = None
     public: Optional[bool] = True
+    creator: Optional[int]
     status: Optional[int] = None
     allow_guests: Optional[bool] = True
     tags: Optional[List[str]] = []
+
+    @validator('max_users')
+    def max_users_max_zero(cls, num):
+        if num < 1:
+            raise ValueError('Max_Users should be at least 1')
+        return num
 
 
 class WorldCreate(BaseWorld):
     name: str
     public: bool
-    creator: int  # id of the User
     allow_guests: bool
     world_map: bytes
     tags: List[str]
