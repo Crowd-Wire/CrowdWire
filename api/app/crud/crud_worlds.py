@@ -11,12 +11,6 @@ from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user
 
-"""
-This Class does both CRUD Operations
-on World as well as World_User, since World_User is a Many-to-Many 
-Association Model
-"""
-
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 

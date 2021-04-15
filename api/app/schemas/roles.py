@@ -18,7 +18,6 @@ class RoleBase(BaseModel):
     ban: Optional[bool]
 
 
-
 class RoleCreate(RoleBase):
     world_id: int
     name: str

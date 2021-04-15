@@ -4,8 +4,6 @@ from sqlalchemy.orm import relationship
 from app.core.config import settings
 from .world_tag import world_tag
 
-from .world_tag import world_tag
-
 
 class World(Base):
     """

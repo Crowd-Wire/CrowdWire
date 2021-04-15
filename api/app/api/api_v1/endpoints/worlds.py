@@ -32,10 +32,8 @@ def join_world(
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
-
     if user:
-        crud.crud_world.get_available(db, world_id=world_id, user_id= user.)
-    e
+        crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)
