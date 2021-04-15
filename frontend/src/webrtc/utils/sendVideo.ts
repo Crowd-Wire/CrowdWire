@@ -2,7 +2,7 @@ import storeDevice from "../../redux/commStore.js";
 import { useVoiceStore } from "../stores/useVoiceStore";
 import { useVideoStore } from "../stores/useVideoStore";
 
-export const sendVoice = async () => {
+export const sendVideo = async () => {
   const { camId } = storeDevice.getState().camId;
   const { set, cam } = useVideoStore.getState();
   const { sendTransport } = useVoiceStore.getState();

@@ -21,6 +21,7 @@ import logo from '../../assets/crowdwire_white_logo.png';
 
 import { getSocket } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 
 interface State {
@@ -60,6 +61,10 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
+        useVideoStore.getState().set({
+          camStream: stream,
+          cam: stream.getVideoTracks()[0]
+        })
         useVoiceStore.getState().set({
           micStream: stream,
           mic: stream.getAudioTracks()[0]
@@ -84,8 +89,9 @@ export default class RoomCall extends React.Component<{}, State> {
               //socket.emit('display-media', true);
             }
             useVoiceStore.getState().set({ mic: stream.getAudioTracks()[0] });
-            this.createVideo({ id: this.myId, stream });
-            this.replaceStream(stream);
+            useVideoStore.getState().set({ cam: stream.getVideoTracks()[0] });
+            // this.createVideo({ id: this.myId, stream });
+            // this.replaceStream(stream);
             resolve(true);
           });
         });
@@ -302,25 +308,18 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
-        { Object.keys(this.state.consumerMap).map((k, index) => {
-          const { consumer, volume: userVolume} = this.state.consumerMap[k];
-          return (
-          <p key={index}>LALDSALDAL{consumer.id}</p>)
-        })}
-
         { Object.keys(this.state.consumerMap).length > 0 ? (
           <Carousel {...gridSettings}>
-            { Object.keys(this.state.consumerMap).map((k, index) => {
-              const { consumer, volume: userVolume} = this.state.consumerMap[k];
-              console.log(consumer)
+            { Object.keys(this.state.consumerMap).map((peerId, index) => {
+              const { consumerAudio, consumerVideo, volume: userVolume} = this.state.consumerMap[peerId];
               return (
                 <Carousel.Item key={index}>
                   <VideoAudioBox
-                    username={consumer._appData.peerId}
-                    id={consumer._appData.peerId}
-                    track={consumer._track}
-                    // stream={this.state.consumerMap[k].stream}
-                    // muted={consumer._appData.peerId == this.myId ? true : false}
+                    username={peerId}
+                    id={peerId}
+                    audioTrack={consumerAudio ? consumerAudio._track : null}
+                    videoTrack={consumerVideo ? consumerVideo._track : null}
+                    // muted={peerId == this.myId ? true : false}
                     volume={(userVolume / 200)}
                   />
                 </Carousel.Item>

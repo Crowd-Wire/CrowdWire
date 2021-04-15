@@ -87,7 +87,7 @@ export const AudioRender: React.FC<AudioRenderProps> = () => {
             }}
           >
             okay
-            {Object.keys(consumerMap).map((k) => {
+            {/* {Object.keys(consumerMap).map((k) => {
               const { consumer, volume: userVolume } = consumerMap[k];
               return (
                 <MyAudio
@@ -115,7 +115,7 @@ export const AudioRender: React.FC<AudioRenderProps> = () => {
                   }}
                 />
               );
-            })}
+            })} */}
           </button>
         </div>
       </div>

@@ -7,7 +7,7 @@ import { useWsHandlerStore } from "./stores/useWsHandlerStore";
 import { consumeAudio } from "./utils/consumeAudio";
 import { createTransport } from "./utils/createTransport";
 import { joinRoom } from "./utils/joinRoom";
-import { receiveVoice } from "./utils/receiveVoice";
+import { receiveVideoVoice } from "./utils/receiveVideoVoice";
 import { sendVoice } from "./utils/sendVoice";
 import storeDevice from "../redux/commStore.js";
 
@@ -124,7 +124,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
           console.log("error creating recv transport | ", err);
           return;
         }
-        // receiveVoice(() => flushConsumerQueue(d.roomId));
+        // receiveVideoVoice(() => flushConsumerQueue(d.roomId));
       },
       "you-joined-as-speaker": async (d) => {
         closeVoiceConnections(null);
@@ -152,7 +152,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
           return;
         }
         await createTransport(d.roomId, "recv", d.recvTransportOptions);
-        // receiveVoice(() => flushConsumerQueue(d.roomId));
+        // receiveVideoVoice(() => flushConsumerQueue(d.roomId));
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

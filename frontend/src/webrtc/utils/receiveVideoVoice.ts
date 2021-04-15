@@ -1,7 +1,7 @@
 import { getSocket } from "../../services/socket";
 import { useVoiceStore } from "../stores/useVoiceStore";
 
-export const receiveVoice = (roomId) => {
+export const receiveVideoVoice = (roomId) => {
   var socket = getSocket(1).socket;
 
   socket.send(JSON.stringify({

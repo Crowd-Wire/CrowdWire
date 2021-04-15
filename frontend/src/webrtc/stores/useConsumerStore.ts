@@ -7,7 +7,7 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { consumer: Consumer; volume: number; }
+        { consumerAudio: Consumer; volume: number; consumerVideo: Consumer }
       >,
     },
     (set) => ({
@@ -26,26 +26,47 @@ export const useConsumerStore = create(
             : s
         );
       },
-      add: (c: Consumer, userId: string) =>
+      add: (c: Consumer, userId: string, kind: string) =>
         set((s) => {
           let volume = 100;
+          let otherConsumer = null;
           if (userId in s.consumerMap) {
             const x = s.consumerMap[userId];
             volume = x.volume;
-            x.consumer.close();
+            if (kind == "audio") {
+              otherConsumer = x.consumerVideo;
+              if (x.consumerAudio) x.consumerAudio.close();
+            } else if (kind == "video") {
+              otherConsumer = x.consumerAudio;
+              if (x.consumerVideo) x.consumerVideo.close();
+            }
           }
-          return {
-            consumerMap: {
-              ...s.consumerMap,
-              [userId]: { consumer: c, volume },
-            },
-          };
+          if (kind == "audio") {
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: { consumerAudio: c, volume, consumerVideo: otherConsumer },
+              },
+            };
+          } else if (kind == "video") {
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: { consumerVideo: c, volume, consumerAudio: otherConsumer },
+              },
+            };
+          }
         }),
       closeAll: () =>
         set((s) => {
-          Object.values(s.consumerMap).forEach(
-            ({ consumer: c }) => !c.closed && c.close()
-          );
+          for (const value of Object.values(s.consumerMap)) {
+            if (value.consumerAudio && !value.consumerAudio.closed) {
+              value.consumerAudio.close()
+            }
+            if (value.consumerVideo && !value.consumerVideo.closed) {
+              value.consumerVideo.close()
+            }
+          };
           return {
             consumerMap: {},
           };

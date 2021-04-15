@@ -4,9 +4,9 @@ import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
 import { joinRoom } from "../webrtc/utils/joinRoom";
 import { consumeAudio } from "../webrtc/utils/consumeAudio";
-import { receiveVoice } from "../webrtc/utils/receiveVoice";
+import { consumeVideo } from "../webrtc/utils/consumeVideo";
+import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
-import { useVideoStore } from "../webrtc/stores/useVideoStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
 import store, {
@@ -113,7 +113,7 @@ export const getSocket = (worldId) => {
           console.log(data)
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
-                receiveVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
           })
           break;
@@ -121,8 +121,7 @@ export const getSocket = (worldId) => {
           console.log(data)
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
-                receiveVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
-                receiveVideo(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                 sendVoice();
@@ -135,10 +134,13 @@ export const getSocket = (worldId) => {
           break;
         case "new-peer-speaker":
           const { roomId, recvTransport } = useVoiceStore.getState();
-          console.log(recvTransport)
+          console.log(data)
 
           if (recvTransport && roomId === data.d.roomId) {
-            consumeAudio(data.d.consumerParameters, data.d.peerId);
+            if (data.d.consumerParameters.kind == "audio")
+              consumeAudio(data.d.consumerParameters, data.d.peerId);
+            else
+              consumeVideo(data.d.consumerParameters, data.d.peerId);
           } else {
             consumerQueue = [...consumerQueue, { roomId, d: data.d }];
           }

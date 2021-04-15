@@ -7,17 +7,17 @@ import { UserVolumeSlider } from "./UserVolumeSlider";
 interface VideoAudioBoxProps {
   username?: string;
   id: string;
-  stream?: MediaStream;
   muted?: boolean;
   volume: number;
-  track: MediaStreamTrack;
+  audioTrack?: MediaStreamTrack;
+  videoTrack?: MediaStreamTrack;
 }
 
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
-  username="anonymous", stream=null, muted=false, id, volume, track=null
+  username="anonymous", muted=false, id, volume, audioTrack=null, videoTrack=null
 }) => {
 
-  const myRef = useRef<HTMLAudioElement>(null);
+  const myRef = useRef<any>(null);
 
   useEffect(() => {
     if (myRef.current) {
@@ -26,33 +26,32 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   }, [volume]);
 
   useEffect(() => {
-    if (stream) {
-      const video = (document.getElementById(id)! as HTMLVideoElement);
-      video.srcObject = stream;
-      video.muted = true;
-
-    } else {
+    const mediaStream = new MediaStream();
+    
+    if (videoTrack) {
+      mediaStream.addTrack(videoTrack);
+    }
+    if (audioTrack) {{
       volumeStore.subscribe(() => {
         myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
       })
-
-
-      const audioStream = new MediaStream();
-      audioStream.addTrack(track);
-      myRef.current.srcObject = audioStream;
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-      myRef.current.muted = muted
+      mediaStream.addTrack(audioTrack);
     }
-  }, [])
-  console.log(volume)
+
+
+    myRef.current.srcObject = mediaStream;
+    myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
+    myRef.current.muted = muted
+    }
+  }, [videoTrack, audioTrack])
   return (
     <div>
       <Card>
         <CardBody>
-          <div style={{backgroundColor:"lightblue"}}>
+          <div>
             <h4>{username}</h4>
-              { stream ? (
-                <video width="100%" autoPlay id={id}/>
+              { videoTrack ? (
+                <video width="100%" autoPlay id={id+"_video"} ref={myRef}/>
               ) : (
                 <audio autoPlay id={id+"_audio"} ref={myRef}/>
               )}

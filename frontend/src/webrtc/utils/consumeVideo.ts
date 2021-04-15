@@ -7,7 +7,7 @@ export const consumeVideo = async (consumerParameters: any, peerId: string) => {
     console.log("skipping consumeVideo because recvTransport is null");
     return false;
   }
-  console.log("novo consumer" + peerId)
+  console.log("new consumer" + peerId)
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {
@@ -17,7 +17,7 @@ export const consumeVideo = async (consumerParameters: any, peerId: string) => {
       kind: "video",
     },
   });
-  useConsumerStore.getState().add(consumer, peerId);
+  useConsumerStore.getState().add(consumer, peerId, 'video');
   console.log(useConsumerStore.getState())
   return true;
 };
