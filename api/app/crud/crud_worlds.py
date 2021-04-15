@@ -3,7 +3,7 @@ from typing import Any, Optional
 
 from sqlalchemy.orm import Session
 
-from app.models import World, Tag, World_User
+from app.models import World
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
 from app.crud.crud_tags import tag as crud_tag
@@ -44,13 +44,12 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                 # in terms of business logic we do not allow users to add the Tags They want
                 raise Exception("Invalid Tag. Tag does not exist.")
             db_world.tags.append(tag)
+
         db.commit()
-        #world_user = World_User(
+        # world_user = World_User(
         #    user_id=user.user_id,
         #    world_id=db_world.world_id
-
-
-        #)
+        # )
         # db_world.users.append(user)
 
         db.commit()
