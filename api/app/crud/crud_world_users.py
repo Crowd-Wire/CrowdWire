@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Dict, Any, Union
 
 from sqlalchemy.orm import Session
 
@@ -45,7 +44,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         db.commit()
         db.refresh(world_user)
         return world_user
-
 
 
 crud_world_user = CRUDWorld_User(World_User)
