@@ -1,22 +1,13 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import NativeSelect from '@material-ui/core/NativeSelect';
-import Button from '@material-ui/core/Button'
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import WorldDetails from 'views/CreateWorld/sections/WorldDetails.js';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
-const useStyles = theme => ({
+import IconButton from '@material-ui/core/IconButton';const useStyles = theme => ({
   root: {
     display: 'flex',
     backgroundImage: `url(${img})`,
@@ -25,23 +16,10 @@ const useStyles = theme => ({
   },
 });
 class CreateWorld extends Component {
-  state={focus: false};
+  state={page:"details"};
   constructor(props){
     super(props);
   }
-  allLabels=[
-    {name:"Classes"},
-    {name:"Meetings"},
-    {name:"Leisure"},
-    {name:"Conferences"},
-    {name:"Biology"},
-    {name:"Physics"},
-    {name:"Philosophy"},
-    {name:"Medicine"},
-    {name:"Maths"},
-    {name:"Sociology"},
-    {name:"Literature"},
-  ]
   handler = (focused) => {
     this.setState({
       focus: focused
@@ -54,81 +32,44 @@ class CreateWorld extends Component {
     //   [name]: event.target.value,
     // });
   };
-
+  changePage = () => {
+    this.setState({
+      page: "edit"
+    });
+  }
   render() {
     const { classes } = this.props;
-    return(
-      <div className={classes.root}>
-        <CssBaseline />
-        <Col style={{height:"100%"}}>
-          <Row style={{width:"100%", height:"80px", backgroundColor:"red", marginLeft:"auto", marginRight:"auto"}}/>
-          <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginBottom:"3%"}}>
-              <Col xs={2} sm={1} md={1}>
+    if(this.state.page==="details"){
+      console.log("details");
+      return(
+        <div className={classes.root}>
+          <CssBaseline />
+          <Col style={{height:"100%"}}>
+            <Row style={{height:"80px", marginLeft:"auto", marginRight:"auto"}}>
+              <Col md={1}></Col>
+              <Col>
+                <Row style={{ height:"100%", marginLeft:"auto", marginRight:"auto"}}>
+                  <Link to="/dashboard" style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px", marginTop:"auto", marginBottom:"auto"}}>
+                    <IconButton style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px"}}>
+                      <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"black", marginBottom:"auto"}}/>
+                    </IconButton>
+                  </Link>
+                </Row>
               </Col>
-              <Col xs={8} sm={5} md={5} style={{minWidth:"270px"}}>
-                  <div style={{height:"100%",width:"100%", borderRadius:"8px", backgroundColor:"white"}}>
-                      <Row style={{height:"20px"}}/>
-                      <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto"}}>
-                          <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>
-                      </Row>
-                      <br/>
-                      <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                          <TextField id="outlined-basic" label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
-                      </Row>
-                      <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                          <Col style={{width:"100%"}}>
-                              <Row style={{marginLeft:"30px", marginTop:"20px"}}>
-                              </Row>
-                              <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                                <div style={{marginLeft:"auto", marginRight:"auto"}}>
-                                  <Typography style={{marginTop:"auto", marginBottom:"auto"}}>Accessibility</Typography>
-                                  <RadioGroup row style={{marginTop:"auto", marginBottom:"auto"}}>
-                                      <FormControlLabel value="female" style={{margin:"auto"}} control={<Radio />} label="Private" />
-                                      <FormControlLabel value="male" style={{margin:"auto"}} control={<Radio />} label="Public" />
-                                  </RadioGroup>
-                                </div>
-                              </Row>
-                          </Col>
-                      </Row>
-                      <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
-                      <Autocomplete
-                        limitTags={3}
-                        style={{width:"90%", marginLeft:"auto",marginRight:"auto"}}
-                        multiple
-                        id="tags-standard"
-                        options={this.allLabels}
-                        getOptionLabel={(option) => option.name}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            variant="standard"
-                            label="Labels"
-                          />
-                        )}
-                      />
-                      </Row>
-                      <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
-                        <TextField
-                          style={{width:"100%"}}
-                          id="outlined-multiline-static"
-                          multiline
-                          rows={3}
-                          placeholder="Description..."
-                          variant="outlined"
-                        />
-                      </Row>
-                      <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px", marginBottom:"30px"}}>
-                        <Button variant="contained" color="primary" style={{marginLeft:"auto", marginRight:"auto"}}
-                        >
-                          Create Map
-                        </Button>
-                      </Row>
-                  </div>
-              </Col>
-          </Row>
-        </Col>
-      </div>
-    );
+            </Row>
+            <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginBottom:"3%"}}>
+                <WorldDetails changePage={this.changePage} />
+            </Row>
+          </Col>
+        </div>
+      );
+    }
+    else if(this.state.page==="edit"){
+      return(<>Wrong2</>);
+    }
+    else{
+      return(<>Wrong</>);
+    }
   };
 }
 
