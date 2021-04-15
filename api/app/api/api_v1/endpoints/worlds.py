@@ -33,9 +33,7 @@ def join_world(
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
 
-    lixo = schemas.World_UserInDB
-    lixo.username = ""
-    lixo.avatar = ""
+    
     # registered user
     if user:
         # checks if the world is available for him
