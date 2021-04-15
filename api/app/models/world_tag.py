@@ -3,6 +3,10 @@ from sqlalchemy import ForeignKey, Integer, Column, String, Table
 from app.core.config import settings
 
 
+"""
+Many to Many between world and tag.
+"""
+
 world_tag = Table(
     "world_tag",
     Base.metadata,
@@ -18,4 +22,5 @@ world_tag = Table(
         ForeignKey(settings.SCHEMA_NAME + ".tag.name"),
         primary_key=True,
     ),
+    schema=settings.SCHEMA_NAME
 )

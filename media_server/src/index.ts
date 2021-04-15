@@ -53,8 +53,8 @@ async function main() {
     "remove-speaker": ({ roomId, peerId }) => {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
-        peer?.producer?.close();
-        peer?.sendTransport?.close();
+        peer?.producer?.audio?.close();
+        // peer?.sendTransport?.close();
       }
     },
     ["destroy-room"]: ({ roomId }) => {
@@ -100,21 +100,24 @@ async function main() {
 
       for (const theirPeerId of Object.keys(state)) {
         const peerState = state[theirPeerId];
-        if (theirPeerId === myPeerId || !peerState || !peerState.producer) {
+        if (theirPeerId === myPeerId || !peerState ||
+          (!peerState.producer?.audio && !peerState.producer?.video)) {
           continue;
         }
         try {
           const { producer } = peerState;
-          consumerParametersArr.push(
-            await createConsumer(
-              router,
-              producer,
-              rtpCapabilities,
-              transport,
-              myPeerId,
-              state[theirPeerId]
-            )
-          );
+          for (const value of Object.values(producer)) {
+            consumerParametersArr.push(
+              await createConsumer(
+                router,
+                value,
+                rtpCapabilities,
+                transport,
+                myPeerId,
+                state[theirPeerId]
+              )
+            );
+          }
         } catch (e) {
           errLog(e.message);
           continue;
@@ -148,9 +151,8 @@ async function main() {
         return;
       }
       const { state } = rooms[roomId];
-      const { sendTransport, producer: previousProducer, consumers } = state[
-        myPeerId
-      ];
+      const { sendTransport, producer: previousProducer, consumers } =
+        state[myPeerId];
       const transport = sendTransport;
       
       if (!transport) {
@@ -159,16 +161,22 @@ async function main() {
       }
       try {
         if (previousProducer) {
-          previousProducer.close();
-          consumers.forEach((c) => c.close());
-          // @todo give some time for frontends to get update, but this can be removed
-          send({
-            rid: roomId,
-            topic: "close_consumer",
-            d: { producerId: previousProducer.id, roomId },
-          });
+          for (const [key, value] of Object.entries(previousProducer)) {
+            if (key == kind) {
+              value.close();
+              consumers.forEach((c) => {
+                if (c.kind == kind ) c.close()
+                // @todo give some time for frontends to get update, but this can be removed
+                send({
+                  rid: roomId,
+                  topic: "close_consumer",
+                  d: { producerId: value.id, roomId },
+                });
+              });
+            }
+          }
         }
-        
+          
         const producer = await transport.produce({
           kind,
           rtpParameters,
@@ -176,7 +184,11 @@ async function main() {
           appData: { ...appData, peerId: myPeerId, transportId },
         });
         
-        rooms[roomId].state[myPeerId].producer = producer;
+        if (!rooms[roomId].state[myPeerId].producer) {
+          rooms[roomId].state[myPeerId].producer = {kind : producer};
+        } else {
+          rooms[roomId].state[myPeerId].producer![kind] = producer;
+        }
         for (const theirPeerId of Object.keys(state)) {
           if (theirPeerId === myPeerId) {
             continue;

@@ -10,6 +10,7 @@ import ComponentsPage from "views/ComponentsPage/ComponentsPage.js";
 import LandingPage from "views/LandingPage/LandingPage.js";
 import ProfilePage from "views/ProfilePage/ProfilePage.js";
 import LoginPage from "views/LoginPage/LoginPage.js";
+import RegisterPage from "views/RegisterPage/RegisterPage.js";
 import GamePage from "views/GamePage/GamePage.js";
 import Dashboard from "views/Dashboard/Dashboard.js";
 import WorldSettings from "views/WorldSettings/WorldSettings.js"
@@ -20,6 +21,8 @@ import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
+
+import { useNavigate } from 'react-router-dom';
 
 /**
  * @author Leandro Silva
@@ -42,7 +45,9 @@ const routes = (isAuth) => [
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
 			{ path: "/comms", element: <Communications /> },
-            { path: "/template-components", element: <ComponentsPage /> },
+			{ path: "/template-components", element: <ComponentsPage /> },
+			{ path: "/register", element: <RegisterPage /> },
+
 		],
 	},
     { path: "/dashboard", element: <Dashboard /> },

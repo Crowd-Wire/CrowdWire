@@ -12,7 +12,7 @@ spec:
       {{- else }}
     - port: {{ .Values.service.port }}
       {{- end }}
-      targetPort: 3000
+      targetPort: 80
       protocol: TCP
   selector:
     {{- include "frontend.selectorLabels" . | nindent 4 }}

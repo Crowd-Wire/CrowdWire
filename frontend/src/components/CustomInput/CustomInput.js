@@ -8,7 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Input from "@material-ui/core/Input";
-
+import FormHelperText from '@material-ui/core/FormHelperText';
 import styles from "assets/jss/material-kit-react/components/customInputStyle.js";
 
 const useStyles = makeStyles(styles);
@@ -24,7 +24,8 @@ export default function CustomInput(props) {
     error,
     white,
     inputRootCustomClasses,
-    success
+    success,
+    st
   } = props;
 
   const labelClasses = classNames({
@@ -54,11 +55,13 @@ export default function CustomInput(props) {
     formControlClasses = classes.formControl;
   }
   return (
-    <FormControl {...formControlProps} className={formControlClasses}>
+    <FormControl {...formControlProps}       helperText="Incorrect entry."
+    className={formControlClasses}>
       {labelText !== undefined ? (
         <InputLabel
-          className={classes.labelRoot + " " + labelClasses}
-          htmlFor={id}
+        className={classes.labelRoot + " " + labelClasses}
+        htmlFor={id}
+        htmlFor="component-error"
           {...labelProps}
         >
           {labelText}
@@ -74,6 +77,10 @@ export default function CustomInput(props) {
         id={id}
         {...inputProps}
       />
+      {st==="" || st==='Incorrect email or password'?
+      <></>
+      :<FormHelperText id="component-error-text">{st}</FormHelperText>
+      }
     </FormControl>
   );
 }
