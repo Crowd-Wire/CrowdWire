@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import { VolumeSlider } from "./VolumeSlider";
 import { Button, Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
-import { changeMicId, changeCamId } from "../../redux/store.js";
-import { storeDevice } from "../../redux/store.js";
+import { changeMicId, changeCamId } from "../../redux/commStore.js";
+import storeDevice from "../../redux/commStore.js";
+import storeVolume, { changeGlobalVolume } from "../../redux/globalVolumeStore.js";
 
 interface DeviceSettingsProps {}
 
@@ -12,6 +13,7 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 
   const [micId, setMicId] = useState(storeDevice.getState().micId);
 	const [camId, setCamId] = useState(storeDevice.getState().camId);
+	const [globalVolume, setGlobalVolume] = useState(storeVolume.getState().globalVolume);
 
   const [optionsMic, setOptionsMic] = useState<
     Array<{ id: string; label: string } | null>
@@ -19,10 +21,8 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
 	const [optionsCamera, setOptionsCamera] = useState<
     Array<{ id: string; label: string } | null>
   >([]);
-	const [volume, setVolume] = useState(100);
 
   useEffect(() => {
-    console.log("dsadasdsadsadasdasdasdsadas")
     navigator.mediaDevices
       .enumerateDevices()
       .then((x) =>
@@ -101,7 +101,10 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
             Microphone Volume
           </div>
           <div className={`mb-8`}>
-            <VolumeSlider volume={volume} onVolume={(n) => setVolume(n)} />
+            <VolumeSlider volume={storeVolume.getState().globalVolume} onVolume={(n) => {
+              setGlobalVolume(n)
+              storeVolume.dispatch(changeGlobalVolume(n))
+            }} />
           </div>
 
           <br />

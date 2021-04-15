@@ -15,15 +15,21 @@ import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
-import { storeDevice } from "../../redux/store.js";
-import { VideoBox } from "./VideoBox"
+import storeDevice from "../../redux/commStore.js";
+import { VideoAudioBox } from "./VideoAudioBox"
 import logo from '../../assets/crowdwire_white_logo.png';
+
+import { getSocket } from "../../services/socket.js";
+import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useVideoStore } from "../../webrtc/stores/useVideoStore";
+import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 
 interface State {
   chatToggle: boolean;
   displayStream: boolean;
   messages: Array<string>;
-  users: { [key: string]: CreateVideo };
+  consumerMap: any;
+  cam: any;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -33,22 +39,22 @@ export default class RoomCall extends React.Component<{}, State> {
       chatToggle: false,
       displayStream: false,
       messages: [],
-      users: {}
+      consumerMap: useConsumerStore.getState().consumerMap,
+      cam: useVideoStore.getState().cam
     }
-    this.chatHandle = this.chatHandle.bind(this);
-    this.setNavigatorToStream = this.setNavigatorToStream.bind(this);
-    this.toggleAudioTrack = this.toggleAudioTrack.bind(this);
-    this.toggleVideoTrack = this.toggleVideoTrack.bind(this);
-    this.listenToEndStream = this.listenToEndStream.bind(this);
-    this.replaceStream = this.replaceStream.bind(this);
-    this.getMyVideo = this.getMyVideo.bind(this);
+    useConsumerStore.subscribe((consumerMap) => {
+      this.setState({consumerMap})
+    }, (state) => state.consumerMap);
+
+    useVideoStore.subscribe((cam) => {
+      this.setState({cam})
+    }, (state) => state.cam);
   }
-  myId: string = '12';
-  //users: { [key: string]: CreateVideo } = {};
-  peers: any = {};
+  myId: string = 'myUsernameId';
   accessMic: boolean = false;
   accessVideo: boolean = false;
-  numberUsers = 0;
+  socket = getSocket(1).socket;
+  myVideoRef = createRef<any>();
 
   chatHandle = (bool:boolean=false) => {
     this.setState({chatToggle:bool});
@@ -57,12 +63,17 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
-        if (this.numberUsers == 0) this.createVideo({ id: this.myId, stream });
-        else this.createVideo({ id: this.myId + this.numberUsers.toString(), stream });
+        useVideoStore.getState().set({
+          camStream: stream,
+          cam: stream.getVideoTracks()[0]
+        })
+        useVoiceStore.getState().set({
+          micStream: stream,
+          mic: stream.getAudioTracks()[0]
+        })
       }
     })
   }
-  
   
   reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
     // @ts-ignore
@@ -76,8 +87,8 @@ export default class RoomCall extends React.Component<{}, State> {
               this.listenToEndStream(stream, {video, audio});
               //socket.emit('display-media', true);
             }
-            this.createVideo({ id: this.myId, stream });
-            this.replaceStream(stream);
+            useVoiceStore.getState().set({ mic: stream.getAudioTracks()[0] });
+            useVideoStore.getState().set({ cam: stream.getVideoTracks()[0] });
             resolve(true);
           });
         });
@@ -92,6 +103,8 @@ export default class RoomCall extends React.Component<{}, State> {
   getMyVideo = (id:string=this.myId) => {
     return document.getElementById(id);
   }
+
+
   
   listenToEndStream = (stream:MediaStream, status:MediaStatus) => {
     const videoTrack = stream.getVideoTracks();
@@ -139,49 +152,22 @@ export default class RoomCall extends React.Component<{}, State> {
       }
     });
   }
-  
-  
-  replaceStream = (mediaStream:MediaStream) => {
-    Object.values(this.peers).map((peer:any) => {
-      peer.peerConnection?.getSenders().map((sender:any) => {
-        if(sender.track.kind == "audio") {
-          if(mediaStream.getAudioTracks().length > 0){
-            sender.replaceTrack(mediaStream.getAudioTracks()[0]);
-          }
-        }
-        if(sender.track.kind == "video") {
-          if(mediaStream.getVideoTracks().length > 0){
-            sender.replaceTrack(mediaStream.getVideoTracks()[0]);
-          }
-        }
-      });
-    })
-  }
 
-  createVideo = (createObj:CreateVideo) => {
-    if (!this.state.users[createObj.id]) {
-      this.numberUsers +=1;
-
-      this.setState(state => {
-        const users = state.users;
-        users[createObj.id] = {
-          ...createObj,
-        };
-        return {users};
-      });
-    } else {
-        //@ts-ignore
-        document.getElementById(createObj.id).srcObject = createObj.stream;
-        //@ts-ignore
-        document.getElementById(createObj.id).play();
+  sendMsg = (topic, d) => {
+    if (this.socket.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(
+        { topic: topic, d: d }
+      ));
     }
   }
 
-
   componentDidMount() {
+    useVoiceStore.getState().set({ roomId: '1' });
+
     storeDevice.subscribe((changeMicId) => {
       this.reInitializeStream()
     })
+
 
     useCheckMediaAccess().then( (data) => {
       this.accessVideo = data[0]
@@ -227,22 +213,23 @@ export default class RoomCall extends React.Component<{}, State> {
 
   
   render () {
+    const numberUsers = Object.keys(this.state.consumerMap).length + 1;
     const gridSettings = {
-      cols: this.numberUsers > 6 ? 6 : this.numberUsers == 4 ? 2 : this.numberUsers > 4 ? 3 : this.numberUsers,
-      rows: this.numberUsers > 3 ? 2 : 1,
+      cols: numberUsers > 6 ? 6 : numberUsers == 4 ? 2 : numberUsers > 4 ? 3 : numberUsers,
+      rows: numberUsers > 3 ? 2 : 1,
       gap: 10,
       loop: true,
-      hideArrow: this.numberUsers > 12 ? false : true,
-      showDots: this.numberUsers > 12 ? true : false,
+      hideArrow: numberUsers > 12 ? false : true,
+      showDots: numberUsers > 12 ? true : false,
       responsiveLayout: [
         {
           breakpoint: 1200,
-          cols: this.numberUsers > 3 ? 3 : this.numberUsers,
-          rows: this.numberUsers > 3 ? 2 : 1,
+          cols: numberUsers > 3 ? 3 : numberUsers,
+          rows: numberUsers > 3 ? 2 : 1,
           gap: 5,
           loop: true,
-          autoplay: false,
-          hideArrow: this.numberUsers > 6 ? false : true
+          autoplay: 0,
+          hideArrow: numberUsers > 6 ? false : true
         }
       ],
       mobileBreakpoint: 600
@@ -269,17 +256,52 @@ export default class RoomCall extends React.Component<{}, State> {
         <Button color="primary" onClick={() => this.toggleAudioTrack()}>Toggle Audio</Button>
         <Button color="primary" onClick={() => this.toggleVideoTrack()}>Toggle Video</Button>
 
-        { this.numberUsers > 0 ? (
-          <Carousel {...gridSettings}>
-            { Object.keys(this.state.users).map((key, index) => (
-              <Carousel.Item key={index}>
-                  <VideoBox username="user1" videoId={key} stream={this.state.users[key].stream} muted={key == this.myId ? true : false}/>
-              </Carousel.Item>
-            ))}
-          </Carousel>
-        ) : '' }
+        <div className="row">
+          <Button color="primary" onClick={() => this.sendMsg("join-as-new-peer", { roomId: '1' })}>
+            {/* This will join a room and then create a Transport that allows to Receive data */}
+            Join Room 1 and only Receive Audio
+          </Button>
+          <Button color="primary" onClick={() => this.sendMsg("join-as-speaker", { roomId: '1' })}>
+            {/* This will join a room and then create a Transport
+            that allows to Receive data and another Transport to send data*/}
+            Join Room 1 and Receive and Send Audio
+          </Button>
+        </div>
+
+        <Carousel {...gridSettings}>
+          <Carousel.Item key={-1}> 
+            <VideoAudioBox
+              username={this.myId}
+              id={this.myId}
+              audioTrack={null}
+              videoTrack={this.state.cam}
+              muted={true}
+              volume={0}
+              me={true}
+              />
+          </Carousel.Item>
+
+          { Object.keys(this.state.consumerMap).length > 0 
+            && Object.keys(this.state.consumerMap).map((peerId, index) => {
+              const { consumerAudio, consumerVideo, volume: userVolume} = this.state.consumerMap[peerId];
+              return (
+                <Carousel.Item key={index}>
+                  <VideoAudioBox
+                    username={peerId}
+                    id={peerId}
+                    audioTrack={consumerAudio ? consumerAudio._track : null}
+                    videoTrack={consumerVideo ? consumerVideo._track : null}
+                    // muted={peerId == this.myId ? true : false}
+                    volume={(userVolume / 200)}
+                  />
+                </Carousel.Item>
+              )
+            })
+          }
+        </Carousel>
 
         <DeviceSettings />
+        
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 
@@ -303,12 +325,6 @@ export default class RoomCall extends React.Component<{}, State> {
       </React.Fragment>
     );
   }
-}
-
-interface CreateVideo {
-    id: string,
-    stream: MediaStream,
-    userData?: any,
 }
 
 interface MediaStatus {
