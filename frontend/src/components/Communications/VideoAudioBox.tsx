@@ -9,12 +9,13 @@ interface VideoAudioBoxProps {
   id: string;
   muted?: boolean;
   volume: number;
+  me?: boolean;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
 }
 
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
-  username="anonymous", muted=false, id, volume, audioTrack=null, videoTrack=null
+  username="anonymous", muted=false, id, volume, audioTrack=null, videoTrack=null, me=false
 }) => {
 
   const myRef = useRef<any>(null);
@@ -27,21 +28,23 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
   useEffect(() => {
     const mediaStream = new MediaStream();
-    
+    console.log("ASEWQEWQ")
+    console.log(videoTrack)
+    console.log(audioTrack)
     if (videoTrack) {
       mediaStream.addTrack(videoTrack);
     }
-    if (audioTrack) {{
+    if (audioTrack) {
       volumeStore.subscribe(() => {
         myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
       })
       mediaStream.addTrack(audioTrack);
     }
 
-
-    myRef.current.srcObject = mediaStream;
-    myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-    myRef.current.muted = muted
+    if (myRef.current) {
+      myRef.current.srcObject = mediaStream;
+      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
+      myRef.current.muted = muted
     }
   }, [videoTrack, audioTrack])
   return (
@@ -52,11 +55,11 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
             <h4>{username}</h4>
               { videoTrack ? (
                 <video width="100%" autoPlay id={id+"_video"} ref={myRef}/>
-              ) : (
+              ) : audioTrack ? (
                 <audio autoPlay id={id+"_audio"} ref={myRef}/>
-              )}
+              ) : ''}
           </div>
-          <UserVolumeSlider userId={id} />
+          {me ? "" : <UserVolumeSlider userId={id} /> }
         </CardBody>
       </Card>
     </div>

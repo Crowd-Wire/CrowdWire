@@ -28,8 +28,8 @@ interface State {
   chatToggle: boolean;
   displayStream: boolean;
   messages: Array<string>;
-  users: { [key: string]: CreateVideo };
   consumerMap: any;
+  cam: any;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -39,20 +39,22 @@ export default class RoomCall extends React.Component<{}, State> {
       chatToggle: false,
       displayStream: false,
       messages: [],
-      users: {},
-      consumerMap: useConsumerStore.getState().consumerMap
+      consumerMap: useConsumerStore.getState().consumerMap,
+      cam: useVideoStore.getState().cam
     }
     useConsumerStore.subscribe((consumerMap) => {
       this.setState({consumerMap})
     }, (state) => state.consumerMap);
+
+    useVideoStore.subscribe((cam) => {
+      this.setState({cam})
+    }, (state) => state.cam);
   }
-  myId: string = '12';
-  //users: { [key: string]: CreateVideo } = {};
-  peers: any = {};
+  myId: string = 'myUsernameId';
   accessMic: boolean = false;
   accessVideo: boolean = false;
-  numberUsers = 0;
   socket = getSocket(1).socket;
+  myVideoRef = createRef<any>();
 
   chatHandle = (bool:boolean=false) => {
     this.setState({chatToggle:bool});
@@ -69,12 +71,9 @@ export default class RoomCall extends React.Component<{}, State> {
           micStream: stream,
           mic: stream.getAudioTracks()[0]
         })
-        if (this.numberUsers == 0) this.createVideo({ id: this.myId, stream });
-        else this.createVideo({ id: this.myId + this.numberUsers.toString(), stream });
       }
     })
   }
-  
   
   reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
     // @ts-ignore
@@ -90,8 +89,6 @@ export default class RoomCall extends React.Component<{}, State> {
             }
             useVoiceStore.getState().set({ mic: stream.getAudioTracks()[0] });
             useVideoStore.getState().set({ cam: stream.getVideoTracks()[0] });
-            // this.createVideo({ id: this.myId, stream });
-            // this.replaceStream(stream);
             resolve(true);
           });
         });
@@ -155,43 +152,6 @@ export default class RoomCall extends React.Component<{}, State> {
       }
     });
   }
-  
-  
-  replaceStream = (mediaStream:MediaStream) => {
-    Object.values(this.peers).map((peer:any) => {
-      peer.peerConnection?.getSenders().map((sender:any) => {
-        if(sender.track.kind == "audio") {
-          if(mediaStream.getAudioTracks().length > 0){
-            sender.replaceTrack(mediaStream.getAudioTracks()[0]);
-          }
-        }
-        if(sender.track.kind == "video") {
-          if(mediaStream.getVideoTracks().length > 0){
-            sender.replaceTrack(mediaStream.getVideoTracks()[0]);
-          }
-        }
-      });
-    })
-  }
-
-  createVideo = (createObj:CreateVideo) => {
-    if (!this.state.users[createObj.id]) {
-      this.numberUsers +=1;
-
-      this.setState(state => {
-        const users = state.users;
-        users[createObj.id] = {
-          ...createObj,
-        };
-        return {users};
-      });
-    } else {
-        //@ts-ignore
-        document.getElementById(createObj.id).srcObject = createObj.stream;
-        //@ts-ignore
-        document.getElementById(createObj.id).play();
-    }
-  }
 
   sendMsg = (topic, d) => {
     if (this.socket.readyState === WebSocket.OPEN) {
@@ -253,7 +213,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
   
   render () {
-    const numberUsers = Object.keys(this.state.consumerMap).length;
+    const numberUsers = Object.keys(this.state.consumerMap).length + 1;
     const gridSettings = {
       cols: numberUsers > 6 ? 6 : numberUsers == 4 ? 2 : numberUsers > 4 ? 3 : numberUsers,
       rows: numberUsers > 3 ? 2 : 1,
@@ -308,9 +268,21 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
-        { Object.keys(this.state.consumerMap).length > 0 ? (
-          <Carousel {...gridSettings}>
-            { Object.keys(this.state.consumerMap).map((peerId, index) => {
+        <Carousel {...gridSettings}>
+          <Carousel.Item key={-1}> 
+            <VideoAudioBox
+              username={this.myId}
+              id={this.myId}
+              audioTrack={null}
+              videoTrack={this.state.cam}
+              muted={true}
+              volume={0}
+              me={true}
+              />
+          </Carousel.Item>
+
+          { Object.keys(this.state.consumerMap).length > 0 
+            && Object.keys(this.state.consumerMap).map((peerId, index) => {
               const { consumerAudio, consumerVideo, volume: userVolume} = this.state.consumerMap[peerId];
               return (
                 <Carousel.Item key={index}>
@@ -324,9 +296,9 @@ export default class RoomCall extends React.Component<{}, State> {
                   />
                 </Carousel.Item>
               )
-            })}
-          </Carousel>
-        ) : '' }
+            })
+          }
+        </Carousel>
 
         <DeviceSettings />
         
@@ -353,12 +325,6 @@ export default class RoomCall extends React.Component<{}, State> {
       </React.Fragment>
     );
   }
-}
-
-interface CreateVideo {
-    id: string,
-    stream: MediaStream,
-    userData?: any,
 }
 
 interface MediaStatus {

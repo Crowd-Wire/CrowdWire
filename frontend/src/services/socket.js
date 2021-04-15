@@ -29,7 +29,10 @@ async function flushConsumerQueue(_roomId) {
       d: { peerId, consumerParameters },
     } of consumerQueue) {
       if (_roomId === roomId) {
-        await consumeAudio(consumerParameters, peerId);
+        if (consumerParameters.kind == "audio")
+          await consumeAudio(consumerParameters, peerId);
+        else
+          consumeVideo(consumerParameters, peerId)
       }
     }
   } catch (err) {
@@ -42,7 +45,10 @@ async function flushConsumerQueue(_roomId) {
 async function consumeAll(consumerParametersArr) {
   try {
     for (const { peerId, consumerParameters } of consumerParametersArr) {
-      if (!(await consumeAudio(consumerParameters, peerId))) {
+      if (consumerParameters.kind == "audio" && !(await consumeAudio(consumerParameters, peerId))) {
+        break;
+      }
+      if (consumerParameters.kind == "video" && !(await consumeVideo(consumerParameters, peerId))) {
         break;
       }
     }
