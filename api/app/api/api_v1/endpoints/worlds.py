@@ -26,15 +26,16 @@ def get_world(
         )
 
 
-@router.get("/join/{world_id}")
+@router.get("/join/{world_id}", response_model=schemas.World_UserInDB)
 def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
-
-    
-    # registered user
+    """
+    Registers a User in a World and returns the Information as a world_user object
+    """
+    # TODO Try Except
     if user:
         # checks if the world is available for him
         world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
@@ -47,13 +48,41 @@ def join_world(
             return world_user
 
         logger.debug("User has avatar")
-        # make a schema with this data
-        # return world_user
         return world_user
 
     else:
         logger.debug("User is not registered")
         return {"lixo": "lixo"}
+
+
+@router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
+def update_world_user_info(
+        world_id: int,
+        user_data: schemas.World_UserUpdate,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False))
+) -> Any:
+    """
+    Update User info for a given world: username and avatar name usually
+    """
+
+    if user:
+        world_user_obj = crud.crud_world_user.get_user_joined(db, world_id, user.user_id)
+        if not world_user_obj:
+            raise HTTPException(
+                status_code=400,
+                detail="User Not Registered in this world",
+            )
+        # registered user
+        world_user = crud.crud_world_user.update(
+            db=db,
+            db_obj=world_user_obj,
+            obj_in=user_data
+        )
+        return world_user
+    else:
+        # guest
+        pass
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)
