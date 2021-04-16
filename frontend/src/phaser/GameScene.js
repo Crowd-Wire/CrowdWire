@@ -92,7 +92,7 @@ class GameScene extends Phaser.Scene {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    this.playerSprites[id].destroy();
+                    this.playerSprites[id].disconnect();
                     delete  this.playerSprites[id];
                 }
             }
@@ -129,7 +129,7 @@ class GameScene extends Phaser.Scene {
  */
 class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     speed = 500;
-    stopped = true;
+    step = 0;
 
     constructor(scene, x, y) {
         super(scene, x, y, 'player', 6);
@@ -167,6 +167,8 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     updateMovement() {
         const direction = new Phaser.Math.Vector2();
 
+        
+
         this.body.setVelocity(0);
 
         // get resultant direction
@@ -184,14 +186,27 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
+
+        // if (this.body.speed !== 0)
+        //     console.log(
+        //         JSON.stringify(this.body.center),
+        //         JSON.stringify(this.body.velocity),
+        //         JSON.stringify(this.body.newVelocity),
+        //         JSON.stringify(),
+        //     )
         
         this.updateAnimation();
 
-        // send movement one more time after stopping
-        if (!this.stopped || this.body.speed)
+        if (this.body.speed) {
+            this.step = 1;
+            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
+        } else if (this.step === 1) {
+            this.step = 2;
+            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
+        } else if (this.step === 2) {
+            this.step = 0;
             ws.sendMovement('1', this.body.center, this.body.velocity);
-        this.stopped = this.body.speed === 0;
-        
+        }
     }
 
     updateAnimation() {
@@ -228,6 +243,7 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 class OnlinePlayerSprite extends PlayerSprite {
     speed = 500; // 900 is the upperbound ig
     numUpdates = 0;
+    wasBlocked = false;
     
     constructor(scene, x, y, id) {
         super(scene, x, y);
@@ -238,30 +254,117 @@ class OnlinePlayerSprite extends PlayerSprite {
                 this.handlePlayerMovement, state => state.players[this.id]);
     }
 
+    // handlePlayerMovement = ({position, velocity}) => {
+    //     this.wasBlocked = !this.body.blocked.none && this.body.blocked;
+
+    //     if (this.numUpdates++ > 15) {
+    //         if (this.wasBlocked) {
+    //             // hack to avoid trespassing wall
+    //             if (this.wasBlocked.up) {
+    //                 position.add(Phaser.Math.Vector2.DOWN.scale(10));
+    //             } else if (this.wasBlocked.down) {
+    //                 position.add(Phaser.Math.Vector2.UP.scale(10));
+    //             } else if (this.wasBlocked.left) {
+    //                 position.add(Phaser.Math.Vector2.RIGHT.scale(10));
+    //             } else {
+    //                 position.add(Phaser.Math.Vector2.LEFT.scale(10));
+    //             }
+    //             console.log('sub', JSON.stringify(position));
+    //         }
+    //         console.log(JSON.stringify(position));
+    //         this.body.reset(position.x, position.y);
+    //         this.numUpdates = 0;
+    //         this.wasBlocked = false;
+    //     }
+    //     this.updateMovement(velocity);
+    // }
+
+    // TODO : ver melhor abaixo
+
+    // handlePlayerMovement = ({position, velocity}) => {
+    //     position = new Phaser.Math.Vector2(position);
+    //     if (!this.body.blocked.none) {
+    //         this.wasBlocked = true;
+    //     }
+    //     if (this.numUpdates++ > 15) {
+    //         if (this.wasBlocked) {
+    //             // hack to avoid trespassing wall
+    //             console.log('subtract', JSON.stringify(new Phaser.Math.Vector2(velocity).normalize().scale(8.4)))
+    //             position.subtract(Phaser.Math.Vector2.DOWN);
+    //             console.log(JSON.stringify(position));
+    //         }
+    //         this.body.reset(position.x, position.y);
+    //         this.numUpdates = 0;
+    //         this.wasBlocked = false;
+    //     }
+    //     this.updateMovement(velocity);
+    // }
+
     handlePlayerMovement = ({position, velocity}) => {
-        console.log(this.body.blocked.none)
-        if (this.numUpdates++ > 15) {
-            this.numUpdates = 0;
-            if (this.body.blocked.none) {
-                // hack to avoid trespassing wall
-                console.log(position)
-                this.body.reset(position.x, position.y);
-            }
-        }
-        this.updateMovement(velocity);
+        // if (!this.body.blocked.none) {
+        //             // hack to avoid trespassing wall
+        //     this.numUpdates = 0;
+        // }
+        // if (this.numUpdates++ > 15) {
+        //     this.numUpdates = 0;
+        //     this.setPosition(position.x, position.y);
+        //     console.log('reset')
+        // }
+        this.updateAnimation(velocity);
+        this.body.reset(position.x, position.y);
+        
     }
+
+    // handlePlayerMovement = ({position, velocity}) => {
+    //     // if (!this.body.blocked.none) {
+    //         // hack to avoid trespassing wall
+    //     //     this.numUpdates = 0;
+    //     // }
+    //     // console.log(
+    //     //     "onCollide", this.body.onCollide,
+    //     //     "onOverlap", this.body.onOverlap,
+    //     //     "touching", this.body.touching,
+    //     //     "wasTouching", this.body.wasTouching,
+    //     //     "blocked", this.body.blocked,
+    //     //     "checkCollision", this.body.checkCollision,
+    //     //     "embedded", this.body.embedded
+    //     // )
+    //     console.log(position)
+    //     if (this.numUpdates++ > 60) {
+    //         this.numUpdates = 0;
+    //         console.log(position.y)
+    //         this.body.reset(position.x, position.y);
+            
+    //     }
+    //     this.body.reset(position.x, position.y);
+    // }
 
     /**
      * Destroys the object cleanly.
      */
-    destroy = () => {
+    disconnect = () => {
         this.unsubscribe();
-        this.body.destroy();
+        this.destroy();
     }
 
-    updateMovement(velocity) {
-        this.body.setVelocity(velocity.x, velocity.y);
-        this.updateAnimation();
+    updateAnimation(velocity) {
+        console.log(velocity)
+        if (velocity.y < 0) {
+            this.anims.play('up', true);
+        }
+        else if (velocity.y > 0) {
+            this.anims.play('down', true);
+        }
+        else if (velocity.x < 0) {
+            this.flipX = true;
+            this.anims.play('horizontal', true);
+        }
+        else if (velocity.x > 0) {
+            this.flipX = false;
+            this.anims.play('horizontal', true);
+        } else {
+            this.anims.stop();
+        }
     }
 }
 

@@ -68,7 +68,7 @@ class ConnectionManager:
                 self.connections[world_id].pop(room_id)
                 if not self.connections[world_id]:
                     self.connections.pop(world_id)
-            logger.info(f"Connection removed from World {world_id}, Room {room_id}")
+            logger.info(f"Removed connection from World {world_id}, Room {room_id}")
         except KeyError:
             logger.error(
                 f"Error when trying to remove connection from World {world_id}, "
@@ -86,8 +86,8 @@ class ConnectionManager:
     async def broadcast(self, world_id: str, room_id: str, payload: dict, sender_id: str):
         try:
             for user_id in self.connections[world_id][room_id]:
-                if user_id != sender_id:
-                    await self.users_ws[user_id].send_json(payload)
+                # if user_id != sender_id:
+                await self.users_ws[user_id].send_json(payload)
             logger.info(
                 f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
                 f"{payload}"
