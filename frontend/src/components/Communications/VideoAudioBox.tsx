@@ -3,6 +3,10 @@ import { Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
 import volumeStore from "../../redux/globalVolumeStore.js";
 import { UserVolumeSlider } from "./UserVolumeSlider";
+import MicIcon from '@material-ui/icons/Mic';
+import MicOffIcon from '@material-ui/icons/MicOff';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 
 interface VideoAudioBoxProps {
   username?: string;
@@ -21,6 +25,12 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 }) => {
 
   const myRef = useRef<any>(null);
+  const [videoState, setVideoState] = useState(true)
+  const [audioState, setAudioState] = useState(true)
+
+  const togleVideo = () => {
+    setVideoState(!videoState)
+  }
 
   useEffect(() => {
     if (myRef.current) {
@@ -38,6 +48,8 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
 
   useEffect(() => {
+    setVideoState(videoTrack ? true : false)
+
     const mediaStream = new MediaStream();
 
     if (videoTrack) {
@@ -66,12 +78,23 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
           <h4>{username}</h4>
           <div id={id+"border_div"}>
               { videoTrack ? (
-                <video width="100%" autoPlay id={id+"_video"} ref={myRef}/>
-              ) : audioTrack ? (
-                <audio autoPlay id={id+"_audio"} ref={myRef}/>
-              ) : ''}
+                <video width="100%" autoPlay id={id+"_video"} ref={myRef}
+                  style={{display: videoState ? 'block' : 'none'}}/>
+                ) : audioTrack ? (
+                  <audio autoPlay id={id+"_audio"} ref={myRef}/>
+                  ) : ''}
           </div>
           {me ? "" : <UserVolumeSlider userId={id} /> }
+          { videoTrack ?
+              videoState ? 
+                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
+              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => togleVideo()}/>)
+            : (<VideocamOffIcon color={'secondary'}/>)
+          }
+          { audioTrack ?
+            (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
+            : (<MicOffIcon color={'secondary'}/>)
+          }
         </CardBody>
       </Card>
     </div>

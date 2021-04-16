@@ -3,11 +3,6 @@ import React, { createRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 // Icons imports
 import { Button } from '@material-ui/core';
-import CallIcon from '@material-ui/icons/CallEnd';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import VideocamIcon from '@material-ui/icons/Videocam';
-import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -72,7 +67,7 @@ export default class RoomCall extends React.Component<{}, State> {
   
   reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
     // @ts-ignore
-    const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : window.navigator.mediaDevices.getDisplayMedia();
+    const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : navigator.mediaDevices.getDisplayMedia();
     return new Promise((resolve) => {
       media.then((stream:MediaStream) => {
             // @ts-ignore
@@ -180,6 +175,7 @@ export default class RoomCall extends React.Component<{}, State> {
           hideProgressBar: false,
           closeOnClick: true,
           draggable: true,
+          pauseOnFocusLoss: false,
           pauseOnHover: false,
           progress: undefined,
         });
@@ -196,6 +192,7 @@ export default class RoomCall extends React.Component<{}, State> {
           hideProgressBar: false,
           closeOnClick: true,
           draggable: true,
+          pauseOnFocusLoss: false,
           pauseOnHover: false,
           progress: undefined,
         });
@@ -232,12 +229,6 @@ export default class RoomCall extends React.Component<{}, State> {
     return (
       <React.Fragment>
         <ActiveSpeakerListener/>
-        <MicIcon></MicIcon>
-        <MicOffIcon></MicOffIcon>
-        <CallIcon></CallIcon>
-        <VideocamIcon></VideocamIcon>
-        <VideocamOffIcon></VideocamOffIcon>
-
         <div>
           <h4>
             Share Screen

@@ -7,7 +7,7 @@ export async function useCheckMediaAccess() {
 
     const getMedia = (mediaType='') => {
         return new Promise((resolve) => {
-            navigator.getUserMedia({[mediaType]: true}, 
+            navigator.mediaDevices.getUserMedia({[mediaType]: true}, 
                 (stream) => {
                     stream.getTracks().map((track) => {
                         track.stop();

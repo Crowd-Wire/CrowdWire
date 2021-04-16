@@ -8,9 +8,10 @@ interface ActiveSpeakerListenerProps {}
 
 export const ActiveSpeakerListener: React.FC<ActiveSpeakerListenerProps> = ({}) => {
   const { micStream, roomId } = useVoiceStore();
-  
+  const isSafari = window['safari'] || navigator.userAgent.toLowerCase().indexOf("Safari") > -1;
+
   useEffect(() => {
-    if (!roomId || !micStream) {
+    if (!roomId || !micStream || isSafari) {
       return;
     }
 
