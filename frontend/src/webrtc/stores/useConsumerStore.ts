@@ -7,7 +7,7 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { consumerAudio: Consumer; volume: number; consumerVideo: Consumer }
+        { consumerAudio: Consumer; volume: number; consumerVideo: Consumer, active: boolean }
       >,
     },
     (set) => ({
@@ -21,7 +21,7 @@ export const useConsumerStore = create(
                     ...s.consumerMap[userId],
                     volume,
                   },
-                },
+                }
               }
             : s
         );
@@ -45,15 +45,41 @@ export const useConsumerStore = create(
             return {
               consumerMap: {
                 ...s.consumerMap,
-                [userId]: { consumerAudio: c, volume, consumerVideo: otherConsumer },
-              },
+                [userId]: { consumerAudio: c, volume, consumerVideo: otherConsumer, active: false },
+              }
             };
           } else if (kind == "video") {
             return {
               consumerMap: {
                 ...s.consumerMap,
-                [userId]: { consumerVideo: c, volume, consumerAudio: otherConsumer },
-              },
+                [userId]: { consumerVideo: c, volume, consumerAudio: otherConsumer, active: false },
+              }
+            };
+          }
+        }),
+      addActiveSpeaker: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            const user = {...s.consumerMap[userId]}
+            user.active = true
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      removeActiveSpeaker: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            const user = {...s.consumerMap[userId]}
+            user.active = false
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
             };
           }
         }),

@@ -20,6 +20,7 @@ async function main() {
     Sentry.init({
       dsn: process.env.SENTRY_DNS,
       enabled: !!process.env.SENTRY_DNS,
+      debug: true,
     });
   }
   // start mediasoup

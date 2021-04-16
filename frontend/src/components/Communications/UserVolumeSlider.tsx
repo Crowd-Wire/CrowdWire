@@ -18,7 +18,7 @@ export const UserVolumeSlider: React.FC<UserVolumeSliderProps> = ({
   return (
     <VolumeSlider
       label
-      max="200"
+      max={200}
       volume={consumerInfo.volume}
       onVolume={(n) => setVolume(userId, n)}
     />
