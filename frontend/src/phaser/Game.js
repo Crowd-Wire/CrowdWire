@@ -12,10 +12,6 @@ const gameConfig = {
   pixelArt: true, 
   zoom: 2,
 
-  fps: {
-    target: 15,
-  },
-
   // width: window.innerWidth,
   // height: window.innerHeight,
 
@@ -51,9 +47,10 @@ const gameConfig = {
   physics: {
     default: 'arcade',
     arcade: {
-        debug: true,
-        gravity: { y: 0 }
-    }
+      debug: true,
+      gravity: { y: 0 },
+      fps: 60,
+    },
   },
   scene: [
     BootScene,

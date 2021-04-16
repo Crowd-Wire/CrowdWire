@@ -69,12 +69,11 @@ class GameScene extends Phaser.Scene {
             globalVar = !globalVar;
         }, this);
         
-        this.onlinePlayers = {};
-
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
-        this.physics.add.collider(Object.values(this.onlinePlayers), this.obstacles);
-        
+        this.physics.add.collider(Object.values(this.playerSprites), this.obstacles);
+
+        console.log(this.obstacles)
     }
 
     handlePlayerConnection = (players, prevPlayers) => {
@@ -86,6 +85,7 @@ class GameScene extends Phaser.Scene {
                 if (!(id in this.playerSprites)) {
                     let position = usePlayerStore.getState().players[id].position;
                     this.playerSprites[id] = new OnlinePlayerSprite(this, position.x, position.y, id);
+                    this.physics.add.collider(this.playerSprites[id], this.obstacles);
                 }
             }
         } else {
@@ -239,10 +239,14 @@ class OnlinePlayerSprite extends PlayerSprite {
     }
 
     handlePlayerMovement = ({position, velocity}) => {
-        console.log(position, velocity);
+        console.log(this.body.blocked.none)
         if (this.numUpdates++ > 15) {
-            this.body.reset(position.x, position.y);
             this.numUpdates = 0;
+            if (this.body.blocked.none) {
+                // hack to avoid trespassing wall
+                console.log(position)
+                this.body.reset(position.x, position.y);
+            }
         }
         this.updateMovement(velocity);
     }
@@ -256,10 +260,7 @@ class OnlinePlayerSprite extends PlayerSprite {
     }
 
     updateMovement(velocity) {
-        this.body.setVelocityX(velocity.x * this.speed);
-        this.body.setVelocityY(velocity.y * this.speed);
-        this.body.velocity.normalize().scale(this.speed);
-
+        this.body.setVelocity(velocity.x, velocity.y);
         this.updateAnimation();
     }
 }
