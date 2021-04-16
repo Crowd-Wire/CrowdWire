@@ -74,9 +74,7 @@ async def world_movement(websocket: WebSocket, world_id: int) -> Any:
                 logger.info(user_id)
                 logger.info(manager.connections[world_id][room_id])
                 if user_id in manager.connections[world_id][room_id]:
-                    await manager.broadcast(world_id, room_id,\
-                        {'topic': 'active_speaker', 'peerId': user_id, 'value': value},\
-                        user_id)
+                    await manager.broadcast(world_id, room_id, {'topic': 'active_speaker', 'peerId': user_id, 'value': value}, user_id)
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
