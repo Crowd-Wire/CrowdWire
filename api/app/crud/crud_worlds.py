@@ -1,8 +1,9 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any, Optional, Tuple
 
 from sqlalchemy.orm import Session
 
+from app.core import strings
 from app.models import World
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
@@ -31,7 +32,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             world_user = crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user_id)
 
         if not world_obj or world_obj.status != 0 \
-                or (not world_obj.public and not world_user)\
+                or (not world_obj.public and not world_user) \
                 or (world_user and world_user.status != 0):
             # checks if world exists, is not banned. If the world is private user has to have entered it before.
             # In case he has entered it before, check if he was banned in that world
@@ -39,7 +40,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             raise Exception(f"World with id {world_id} Not Found or is not currently available.")
         return world_obj
 
-    def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Any:
+    def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Tuple[Optional[World], str]:
         """
          Create a World
         """
@@ -47,7 +48,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
         user = kwargs.get('user')
         if not user:
-            raise Exception("Argument \"user\" was not passed.")
+            return None, strings.USER_NOT_PASSED
 
         db_world = World(
             creator=user.user_id,
@@ -67,7 +68,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             tag = crud_tag.get_by_name(db=db, name=tag_name)
             if not tag:
                 # in terms of business logic we do not allow users to add the Tags They want
-                raise Exception("Invalid Tag. Tag does not exist.")
+                return None, strings.INVALID_TAG
             db_world.tags.append(tag)
 
         db.commit()
@@ -77,7 +78,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         logger.debug(default_roles)
         _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
 
-        return db_world
+        return db_world, strings.WORLD_CREATED_SUCCESS
 
 
 crud_world = CRUDWorld(World)

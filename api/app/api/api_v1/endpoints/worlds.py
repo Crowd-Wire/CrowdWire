@@ -6,6 +6,8 @@ from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 
+from app.core import strings
+
 router = APIRouter()
 
 
@@ -35,13 +37,12 @@ def join_world(
     """
     Registers a User in a World and returns the Information as a world_user object
     """
-    # TODO Try Except
+
     if user:
         # checks if the world is available for him
         world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
 
         world_user = crud.crud_world_user.join_world(db, _world=world, _user=user)
-
         if not world_user.avatar or not world_user.username:
             # Return something that says he does not have any of these
             logger.debug("User does not have avatar")
@@ -52,7 +53,10 @@ def join_world(
 
     else:
         logger.debug("User is not registered")
-        return {"lixo": "lixo"}
+        raise HTTPException(
+            status_code=400,
+            detail=strings.ACCESS_FORBIDDEN,
+        )
 
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
@@ -71,7 +75,7 @@ def update_world_user_info(
         if not world_user_obj:
             raise HTTPException(
                 status_code=400,
-                detail="User Not Registered in this world",
+                detail=strings.USER_NOT_IN_WORLD
             )
         # registered user
         world_user = crud.crud_world_user.update(
@@ -82,7 +86,10 @@ def update_world_user_info(
         return world_user
     else:
         # guest
-        pass
+        raise HTTPException(
+            status_code=400,
+            detail=strings.ACCESS_FORBIDDEN,
+        )
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)
@@ -92,13 +99,12 @@ def create_world(
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
-    try:
-        world_in.creator = user
-        obj = crud.crud_world.create(db=db, obj_in=world_in, user=user)
-        return obj
-    except Exception as e:
-        logger.exception(str(e))
+    world_in.creator = user
+    obj, message = crud.crud_world.create(db=db, obj_in=world_in, user=user)
+    if not obj:
         raise HTTPException(
             status_code=400,
-            detail=str(e)
+            detail=message
         )
+
+    return obj
