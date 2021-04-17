@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
+from app.redis import redis_connector
+
 
 from app.core import strings
 
@@ -29,7 +31,7 @@ def get_world(
 
 
 @router.get("/join/{world_id}", response_model=schemas.World_UserInDB)
-def join_world(
+async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
@@ -39,6 +41,22 @@ def join_world(
     """
 
     if user:
+        # TODO: create redis class to handle each of the models?
+
+        # ONLY FOR TEST PURPOSES
+        await redis_connector.hset("ola1", "username", "working")
+
+        # verify if the user is in redis cache
+        user_info = await redis_connector.hget("ola1", "username")
+        logger.debug(user_info)
+
+        if user_info:
+            return schemas.World_UserInDB(
+                world_id=world_id,
+                user_id=user.user_id,
+                avatar=user_info,
+                username="username"
+            )
         # checks if the world is available for him
         world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
 
@@ -57,7 +75,6 @@ def join_world(
             status_code=400,
             detail=strings.ACCESS_FORBIDDEN,
         )
-
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
 def update_world_user_info(

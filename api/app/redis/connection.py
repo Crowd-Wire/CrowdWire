@@ -28,5 +28,13 @@ class RedisConnector:
 
         return await self.master.execute(*args, **kwargs)
 
+    async def hget(self, key: str, field: str):
+
+        return await self.master.execute('hget', key, field)
+
+    async def hset(self, key: str, field: str, value: str):
+
+        return await self.master.execute('hset', key, field, value)
+
 
 redis_connector = RedisConnector()
