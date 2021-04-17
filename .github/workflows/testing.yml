@@ -30,16 +30,17 @@ jobs:
       - name: Install poetry
         run: pip install poetry==1.1
       - uses: actions/cache@v1
+        id: cache-poetry-deps
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-      - name: Install dependecies
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependencies
+        if: steps.cache-poetry-deps.outputs.cache-hit != 'true'
         run: |
           cd api/
-          source $HOME/.poetry/env
+          poetry config virtualenvs.in-project true
           poetry install
       - name: Run tests
         run: |
           cd api/
-          source $HOME/.poetry/env
           poetry run pytest
