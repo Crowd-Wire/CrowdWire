@@ -34,6 +34,8 @@ jobs:
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+           venv-${{ runner.os }}-
       - name: Install dependencies
         if: steps.cache-poetry-deps.outputs.cache-hit != 'true'
         run: |
