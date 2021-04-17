@@ -1,0 +1,44 @@
+name: Action for Tests
+on: [push, pull_request]
+
+jobs:
+  lint:
+    name: Lint code (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.8]
+    services:
+      postgres:
+        image: postgres:11.5-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1234
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - name: rabbitmq and redis docker composes
+        run: |
+          cd api/
+          sh ./build-docker.sh
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install poetry
+        run: pip install poetry==1.1
+      - uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      - name: Install dependecies
+        run: |
+          cd api/
+          poetry config virtualenvs.in-project true
+          poetry install
+      - name: Run tests
+        run: |
+          cd api/
+          poetry run pytest
