@@ -3,11 +3,6 @@ import React, { createRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 // Icons imports
 import { Button } from '@material-ui/core';
-import CallIcon from '@material-ui/icons/CallEnd';
-import MicIcon from '@material-ui/icons/Mic';
-import MicOffIcon from '@material-ui/icons/MicOff';
-import VideocamIcon from '@material-ui/icons/Videocam';
-import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import ChatIcon from '@material-ui/icons/Chat';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -23,6 +18,7 @@ import { getSocket } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
+import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 
 interface State {
   chatToggle: boolean;
@@ -63,21 +59,15 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
-        useVideoStore.getState().set({
-          camStream: stream,
-          cam: stream.getVideoTracks()[0]
-        })
-        useVoiceStore.getState().set({
-          micStream: stream,
-          mic: stream.getAudioTracks()[0]
-        })
+        useVideoStore.getState().set({camStream: stream,cam: stream.getVideoTracks()[0]})
+        useVoiceStore.getState().set({micStream: stream,mic: stream.getAudioTracks()[0]})
       }
     })
   }
   
   reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
     // @ts-ignore
-    const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : window.navigator.mediaDevices.getDisplayMedia();
+    const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : navigator.mediaDevices.getDisplayMedia();
     return new Promise((resolve) => {
       media.then((stream:MediaStream) => {
             // @ts-ignore
@@ -87,8 +77,8 @@ export default class RoomCall extends React.Component<{}, State> {
               this.listenToEndStream(stream, {video, audio});
               //socket.emit('display-media', true);
             }
-            useVoiceStore.getState().set({ mic: stream.getAudioTracks()[0] });
-            useVideoStore.getState().set({ cam: stream.getVideoTracks()[0] });
+            useVideoStore.getState().set({camStream: stream,cam: stream.getVideoTracks()[0]})
+            useVoiceStore.getState().set({micStream: stream,mic: stream.getAudioTracks()[0]})
             resolve(true);
           });
         });
@@ -185,6 +175,7 @@ export default class RoomCall extends React.Component<{}, State> {
           hideProgressBar: false,
           closeOnClick: true,
           draggable: true,
+          pauseOnFocusLoss: false,
           pauseOnHover: false,
           progress: undefined,
         });
@@ -201,6 +192,7 @@ export default class RoomCall extends React.Component<{}, State> {
           hideProgressBar: false,
           closeOnClick: true,
           draggable: true,
+          pauseOnFocusLoss: false,
           pauseOnHover: false,
           progress: undefined,
         });
@@ -236,12 +228,7 @@ export default class RoomCall extends React.Component<{}, State> {
     }
     return (
       <React.Fragment>
-      <MicIcon></MicIcon>
-      <MicOffIcon></MicOffIcon>
-      <CallIcon></CallIcon>
-      <VideocamIcon></VideocamIcon>
-      <VideocamOffIcon></VideocamOffIcon>
-
+        <ActiveSpeakerListener/>
         <div>
           <h4>
             Share Screen
@@ -268,7 +255,9 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
+            
         <Carousel {...gridSettings}>
+
           <Carousel.Item key={-1}> 
             <VideoAudioBox
               username={this.myId}
@@ -278,15 +267,17 @@ export default class RoomCall extends React.Component<{}, State> {
               muted={true}
               volume={0}
               me={true}
+              active={false}
               />
           </Carousel.Item>
 
           { Object.keys(this.state.consumerMap).length > 0 
-            && Object.keys(this.state.consumerMap).map((peerId, index) => {
-              const { consumerAudio, consumerVideo, volume: userVolume} = this.state.consumerMap[peerId];
+            && Object.keys(this.state.consumerMap).map((peerId) => {
+              const { consumerAudio, consumerVideo, volume: userVolume, active} = this.state.consumerMap[peerId];
               return (
-                <Carousel.Item key={index}>
+                <Carousel.Item key={peerId+"_crs_item"}>
                   <VideoAudioBox
+                    active={active}
                     username={peerId}
                     id={peerId}
                     audioTrack={consumerAudio ? consumerAudio._track : null}

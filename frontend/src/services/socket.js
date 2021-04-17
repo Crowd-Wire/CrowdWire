@@ -7,6 +7,7 @@ import { consumeAudio } from "../webrtc/utils/consumeAudio";
 import { consumeVideo } from "../webrtc/utils/consumeVideo";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
+import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
 import store, {
@@ -151,6 +152,13 @@ export const getSocket = (worldId) => {
             consumerQueue = [...consumerQueue, { roomId, d: data.d }];
           }
           break;
+        case "active_speaker":
+          console.log(data)
+          if (data.value)
+            useConsumerStore.getState().addActiveSpeaker(data.peerId)
+          else
+            useConsumerStore.getState().removeActiveSpeaker(data.peerId)
+          break;
         default:
           const { handlerMap } = useWsHandlerStore.getState();
           if (data.topic in handlerMap) {
@@ -177,3 +185,9 @@ export const getSocket = (worldId) => {
 
   return {socket, sendPosition, sendComms};
 }
+
+export const wsend = (d) => {
+  if (socket || socket.readyState !== socket.CLOSED) {
+    socket.send(JSON.stringify(d));
+  }
+};
