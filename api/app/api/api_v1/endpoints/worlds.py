@@ -21,7 +21,12 @@ async def get_world(
 ) -> Any:
     if user:
         logger.debug(f"Registered User {user.name} joining in")
-        db_world, _ = await crud.crud_world.get(db=db, world_id=world_id)
+        db_world, message = await crud.crud_world.get(db=db, world_id=world_id)
+        if not db_world:
+            raise HTTPException(
+                status_code=400,
+                detail=message,
+            )
         return db_world
     else:
         raise HTTPException(

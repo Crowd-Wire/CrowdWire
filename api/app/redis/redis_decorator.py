@@ -43,4 +43,3 @@ def cache(func):
         return data, message
 
     return wrapper
-

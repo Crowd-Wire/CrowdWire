@@ -17,7 +17,7 @@ class RedisConnector:
 
     async def key_exists(self, key: str):
         return await self.master.execute('exists', key)
-    
+
     async def get(self, key: str) -> any:
         return await self.master.execute('get', key)
 
