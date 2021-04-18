@@ -8,32 +8,26 @@ import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 
-interface VideoAudioBoxProps {
+interface MyVideoAudioBoxProps {
   username?: string;
   id: string;
   muted?: boolean;
   volume: number;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
-  active: boolean;
 }
 
-export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
+export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   username="anonymous", muted=false, id, volume,
-  audioTrack=null, videoTrack=null, active
+  audioTrack=null, videoTrack=null
 }) => {
 
   const myRef = useRef<any>(null);
   const [videoState, setVideoState] = useState(true)
   const [audioState, setAudioState] = useState(true)
 
-  const toggleVideo = () => {
+  const togleVideo = () => {
     setVideoState(!videoState)
-  }
-
-  const toggleAudio = () => {
-    setAudioState(!audioState)
-    myRef.current.muted = audioState;
   }
 
   useEffect(() => {
@@ -41,13 +35,6 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
       myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
     }
   }, [volume]);
-
-  useEffect(() => {
-    if (active && !muted)
-      document.getElementById(id+"border_div").style.border = "thick solid #0000FF";
-    else
-      document.getElementById(id+"border_div").style.border = "0px";
-  }, [active]);
 
   useEffect(() => {
     setVideoState(videoTrack ? true : false)
@@ -88,19 +75,14 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
           </div>
           { videoTrack ?
               videoState ? 
-                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
-              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-            : (<VideocamOffIcon color={'action'}/>)
+                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
+              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => togleVideo()}/>)
+            : (<VideocamOffIcon color={'secondary'}/>)
           }
           { audioTrack ?
-            audioState ? 
-              (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon color={'action'}/>)
+            (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
+            : (<MicOffIcon color={'secondary'}/>)
           }
-
-          <UserVolumeSlider userId={id} />
-
         </CardBody>
       </Card>
     </div>

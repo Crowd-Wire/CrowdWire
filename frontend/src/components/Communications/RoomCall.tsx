@@ -11,7 +11,8 @@ import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import { DeviceSettings } from "./DeviceSettings";
 import storeDevice from "../../redux/commStore.js";
-import { VideoAudioBox } from "./VideoAudioBox"
+import { VideoAudioBox } from "./VideoAudioBox";
+import { MyVideoAudioBox } from "./MyVideoAudioBox";
 import logo from '../../assets/crowdwire_white_logo.png';
 
 import { getSocket } from "../../services/socket.js";
@@ -38,6 +39,7 @@ export default class RoomCall extends React.Component<{}, State> {
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam
     }
+
     useConsumerStore.subscribe((consumerMap) => {
       this.setState({consumerMap})
     }, (state) => state.consumerMap);
@@ -77,8 +79,8 @@ export default class RoomCall extends React.Component<{}, State> {
               this.listenToEndStream(stream, {video, audio});
               //socket.emit('display-media', true);
             }
-            useVideoStore.getState().set({camStream: stream,cam: stream.getVideoTracks()[0]})
-            useVoiceStore.getState().set({micStream: stream,mic: stream.getAudioTracks()[0]})
+            useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
+            useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
             resolve(true);
           });
         });
@@ -154,7 +156,7 @@ export default class RoomCall extends React.Component<{}, State> {
   componentDidMount() {
     useVoiceStore.getState().set({ roomId: '1' });
 
-    storeDevice.subscribe((changeMicId) => {
+    storeDevice.subscribe(() => {
       this.reInitializeStream()
     })
 
@@ -228,7 +230,7 @@ export default class RoomCall extends React.Component<{}, State> {
     }
     return (
       <React.Fragment>
-        <ActiveSpeakerListener/>
+        {/* <ActiveSpeakerListener/> */}
         <div>
           <h4>
             Share Screen
@@ -246,28 +248,26 @@ export default class RoomCall extends React.Component<{}, State> {
         <div className="row">
           <Button color="primary" onClick={() => this.sendMsg("join-as-new-peer", { roomId: '1' })}>
             {/* This will join a room and then create a Transport that allows to Receive data */}
-            Join Room 1 and only Receive Audio
+            Join Room 1 and only Send Video
           </Button>
           <Button color="primary" onClick={() => this.sendMsg("join-as-speaker", { roomId: '1' })}>
             {/* This will join a room and then create a Transport
             that allows to Receive data and another Transport to send data*/}
-            Join Room 1 and Receive and Send Audio
+            Join Room 1 and Send Video Audio
           </Button>
         </div>
 
             
         <Carousel {...gridSettings}>
 
-          <Carousel.Item key={-1}> 
-            <VideoAudioBox
+          <Carousel.Item key={this.myId}> 
+            <MyVideoAudioBox
               username={this.myId}
               id={this.myId}
               audioTrack={null}
               videoTrack={this.state.cam}
-              muted={true}
+              muted={false}
               volume={0}
-              me={true}
-              active={false}
               />
           </Carousel.Item>
 
@@ -282,7 +282,6 @@ export default class RoomCall extends React.Component<{}, State> {
                     id={peerId}
                     audioTrack={consumerAudio ? consumerAudio._track : null}
                     videoTrack={consumerVideo ? consumerVideo._track : null}
-                    // muted={peerId == this.myId ? true : false}
                     volume={(userVolume / 200)}
                   />
                 </Carousel.Item>

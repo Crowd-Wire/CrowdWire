@@ -6,6 +6,8 @@ import CardBody from "../Card/CardBody.js";
 import { changeMicId, changeCamId } from "../../redux/commStore.js";
 import storeDevice from "../../redux/commStore.js";
 import storeVolume, { changeGlobalVolume } from "../../redux/globalVolumeStore.js";
+import { sendVoice } from "../../webrtc/utils/sendVoice";
+import { sendVideo } from "../../webrtc/utils/sendVideo";
 
 interface DeviceSettingsProps {}
 
@@ -58,8 +60,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
                 value={storeDevice.getState().camId}
                 onChange={(e) => {
                   const id = e.target.value;
-                  storeDevice.dispatch(changeCamId(id))
+                  storeDevice.dispatch(changeCamId(id));
                   setCamId(id);
+                  sendVideo();
                 }}
               >
                 {optionsCamera.map((x) =>
@@ -81,8 +84,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
               value={storeDevice.getState().micId}
               onChange={(e) => {
                 const id = e.target.value;
-                storeDevice.dispatch(changeMicId(id))
-                setMicId(id)
+                storeDevice.dispatch(changeMicId(id));
+                setMicId(id);
+                sendVoice();
               }}
             >
               {optionsMic.map((x) =>

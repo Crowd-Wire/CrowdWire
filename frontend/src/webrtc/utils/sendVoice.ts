@@ -1,39 +1,39 @@
 import storeDevice from "../../redux/commStore.js";
-import { useProducerStore } from "../stores/useProducerStore";
 import { useVoiceStore } from "../stores/useVoiceStore";
 
 export const sendVoice = async () => {
+  const { sendTransport, set, mic, micStream } = useVoiceStore.getState();
   const { micId } = storeDevice.getState().micId;
-  const { sendTransport, set, mic } = useVoiceStore.getState();
+  
   if (!sendTransport) {
     console.log("no sendTransport in sendVoice");
     return;
   }
-  mic?.stop();
-  let micStream: MediaStream;
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({
-      audio: micId ? { deviceId: micId } : true,
-      video: false
-    });
-  } catch (err) {
-    set({ mic: null, micStream: null });
-    console.log(err);
-    return;
-  }
+  if (!micStream) {
+    try {
+      set({
+        micStream: await navigator.mediaDevices.getUserMedia({
+          audio: micId ? { deviceId: micId } : true,
+          video: false
+        })
+      });
+      set({
+        mic: micStream.getAudioTracks()[0]
+      })
+    } catch (err) {
+      set({ mic: null, micStream: null });
+      console.log(err);
+      return;
+    }
+  } 
 
-  const audioTracks = micStream.getAudioTracks();
-
-  if (audioTracks.length) {
+  if (mic) {
     console.log("creating producer...");
-    const track = audioTracks[0];
-    await sendTransport.produce({
-      track: track,
+    sendTransport.produce({
+      track: mic,
       appData: { mediaTag: "cam-audio" },
-    })
-    set({ mic: track, micStream });
-    return;
+    }).then(() => {return;})
   }
 
-  set({ mic: null, micStream: null });
+
 };

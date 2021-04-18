@@ -122,6 +122,9 @@ export const getSocket = (worldId) => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
+              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                sendVideo();
+              });
           })
           break;
         case "you-joined-as-speaker":
@@ -139,7 +142,7 @@ export const getSocket = (worldId) => {
         case "@get-recv-tracks-done":
           consumeAll(data.d.consumerParametersArr);
           break;
-        case "new-peer-speaker":
+        case "new-peer-producer":
           const { roomId, recvTransport } = useVoiceStore.getState();
           console.log(data)
 

@@ -89,7 +89,7 @@ type OutgoingMessageDataMap = {
     producerId: string;
     roomId: string;
   };
-  "new-peer-speaker": {
+  "new-peer-producer": {
     roomId: string;
     peerId: string;
   } & Consumer;
@@ -107,6 +107,7 @@ type OutgoingMessageDataMap = {
     peerId: string;
     routerRtpCapabilities: RtpCapabilities;
     recvTransportOptions: TransportOptions;
+    sendTransportOptions: TransportOptions;
   };
 } & {
   [Key in SendTrackDoneOperationName]: {
