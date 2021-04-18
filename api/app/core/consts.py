@@ -1,0 +1,14 @@
+# user STATUS
+USER_NORMAL_STATUS = 0
+USER_BANNED_STATUS = 1
+
+# world STATUS
+WORLD_NORMAL_STATUS = 0
+WORLD_BANNED_STATUS = 1
+
+# Avatar filenames
+AVATAR_1 = "avatar_1"
+AVATAR_2 = "avatar_2"
+AVATAR_3 = "avatar_3"
+
+AVATARS_LIST = [AVATAR_1, AVATAR_2, AVATAR_3]

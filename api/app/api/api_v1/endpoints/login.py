@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import dependencies
-from app.core import security
+from app.core import security, strings
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -27,10 +27,10 @@ def register(
     Register a user, returns an access token for that user
     """
 
-    user = crud.user.create(db=db, user_data=user_data)
+    user, message = crud.crud_user.create(db=db, user_data=user_data)
 
     if not user:
-        raise HTTPException(status_code=400, detail="A user with that email already exists")
+        raise HTTPException(status_code=400, detail=message)
 
     access_token, expires = security.create_access_token(user.user_id)
 
@@ -50,14 +50,14 @@ def login_access_token(
     OAuth2 compatible token login, get an access token for future requests
     """
 
-    user = crud.user.authenticate(
+    user, message = crud.crud_user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not crud.user.is_active(db=db, user=user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail=message)
+    elif not crud.crud_user.is_active(db=db, user=user):
+        raise HTTPException(status_code=400, detail=strings.INACTIVE_USER)
 
     access_token, expires = security.create_access_token(user.user_id)
 

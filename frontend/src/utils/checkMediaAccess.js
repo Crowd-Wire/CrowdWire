@@ -1,5 +1,5 @@
 import videoCall from "../consts/videoCall";
-import { storeDevice } from "../redux/store.js";
+import storeDevice from "../redux/commStore.js";
 
 
 export async function useCheckMediaAccess() {
@@ -7,7 +7,7 @@ export async function useCheckMediaAccess() {
 
     const getMedia = (mediaType='') => {
         return new Promise((resolve) => {
-            navigator.getUserMedia({[mediaType]: true}, 
+            navigator.mediaDevices.getUserMedia({[mediaType]: true}, 
                 (stream) => {
                     stream.getTracks().map((track) => {
                         track.stop();
