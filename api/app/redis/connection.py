@@ -40,7 +40,7 @@ class RedisConnector:
 
         for k, v in data.items():
             await self.hset(
-                'world:{' + str(world_id) + '}:{' + str(user_id) + '}',
+                'world:' + str(world_id) + ':' + str(user_id),
                 k, v
             )
 
@@ -49,10 +49,10 @@ class RedisConnector:
         # TODO: maybe check encoding instead of converting to string
         data = {
             'username': await self.hget(
-                'world:{' + str(world_id) + '}:{' + str(user_id) + '}', 'username'
+                'world:' + str(world_id) + ':' + str(user_id), 'username'
             ),
             'avatar': await self.hget(
-                'world:{' + str(world_id) + '}:{' + str(user_id) + '}', 'avatar'
+                'world:' + str(world_id) + ':' + str(user_id), 'avatar'
             )
         }
 

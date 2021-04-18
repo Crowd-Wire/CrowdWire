@@ -30,7 +30,7 @@ def get_world(
         )
 
 
-@router.get("/join/{world_id}", response_model=schemas.World_UserInDB)
+@router.get("/{world_id}/users", response_model=schemas.World_UserInDB)
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -41,7 +41,10 @@ async def join_world(
     """
 
     if user:
-        # TODO: create redis class to handle each of the models?
+        # checks if the world is available for him
+        world, msg = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
+
+        # TODO: create redis helper class
         # verify if the user is in redis cache
         user_info = await redis_connector.get_world_user_data(world_id, user.user_id)
         logger.debug(user_info)
@@ -53,8 +56,6 @@ async def join_world(
                 avatar=user_info['avatar'],
                 username=user_info['username']
             )
-        # checks if the world is available for him
-        world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
         world_user = crud.crud_world_user.join_world(db, _world=world, _user=user)
         return world_user
 
