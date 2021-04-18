@@ -42,17 +42,11 @@ async def join_world(
 
     if user:
         # TODO: create redis class to handle each of the models?
-
-        # ONLY FOR TEST PURPOSES
-        await redis_connector.save_world_user_data(
-            world_id, user.user_id, {'username': 'ola', 'avatar': 'adeus'}
-        )
-
         # verify if the user is in redis cache
         user_info = await redis_connector.get_world_user_data(world_id, user.user_id)
         logger.debug(user_info)
 
-        if user_info:
+        if user_info.get('avatar') and user_info.get('username'):
             return schemas.World_UserInDB(
                 world_id=world_id,
                 user_id=user.user_id,
@@ -61,14 +55,7 @@ async def join_world(
             )
         # checks if the world is available for him
         world = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
-
         world_user = crud.crud_world_user.join_world(db, _world=world, _user=user)
-        if not world_user.avatar or not world_user.username:
-            # Return something that says he does not have any of these
-            logger.debug("User does not have avatar")
-            return world_user
-
-        logger.debug("User has avatar")
         return world_user
 
     else:

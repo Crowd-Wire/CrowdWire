@@ -9,8 +9,8 @@ class User(Base):
     """
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), index=True)
-    email = Column(String(100), unique=True, index=True, nullable=False)
+    name = Column(String(50), index=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
     hashed_password = Column(String(256), nullable=False)
     birth = Column(Date)
     register_date = Column(DateTime, nullable=False)

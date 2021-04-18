@@ -76,7 +76,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         # Create Default Roles for a World
         default_roles = crud_role.create_default(db=db, world_id=db_world.world_id)
         logger.debug(default_roles)
-        _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
+        # TODO: check this
+        # _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
 

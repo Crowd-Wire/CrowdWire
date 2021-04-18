@@ -6,6 +6,8 @@ from .crud_roles import crud_role
 from .base import CRUDBase
 from app.models import World_User, World, User
 from app.schemas import World_UserCreate, World_UserUpdate
+from app.core.consts import AVATARS_LIST
+from random import choice
 
 
 class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
@@ -15,6 +17,14 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         Verify if user has already joined this world
         """
         return db.query(World_User).filter(World_User.user_id == user_id, World_User.world_id == world_id).first()
+
+    def choose_avatar(self):
+        """
+        Chooses a random avatar from the available Ones
+        @return: a avatar filename
+        """
+
+        return choice(AVATARS_LIST)
 
     def join_world(self, db: Session, _world: World, _user: User) -> World_User:
         """
@@ -30,9 +40,10 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
                 join_date=current_time,
                 last_join=current_time,
                 n_joins=1,
-                status=0
+                status=0,
+                avatar=self.choose_avatar(),
+                username=_user.name
             )
-
             db.add(world_user)
             world_user.world = _world
             _user.worlds.append(world_user)
