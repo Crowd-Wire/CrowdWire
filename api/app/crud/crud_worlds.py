@@ -11,7 +11,8 @@ from app.crud.crud_tags import tag as crud_tag
 from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user
-from  app.core import consts
+from app.core import consts
+
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
