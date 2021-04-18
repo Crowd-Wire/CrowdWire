@@ -12,6 +12,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons';
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const drawerWidth = 240;
@@ -29,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: 'nowrap',
   },
   drawerOpen: {
+    overflowX: 'hidden',
     background: "#3A506B",
     width: drawerWidth,
     transition: theme.transitions.create('width', {
@@ -52,7 +54,6 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-    maxHeight:"50px",
     // necessary for content to be below app bar
     ...theme.mixins.toolbar,
   },
@@ -66,6 +67,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function DashDrawer(){
+  const navigation = useNavigate();
+  const location = useLocation();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -73,6 +76,29 @@ export default function DashDrawer(){
   const handleDrawerOpen = () => {
     setOpen(true);
   };
+
+  const onClickAllWorlds = () => {
+    console.log(location.pathname);
+    if(location.pathname!=="/dashboard")
+      navigation("/dashboard");
+    console.log("perform query on all worlds;")
+  }
+
+  const onClickJoinedWorlds = () => {
+    console.log(navigation.toString());
+    if(location.pathname!=="/dashboard")
+      navigation("/dashboard");
+  }
+
+  const onClickCreateWorld = () => {
+    console.log(navigation.toString());
+    navigation("../create-world");
+  }
+
+  const onClickDefinitions = () => {
+    console.log(navigation.toString());
+
+  }
 
   const handleDrawerClose = () => {
     setOpen(false);
@@ -115,37 +141,46 @@ export default function DashDrawer(){
         </div>
         <Divider />
         <List>
-        {['My Worlds', 'Public Worlds'].map((text, index) => (
-            <ListItem 
-            button key={text}
-            >
-            <ListItemIcon>{index % 2 === 0 ? <Explore className={classes.iconDrawer}/> : <Public className={classes.iconDrawer}/>}</ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary={text} />
-            </ListItem>
-        ))}
-            <ListItem className={clsx(classes.drawer, {
+          <ListItem button key='My Worlds' className={clsx(classes.drawer, {
               [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: addWorld}}>
-              <ListItemIcon>
-                  <AddCircleOutlined className={classes.iconDrawer}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
+              [classes.drawerClose]: !open,})}>
+            <ListItemIcon>
+              <Explore className={classes.iconDrawer}/>
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary='My Worlds' className={classes.toolbar}
                   className={clsx(classes.menuButton, {
                       [classes.hide]: !open,
                   })}/>
-            </ListItem>
-            <ListItem className={clsx(classes.drawer, {
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
+          </ListItem>
+          <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
+          className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
             <ListItemIcon>
-                <Settings className={classes.iconDrawer}/>
+              <Public className={classes.iconDrawer}/>
             </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS" className={classes.toolbar}
+            <ListItemText style={{ color: '#FFFFFF' }} primary='Public Worlds' className={classes.toolbar}
+                  className={clsx(classes.menuButton, {
+                      [classes.hide]: !open,
+                  })}/>
+          </ListItem>
+          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: addWorld}}
+          onClick={onClickCreateWorld}>
+            <ListItemIcon>
+                <AddCircleOutlined className={classes.iconDrawer}/>
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
                 className={clsx(classes.menuButton, {
                     [classes.hide]: !open,
                 })}/>
-            </ListItem>
+          </ListItem>
+          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+            button key={Settings} style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
+          <ListItemIcon>
+              <Settings className={classes.iconDrawer}/>
+          </ListItemIcon>
+          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+          </ListItem>
         </List>
-        </Drawer>
+      </Drawer>
     );
 }

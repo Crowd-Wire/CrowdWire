@@ -36,32 +36,36 @@ export default function WorldDetails(props){
             <Col xs={8} sm={5} md={5} style={{minWidth:"270px"}}>
                 <div style={{height:"100%",width:"100%", borderRadius:"8px", backgroundColor:"white"}}>
                     <Row style={{height:"20px"}}/>
-                    <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto"}}>
+                    <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                         <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>
                     </Row>
-                    <br/>
-                    <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
+                    <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
                         <TextField id="outlined-basic" label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
                     </Row>
-                    <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                        <Col style={{width:"100%"}}>
-                            <Row style={{marginLeft:"30px", marginTop:"20px"}}>
-                            </Row>
-                            <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                                <div style={{marginLeft:"auto", marginRight:"auto"}}>
-                                <Typography style={{marginTop:"auto", marginBottom:"auto"}}>Accessibility</Typography>
-                                <RadioGroup row style={{marginTop:"auto", marginBottom:"auto"}}>
-                                    <FormControlLabel value="female" style={{margin:"auto"}} control={<Radio />} label="Private" />
-                                    <FormControlLabel value="male" style={{margin:"auto"}} control={<Radio />} label="Public" />
-                                </RadioGroup>
-                                </div>
-                            </Row>
-                        </Col>
+                    <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"30px"}}>
+                        <div style={{width:"100%", marginLeft:"30px", marginRight:"auto"}}>
+                        <Typography>Accessibility</Typography>
+                        <RadioGroup row>
+                            <FormControlLabel value="female" control={<Radio />} label="Private" />
+                            <FormControlLabel value="male"  control={<Radio />} label="Public" />
+                        </RadioGroup>
+                        </div>
                     </Row>
-                    <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
+                    <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                        <TextField
+                            style={{marginLeft:"30px",marginRight:"auto"}}
+                            id="standard-number"
+                            label="Max Online Users"
+                            type="number"
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                        />
+                    </Row>
+                    <Row style={{marginLeft:"auto", marginTop:"10px", marginRight:"auto"}}>
                     <Autocomplete
                         limitTags={3}
-                        style={{width:"90%", marginLeft:"auto",marginRight:"auto"}}
+                        style={{width:"90%", marginLeft:"30px",marginRight:"auto"}}
                         multiple
                         id="tags-standard"
                         options={allLabels}
