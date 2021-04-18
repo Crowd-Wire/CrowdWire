@@ -3,7 +3,7 @@ import { Router, WebRtcTransport } from "mediasoup/lib/types";
 import { MediaSendDirection } from "src/types";
 import { config } from "../config";
 
-const log = debugModule("shawarma:create-transport");
+const log = debugModule("crowdwire:create-transport");
 
 
 export const transportToOptions = ({
