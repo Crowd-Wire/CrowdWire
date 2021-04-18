@@ -15,7 +15,7 @@ class TestAuth(TestCase):
         """
         with patch("app.crud.crud_users.CRUDUser.authenticate") as mock_post:
 
-            mock_post.return_value = User(status=1)
+            mock_post.return_value = User(status=1), ""
             response = client.post(
                 "/login",
                 data={
@@ -32,7 +32,7 @@ class TestAuth(TestCase):
         """
         with patch("app.crud.crud_users.CRUDUser.authenticate") as mock_post:
 
-            mock_post.return_value = None
+            mock_post.return_value = None, ""
 
             response = client.post(
                 "/login",
@@ -51,7 +51,7 @@ class TestAuth(TestCase):
 
         with patch("app.crud.crud_users.CRUDUser.authenticate") as mock_post:
 
-            mock_post.return_value = User(status=0)
+            mock_post.return_value = User(status=0), ""
 
             response = client.post(
                 "/login",
@@ -82,7 +82,7 @@ class TestAuth(TestCase):
         """
 
         with patch("app.crud.crud_users.CRUDUser.create") as mock_post:
-            mock_post.return_value = None
+            mock_post.return_value = None, ""
 
             response = client.post(
                 "/register",
@@ -102,7 +102,7 @@ class TestAuth(TestCase):
         """
 
         with patch("app.crud.crud_users.CRUDUser.create") as mock_post:
-            mock_post.return_value = User()
+            mock_post.return_value = User(), ""
 
             response = client.post(
                 "/register",

@@ -14,6 +14,7 @@ class Role(Base):
         nullable=False
     )
     name = Column(String(30), nullable=False)
+    is_default = Column(Boolean)
     interact = Column(Boolean)
     walk = Column(Boolean)
     talk = Column(Boolean)

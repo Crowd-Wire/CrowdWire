@@ -6,6 +6,7 @@ per-file-ignores =
     __init__.py:F401
     app/db/base.py:F401
 exclude =
+    alembic
     .git
     __pycache__
     setup.py

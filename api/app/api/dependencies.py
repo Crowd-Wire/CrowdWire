@@ -1,4 +1,4 @@
-from typing import Generator
+from typing import Generator, Callable
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
+reusable_oauth2_optional = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
 
 
 def get_db() -> Generator:
@@ -22,8 +23,24 @@ def get_db() -> Generator:
         db.close()
 
 
+def get_current_user_authorizer(*, required: bool = True) -> Callable:
+    """
+    @param required: a boolean flag to check whether a Authorization Dependency is needed or not
+    @return: Callable function dependency based on the @param required
+    """
+    return get_current_user if required else get_current_user_optional
+
+
+def get_current_user_optional(
+        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2_optional)
+) -> any:
+    if token:
+        return get_current_user(db, token)
+    return None
+
+
 def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+        db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> models.User:
     try:
         payload = jwt.decode(
@@ -35,14 +52,14 @@ def get_current_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = crud.user.get(db, id=token_data.sub)
+    user = crud.crud_user.get(db, id=token_data.sub)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
 
 def get_current_active_user(
-    current_user: models.User = Depends(get_current_user),
+        current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -50,7 +67,7 @@ def get_current_active_user(
 
 
 def get_current_active_superuser(
-    current_user: models.User = Depends(get_current_user),
+        current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if not crud.user.is_superuser(current_user):
         raise HTTPException(
