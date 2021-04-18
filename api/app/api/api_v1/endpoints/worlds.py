@@ -78,6 +78,7 @@ async def join_world(
             detail=strings.ACCESS_FORBIDDEN,
         )
 
+
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
 def update_world_user_info(
         world_id: int,
