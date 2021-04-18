@@ -30,11 +30,33 @@ class RedisConnector:
 
     async def hget(self, key: str, field: str):
 
-        return await self.master.execute('hget', key, field)
+        return await self.master.execute('hget', key, field, encoding='utf-8')
 
     async def hset(self, key: str, field: str, value: str):
 
         return await self.master.execute('hset', key, field, value)
+
+    async def save_world_user_data(self, world_id: int, user_id: int, data: dict):
+
+        for k, v in data.items():
+            await self.hset(
+                'world:{' + str(world_id) + '}:{' + str(user_id) + '}',
+                k, v
+            )
+
+    async def get_world_user_data(self, world_id: int, user_id: int):
+
+        # TODO: maybe check encoding instead of converting to string
+        data = {
+            'username': await self.hget(
+                'world:{' + str(world_id) + '}:{' + str(user_id) + '}', 'username'
+            ),
+            'avatar': await self.hget(
+                'world:{' + str(world_id) + '}:{' + str(user_id) + '}', 'avatar'
+            )
+        }
+
+        return data
 
 
 redis_connector = RedisConnector()
