@@ -2,13 +2,40 @@ from aio_pika import connect_robust, Channel, IncomingMessage, Message
 from aio_pika.pool import Pool
 from loguru import logger
 from app.core.config import settings
+from app.api.api_v1.endpoints.connection_manager import manager
+import json
 
 
 # Message Receiving format
 async def on_message(message: IncomingMessage) -> None:
     async with message.process():
-        logger.info(" [x] Received message %r" % message)
-        logger.info("     Message body is: %r" % message.body.decode())
+        # logger.info(" [x] Received message %r" % message)
+        msg = message.body.decode()
+        # logger.info("Message body is: %r" % msg)
+        msg = json.loads(msg)
+        topic = msg['topic']
+
+        if topic == 'you-joined-as-peer'\
+                or topic == 'you-joined-as-speaker'\
+                or topic == "@get-recv-tracks-done"\
+                or topic == "@send-track-send-done"\
+                or topic == "@connect-transport-recv-done"\
+                or topic == "@connect-transport-send-done":
+            user_id = msg['d']['peerId']
+
+            if user_id in manager.users_ws:
+                user_ws = manager.users_ws[user_id]
+                await manager.send_personal_message(msg, user_ws)
+        elif topic == "new-peer-speaker":
+            # uid identifies to whom the message is suppost to be sent to
+            # peerId identifies the new peerId that joined
+            user_id = msg['uid']
+
+            if user_id in manager.users_ws:
+                user_ws = manager.users_ws[user_id]
+                await manager.send_personal_message(msg, user_ws)
+        else:
+            logger.error(f"Unknown topic \"{topic}\"")
 
 
 class RabbitHandler:
@@ -17,7 +44,7 @@ class RabbitHandler:
         self.connection_pool = None
         self.channel_pool = None
         self.queue_to_send = settings.RABBITMQ_SENDING_QUEUE
-        self.queue_to_receive = settings.RABBITMQ_SENDING_QUEUE
+        self.queue_to_receive = settings.RABBITMQ_RECEIVING_QUEUE
 
     async def start_pool(self):
         self.connection_pool = Pool(self.get_connection, max_size=2)

@@ -12,7 +12,9 @@
     "@splidejs/splide-extension-grid": "^0.2.0",
     "bootstrap": "^4.6.0",
     "classnames": "2.2.6",
+    "hark": "^1.2.3",
     "history": "^5.0.0",
+    "mediasoup-client": "^3.6.29",
     "moment": "2.26.0",
     "node-sass": "4.14.1",
     "nouislider": "14.5.0",
@@ -25,6 +27,8 @@
     "react-dnd-html5-backend": "^14.0.0",
     "react-dom": "16.13.1",
     "react-grid-carousel": "^1.0.1",
+    "react-hotkeys": "^2.0.0",
+    "react-query": "^3.13.5",
     "react-redux": "^7.2.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
@@ -33,7 +37,8 @@
     "react-swipeable-views": "0.13.9",
     "react-toastify": "^7.0.3",
     "redux": "^4.0.5",
-    "toastify": "^2.0.1"
+    "toastify": "^2.0.1",
+    "zustand": "^3.4.1"
   },
   "devDependencies": {
     "@babel/cli": "7.10.1",

@@ -1,32 +1,86 @@
 import React from "react";
+import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Input from '@material-ui/core/Input';
+import VolumeUp from '@material-ui/icons/VolumeUp';
 
 interface VolumeSliderProps {
   label?: boolean;
-  max?: string;
+  max?: number;
   volume: number;
   onVolume: (n: number) => void;
 }
 
 export const VolumeSlider: React.FC<VolumeSliderProps> = ({
   label,
-  max = "100",
+  max = 100,
   volume,
   onVolume,
 }) => {
+
+  const useStyles = makeStyles({
+    root: {
+      width: 250,
+    },
+    input: {
+      width: 42,
+    },
+  });
+
+  const classes = useStyles();
+
+  const handleInputChange = (event) => {
+    onVolume(event.target.value === '' ? volume : Number(event.target.value));
+  };
+
   return (
-    <div className={`flex flex-col`}>
-      {label ? "volume: " : ""}
-      {volume}
-      <input
-        type="range"
-        min="1"
-        max={max}
-        value={volume}
-        onChange={(e) => {
-          const n = parseInt(e.target.value);
-          onVolume(n);
-        }}
-      />
+
+    <div className={classes.root}>
+      <Typography id="input-slider" gutterBottom>
+        Volume
+      </Typography>
+      <Grid container spacing={2} alignItems="center">
+        <Grid item>
+          <VolumeUp />
+        </Grid>
+        <Grid item xs>
+          <input
+            type="range"
+            min="0"
+            max={max}
+            value={volume}
+            onChange={(e) => {
+              const n = parseInt(e.target.value);
+              onVolume(n);
+            }}
+          />
+        </Grid>
+        <Grid item>
+          <Input
+            className={classes.input}
+            value={volume}
+            margin="dense"
+            onChange={handleInputChange}
+            onBlur={() => {
+                if (volume < 0) {
+                  onVolume(0);
+                } else if (volume > max) {
+                  onVolume(max);
+                } else {
+                  onVolume(volume)
+                }
+              }}
+            inputProps={{
+              step: 10,
+              min: 0,
+              max: max,
+              type: 'number',
+              'aria-labelledby': 'input-slider',
+            }}
+          />
+        </Grid>
+      </Grid>
     </div>
   );
 };
