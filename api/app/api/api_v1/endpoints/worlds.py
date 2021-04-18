@@ -14,14 +14,14 @@ router = APIRouter()
 
 
 @router.get("/{world_id}", response_model=schemas.WorldMapInDB)
-def get_world(
+async def get_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
 ) -> Any:
     if user:
         logger.debug(f"Registered User {user.name} joining in")
-        db_world = crud.crud_world.get(db, world_id)
+        db_world, _ = await crud.crud_world.get(db=db, world_id=world_id)
         return db_world
     else:
         raise HTTPException(
@@ -42,13 +42,10 @@ async def join_world(
 
     if user:
         # checks if the world is available for him
-        world, msg = crud.crud_world.get_available(db, world_id=world_id, user_id=user.user_id)
-
-        # TODO: create redis helper class
+        world, msg = await crud.crud_world.get_available(db=db, world_id=world_id, user_id=user.user_id)
         # verify if the user is in redis cache
         user_info = await redis_connector.get_world_user_data(world_id, user.user_id)
         logger.debug(user_info)
-
         if user_info.get('avatar') and user_info.get('username'):
             return schemas.World_UserInDB(
                 world_id=world_id,
@@ -56,7 +53,7 @@ async def join_world(
                 avatar=user_info['avatar'],
                 username=user_info['username']
             )
-        world_user = crud.crud_world_user.join_world(db, _world=world, _user=user)
+        world_user = crud.crud_world_user.join_world(db=db, _world=world, _user=user)
         return world_user
 
     else:
