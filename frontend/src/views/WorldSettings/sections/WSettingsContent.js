@@ -9,7 +9,14 @@ import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
 
 
 class WSettingsContent extends Component {
-	roles = {'Admin':[0,1,2,3,4,5,6,7], 'Speaker':[0,1,2,4,5,7],'Member':[0,1,2,7]};
+	roles = {
+		'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':['João', 'Maria', 'António']},
+		'Speaker':{'permissions':[0,1,2,4,5,7],'users':['Carlos', 'Sofia', 'meunicklegal']},
+		'Member':{'persmissions':[0,1,2,7],'users':['meunickilegal','xXnoobM4sterXx']},
+		'Atrasados':{'permissions':[], 'users':['Wilson']}
+	};
+
+
 	users = ['Silvia','Marco','Teixeira'];
 	reports = [
 		{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
