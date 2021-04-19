@@ -1,5 +1,5 @@
-from fastapi import HTTPException
-from typing import Optional, Any
+from fastapi import HTTPException, Query
+from typing import Optional, Any, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
@@ -118,3 +118,16 @@ def create_world(
         )
 
     return obj
+
+
+@router.get("/")
+def search_world(
+        search: str,
+        tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
+        db: Session = Depends(deps.get_db),
+        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+) -> Any:
+    logger.debug(crud.crud_world.filter(db=db, search=search, tags=tags))
+    worlds = crud.crud_world.filter(db=db, search=search, tags=tags)
+
+    return worlds

@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
@@ -87,6 +88,27 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         # _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
+
+    def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
+
+        query = db.query(World).filter(
+            or_(World.name.like("%"+search+"%"), World.description.like("%"+search+"%"))
+        ).all()
+
+        if tags:
+            ret = []
+            for obj in query:
+                for tag in tags:
+                    if tag in obj.tags:
+                        ret.append(obj)
+                        break
+
+            return ret
+        return query
+
+
+
+
 
 
 crud_world = CRUDWorld(World)
