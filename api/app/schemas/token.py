@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Optional, Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID1
 
 
 class Token(BaseModel):
@@ -10,4 +10,6 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[int] = None
+    # Guest Users ID is not an integer
+    sub: Union[int, UUID1] = None
+    is_guest_user: Optional[bool] = False

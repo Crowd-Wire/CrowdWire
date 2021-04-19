@@ -49,7 +49,6 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-
     user, message = crud.crud_user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
@@ -61,6 +60,20 @@ def login_access_token(
 
     access_token, expires = security.create_access_token(user.user_id)
 
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires),
+    }
+
+
+@router.post('/join-guest', response_model=schemas.Token)
+def join_as_guest():
+    """
+    Generates Valid Token for Guest Users
+    """
+    _uuid = security.create_guest_uuid()
+    access_token, expires = security.create_access_token(_uuid, is_guest_user=True)
     return {
         "access_token": access_token,
         "token_type": "bearer",

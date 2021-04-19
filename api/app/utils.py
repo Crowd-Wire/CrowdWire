@@ -1,9 +1,16 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 # import emails
 # from emails.template import JinjaTemplate
 from jose import jwt
+
+from app import schemas, models
 from app.core.config import settings
+
+
+def is_guest_user(obj: Union[schemas.GuestUser, models.User]):
+    return isinstance(obj, schemas.GuestUser)
+
 
 """
 def send_email(

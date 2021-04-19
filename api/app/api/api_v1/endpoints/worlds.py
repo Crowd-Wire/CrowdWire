@@ -1,13 +1,12 @@
 from fastapi import HTTPException
-from typing import Optional, Any
+from typing import Optional, Any, Union
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 from app.redis import redis_connector
-
-
+from app.utils import is_guest_user
 from app.core import strings
 
 router = APIRouter()
@@ -17,22 +16,21 @@ router = APIRouter()
 async def get_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
-        user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
-    if user:
+    if not is_guest_user(user):
         logger.debug(f"Registered User {user.name} joining in")
         db_world, message = await crud.crud_world.get(db=db, world_id=world_id)
-        if not db_world:
-            raise HTTPException(
-                status_code=400,
-                detail=message,
-            )
-        return db_world
     else:
+        db_world, message = await crud.crud_world.get_available_for_guests(
+            db=db, world_id=world_id
+        )
+    if not db_world:
         raise HTTPException(
             status_code=400,
-            detail="Guest User cant join yet. Not Implemented.",
+            detail=message,
         )
+    return db_world
 
 
 @router.get("/{world_id}/users", response_model=schemas.World_UserInDB)
