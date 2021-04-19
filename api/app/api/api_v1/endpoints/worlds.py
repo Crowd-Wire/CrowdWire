@@ -122,12 +122,14 @@ def create_world(
 
 @router.get("/")
 def search_world(
-        search: str,
+        search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
-    logger.debug(crud.crud_world.filter(db=db, search=search, tags=tags))
-    worlds = crud.crud_world.filter(db=db, search=search, tags=tags)
 
-    return worlds
+    # TODO: change this to work for guests
+    if user:
+
+        return crud.crud_world.filter(db=db, search=search, tags=tags)
+

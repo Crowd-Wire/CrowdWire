@@ -5,7 +5,8 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
-from app.models import World
+from app.models import World, Tag
+from app.models.world_tag import world_tag
 from app.redis.redis_decorator import cache
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
@@ -91,24 +92,25 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
     def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
 
-        query = db.query(World).filter(
-            or_(World.name.like("%"+search+"%"), World.description.like("%"+search+"%"))
+        if not tags:
+            tags = []
+
+        query = db.query(World).filter(World.public == True).filter(
+            or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
         ).all()
+
+        # TODO: try to find a solution in sqlalchemy
 
         if tags:
             ret = []
             for obj in query:
-                for tag in tags:
-                    if tag in obj.tags:
+                for obj_tag in obj.tags:
+                    if obj_tag.name in tags:
                         ret.append(obj)
                         break
 
             return ret
         return query
-
-
-
-
 
 
 crud_world = CRUDWorld(World)
