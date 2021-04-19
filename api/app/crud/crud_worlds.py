@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core import strings
 from app.models import World
+from app.redis.redis_decorator import cache
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
 from app.crud.crud_tags import tag as crud_tag
@@ -16,17 +17,22 @@ from app.core import consts
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
-    def get(self, db: Session, world_id: int) -> Optional:
-        return db.query(World).filter(World.world_id == world_id).first()
+    @cache
+    async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+        world_obj = db.query(World).filter(World.world_id == world_id).first()
+        if not world_obj:
+            return None, strings.WORLD_NOT_FOUND
+        return world_obj, ""
 
-    def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
+    @cache
+    async def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
         """
         Verify the availability of a world, given a user.
         Raises Exception if the world does not exist, is Banned
         or the Users doesn't have access.
         @return: a valid World_User(or None if not valid) object and a message
         """
-        world_obj = self.get(db=db, world_id=world_id)
+        world_obj, _ = await self.get(db=db, world_id=world_id)
 
         world_user = None
         if user_id:
