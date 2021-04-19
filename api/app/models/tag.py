@@ -12,4 +12,4 @@ class Tag(Base):
     """
 
     name = Column(String(30), primary_key=True)
-    worlds = relationship("World", secondary=world_tag, back_populates='tags')
+    worlds = relationship("World", lazy="subquery", secondary=world_tag, back_populates='tags')

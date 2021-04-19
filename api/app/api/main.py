@@ -6,7 +6,7 @@ from app.api.api_v1.api import api_router
 from app.core.logging import init_logging
 from fastapi.middleware.cors import CORSMiddleware
 from app.rabbitmq import rabbit_handler
-# from app.redis import redis_connector
+from app.redis import redis_connector
 
 app = FastAPI(debug=True)
 origins = [
