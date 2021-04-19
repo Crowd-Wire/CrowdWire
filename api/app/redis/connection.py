@@ -1,4 +1,4 @@
-from typing import Union, Tuple, Optional
+from typing import Union, Optional
 
 import aioredis
 from app.core.config import settings

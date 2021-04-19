@@ -6,7 +6,7 @@ from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 from app.redis import redis_connector
-from app.utils import is_guest_user, generate_guest_username
+from app.utils import is_guest_user
 from app.core import strings
 
 router = APIRouter()
@@ -61,7 +61,7 @@ async def join_world(
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
             logger.debug('not cached:/')
-            world_user = await redis_connector.join_new_guest_user(world_id=world_id,user_id=user.user_id)
+            world_user = await redis_connector.join_new_guest_user(world_id=world_id, user_id=user.user_id)
     return world_user
 
 

@@ -67,7 +67,7 @@ def login_access_token(
     }
 
 
-@router.post('/join-guest', response_model=schemas.Token)
+@router.post('/join-guest', response_model=schemas.TokenGuest)
 def join_as_guest():
     """
     Generates Valid Token for Guest Users
@@ -76,8 +76,9 @@ def join_as_guest():
     access_token, expires = security.create_access_token(_uuid, is_guest_user=True)
     return {
         "access_token": access_token,
-        "token_type": "bearer",
-        "expire_date": str(expires)
+        "token_type": str(_uuid),
+        "expire_date": str(expires),
+        "guest_uuid": _uuid
     }
 
 

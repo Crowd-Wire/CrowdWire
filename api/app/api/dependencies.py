@@ -1,4 +1,4 @@
-from typing import Generator, Callable, Optional, Union
+from typing import Generator, Callable, Union
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer

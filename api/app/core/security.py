@@ -5,7 +5,6 @@ from jose import jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
-from loguru import logger
 from uuid import uuid1, UUID
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

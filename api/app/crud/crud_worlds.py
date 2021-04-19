@@ -35,7 +35,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-
     @cache
     async def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
         """
