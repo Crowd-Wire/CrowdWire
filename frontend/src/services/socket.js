@@ -55,7 +55,7 @@ export const getSocket = (worldId) => {
           
         socket.onmessage = (event) => {
             var data = JSON.parse(event.data);
-            // console.info(`[message] Data received for topic ${data.topic}`);
+            console.info(`[message] Data received for topic ${data.topic}`);
 
             switch (data.topic) {
                 case "JOIN_PLAYER":

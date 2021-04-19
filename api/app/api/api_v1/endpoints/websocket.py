@@ -30,7 +30,6 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
                 await manager.connect_room(world_id, room_id, user_id, position)
                 
             elif topic == 'PLAYER_MOVEMENT':
-                print(payload)
                 room_id = payload['room_id']
                 velocity = payload['velocity']
                 position = payload['position']
