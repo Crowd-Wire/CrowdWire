@@ -1,0 +1,9 @@
+{
+  "name": "game_server",
+  "version": "0.0.1",
+  "description": "An authoritive game server to sync the client games",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.0.1"
+  }
+}
