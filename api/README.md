@@ -51,3 +51,8 @@ This command will undo the last migration and in our case will delete all the ta
 
 Note: Changing the number -1 or +1 will run other migrations that you have.
 It is also possible to use "head" instead of +1
+
+delete older revisions from db:
+```
+delete from alembic_version;
+```
