@@ -5,23 +5,23 @@ import { useVideoStore } from "../stores/useVideoStore";
 export const sendVideo = async () => {
   const { camId } = storeDevice.getState().camId;
   const { set, cam, camStream } = useVideoStore.getState();
-  const { sendTransport } = useVoiceStore.getState();
+  const { sendTransport, roomId } = useVoiceStore.getState();
+  
+  if (!roomId)
+    return;
 
-  if (!sendTransport) {
+    if (!sendTransport) {
     console.log("no sendTransport in sendVoice");
     return;
   }
 
   if (!camStream) {
     try {
-      set({
-        camStream: await navigator.mediaDevices.getUserMedia({
-          video: camId ? { deviceId: camId } : true,
-          audio: false
-        })
-      })
-      set({
-        cam: camStream.getVideoTracks()[0]
+      await navigator.mediaDevices.getUserMedia({
+        video: camId ? { deviceId: camId } : true,
+        audio: false
+      }).then((camStream) => {
+        set({camStream: camStream, cam: camStream.getVideoTracks()[0]})
       })
     } catch (err) {
       set({ cam: null, camStream: null });

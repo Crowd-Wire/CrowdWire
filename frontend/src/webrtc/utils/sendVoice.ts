@@ -2,23 +2,23 @@ import storeDevice from "../../redux/commStore.js";
 import { useVoiceStore } from "../stores/useVoiceStore";
 
 export const sendVoice = async () => {
-  const { sendTransport, set, mic, micStream } = useVoiceStore.getState();
   const { micId } = storeDevice.getState().micId;
-  
+  const { sendTransport, set, mic, micStream, roomId } = useVoiceStore.getState();
+
+  if (!roomId)
+    return;
+
   if (!sendTransport) {
     console.log("no sendTransport in sendVoice");
     return;
   }
   if (!micStream) {
     try {
-      set({
-        micStream: await navigator.mediaDevices.getUserMedia({
-          audio: micId ? { deviceId: micId } : true,
-          video: false
-        })
-      });
-      set({
-        mic: micStream.getAudioTracks()[0]
+      await navigator.mediaDevices.getUserMedia({
+        audio: micId ? { deviceId: micId } : true,
+        video: false
+      }).then((micStream) => {
+        set({micStream: micStream, mic: micStream.getVideoTracks()[0]})
       })
     } catch (err) {
       set({ mic: null, micStream: null });

@@ -197,7 +197,7 @@ export const getSocket = (worldId) => {
 }
 
 export const wsend = (d) => {
-  if (socket || socket.readyState !== socket.CLOSED) {
+  if (socket && socket.readyState === socket.OPEN) {
     socket.send(JSON.stringify(d));
   }
 };

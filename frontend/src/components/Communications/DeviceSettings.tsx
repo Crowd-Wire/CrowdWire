@@ -61,10 +61,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
                 <select
                   value={storeDevice.getState().camId}
                   onChange={(e) => {
-                    const id = e.target.value;
-                    storeDevice.dispatch(changeCamId(id));
-                    setCamId(id);
-                    sendVideo();
+                    const camId = e.target.value;
+                    storeDevice.dispatch(changeCamId(camId));
+                    setCamId(camId);
                   }}
                 >
                   {optionsCamera.map((x) =>
@@ -85,10 +84,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
               <select
                 value={storeDevice.getState().micId}
                 onChange={(e) => {
-                  const id = e.target.value;
-                  storeDevice.dispatch(changeMicId(id));
-                  setMicId(id);
-                  sendVoice();
+                  const micId = e.target.value;
+                  storeDevice.dispatch(changeMicId(micId));
+                  setMicId(micId);
                 }}
               >
                 {optionsMic.map((x) =>

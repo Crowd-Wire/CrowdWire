@@ -89,13 +89,13 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                   <audio autoPlay id={id+"_audio"} ref={myRef}/>
                   ) : ''}
           </div>
-          { videoTrack ?
+          { videoTrack && !videoToggle ?
               videoState ? 
                 (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
               : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
             : (<VideocamOffIcon color={'action'}/>)
           }
-          { audioTrack ?
+          { audioTrack && !audioToggle ?
               audioState ? 
                 (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
               : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)

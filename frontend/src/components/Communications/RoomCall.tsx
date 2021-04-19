@@ -15,11 +15,13 @@ import { VideoAudioBox } from "./VideoAudioBox";
 import { MyVideoAudioBox } from "./MyVideoAudioBox";
 import logo from '../../assets/crowdwire_white_logo.png';
 
-import { getSocket } from "../../services/socket.js";
+import { getSocket, wsend } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
+import { sendVoice } from 'webrtc/utils/sendVoice';
+import { sendVideo } from 'webrtc/utils/sendVideo';
 
 interface State {
   chatToggle: boolean;
@@ -47,11 +49,13 @@ export default class RoomCall extends React.Component<{}, State> {
     }, (state) => state.consumerMap);
 
     useVideoStore.subscribe((cam) => {
-      this.setState({cam})
+      this.setState({cam});
+      sendVideo();
     }, (state) => state.cam);
 
     useVoiceStore.subscribe((mic) => {
-      this.setState({mic})
+      this.setState({mic});
+      sendVoice();
     }, (state) => state.mic);
   }
   myId: string = 'myUsernameId';
@@ -78,13 +82,6 @@ export default class RoomCall extends React.Component<{}, State> {
     const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : navigator.mediaDevices.getDisplayMedia();
     return new Promise((resolve) => {
       media.then((stream:MediaStream) => {
-            // @ts-ignore
-            const myVideo = this.getMyVideo();
-            if (type === 'displayMedia') {
-              this.toggleVideoTrack({audio, video});
-              this.listenToEndStream(stream, {video, audio});
-              //socket.emit('display-media', true);
-            }
             useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
             useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
             resolve(true);
@@ -102,66 +99,7 @@ export default class RoomCall extends React.Component<{}, State> {
     return document.getElementById(id);
   }
 
-
-  
-  listenToEndStream = (stream:MediaStream, status:MediaStatus) => {
-    const videoTrack = stream.getVideoTracks();
-      if (videoTrack[0]) {
-        videoTrack[0].onended = () => {
-              // this.socket.emit('display-media', false);
-              this.reInitializeStream(status.video, status.audio);
-              // settings.updateInstance('displayStream', false);
-              this.toggleVideoTrack(status);
-          }
-      }
-    };
-    
-  toggleVideoTrack = (status:MediaStatus={video:!this.accessVideo, audio: this.accessMic}) => {
-    const myVideo = this.getMyVideo() as HTMLVideoElement;
-    this.accessVideo = status.video;
-    // @ts-ignore
-      if (myVideo) myVideo.srcObject?.getVideoTracks().forEach((track:any) => {
-        if (track.kind === 'video') {
-          track.enabled = status.video;
-          if (!status.video) {
-            track.stop()
-          } else {
-            getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
-              if (stream) {
-                myVideo.srcObject = stream;
-                myVideo.play();
-              }
-            })
-            return;
-          }
-          // this.socket.emit('user-video-off', {id: this.myId, status: true});
-          // changeMediaView(this.myId, true);
-        }
-      });
-  }
-  
-  toggleAudioTrack = (status:MediaStatus={video:this.accessVideo, audio:!this.accessMic}) => {
-    const myVideo = this.getMyVideo();
-    this.accessMic = status.audio;
-    // @ts-ignore
-    if (myVideo) myVideo.srcObject?.getAudioTracks().forEach((track:any) => {
-      if (track.kind === 'audio') {
-        track.enabled = status.audio;
-      }
-    });
-  }
-
-  sendMsg = (topic, d) => {
-    if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(
-        { topic: topic, d: d }
-      ));
-    }
-  }
-
   componentDidMount() {
-    useVoiceStore.getState().set({ roomId: '1' });
-
     storeDevice.subscribe(() => {
       this.reInitializeStream()
     })
@@ -248,15 +186,17 @@ export default class RoomCall extends React.Component<{}, State> {
         </div>
         <Button color="primary" onClick={this.setNavigatorToStream}>Add Component</Button>
         <Button color="primary" onClick={() => this.reInitializeStream}>Re-initialize Stream</Button>
-        <Button color="primary" onClick={() => this.toggleAudioTrack()}>Toggle Audio</Button>
-        <Button color="primary" onClick={() => this.toggleVideoTrack()}>Toggle Video</Button>
 
         <div className="row">
-          <Button color="primary" onClick={() => this.sendMsg("join-as-new-peer", { roomId: '1' })}>
+          <Button color="primary" onClick={() => {
+            useVoiceStore.getState().set({ roomId: '1' });
+            wsend({topic: "join-as-new-peer", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport that allows to Receive data */}
             Join Room 1 and only Send Video
           </Button>
-          <Button color="primary" onClick={() => this.sendMsg("join-as-speaker", { roomId: '1' })}>
+          <Button color="primary" onClick={() => {
+            useVoiceStore.getState().set({ roomId: '1' });
+            wsend({topic: "join-as-speaker", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport
             that allows to Receive data and another Transport to send data*/}
             Join Room 1 and Send Video Audio
@@ -328,14 +268,4 @@ export default class RoomCall extends React.Component<{}, State> {
       </React.Fragment>
     );
   }
-}
-
-interface MediaStatus {
-    video: boolean,
-    audio: boolean
-}
-
-interface UserVideoToggle {
-    id: string,
-    status: boolean
 }
