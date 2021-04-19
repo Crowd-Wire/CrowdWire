@@ -1,8 +1,8 @@
 """First Commit
 
-Revision ID: 9b2a28f58276
+Revision ID: 6a7141df72c8
 Revises: 
-Create Date: 2021-04-12 18:19:08.339568
+Create Date: 2021-04-19 14:30:11.801455
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9b2a28f58276'
+revision = '6a7141df72c8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -26,7 +26,7 @@ def upgrade():
     )
     op.create_table('user',
     sa.Column('user_id', sa.Integer(), autoincrement=True, nullable=False),
-    sa.Column('name', sa.String(length=50), nullable=True),
+    sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
     sa.Column('hashed_password', sa.String(length=256), nullable=False),
     sa.Column('birth', sa.Date(), nullable=True),
@@ -34,9 +34,9 @@ def upgrade():
     sa.Column('status', sa.Integer(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('user_id'),
+    sa.UniqueConstraint('email'),
     schema='fastapi'
     )
-    op.create_index(op.f('ix_fastapi_user_email'), 'user', ['email'], unique=True, schema='fastapi')
     op.create_index(op.f('ix_fastapi_user_name'), 'user', ['name'], unique=False, schema='fastapi')
     op.create_table('world',
     sa.Column('world_id', sa.Integer(), autoincrement=True, nullable=False),
@@ -47,6 +47,7 @@ def upgrade():
     sa.Column('description', sa.String(length=300), nullable=True),
     sa.Column('max_users', sa.Integer(), nullable=True),
     sa.Column('public', sa.Boolean(), nullable=False),
+    sa.Column('allow_guests', sa.Boolean(), nullable=False),
     sa.Column('world_map', sa.LargeBinary(), nullable=False),
     sa.Column('status', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['creator'], ['fastapi.user.user_id'], ),
@@ -90,6 +91,7 @@ def upgrade():
     sa.Column('role_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('world_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=30), nullable=False),
+    sa.Column('is_default', sa.Boolean(), nullable=True),
     sa.Column('interact', sa.Boolean(), nullable=True),
     sa.Column('walk', sa.Boolean(), nullable=True),
     sa.Column('talk', sa.Boolean(), nullable=True),
@@ -117,11 +119,11 @@ def upgrade():
     sa.Column('world_id', sa.Integer(), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.Column('avatar', sa.String(length=50), nullable=True),
-    sa.Column('join_date', sa.TIMESTAMP(), nullable=True),
+    sa.Column('join_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('n_joins', sa.Integer(), nullable=False),
     sa.Column('last_join', sa.TIMESTAMP(), nullable=False),
     sa.Column('status', sa.Integer(), nullable=False),
-    sa.Column('username', sa.String(length=50), nullable=False),
+    sa.Column('username', sa.String(length=50), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['fastapi.role.role_id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['fastapi.user.user_id'], ),
     sa.ForeignKeyConstraint(['world_id'], ['fastapi.world.world_id'], ),
@@ -145,8 +147,8 @@ def downgrade():
     op.drop_table('event', schema='fastapi')
     op.drop_table('world', schema='fastapi')
     op.drop_index(op.f('ix_fastapi_user_name'), table_name='user', schema='fastapi')
-    op.drop_index(op.f('ix_fastapi_user_email'), table_name='user', schema='fastapi')
     op.drop_table('user', schema='fastapi')
     op.drop_table('tag', schema='fastapi')
     op.execute("drop schema fastapi")
+
     # ### end Alembic commands ###
