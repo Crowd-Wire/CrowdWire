@@ -1,43 +1,62 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
-import volumeStore from "../../redux/globalVolumeStore.js";
-import { UserVolumeSlider } from "./UserVolumeSlider";
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import { useVideoStore } from "../../webrtc/stores/useVideoStore";
+import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { wsend } from "../../services/socket.js";
 
 interface MyVideoAudioBoxProps {
   username?: string;
   id: string;
-  muted?: boolean;
-  volume: number;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
 }
 
 export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
-  username="anonymous", muted=false, id, volume,
+  username="anonymous", id,
   audioTrack=null, videoTrack=null
 }) => {
+  const { camProducer } = useVideoStore.getState();
+  const { micProducer, roomId } = useVoiceStore.getState();
 
   const myRef = useRef<any>(null);
   const [videoState, setVideoState] = useState(true)
   const [audioState, setAudioState] = useState(true)
 
-  const togleVideo = () => {
+  const toggleVideo = () => {
     setVideoState(!videoState)
+    if (camProducer) {
+      if (videoState) {
+        console.log(camProducer)
+        camProducer.pause();
+        wsend({ topic: "pause-speaker", d: { roomId: roomId, kind: 'video' } })
+      } else {
+        camProducer.resume();
+        wsend({ topic: "resume-speaker", d: { roomId: roomId, kind: 'video' } });
+      }
+    }
+  }
+  const toggleAudio = () => {
+    setAudioState(!audioState)
+    if (micProducer) {
+      if (audioState) {
+        console.log(micProducer)
+        micProducer.pause();
+        wsend({ topic: "pause-speaker", d: { roomId: roomId, kind: 'audio' } })
+      } else {
+        micProducer.resume();
+        wsend({ topic: "resume-speaker", d: { roomId: roomId, kind: 'audio' } });
+      }
+    }
   }
 
   useEffect(() => {
-    if (myRef.current) {
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
-    }
-  }, [volume]);
-
-  useEffect(() => {
     setVideoState(videoTrack ? true : false)
+    setAudioState(audioTrack ? true : false)
 
     const mediaStream = new MediaStream();
 
@@ -46,20 +65,14 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
 
     if (audioTrack) {
-      volumeStore.subscribe(() => {
-        if (myRef.current) {
-          myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-        }
-      })
       mediaStream.addTrack(audioTrack);
     }
 
     if (myRef.current) {
       myRef.current.srcObject = mediaStream;
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-      myRef.current.muted = muted
+      myRef.current.muted = true
     }
-  }, [videoTrack, audioTrack, volumeStore.getState().globalVolume])
+  }, [videoTrack, audioTrack])
   return (
     <div>
       <Card>
@@ -75,13 +88,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           </div>
           { videoTrack ?
               videoState ? 
-                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
-              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => togleVideo()}/>)
-            : (<VideocamOffIcon color={'secondary'}/>)
+                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
+              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
+            : (<VideocamOffIcon color={'action'}/>)
           }
           { audioTrack ?
-            (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => togleVideo()}/>)
-            : (<MicOffIcon color={'secondary'}/>)
+            audioState ? 
+              (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+            : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+            : (<MicOffIcon color={'action'}/>)
           }
         </CardBody>
       </Card>

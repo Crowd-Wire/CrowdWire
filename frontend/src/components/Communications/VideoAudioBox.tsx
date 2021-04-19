@@ -51,6 +51,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
   useEffect(() => {
     setVideoState(videoTrack ? true : false)
+    setAudioState(audioTrack ? true : false)
 
     const mediaStream = new MediaStream();
 

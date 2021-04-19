@@ -27,6 +27,7 @@ export const useVoiceStore = create(
       recvTransport: null as Transport | null,
       sendTransport: null as Transport | null,
       device: getDevice(),
+      micProducer: null as any | null,
     },
     (set) => ({
       nullify: () =>
@@ -36,6 +37,7 @@ export const useVoiceStore = create(
           roomId: "",
           mic: null,
           micStream: null,
+          micProducer: null,
         }),
       set,
     })

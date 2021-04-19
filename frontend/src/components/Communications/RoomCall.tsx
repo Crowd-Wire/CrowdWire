@@ -27,6 +27,7 @@ interface State {
   messages: Array<string>;
   consumerMap: any;
   cam: any;
+  mic: any;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -37,7 +38,8 @@ export default class RoomCall extends React.Component<{}, State> {
       displayStream: false,
       messages: [],
       consumerMap: useConsumerStore.getState().consumerMap,
-      cam: useVideoStore.getState().cam
+      cam: useVideoStore.getState().cam,
+      mic: useVoiceStore.getState().mic
     }
 
     useConsumerStore.subscribe((consumerMap) => {
@@ -47,6 +49,10 @@ export default class RoomCall extends React.Component<{}, State> {
     useVideoStore.subscribe((cam) => {
       this.setState({cam})
     }, (state) => state.cam);
+
+    useVoiceStore.subscribe((mic) => {
+      this.setState({mic})
+    }, (state) => state.mic);
   }
   myId: string = 'myUsernameId';
   accessMic: boolean = false;
@@ -264,10 +270,8 @@ export default class RoomCall extends React.Component<{}, State> {
             <MyVideoAudioBox
               username={this.myId}
               id={this.myId}
-              audioTrack={null}
+              audioTrack={this.state.mic}
               videoTrack={this.state.cam}
-              muted={false}
-              volume={0}
               />
           </Carousel.Item>
 

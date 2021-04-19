@@ -35,6 +35,6 @@ export const sendVideo = async () => {
     sendTransport.produce({
       track: cam,
       appData: { mediaTag: "cam-video" },
-    }).then(() => {return;})
+    }).then((producer) => {set({camProducer: producer})})
   }
 };

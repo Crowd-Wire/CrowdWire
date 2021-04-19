@@ -65,7 +65,9 @@ async def world_movement(websocket: WebSocket, world_id: int) -> Any:
             elif topic == "@connect-transport"\
                     or topic == "@get-recv-tracks"\
                     or topic == "@connect-transport-send-done"\
-                    or topic == "@send-track":
+                    or topic == "@send-track"\
+                    or topic == "resume-speaker"\
+                    or topic == "pause-speaker":
                 payload['d']['peerId'] = user_id
                 await rabbit_handler.publish(json.dumps(payload))
             elif topic == "speaking_change":

@@ -58,6 +58,21 @@ async function main() {
         // peer?.sendTransport?.close();
       }
     },
+    ['pause-producer']: ({ roomId, peerId, kind }) => {
+      if (roomId in rooms) {
+        const peer = rooms[roomId].state[peerId];
+        console.log("pausing producer..")
+        peer?.producer?.get(kind)?.pause();
+
+      }
+    },
+    ['resume-producer']: ({ roomId, peerId, kind }) => {
+      if (roomId in rooms) {
+        const peer = rooms[roomId].state[peerId];
+        console.log("resuming producer..")
+        peer?.producer?.get(kind)?.resume();
+      }
+    },
     ["destroy-room"]: ({ roomId }) => {
       if (roomId in rooms) {
         for (const peer of Object.values(rooms[roomId].state)) {
@@ -105,14 +120,9 @@ async function main() {
           (!peerState.producer?.has('audio') && !peerState.producer?.has('video'))) {
           continue;
         }
-        console.log("tem pelo menos 1 producer")
         try {
           const { producer } = peerState;
-          console.log("q producer temos aqui?")
-          console.log(producer)
           for (let value of producer.values()) {
-            console.log("aqui")
-            console.log(value)
             consumerParametersArr.push(
               await createConsumer(
                 router,
@@ -129,8 +139,6 @@ async function main() {
           continue;
         }
       }
-      console.log("aqui2")
-      console.log(consumerParametersArr)
       send({
         topic: "@get-recv-tracks-done",
         uid,

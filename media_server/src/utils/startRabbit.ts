@@ -13,6 +13,8 @@ import { Consumer } from "./createConsumer";
 const retryInterval = 5000;
 export interface HandlerDataMap {
   "remove-speaker": { roomId: string; peerId: string };
+  "pause-producer": { roomId: string; peerId: string; kind: MediaKind };
+  "resume-producer": { roomId: string; peerId: string; kind: MediaKind };
   "destroy-room": { roomId: string };
   "close-peer": { roomId: string; peerId: string; kicked?: boolean };
   "@get-recv-tracks": {

@@ -32,7 +32,7 @@ export const sendVoice = async () => {
     sendTransport.produce({
       track: mic,
       appData: { mediaTag: "cam-audio" },
-    }).then(() => {return;})
+    }).then((producer) => {set({micProducer: producer})})
   }
 
 
