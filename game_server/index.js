@@ -8,7 +8,8 @@ const io = require('socket.io')(server, {
     // below are engine.IO options
     // pingInterval: 10000,
     pingTimeout: 5000,
-    cookie: false
+    cookie: false,
+    cors: false
 });
 
 app.get('/', (req, res) => {

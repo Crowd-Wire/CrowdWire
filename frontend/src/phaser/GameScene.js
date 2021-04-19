@@ -1,10 +1,8 @@
 import * as Phaser from 'phaser';
 
-import { getSocket } from "services/socket";
-
 import usePlayerStore from "stores/usePlayerStore.ts";
+import ClientManager from './client/ClientManager';
 
-var ws = getSocket('1');
 
 const sceneConfig = {
     active: false,
@@ -14,7 +12,7 @@ const sceneConfig = {
 
 var globalVar = false;
 
-
+var client = new ClientManager();
 
 class GameScene extends Phaser.Scene {
     playerSprites = {};
@@ -52,8 +50,8 @@ class GameScene extends Phaser.Scene {
 
         // main player
         this.player = new PlayerSprite(this, 50, 50);
-        // connect to room
-        ws.joinRoom('1', {x: 50, y: 50});
+
+        client.joinUser();
 
         // make camera follow player
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
@@ -107,9 +105,6 @@ class GameScene extends Phaser.Scene {
         if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            // if (ws.socket.readyState === WebSocket.OPEN) {
-            //     ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
-            // }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
@@ -185,16 +180,6 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 
         this.updateAnimation();
 
-        if (this.body.speed) {
-            this.step = 1;
-            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
-        } else if (this.step === 1) {
-            this.step = 2;
-            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
-        } else if (this.step === 2) {
-            this.step = 0;
-            ws.sendMovement('1', this.body.center, this.body.velocity);
-        }
     }
 
     updateAnimation(velocity) {
