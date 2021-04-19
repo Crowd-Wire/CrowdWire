@@ -8,6 +8,7 @@ export const consumeVideo = async (consumerParameters: any, peerId: string) => {
     return false;
   }
   console.log("new consumer" + peerId)
+  console.log(consumerParameters.producerPaused)
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {
@@ -18,6 +19,7 @@ export const consumeVideo = async (consumerParameters: any, peerId: string) => {
     },
   });
   useConsumerStore.getState().add(consumer, peerId, 'video');
+  useConsumerStore.getState().addVideoToggle(peerId, consumerParameters.producerPaused);
   console.log(useConsumerStore.getState())
   return true;
 };

@@ -58,19 +58,13 @@ async function main() {
         // peer?.sendTransport?.close();
       }
     },
-    ['pause-producer']: ({ roomId, peerId, kind }) => {
+    ['toggle-producer']: ({ roomId, peerId, kind, pause }) => {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
-        console.log("pausing producer..")
-        peer?.producer?.get(kind)?.pause();
-
-      }
-    },
-    ['resume-producer']: ({ roomId, peerId, kind }) => {
-      if (roomId in rooms) {
-        const peer = rooms[roomId].state[peerId];
-        console.log("resuming producer..")
-        peer?.producer?.get(kind)?.resume();
+        if (pause)
+          peer?.producer?.get(kind)?.pause();
+        else
+          peer?.producer?.get(kind)?.resume();
       }
     },
     ["destroy-room"]: ({ roomId }) => {

@@ -16,16 +16,18 @@ interface VideoAudioBoxProps {
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
   active: boolean;
+  videoToggle: boolean;
+  audioToggle: boolean;
 }
 
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   username="anonymous", muted=false, id, volume,
-  audioTrack=null, videoTrack=null, active
+  audioTrack=null, videoTrack=null, active, audioToggle, videoToggle
 }) => {
 
   const myRef = useRef<any>(null);
-  const [videoState, setVideoState] = useState(true)
-  const [audioState, setAudioState] = useState(true)
+  const [videoState, setVideoState] = useState(videoToggle)
+  const [audioState, setAudioState] = useState(audioToggle)
 
   const toggleVideo = () => {
     setVideoState(!videoState)
@@ -50,8 +52,8 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   }, [active]);
 
   useEffect(() => {
-    setVideoState(videoTrack ? true : false)
-    setAudioState(audioTrack ? true : false)
+    setVideoState(videoTrack ? !videoToggle : false)
+    setAudioState(audioTrack ? !audioToggle : false)
 
     const mediaStream = new MediaStream();
 
@@ -73,7 +75,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
       myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
       myRef.current.muted = muted
     }
-  }, [videoTrack, audioTrack, volumeStore.getState().globalVolume])
+  }, [videoTrack, audioTrack, volumeStore.getState().globalVolume, videoToggle, audioToggle])
   return (
     <div>
       <Card>
@@ -94,9 +96,9 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
             : (<VideocamOffIcon color={'action'}/>)
           }
           { audioTrack ?
-            audioState ? 
-              (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+              audioState ? 
+                (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+              : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
             : (<MicOffIcon color={'action'}/>)
           }
 

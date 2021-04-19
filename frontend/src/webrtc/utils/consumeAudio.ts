@@ -8,6 +8,7 @@ export const consumeAudio = async (consumerParameters: any, peerId: string) => {
     return false;
   }
   console.log("new consumer" + peerId)
+  console.log(consumerParameters.producerPaused)
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {
@@ -18,6 +19,7 @@ export const consumeAudio = async (consumerParameters: any, peerId: string) => {
     },
   });
   useConsumerStore.getState().add(consumer, peerId, 'audio');
+  useConsumerStore.getState().addAudioToggle(peerId, consumerParameters.producerPaused)
   console.log(useConsumerStore.getState())
   return true;
 };

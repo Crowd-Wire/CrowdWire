@@ -30,27 +30,21 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoState(!videoState)
     if (camProducer) {
-      if (videoState) {
-        console.log(camProducer)
+      if (videoState)
         camProducer.pause();
-        wsend({ topic: "pause-speaker", d: { roomId: roomId, kind: 'video' } })
-      } else {
+      else
         camProducer.resume();
-        wsend({ topic: "resume-speaker", d: { roomId: roomId, kind: 'video' } });
-      }
+      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoState } })
     }
   }
   const toggleAudio = () => {
     setAudioState(!audioState)
     if (micProducer) {
-      if (audioState) {
-        console.log(micProducer)
+      if (audioState)
         micProducer.pause();
-        wsend({ topic: "pause-speaker", d: { roomId: roomId, kind: 'audio' } })
-      } else {
+      else
         micProducer.resume();
-        wsend({ topic: "resume-speaker", d: { roomId: roomId, kind: 'audio' } });
-      }
+      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioState } });
     }
   }
 
@@ -93,9 +87,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
             : (<VideocamOffIcon color={'action'}/>)
           }
           { audioTrack ?
-            audioState ? 
-              (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+              audioState ? 
+                (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+              : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
             : (<MicOffIcon color={'action'}/>)
           }
         </CardBody>

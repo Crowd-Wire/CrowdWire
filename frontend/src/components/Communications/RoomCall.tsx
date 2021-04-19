@@ -67,8 +67,8 @@ export default class RoomCall extends React.Component<{}, State> {
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
-        useVideoStore.getState().set({camStream: stream,cam: stream.getVideoTracks()[0]})
-        useVoiceStore.getState().set({micStream: stream,mic: stream.getAudioTracks()[0]})
+        useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
+        useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
       }
     })
   }
@@ -277,7 +277,14 @@ export default class RoomCall extends React.Component<{}, State> {
 
           { Object.keys(this.state.consumerMap).length > 0 
             && Object.keys(this.state.consumerMap).map((peerId) => {
-              const { consumerAudio, consumerVideo, volume: userVolume, active} = this.state.consumerMap[peerId];
+              const {
+                consumerAudio,
+                consumerVideo,
+                volume: userVolume,
+                active,
+                videoToggle,
+                audioToggle
+              } = this.state.consumerMap[peerId];
               return (
                 <Carousel.Item key={peerId+"_crs_item"}>
                   <VideoAudioBox
@@ -287,6 +294,8 @@ export default class RoomCall extends React.Component<{}, State> {
                     audioTrack={consumerAudio ? consumerAudio._track : null}
                     videoTrack={consumerVideo ? consumerVideo._track : null}
                     volume={(userVolume / 200)}
+                    videoToggle={videoToggle}
+                    audioToggle={audioToggle}
                   />
                 </Carousel.Item>
               )

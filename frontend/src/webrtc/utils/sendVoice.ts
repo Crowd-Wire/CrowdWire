@@ -34,6 +34,4 @@ export const sendVoice = async () => {
       appData: { mediaTag: "cam-audio" },
     }).then((producer) => {set({micProducer: producer})})
   }
-
-
 };

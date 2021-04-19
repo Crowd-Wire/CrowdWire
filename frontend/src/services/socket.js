@@ -162,6 +162,13 @@ export const getSocket = (worldId) => {
           else
             useConsumerStore.getState().removeActiveSpeaker(data.peerId)
           break;
+        case "toggle_peer_producer":
+          console.log(data)
+          if (data.kind == 'audio')
+            useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
+          else
+            useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
+          break;
         default:
           const { handlerMap } = useWsHandlerStore.getState();
           if (data.topic in handlerMap) {
