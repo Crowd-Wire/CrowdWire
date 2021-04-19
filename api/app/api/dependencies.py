@@ -60,7 +60,7 @@ def get_current_user(
             raise HTTPException(status_code=404, detail="User not found")
         return user
 
-    return schemas.GuestUser(is_guest_user=True)
+    return schemas.GuestUser(is_guest_user=True, user_id=token_data.sub)
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency

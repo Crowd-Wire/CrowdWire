@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID1
 import datetime
 
 
@@ -14,6 +14,7 @@ class UserBase(BaseModel):
 
 
 class GuestUser(UserBase):
+    user_id: UUID1
     is_guest_user: bool = True
 
 

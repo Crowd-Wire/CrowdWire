@@ -1,3 +1,4 @@
+from uuid import uuid1
 from datetime import datetime, timedelta
 from typing import Optional, Union
 # import emails
@@ -6,10 +7,25 @@ from jose import jwt
 
 from app import schemas, models
 from app.core.config import settings
+from app.core.consts import AVATARS_LIST
+from random import choice
 
 
-def is_guest_user(obj: Union[schemas.GuestUser, models.User]):
+def choose_avatar():
+    """
+    Chooses a random avatar from the available Ones
+    @return: a avatar filename
+    """
+    return choice(AVATARS_LIST)
+
+
+def is_guest_user(obj: Union[schemas.GuestUser, models.User]) -> bool:
     return isinstance(obj, schemas.GuestUser)
+
+
+def generate_guest_username(user_id: uuid1) -> str:
+    sub_uuid = str(uuid1().fields[-1])[:5]
+    return f'Guest_{sub_uuid}'
 
 
 """

@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator
-from typing import Optional
+from pydantic import BaseModel, validator, UUID1
+from typing import Optional, Union
 
 
 class World_UserBase(BaseModel):
@@ -35,7 +35,8 @@ class World_UserUpdate(World_UserBase):
 
 # Base Schema to retrieve data from DB
 class World_UserInDBBase(BaseModel):
-    user_id: int
+    # user_id is an UUID1 for Guest Users
+    user_id: Optional[Union[int, UUID1]]
     world_id: int
 
     class Config:

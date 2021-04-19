@@ -6,7 +6,7 @@ from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 from app.redis import redis_connector
-from app.utils import is_guest_user
+from app.utils import is_guest_user, generate_guest_username
 from app.core import strings
 
 router = APIRouter()
@@ -19,7 +19,6 @@ async def get_world(
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     if not is_guest_user(user):
-        logger.debug(f"Registered User {user.name} joining in")
         db_world, message = await crud.crud_world.get(db=db, world_id=world_id)
     else:
         db_world, message = await crud.crud_world.get_available_for_guests(
@@ -37,34 +36,33 @@ async def get_world(
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
-        user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False)),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     """
     Registers a User in a World and returns the Information as a world_user object
     """
-
-    if user:
+    if not is_guest_user(user):
         # checks if the world is available for him
-        world, msg = await crud.crud_world.get_available(db=db, world_id=world_id, user_id=user.user_id)
-        # verify if the user is in redis cache
-        user_info = await redis_connector.get_world_user_data(world_id, user.user_id)
-        logger.debug(user_info)
-        if user_info.get('avatar') and user_info.get('username'):
-            return schemas.World_UserInDB(
-                world_id=world_id,
-                user_id=user.user_id,
-                avatar=user_info['avatar'],
-                username=user_info['username']
-            )
-        world_user = crud.crud_world_user.join_world(db=db, _world=world, _user=user)
-        return world_user
-
+        world_obj, msg = await crud.crud_world.get_available(db=db, world_id=world_id, user_id=user.user_id)
+        if not world_obj:
+            raise HTTPException(status_code=400, detail=msg)
+        # verify if the user is already in redis cache
+        # If it's not the first time the user has joined the world, get it from redis(cache)
+        world_user = await redis_connector.get_world_user_data(world_id, user.user_id)
+        if not world_user:
+            # Otherwise, goes to PostgreSQL database
+            world_user = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+            return world_user
     else:
-        logger.debug("User is not registered")
-        raise HTTPException(
-            status_code=400,
-            detail=strings.ACCESS_FORBIDDEN,
-        )
+        # There are some differences for guests..
+        world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id)
+        if not world_obj:
+            raise HTTPException(status_code=400, detail=msg)
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
+        if not world_user:
+            logger.debug('not cached:/')
+            world_user = await redis_connector.join_new_guest_user(world_id=world_id,user_id=user.user_id)
+    return world_user
 
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
