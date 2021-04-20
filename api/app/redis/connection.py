@@ -7,6 +7,7 @@ from app import schemas
 from uuid import uuid4
 from loguru import logger
 
+
 class RedisConnector:
 
     def __init__(self):

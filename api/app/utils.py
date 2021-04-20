@@ -11,6 +11,7 @@ from app.core.consts import AVATARS_LIST
 from random import choice
 from loguru import logger
 
+
 def choose_avatar():
     """
     Chooses a random avatar from the available Ones
