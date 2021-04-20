@@ -18,6 +18,7 @@ import logo from '../../assets/crowdwire_white_logo.png';
 import { getSocket, wsend } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
+import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
@@ -110,6 +111,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.accessMic = data[1]
 
       if (this.accessMic) {
+        useMuteStore.getState().setAudioMute(false)
         toast.dark(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -127,6 +129,7 @@ export default class RoomCall extends React.Component<{}, State> {
         });
       }
       if (this.accessVideo) {
+        useMuteStore.getState().setVideoMute(false)
         toast.dark(
           <span>
             <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />

@@ -32,7 +32,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
   );
   const { mic } = useVoiceStore();
   const { micId } = storeDevice.getState().micId;
-  const { muted } = useMuteStore();
+  const { audioMuted } = useMuteStore();
   const { setCurrentRoom } = useCurrentRoomStore();
   const initialLoad = useRef(true);
 
@@ -63,9 +63,9 @@ export const WebRtcApp: React.FC<App2Props> = () => {
   }
   useEffect(() => {
     if (mic) {
-      mic.enabled = !muted;
+      mic.enabled = !audioMuted;
     }
-  }, [mic, muted]);
+  }, [mic, audioMuted]);
   useEffect(() => {
     return addMultipleWsListener({
       you_left_room: (d) => {

@@ -1,11 +1,14 @@
 import storeDevice from "../../redux/commStore.js";
 import { useVoiceStore } from "../stores/useVoiceStore";
+import { useMuteStore } from "../stores/useMuteStore";
 
 export const sendVoice = async () => {
   const { micId } = storeDevice.getState().micId;
   const { sendTransport, set, mic, micStream, roomId } = useVoiceStore.getState();
+  const { audioMuted } = useMuteStore.getState();
 
-  if (!roomId)
+  console.log(audioMuted)
+  if (!roomId || audioMuted)
     return;
 
   if (!sendTransport) {
@@ -25,7 +28,7 @@ export const sendVoice = async () => {
       console.log(err);
       return;
     }
-  } 
+  }
 
   if (mic) {
     console.log("creating producer...");

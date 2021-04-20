@@ -7,7 +7,10 @@ import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { wsend } from "../../services/socket.js";
+import { sendVoice } from "../../webrtc/utils/sendVoice";
+import { sendVideo } from "../../webrtc/utils/sendVideo";
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -29,21 +32,27 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
   const toggleVideo = () => {
     setVideoState(!videoState)
+    useMuteStore.getState().setVideoMute(videoState);
     if (camProducer) {
       if (videoState)
         camProducer.pause();
-      else
+      else {
+        sendVideo();
         camProducer.resume();
+      }
       wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoState } })
     }
   }
   const toggleAudio = () => {
     setAudioState(!audioState)
+    useMuteStore.getState().setAudioMute(audioState)
     if (micProducer) {
       if (audioState)
         micProducer.pause();
-      else
+      else {
+        sendVoice();
         micProducer.resume();
+      }
       wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioState } });
     }
   }

@@ -1,16 +1,18 @@
 import storeDevice from "../../redux/commStore.js";
 import { useVoiceStore } from "../stores/useVoiceStore";
 import { useVideoStore } from "../stores/useVideoStore";
+import { useMuteStore } from "../stores/useMuteStore";
 
 export const sendVideo = async () => {
   const { camId } = storeDevice.getState().camId;
   const { set, cam, camStream } = useVideoStore.getState();
   const { sendTransport, roomId } = useVoiceStore.getState();
+  const { videoMuted } = useMuteStore.getState();
   
-  if (!roomId)
+  if (!roomId || videoMuted)
     return;
 
-    if (!sendTransport) {
+  if (!sendTransport) {
     console.log("no sendTransport in sendVoice");
     return;
   }
