@@ -54,6 +54,11 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   useEffect(() => {
     setVideoState(videoTrack ? !videoToggle : false)
     setAudioState(audioTrack ? !audioToggle : false)
+  }, [videoToggle, audioToggle])
+
+  useEffect(() => {
+    setVideoState(videoTrack ? !videoToggle : false)
+    setAudioState(audioTrack ? !audioToggle : false)
 
     const mediaStream = new MediaStream();
 
@@ -75,7 +80,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
       myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
       myRef.current.muted = muted
     }
-  }, [videoTrack, audioTrack, volumeStore.getState().globalVolume, videoToggle, audioToggle])
+  }, [videoTrack, audioTrack])
   return (
     <div>
       <Card>

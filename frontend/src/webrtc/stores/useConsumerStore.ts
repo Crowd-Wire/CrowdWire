@@ -36,9 +36,13 @@ export const useConsumerStore = create(
         set((s) => {
           let volume = 100;
           let otherConsumer = null;
+          let videoToggle = false;
+          let audioToggle = false;
           if (userId in s.consumerMap) {
             const x = s.consumerMap[userId];
             volume = x.volume;
+            videoToggle = x.videoToggle;
+            audioToggle = x.audioToggle;
             if (kind == "audio") {
               otherConsumer = x.consumerVideo;
               if (x.consumerAudio) x.consumerAudio.close();
@@ -56,8 +60,8 @@ export const useConsumerStore = create(
                   volume,
                   consumerVideo: otherConsumer,
                   active: false,
-                  videoToggle: false,
-                  audioToggle: false
+                  videoToggle,
+                  audioToggle
                 },
               }
             };
@@ -70,8 +74,8 @@ export const useConsumerStore = create(
                   volume,
                   consumerAudio: otherConsumer,
                   active: false,
-                  videoToggle: false,
-                  audioToggle: false
+                  videoToggle,
+                  audioToggle
                 },
               }
             };
@@ -80,7 +84,7 @@ export const useConsumerStore = create(
       addAudioToggle: (userId: string, audioToggle: boolean) =>
         set((s) => {
           if (s.consumerMap[userId]) {
-            const user = {...s.consumerMap[userId]}
+            let user = {...s.consumerMap[userId]}
             user.audioToggle = audioToggle
             return {
               consumerMap: {
@@ -93,7 +97,7 @@ export const useConsumerStore = create(
       addVideoToggle: (userId: string, videoToggle: boolean) =>
         set((s) => {
           if (s.consumerMap[userId]) {
-            const user = {...s.consumerMap[userId]}
+            let user = {...s.consumerMap[userId]}
             user.videoToggle = videoToggle
             return {
               consumerMap: {

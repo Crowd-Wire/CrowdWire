@@ -29,5 +29,5 @@ app.include_router(api_router)
 if __name__ == "__main__":
     init_logging()
     app.add_event_handler("startup", rabbit_handler.start_pool)
-    app.add_event_handler('startup', redis_connector.sentinel_connection)
+    # app.add_event_handler('startup', redis_connector.sentinel_connection)
     uvicorn.run(app, host="0.0.0.0", port=8000)

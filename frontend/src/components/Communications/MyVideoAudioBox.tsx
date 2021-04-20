@@ -23,9 +23,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   username="anonymous", id,
   audioTrack=null, videoTrack=null
 }) => {
-  const { camProducer } = useVideoStore.getState();
-  const { micProducer, roomId } = useVoiceStore.getState();
-
   const myRef = useRef<any>(null);
   const [videoState, setVideoState] = useState(true)
   const [audioState, setAudioState] = useState(true)
@@ -33,24 +30,30 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoState(!videoState)
     useMuteStore.getState().setVideoMute(videoState);
+    const { roomId } = useVoiceStore.getState();
+    let { camProducer } = useVideoStore.getState();
+
+    sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
+
     if (camProducer) {
       if (videoState)
         camProducer.pause();
-      else {
-        sendVideo();
+      else
         camProducer.resume();
-      }
       wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoState } })
     }
   }
   const toggleAudio = () => {
     setAudioState(!audioState)
     useMuteStore.getState().setAudioMute(audioState)
+    let { micProducer, roomId } = useVoiceStore.getState();
+
+    sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
+    
     if (micProducer) {
       if (audioState)
         micProducer.pause();
       else {
-        sendVoice();
         micProducer.resume();
       }
       wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioState } });
