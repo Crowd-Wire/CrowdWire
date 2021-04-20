@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -14,6 +15,7 @@ from app.core import security, strings
 # send_reset_password_email,
 # verify_password_reset_token,
 # )
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -73,10 +75,14 @@ def join_as_guest():
     Generates Valid Token for Guest Users
     """
     _uuid = security.create_guest_uuid()
-    access_token, expires = security.create_access_token(_uuid, is_guest_user=True)
+    access_token, expires = security.create_access_token(
+        subject=_uuid,
+        is_guest_user=True,
+        expires_delta=timedelta(hours=settings.ACCESS_GUEST_TOKEN_EXPIRE_HOURS)
+    )
     return {
         "access_token": access_token,
-        "token_type": str(_uuid),
+        "token_type": 'Bearer',
         "expire_date": str(expires),
         "guest_uuid": _uuid
     }

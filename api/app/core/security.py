@@ -5,7 +5,7 @@ from jose import jwt
 from passlib.context import CryptContext
 
 from app.core.config import settings
-from uuid import uuid1, UUID
+from uuid import uuid4
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -46,9 +46,9 @@ def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
 
 
-def create_guest_uuid() -> UUID:
+def create_guest_uuid() -> uuid4:
     """
     Generates a uuid for Guest Users
     @return: a uuid object
     """
-    return uuid1()
+    return uuid4()
