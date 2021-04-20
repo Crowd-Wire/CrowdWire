@@ -120,7 +120,8 @@ def create_world(
     return obj
 
 
-@router.get("/")
+# TODO: add response model
+@router.get("/", response_model=List[schemas.WorldInDB])
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
@@ -129,7 +130,5 @@ def search_world(
 ) -> Any:
 
     # TODO: change this to work for guests
-    if user:
-
-        return crud.crud_world.filter(db=db, search=search, tags=tags)
+    return crud.crud_world.filter(db=db, search=search, tags=tags)
 
