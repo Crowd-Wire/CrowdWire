@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID4
 import datetime
 
 
@@ -10,6 +10,12 @@ class UserBase(BaseModel):
     register_date: Optional[datetime.datetime] = None
     birth: Optional[datetime.date] = None
     status: Optional[int] = None
+    is_guest_user: Optional[bool] = False
+
+
+class GuestUser(UserBase):
+    user_id: UUID4
+    is_guest_user: bool = True
 
 
 # schema for Login

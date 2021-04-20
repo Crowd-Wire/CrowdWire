@@ -26,9 +26,20 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         return world_obj, ""
 
     @cache
+    async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+        world_obj = db.query(World).filter(
+            World.world_id == world_id,
+            World.public.is_(True),
+            World.allow_guests.is_(True)
+        ).first()
+        if not world_obj:
+            return None, strings.WORLD_NOT_FOUND
+        return world_obj, ""
+
+    @cache
     async def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
         """
-        Verify the availability of a world, given a user.
+        Verify the availability of a world, given a  registered user.
         Raises Exception if the world does not exist, is Banned
         or the Users doesn't have access.
         @return: a valid World_User(or None if not valid) object and a message
