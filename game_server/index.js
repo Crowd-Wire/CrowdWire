@@ -21,6 +21,6 @@ server.listen(4000, () => {
 });
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
-    require('./src/server')(io, socket);
+  console.log('a new user connected')
+  require('./src/server.js')(io, socket);
 });

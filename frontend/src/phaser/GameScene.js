@@ -12,7 +12,7 @@ const sceneConfig = {
 
 var globalVar = false;
 
-var client = new ClientManager();
+var client = new ClientManager(1);
 
 class GameScene extends Phaser.Scene {
     playerSprites = {};
