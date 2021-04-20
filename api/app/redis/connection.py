@@ -27,6 +27,9 @@ class RedisConnector:
     async def get(self, key: str) -> any:
         return await self.master.execute('get', key)
 
+    async def delete(self, key: Union[str, bytes]):
+        return await self.master.execute('del', key)
+
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
 

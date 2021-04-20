@@ -6,6 +6,7 @@ from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 from app.redis import redis_connector
+from app.redis.redis_decorator import cache
 from app.utils import is_guest_user
 from app.core import strings
 
@@ -63,6 +64,22 @@ async def join_world(
             logger.debug('not cached:/')
             world_user = await redis_connector.join_new_guest_user(world_id=world_id, user_id=user.user_id)
     return world_user
+
+
+@router.put("/{world_id}", response_model=schemas.WorldMapInDB)
+async def update_world(
+        world_id: int,
+        world_in: schemas.WorldUpdate,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Updates a  specific World's Information
+    """
+    await crud.crud_world.get.clear(crud.crud_world, world_id=world_id)
+    # TODO Check if world is available, and if the user has enough permision
+    # to edit the World
+    return None
 
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)

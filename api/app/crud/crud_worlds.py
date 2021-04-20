@@ -19,13 +19,14 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
     @cache
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+        logger.info("------>")
         world_obj = db.query(World).filter(World.world_id == world_id).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
-
     @cache
     async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+
         world_obj = db.query(World).filter(
             World.world_id == world_id,
             World.public.is_(True),
@@ -57,6 +58,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
+
+
+
+
 
     def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Tuple[Optional[World], str]:
         """
