@@ -33,7 +33,6 @@ class WSettingsContent extends Component {
 	};
 	
 	a11yProps(index) {
-		console.log("index"+index);
 		return {
 			id: `simple-tab-${index}`,
 			'aria-controls': `simple-tabpanel-${index}`,

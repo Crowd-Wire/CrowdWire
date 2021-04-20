@@ -6,27 +6,23 @@ import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RoleUserList from 'components/RoleUserList/RoleUserList.js';
-
+import { DragDropContext } from 'react-beautiful-dnd';
 export default function RolePanel(props){
 	const { children, users, roles,value, index, ...other } = props;
 	let rows = [];
 	let rolekeys = [];
-
-
-    for(let i=0; i<users.length; i++){
-      rows.push(
-		<Row style={{height:"50px"}}>
-			<Col>
-				<Typography variant="h4" style={{backgroundColor:"red",marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
-			</Col>
-		</Row>
-	  );
-    }
+	const onDrop = result => {
+	}
+	let x = 0;
 	Object.keys(roles).forEach(function(key) {
 		console.log(key,roles[key]);
+		console.log(x);
 		rolekeys.push(
-			<RoleUserList roleName={key} value={roles[key]}/>
+			<DragDropContext onDragEnd={onDrop}>
+				<RoleUserList roleName={key} value={roles[key]} key={x}/>
+			</DragDropContext>
 		);
+		x++;
 	});
 	return(
 		<div

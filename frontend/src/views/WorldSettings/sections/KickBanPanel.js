@@ -13,7 +13,6 @@ export default function KickBanPanel(props){
 	const { children, users, reports, value, index, ...other } = props;
 	let rows = [];
 	let reportBoxes = [];
-	console.log(index+","+value+children);
 	for(let i=0; i<users.length; i++){
 		rows.push(
 			<Row style={{height:"50px"}}>
@@ -22,7 +21,6 @@ export default function KickBanPanel(props){
 		);
 	}
 	for(let i=0; i<reports.length; i++){
-		console.log(reports[i]['Message']);
 		reportBoxes.push(
 			<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
 				<Typography style={{marginTop:"auto"}} variant="h5">{reports[i]['Reporter']}</Typography>
