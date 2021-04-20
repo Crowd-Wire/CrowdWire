@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -6,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.api import dependencies
-from app.core import security
+from app.core import security, strings
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -14,6 +15,7 @@ from app.core import security
 # send_reset_password_email,
 # verify_password_reset_token,
 # )
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -27,10 +29,10 @@ def register(
     Register a user, returns an access token for that user
     """
 
-    user = crud.user.create(db=db, user_data=user_data)
+    user, message = crud.crud_user.create(db=db, user_data=user_data)
 
     if not user:
-        raise HTTPException(status_code=400, detail="A user with that email already exists")
+        raise HTTPException(status_code=400, detail=message)
 
     access_token, expires = security.create_access_token(user.user_id)
 
@@ -49,22 +51,40 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-
-    user = crud.user.authenticate(
+    user, message = crud.crud_user.authenticate(
         db, email=form_data.username, password=form_data.password
     )
 
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-    elif not crud.user.is_active(db=db, user=user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=400, detail=message)
+    elif not crud.crud_user.is_active(db=db, user=user):
+        raise HTTPException(status_code=400, detail=strings.INACTIVE_USER)
 
     access_token, expires = security.create_access_token(user.user_id)
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "expire_date": str(expires)
+        "expire_date": str(expires),
+    }
+
+
+@router.post('/join-guest', response_model=schemas.TokenGuest)
+def join_as_guest():
+    """
+    Generates Valid Token for Guest Users
+    """
+    _uuid = security.create_guest_uuid()
+    access_token, expires = security.create_access_token(
+        subject=_uuid,
+        is_guest_user=True,
+        expires_delta=timedelta(hours=settings.ACCESS_GUEST_TOKEN_EXPIRE_HOURS)
+    )
+    return {
+        "access_token": access_token,
+        "token_type": 'Bearer',
+        "expire_date": str(expires),
+        "guest_uuid": _uuid
     }
 
 

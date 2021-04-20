@@ -1,8 +1,24 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, UUID4
 import datetime
 
 
+# Base Attributes shared By All Schemas of User
+class UserBase(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    register_date: Optional[datetime.datetime] = None
+    birth: Optional[datetime.date] = None
+    status: Optional[int] = None
+    is_guest_user: Optional[bool] = False
+
+
+class GuestUser(UserBase):
+    user_id: UUID4
+    is_guest_user: bool = True
+
+
+# schema for Login
 class UserInLogin(BaseModel):
     email: EmailStr
     hashed_password: str
@@ -11,15 +27,22 @@ class UserInLogin(BaseModel):
         orm_mode = True
 
 
-class UserCreate(UserInLogin):
+# schema for User Creation
+class UserCreate(UserBase):
     name: str
-    register_date: Optional[datetime.datetime] = None
-    birth: Optional[datetime.date] = None
+    email: EmailStr
+    hashed_password: str
 
 
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
+# schema for User Update
+class UserUpdate(UserBase):
     password: Optional[str] = None
-    register_date: Optional[datetime.date] = None
-    birth: Optional[datetime.date] = None
+
+
+# retrieve User from DB to client via API
+class UserInDB(UserBase):
+    user_id: Optional[int] = None
+    register_date: datetime.datetime
+
+    class Config:
+        orm_mode = True
