@@ -6,31 +6,28 @@ import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RoleUserList from 'components/RoleUserList/RoleUserList.js';
-import { DragDropContext } from 'react-beautiful-dnd';
+// import { DragDropContext } from 'react-beautiful-dnd';
+import { useDrag, useDrop } from 'react-dnd';
+
 export default function RolePanel(props){
-	const { children, users, roles,value, index, ...other } = props;
+	const { children, users, roles,value, index, setUsers , ...other } = props;
 	let rows = [];
 	let rolekeys = [];
-	const onDrop = result => {
-	}
-	let x = 0;
+
 	Object.keys(roles).forEach(function(key) {
-		console.log(key,roles[key]);
-		console.log(x);
 		rolekeys.push(
-			<DragDropContext onDragEnd={onDrop}>
-				<RoleUserList roleName={key} value={roles[key]} key={x}/>
-			</DragDropContext>
+			<div id="context">
+				<RoleUserList setUsers={setUsers} roleName={key} value={roles[key]}/>
+			</div>
 		);
-		x++;
 	});
 	return(
 		<div
-		role="tabpanel"
-		hidden={value !== index}
-		id={`simple-tabpanel-${index}`}
-		aria-labelledby={`simple-tab-${index}`}
-		{...other}
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
 		>
 			{value === index && (
 				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>

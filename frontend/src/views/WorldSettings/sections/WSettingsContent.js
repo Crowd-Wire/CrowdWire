@@ -9,23 +9,39 @@ import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
 
 
 class WSettingsContent extends Component {
-	roles = {
-		'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':['João', 'Maria', 'António']},
-		'Speaker':{'permissions':[0,1,2,4,5,7],'users':['Carlos', 'Sofia', 'meunicklegal']},
-		'Member':{'persmissions':[0,1,2,7],'users':['meunickilegal','xXnoobM4sterXx']},
-		'Atrasados':{'permissions':[], 'users':['Wilson']}
-	};
 
-
-	users = ['Silvia','Marco','Teixeira'];
-	reports = [
-		{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
-		{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
-		{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
-	];
-	state = {value: 0};
+	state = 
+		{
+			value: 0,
+			roles: {
+				'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
+				'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
+				'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
+				'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
+			},
+			users: ['Silvia','Marco','Teixeira'],
+			reports: [
+				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
+				{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
+				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
+			]
+		};
 	constructor(props){
 		super(props);
+	}
+	setUsers = (dragArray, hoverArray, dragCard) => {
+		this.setState(state => {
+			const [dragRoleName, dragIndex] = dragArray;
+			const [hoverRoleName, hoverIndex] = hoverArray;
+
+			const roles = state.roles;
+
+			roles[dragRoleName].users.splice(dragIndex, 1);
+			console.log('AQUI', dragCard)
+			roles[hoverRoleName].users.splice(hoverIndex, 0, dragCard);
+
+			return { roles };
+		})
 	}
 
 	changeTab = (event, newValue) => {
@@ -54,8 +70,8 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel roles={this.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
-						<KickBanPanel users={this.users} reports={this.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
+						<RolePanel roles={this.state.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>
 		);
