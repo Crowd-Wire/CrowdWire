@@ -1,5 +1,11 @@
+from typing import Union, Optional
+
 import aioredis
 from app.core.config import settings
+from app.utils import generate_guest_username, choose_avatar
+from app import schemas
+from uuid import uuid4
+from loguru import logger
 
 
 class RedisConnector:
@@ -33,12 +39,42 @@ class RedisConnector:
     async def hset(self, key: str, field: str, value: str):
         return await self.master.execute('hset', key, field, value)
 
-    async def save_world_user_data(self, world_id: int, user_id: int, data: dict):
+    async def save_world_user_data(self, world_id: int, user_id: Union[int, uuid4], data: dict):
+        """
+        saves a  new user that joined into a world,
+        alongside its data. The @param user_id can also
+        be a string of the uuid for guests
+        """
         for k, v in data.items():
             await self.hset(f"world:{str(world_id)}:{str(user_id)}",
                             k, v)
 
-    async def get_world_user_data(self, world_id: int, user_id: int):
+    async def join_new_guest_user(self, world_id: int, user_id: uuid4) -> schemas.World_UserInDB:
+        """
+        Generates a username for guests and the user the @method save_world_user_data
+        to store the user data
+        @return : a schema of a World User taking into consideration Redis Stored Values
+        """
+        logger.info(user_id)
+        username = generate_guest_username(user_id)
+        avatar = choose_avatar()
+        await self.save_world_user_data(
+            world_id=world_id,
+            user_id=user_id,
+            data={'username': username, 'avatar': avatar}
+        )
+        return schemas.World_UserInDB(
+            world_id=world_id,
+            user_id=user_id,
+            username=username,
+            avatar=avatar
+        )
+
+    async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) -> Optional[schemas.World_UserInDB]:
+        """
+        Checks World_User Data, if present, to be returned to REST API
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
         # TODO: maybe check encoding instead of converting to string
         data = {
             'username': await self.hget(
@@ -48,8 +84,15 @@ class RedisConnector:
                 f"world:{str(world_id)}:{str(user_id)}", 'avatar'
             )
         }
+        if data.get('avatar') and data.get('username'):
+            return schemas.World_UserInDB(
+                world_id=world_id,
+                user_id=user_id,
+                avatar=data['avatar'],
+                username=data['username']
+            )
 
-        return data
+        return None
 
 
 redis_connector = RedisConnector()

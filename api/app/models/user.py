@@ -16,5 +16,4 @@ class User(Base):
     register_date = Column(DateTime, nullable=False)
     status = Column(Integer, nullable=False)
     is_superuser = Column(Boolean, nullable=False)
-
     worlds = relationship("World_User", back_populates="user")

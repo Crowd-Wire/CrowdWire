@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator
-from typing import Optional
+from pydantic import BaseModel, validator, UUID4
+from typing import Optional, Union
+from app.core.consts import AVATARS_LIST
 
 
 class World_UserBase(BaseModel):
@@ -13,7 +14,7 @@ class World_UserBase(BaseModel):
 
     @validator("avatar")
     def validate_avatar(cls, v):
-        if v not in [str(i) for i in range(10)]:
+        if v not in AVATARS_LIST:
             raise ValueError("Avatar name not Valid!")
         return v
 
@@ -35,7 +36,8 @@ class World_UserUpdate(World_UserBase):
 
 # Base Schema to retrieve data from DB
 class World_UserInDBBase(BaseModel):
-    user_id: int
+    # user_id is an UUID1 for Guest Users
+    user_id: Optional[Union[int, UUID4]]
     world_id: int
 
     class Config:
