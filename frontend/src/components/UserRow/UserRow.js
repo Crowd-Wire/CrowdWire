@@ -24,6 +24,8 @@ export default function UserRow(props){
         },
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
+            if (!dropResult)
+                return;
             console.log(allRoles);
             allRoles.forEach(rName => {
                 console.log(rName);

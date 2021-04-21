@@ -25,7 +25,7 @@ export default function RoleUserList(props){
     });
     return(
         <div style={{marginTop:"10px", marginBottom:"10px"}}>
-            <Row style={{backgroundColor:"#5AB9BA"}}>
+            <Row style={{backgroundColor:"#58B6B8"}}>
                 <Col sm={10} md={10}>
                     <Typography variant="h5">{roleName}</Typography>
                 </Col>
@@ -33,12 +33,14 @@ export default function RoleUserList(props){
                         <ExpandMoreIcon/>
                 </Col>
             </Row>
-            <div id="droppable" ref={drop}>
-                {value.users.map((user, index) => {
-                    return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
-                })
-                }
-            </div>
+            <Row>
+                <Col id="droppable" ref={drop} style={{width:"100%", minHeight:"20px", border:"1px solid #58B6B8", borderRadius:"10px"}}>
+                    {value.users.map((user, index) => {
+                        return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
+                    })
+                    }
+                </Col>
+            </Row>
         </div>
     );
 }
