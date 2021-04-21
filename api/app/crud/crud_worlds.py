@@ -9,7 +9,7 @@ from app.models import World
 from app.redis.redis_decorator import cache
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
-from app.crud.crud_tags import tag as crud_tag
+from app.crud.crud_tags import crud_tag
 from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user

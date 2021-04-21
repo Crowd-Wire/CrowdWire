@@ -16,6 +16,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import { Button } from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import TagService from 'services/TagService';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,7 +55,13 @@ export default function MapFilters(props) {
 
 
   useEffect (() => {
-    setTags(["string", "test", "lixo"])
+    TagService.getAll()
+			.then((res) => {return res.json()})
+			.then((res) => {
+        let arr = [];
+        res.forEach(tag => arr.push(tag.name)); 
+        setTags(arr);
+      })
   }, [])
 
   const [tags, setTags] = React.useState([]);

@@ -15,7 +15,7 @@ class WorldService {
             query.push('search='+search);
         
         if(tags.length != 0)
-            query.push('tags='+tags.join(','));
+            query.push('tags='+tags.join('&tags='));
 
         if(query.length != 0)
             url = url.concat('?'+query.join('&'));

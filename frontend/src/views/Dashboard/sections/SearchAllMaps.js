@@ -16,6 +16,7 @@ import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
+import TagService from 'services/TagService';
 
 const useStyles = theme => ({
 	root: {
@@ -67,6 +68,13 @@ class SearchAllMaps extends Component {
 
 	}
 
+	componentDidMount(){
+		WorldService.search("", [])
+			.then((res) => { return res.json() })
+			.then((res) => { this.setState({ maps: res }) });
+
+			
+	}
 
 	render() {
 		const { classes } = this.props;

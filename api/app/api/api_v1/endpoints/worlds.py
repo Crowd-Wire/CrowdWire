@@ -133,7 +133,7 @@ def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         db: Session = Depends(deps.get_db),
-        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+        #user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
 
     # TODO: change this to work for guests
