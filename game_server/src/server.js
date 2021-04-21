@@ -46,29 +46,29 @@ module.exports = (io, socket) => {
     });
 
 
-    //   socket.on(protocol.NEWUSER, (packet) => {
-    //     user.m_player = new Player(
-    //       MyMath.RandomInt(100, 400),
-    //       MyMath.RandomInt(100, 400),
-    //       MyMath.RandomInt(0, 90)
-    //     );
+    socket.on(protocol.JOIN_USER, (packet) => {
+        user.m_player = new Player(
+            MyMath.RandomInt(100, 400),
+            MyMath.RandomInt(100, 400),
+            MyMath.RandomInt(0, 90)
+        );
 
-    //     const data = (() => {
-    //       const users = room.FindAnotherUsers(user.m_socket.id);
-    //       const players = [];
-    //       for (const id in users) {
-    //         players.push(users[id].m_player);
-    //       }
+        const data = (() => {
+            const users = room.FindAnotherUsers(user.m_socket.id);
+            const players = [];
+            for (const id in users) {
+            players.push(users[id].m_player);
+            }
 
-    //       return {
-    //         myid: user.m_player.id,
-    //         players: players
-    //       };
-    //     })();
+            return {
+            myid: user.m_player.id,
+            players: players
+            };
+        })();
 
-    //     socket.emit(protocol.LOADALLPLAYER, data);
-    //     io.sockets.in(user.m_room).emit(protocol.NEWUSER, user.m_player);
-    //   });
+        socket.emit(protocol.LOADALLPLAYER, data);
+        io.sockets.in(user.m_room).emit(protocol.NEWUSER, user.m_player);
+    });
 
     //   socket.on(protocol.GAMEREADY, () => {
     //     socket.emit(protocol.GAMESTART);
