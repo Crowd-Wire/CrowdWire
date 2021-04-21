@@ -18,18 +18,19 @@ async def override_dependency(token: str = None):
 app.dependency_overrides[get_current_user] = override_dependency
 
 
+# TODO: add more tests for guests and users
 class TestTags(TestCase):
     def test_get_all(self):
         """
         Expects 200 Ok and confirms the length and content returned
         """
-        with patch("app.crud.crud_tags.CRUDTag.get_all") as mock_post:
-            mock_post.return_value = [Tag(name="string"), Tag(name="string2"), Tag(name="string3")]
+        with patch("app.crud.crud_tags.CRUDTag.get_all") as mock_get:
+            mock_get.return_value = [Tag(name="string"), Tag(name="string2"), Tag(name="string3")]
             response = client.get(
                 "/tags",
             )
-            print(response.json())
+
             assert response.status_code == 200
-            assert mock_post.call_count == 1
+            assert mock_get.call_count == 1
             assert len(response.json()) == 3
             assert response.json()[0]['name'] == "string"
