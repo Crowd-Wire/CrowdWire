@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "auto",
         marginRight: "auto",
         marginBottom: "30px",
+        height: "300px"
+        
     },
     media: {
         height: 140,
@@ -28,11 +30,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function MapCard(props){
+    const {title, desc, focusMap, ...other } = props;
     const history = useNavigate();
-    
+    console.log(title);
     const routeChange = () =>{ 
-      let path = `App`; 
-      history.push(path);
+      let wId=1
+      let path = `../world/`+wId; 
+      history(path);
     }
     const classes = useStyles();
     return(
@@ -43,14 +47,14 @@ export default function MapCard(props){
                 <CardMedia
                     className={classes.media}
                     image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
-                    title="Jungle"
+                    title={title}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                    Jungle
+                    {title}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                    This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users.
+                    <Typography noWrap variant="body2" color="textSecondary" component="p">
+                        {desc}
                     </Typography>
                 </CardContent>
                 </CardActionArea>
