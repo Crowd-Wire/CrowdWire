@@ -1,13 +1,8 @@
-from fastapi import HTTPException, Query
-from typing import Optional, Any, List, Union
+from typing import Any, List
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
 from app.api import dependencies as deps
-from loguru import logger
-from app.redis import redis_connector
-from app.utils import is_guest_user
-from app.core import strings
 
 router = APIRouter()
 

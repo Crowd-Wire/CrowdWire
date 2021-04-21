@@ -138,4 +138,3 @@ def search_world(
 
     # TODO: change this to work for guests
     return crud.crud_world.filter(db=db, search=search, tags=tags)
-
