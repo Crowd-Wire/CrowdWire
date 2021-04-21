@@ -7,6 +7,7 @@ import { consumeAudio } from "../webrtc/utils/consumeAudio";
 import { consumeVideo } from "../webrtc/utils/consumeVideo";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
+import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
@@ -143,7 +144,9 @@ export const getSocket = (worldId) => {
           consumeAll(data.d.consumerParametersArr);
           break;
         case "new-peer-producer":
-          const { roomId, recvTransport } = useVoiceStore.getState();
+          const { recvTransport } = useVoiceStore.getState();
+          const { roomId } = useRoomStore.getState();
+          
           console.log(data)
 
           if (recvTransport && roomId === data.d.roomId) {

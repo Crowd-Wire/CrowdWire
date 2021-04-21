@@ -1,10 +1,12 @@
 import storeDevice from "../../redux/commStore.js";
-import { useVoiceStore } from "../stores/useVoiceStore";
 import { useMuteStore } from "../stores/useMuteStore";
+import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 
 export const sendVoice = async () => {
   const { micId } = storeDevice.getState().micId;
-  const { sendTransport, set, mic, micStream, roomId } = useVoiceStore.getState();
+  const { set, mic, micStream } = useVoiceStore.getState();
+  const { sendTransport, roomId } = useRoomStore.getState();
   const { audioMuted } = useMuteStore.getState();
 
   console.log(audioMuted)

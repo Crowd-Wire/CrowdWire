@@ -1,8 +1,8 @@
 import { useConsumerStore } from "../stores/useConsumerStore";
-import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 
 export const consumeVideo = async (consumerParameters: any, peerId: string) => {
-  const { recvTransport } = useVoiceStore.getState();
+  const { recvTransport } = useRoomStore.getState();
   if (!recvTransport) {
     console.log("skipping consumeVideo because recvTransport is null");
     return false;

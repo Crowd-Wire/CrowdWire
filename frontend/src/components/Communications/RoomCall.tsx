@@ -1,10 +1,9 @@
 import React, { createRef } from 'react';
 
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 // Icons imports
 import { Button } from '@material-ui/core';
 import ChatIcon from '@material-ui/icons/Chat';
-import 'react-toastify/dist/ReactToastify.css';
 
 import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
@@ -17,6 +16,7 @@ import logo from '../../assets/crowdwire_white_logo.png';
 
 import { getSocket, wsend } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
@@ -71,6 +71,10 @@ export default class RoomCall extends React.Component<{}, State> {
   
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
+      console.log(stream)
+      console.log(stream.getVideoTracks()[0])
+      console.log(stream.getAudioTracks()[0])
+
       if (stream) {
         useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
         useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
@@ -115,7 +119,7 @@ export default class RoomCall extends React.Component<{}, State> {
         toast.dark(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          Microphone Access Granted
+          Microphone Detected 🎙️
         </span>
         ,{
           position: "bottom-right",
@@ -133,7 +137,7 @@ export default class RoomCall extends React.Component<{}, State> {
         toast.dark(
           <span>
             <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-            Video Access Granted
+            Camera Detected 📹 
           </span>
           , {
           position: "bottom-right",
@@ -192,13 +196,13 @@ export default class RoomCall extends React.Component<{}, State> {
 
         <div className="row">
           <Button color="primary" onClick={() => {
-            useVoiceStore.getState().set({ roomId: '1' });
+            useRoomStore.getState().set({ roomId: '1' });
             wsend({topic: "join-as-new-peer", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport that allows to Receive data */}
             Join Room 1 and only Send Video
           </Button>
           <Button color="primary" onClick={() => {
-            useVoiceStore.getState().set({ roomId: '1' });
+            useRoomStore.getState().set({ roomId: '1' });
             wsend({topic: "join-as-speaker", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport
             that allows to Receive data and another Transport to send data*/}
@@ -220,13 +224,9 @@ export default class RoomCall extends React.Component<{}, State> {
 
           { Object.keys(this.state.consumerMap).length > 0 
             && Object.keys(this.state.consumerMap).map((peerId) => {
-              const {
-                consumerAudio,
-                consumerVideo,
-                volume: userVolume,
-                active,
-                videoToggle,
-                audioToggle
+              const { consumerAudio, consumerVideo,
+                volume: userVolume, active,
+                videoToggle, audioToggle
               } = this.state.consumerMap[peerId];
               return (
                 <Carousel.Item key={peerId+"_crs_item"}>
@@ -256,17 +256,6 @@ export default class RoomCall extends React.Component<{}, State> {
           // myDetails={userDetails} 
           messages={this.state.messages}>
         </ChatBox>
-        <ToastContainer
-          position="bottom-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover={false}
-        />
         
       </React.Fragment>
     );

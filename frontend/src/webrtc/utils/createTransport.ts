@@ -1,6 +1,6 @@
 import { TransportOptions } from "mediasoup-client/lib/types";
 import { getSocket } from "../../services/socket";
-import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 import { useWsHandlerStore } from "../stores/useWsHandlerStore";
 
 
@@ -10,7 +10,7 @@ export async function createTransport(
   transportOptions: TransportOptions
 ) {
   console.log(`create ${direction} transport`);
-  const { device, set } = useVoiceStore.getState();
+  const { device, set } = useRoomStore.getState();
   var socket = getSocket(1).socket;
 
   // ask the server to create a server-side transport object and send

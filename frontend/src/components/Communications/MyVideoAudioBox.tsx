@@ -7,6 +7,7 @@ import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
@@ -30,8 +31,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoState(!videoState)
     useMuteStore.getState().setVideoMute(videoState);
-    const { roomId } = useVoiceStore.getState();
     let { camProducer } = useVideoStore.getState();
+    let { roomId } = useRoomStore.getState();
 
     sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
 
@@ -46,7 +47,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleAudio = () => {
     setAudioState(!audioState)
     useMuteStore.getState().setAudioMute(audioState)
-    let { micProducer, roomId } = useVoiceStore.getState();
+    let { micProducer } = useVoiceStore.getState();
+    let { roomId } = useRoomStore.getState();
 
     sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
     

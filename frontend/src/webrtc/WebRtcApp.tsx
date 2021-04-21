@@ -3,6 +3,7 @@ import { AudioRender } from "./components/AudioRender";
 import { useCurrentRoomStore } from "./stores/useCurrentRoomStore";
 import { useMuteStore } from "./stores/useMuteStore";
 import { useVoiceStore } from "./stores/useVoiceStore";
+import { useRoomStore } from "./stores/useRoomStore";
 import { useWsHandlerStore } from "./stores/useWsHandlerStore";
 import { consumeAudio } from "./utils/consumeAudio";
 import { createTransport } from "./utils/createTransport";
@@ -14,7 +15,8 @@ import storeDevice from "../redux/commStore.js";
 interface App2Props {}
 
 function closeVoiceConnections(_roomId: string | null) {
-  const { roomId, mic, nullify } = useVoiceStore.getState();
+  const { mic, nullify } = useVoiceStore.getState();
+  const { roomId } = useRoomStore.getState();
   if (_roomId === null || _roomId === roomId) {
     if (mic) {
       console.log("stopping mic");
@@ -80,7 +82,8 @@ export const WebRtcApp: React.FC<App2Props> = () => {
         closeVoiceConnections(d.roomId);
       },
       "new-peer-speaker": async (d) => {
-        const { roomId, recvTransport } = useVoiceStore.getState();
+        const { roomId, recvTransport } = useRoomStore.getState();
+
         if (recvTransport && roomId === d.roomId) {
           await consumeAudio(d.consumerParameters, d.peerId);
         } else {
@@ -88,7 +91,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
         }
       },
       "you-are-now-a-speaker": async (d) => {
-        if (d.roomId !== useVoiceStore.getState().roomId) {
+        if (d.roomId !== useRoomStore.getState().roomId) {
           return;
         }
         // setStatus("connected-speaker");
@@ -108,7 +111,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
       },
       "you-joined-as-peer": async (d) => {
         closeVoiceConnections(null);
-        useVoiceStore.getState().set({ roomId: d.roomId });
+        useRoomStore.getState().set({ roomId: d.roomId });
         // setStatus("connected-listener");
         consumerQueue.current = [];
         console.log("creating a device");
@@ -128,7 +131,7 @@ export const WebRtcApp: React.FC<App2Props> = () => {
       },
       "you-joined-as-speaker": async (d) => {
         closeVoiceConnections(null);
-        useVoiceStore.getState().set({ roomId: d.roomId });
+        useRoomStore.getState().set({ roomId: d.roomId });
         // setStatus("connected-speaker");
         consumerQueue.current = [];
         console.log("creating a device");
