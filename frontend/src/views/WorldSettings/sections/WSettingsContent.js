@@ -26,19 +26,32 @@ class WSettingsContent extends Component {
 				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
 			],
 		};
+		
 	constructor(props){
 		super(props);
 	}
-	setUsers = (dragArray, hoverArray, dragCard) => {
+	
+	setUsers = (item, rName) => {
 		this.setState(state => {
-			const [dragRoleName, dragIndex] = dragArray;
-			const [hoverRoleName, hoverIndex] = hoverArray;
+			console.log(item, 1)
 
 			const roles = state.roles;
-
-			roles[dragRoleName].users.splice(dragIndex, 1);
-			console.log('AQUI', dragCard)
-			roles[hoverRoleName].users.splice(hoverIndex, 0, dragCard);
+			let flag = false;
+			for (let [key, value] of Object.entries(roles)) {
+				let users = value.users;	
+				for (let i=0; i < users.length; i++) {
+					if (users[i]['id'] == item.id) {
+						users.splice(i, 1);
+						flag = true;
+						break;
+						
+					}
+				}
+				if (flag) break;
+			}
+			console.log(item, 2)
+			roles[rName].users.splice(0, 0, item);
+			console.log(roles)
 
 			return { roles };
 		})

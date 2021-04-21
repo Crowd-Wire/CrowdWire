@@ -15,11 +15,11 @@ export default function RoleUserList(props){
 
     const [, drop] = useDrop({
         accept: "ACCEPT",
-        drop: () => ({name: "some name"}),
+        drop: () => ({name: roleName}),
     });
 
     const moveCard = useCallback((dragArray, hoverArray) => {
-        const dragCard = value.users[dragArray[1]]; // outra vez?ah
+        const dragCard = value.users[dragArray[1]];
         console.log(dragCard, dragArray, hoverArray);
         setUsers(dragArray, hoverArray, dragCard);
     });
@@ -35,7 +35,7 @@ export default function RoleUserList(props){
             </Row>
             <div id="droppable" ref={drop}>
                 {value.users.map((user, index) => {
-                    return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} moveCard={moveCard}></UserRow>
+                    return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
                 })
                 }
             </div>

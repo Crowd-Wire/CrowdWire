@@ -4,31 +4,42 @@ import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import MenuIcon from '@material-ui/icons/Menu';
 import Col from 'react-bootstrap/Col';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-// import { Draggable } from 'react-beautiful-dnd';
+
 
 
 export default function UserRow(props){
 
-    const {user, index, id, moveCard, style, ...other} = props;
+    const {user, index, id, moveCard, allRoles, style, setUsers, ...other} = props;
 
+
+
+    const changeItemColumn = (currentItem, columnName) => {
+        setUsers(currentItem, columnName);
+    };
     const [{ isDragging }, drag] = useDrag({
         type: "ACCEPT",
         item: {
-            name: "name"
+            id:id,
+            Nome: user
         },
         end: (item, monitor) => {
-            // item -> what we are dragging
-            // dropResult -> where we dropped this item
             const dropResult = monitor.getDropResult();
-            if (dropResult && dropResult.name === )
-        }
+            console.log(allRoles);
+            allRoles.forEach(rName => {
+                console.log(rName);
+                console.log("dropRes"+dropResult.name);
+                if (dropResult && dropResult.name === rName){
+                    console.log("role name is "+rName);
+                    changeItemColumn(item, rName);
+                }
+            });
+        },
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
     });
     const opacity = isDragging ? 0.4 : 1;
+
     // drag(drop(ref));
     return(
         <div id="draggable" ref={drag} style={{ ...style, opacity }} > {/*data-handler-id={handlerId}>*/}
