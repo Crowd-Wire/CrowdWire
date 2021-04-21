@@ -6,8 +6,6 @@ import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
 import RoleUserList from 'components/RoleUserList/RoleUserList.js';
-// import { DragDropContext } from 'react-beautiful-dnd';
-import { useDrag, useDrop } from 'react-dnd';
 
 export default function RolePanel(props){
 	const { children, users, roles,value, index, setUsers , ...other } = props;
@@ -33,7 +31,7 @@ export default function RolePanel(props){
 				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
 					<Col xs={4} sm={4} md={4} style = {{borderRight:"1px solid black",height:"100%"}}>
 						<Row style={{ height:"10%"}}>
-							<TextField id="filled-search" label="Search field" type="search" variant="filled" style={{width:"100%"}}/>
+							<TextField id="filled-search" label="Search user" type="search" variant="filled" style={{width:"100%"}}/>
 						</Row>
 						<hr/>
 						<Row style={{overflowY:"auto", height:"65%"}}>

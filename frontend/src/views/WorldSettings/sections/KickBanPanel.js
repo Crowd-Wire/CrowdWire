@@ -2,10 +2,7 @@ import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import AddIcon from '@material-ui/icons/Add';
-import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
-import CheckIcon from '@material-ui/icons/Check';
 import Button from 'react-bootstrap/Button';
 
 
@@ -13,10 +10,16 @@ export default function KickBanPanel(props){
 	const { children, users, reports, value, index, ...other } = props;
 	let rows = [];
 	let reportBoxes = [];
+
+
 	for(let i=0; i<users.length; i++){
 		rows.push(
-			<Row style={{height:"50px"}}>
-				<Typography variant="h5" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
+			<Row 
+				style={{height:"40px", border:"solid #54B5B4 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%"}}
+			>
+				<Typography variant="h6" style={{marginLeft:"30px", marginTop:"auto", marginBottom:"auto"}}>
+					{users[i]}
+				</Typography>
 			</Row>
 		);
 	}
@@ -41,9 +44,9 @@ export default function KickBanPanel(props){
 		>
 			{value === index && (
 				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
-					<Col md={3} style={{height:"100%", borderRight:"1px solid black"}}>
+					<Col xs={4} sm={4} md={4} style={{height:"100%", borderRight:"1px solid black"}}>
 						<Row style={{ height:"10%"}}>
-							<Typography variant="h5" style={{marginTop:"10px", marginLeft:"10px"}}>Users:</Typography>
+						<TextField id="filled-search" label="Search user" type="search" variant="filled" style={{width:"100%"}}/>
 						</Row>
 						<hr/>
 						<Row style={{overflowY:"auto", height:"80%"}}>
@@ -52,7 +55,7 @@ export default function KickBanPanel(props){
 							</Col>
 						</Row>
 					</Col>
-					<Col style={{height:"100%"}}>
+					<Col xs={8} sm={8} md={8} style={{height:"100%"}}>
 						<Row style={{ height:"10%"}}>
 							<Typography variant="h5" style={{marginTop:"10px", marginLeft:"10px"}}>Requests:</Typography>
 						</Row>

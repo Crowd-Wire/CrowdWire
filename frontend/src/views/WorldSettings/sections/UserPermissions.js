@@ -27,112 +27,129 @@ export default function UserPermissions() {
     <FormGroup style={{height:"100%"}}>
       <Row style={{height:"100%"}}>
         <Col xs={6} sm={6} md={6}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-                />
-              }
-              label="Object Interaction"
-              labelPlacement="end"
-              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-                />
-              }
-              label="Walk"
-              labelPlacement="end"
-              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-                />
-              }
-              label="Talk"
-              labelPlacement="end"
-              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-                />
-              }
-              label="Invite Users"
-              labelPlacement="end"
-              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
-          />
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                  />
+                }
+                label="Object Interaction"
+                labelPlacement="end"
+                style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                  />
+                }
+                label="Walk"
+                labelPlacement="end"
+                style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+
+          </Row>
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                  />
+                }
+                label="Talk"
+                labelPlacement="end"
+                style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                  />
+                }
+                label="Invite Users"
+                labelPlacement="end"
+                style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
         </Col>
         <Col Col xs={6} sm={6} md={6}>
-          <FormControlLabel
-            control={
-              <Checkbox
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
                 checked={state.checkedB}
                 onChange={handleChange}
                 name="checkedB"
                 color="primary"
-              />
-            }
-            label="Talk Conference"
-            labelPlacement="end"
-            style={{color:"black", margin:"auto"}}
-          />
+                />
+              }
+              label="Talk Conference"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
           <FormControlLabel
             control={
               <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
+              checked={state.checkedB}
+              onChange={handleChange}
                 name="checkedB"
                 color="primary"
               />
-            }
-            label="Conference Manage"
-            labelPlacement="end"
-            style={{color:"black", margin:"auto"}}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-              />
-            }
-            label="Role Manage"
-            labelPlacement="end"
-            style={{color:"black", margin:"auto"}}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={state.checkedB}
-                onChange={handleChange}
-                name="checkedB"
-                color="primary"
-              />
-            }
-            label="Write in Chat"
-            labelPlacement="end"
-            style={{color:"black", margin:"auto"}}
-          />
+              }
+              label="Conference Manage"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                />
+              }
+              label="Role Manage"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={state.checkedB}
+                  onChange={handleChange}
+                  name="checkedB"
+                  color="primary"
+                />
+              }
+              label="Write in Chat"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
         </Col>
       </Row>
     </FormGroup>
