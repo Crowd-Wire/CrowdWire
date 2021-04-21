@@ -58,6 +58,7 @@ export default function MapFilters(props) {
     TagService.getAll()
 			.then((res) => {return res.json()})
 			.then((res) => {
+        console.log(res);
         let arr = [];
         res.forEach(tag => arr.push(tag.name)); 
         setTags(arr);

@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("/", response_model=List[schemas.TagInDB])
 def get_all(
         db: Session = Depends(deps.get_db),
-        #user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
 
     return crud.crud_tag.get_all(db=db)
