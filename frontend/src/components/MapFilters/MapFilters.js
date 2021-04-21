@@ -126,7 +126,7 @@ export default function MapFilters(props) {
 											style={{width:"70%", marginLeft:"auto",marginRight:"auto"}}
 											multiple
 											id="tags-standard"
-											options={allLabels}
+											options={tags}
 											getOptionLabel={(option) => option.name}
 											renderInput={(params) => (
 											<TextField
@@ -142,6 +142,9 @@ export default function MapFilters(props) {
 							<Col xs={10} sm={10} md={10}></Col>
 						}
 					</Row>
+          <Row>
+            <Button onClick={() => props.handler(search)}>Search</Button>
+          </Row>
         </>
     );
 }
