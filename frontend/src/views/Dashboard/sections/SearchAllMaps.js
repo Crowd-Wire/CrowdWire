@@ -13,69 +13,80 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import MapFilters from 'components/MapFilters/MapFilters.js'
+import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import WorldService from 'services/WorldService';
+import TagService from 'services/TagService';
 
 const useStyles = theme => ({
-    root: {
-        maxWidth: 345,
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginBottom: "30px",
-    },
-    media: {
-        height: 140,
-    },
-    margin: {
-        margin: theme.spacing(2),
-      },
-      filter: {
-          margin:"auto",
-      },
-      filterIcon: {
-          fontSize:"2rem",
-          borderRadius:"5px",
-          '&:hover':{
-              backgroundColor:"#45B0AE",
-          },
-      },
-      formControl: {
-        marginRight: theme.spacing(1.5),
-        minWidth: 90,
-      },
+	root: {
+		maxWidth: 345,
+		marginLeft: "auto",
+		marginRight: "auto",
+		marginBottom: "30px",
+	},
+	media: {
+		height: 140,
+	},
+	margin: {
+		margin: theme.spacing(2),
+	},
+	filter: {
+		margin: "auto",
+	},
+	filterIcon: {
+		fontSize: "2rem",
+		borderRadius: "5px",
+		'&:hover': {
+			backgroundColor: "#45B0AE",
+		},
+	},
+	formControl: {
+		marginRight: theme.spacing(1.5),
+		minWidth: 90,
+	},
 });
 
-class SearchAllMaps extends Component{
-	constructor(props){
-		super(props);
-		this.cards=[];
-	}
-	maps=[
-		{"Title":"City","description":"This map was created with the purpose of gathering people to explore a beautiful city and convey a near life-like experience to users."},
-		{"Title":"Junle","description":"This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users."},
-		{"Title":"Mountains","description":"It is really cold up here."}
-	]
-	componentDidMount(){
+class SearchAllMaps extends Component {
 
-		this.setState();
+	state = {
+		maps: [],
+		typeAccess: '',
+		typeFormat: '',
+		typeTopic: '',
 	}
 
 	focusMap = () => {
-		this.props.handler(true)
+		this.props.handler(false)
 	}
+
+	search_handler = (search, tags) => {
+
+		WorldService.search(search, tags)
+			.then((res) => { return res.json() })
+			.then((res) => { this.setState({ maps: res }) });
+
+	}
+
+	componentDidMount(){
+		WorldService.search("", [])
+			.then((res) => { return res.json() })
+			.then((res) => { this.setState({ maps: res }) });
+
+			
+	}
+
 	render() {
 		const { classes } = this.props;
-		for(let i = 0;i<this.maps.length;i++){
-			console.debug(this.maps[i]["Title"]);
-			this.cards.push(<MapCard title={this.maps[i]["Title"]} desc={this.maps[i]["description"]} focusMap={this.focusMap}/>);
-		}
-		return(
+		return (
 			<>
-				<Container style={{overflowX: "hidden"}}>
-					<MapFilters/>
-					<hr/>
+				<Container style={{ overflowX: "hidden" }}>
+					<MapFilters handler={this.search_handler} />
+					<hr />
 					<Row>
-						{this.cards}
+						{this.state.maps.map((m, i) => {
+							return (<MapCard focusMap={this.focusMap} key={i} map={m} />)
+						})}
 					</Row>
 				</Container>
 			</>
@@ -83,5 +94,4 @@ class SearchAllMaps extends Component{
 
 	}
 }
-
 export default withStyles(useStyles)(SearchAllMaps);

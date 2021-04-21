@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
@@ -8,7 +9,7 @@ from app.models import World
 from app.redis.redis_decorator import cache
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
-from app.crud.crud_tags import tag as crud_tag
+from app.crud.crud_tags import crud_tag
 from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user
@@ -98,6 +99,28 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         # _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
+
+    def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
+
+        # TODO: search world might need pagination
+        if not tags:
+            tags = []
+
+        query = db.query(World).filter(World.public).filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
+            or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
+        ).all()
+
+        # TODO: try to find a solution in sqlalchemy
+
+        if tags:
+            ret = []
+            for obj in query:
+                for obj_tag in obj.tags:
+                    if obj_tag.name in tags:
+                        ret.append(obj)
+                        break
+            return ret
+        return query
 
 
 crud_world = CRUDWorld(World)

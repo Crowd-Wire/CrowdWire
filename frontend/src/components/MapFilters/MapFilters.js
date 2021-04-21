@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React, { useState, Component, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import SearchIcon from '@material-ui/icons/Search';
@@ -13,85 +13,92 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import { Button } from "@material-ui/core";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
+import TagService from 'services/TagService';
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        maxWidth: 345,
-        marginLeft: "auto",
-        marginRight: "auto",
-        marginBottom: "30px",
+  root: {
+    maxWidth: 345,
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginBottom: "30px",
+  },
+  media: {
+    height: 140,
+  },
+  margin: {
+    margin: theme.spacing(2),
+  },
+  filter: {
+    margin: "auto",
+  },
+  filterIcon: {
+    fontSize: "2rem",
+    borderRadius: "5px",
+    '&:hover': {
+      backgroundColor: "#45B0AE",
     },
-    media: {
-        height: 140,
-    },
-    margin: {
-        margin: theme.spacing(2),
-      },
-      filter: {
-          margin:"auto",
-      },
-      filterIcon: {
-          fontSize:"2rem",
-          borderRadius:"5px",
-          '&:hover':{
-              backgroundColor:"#45B0AE",
-          },
-      },
-      formControl: {
-        marginRight: theme.spacing(1.5),
-        minWidth: 90,
-      },
+  },
+  formControl: {
+    marginRight: theme.spacing(1.5),
+    minWidth: 90,
+  },
 }));
 
-export default function MapFilters(){
-    
-    const classes = useStyles();
-	const allLabels=[
-		{name:"Classes"},
-		{name:"Meetings"},
-		{name:"Leisure"},
-		{name:"Conferences"},
-		{name:"Biology"},
-		{name:"Physics"},
-		{name:"Philosophy"},
-		{name:"Medicine"},
-		{name:"Maths"},
-		{name:"Sociology"},
-		{name:"Literature"},
-	]
-    const [typeAccess, setAccess] = React.useState('');
-    const [typeFormat, setFormat] = React.useState('');
-    const [typeTopic, setTopic] = React.useState('');
-    const [isOpened, setIsOpened] = useState(false);
+let search = "";
+let tag_array = [];
+export default function MapFilters(props) {
 
-    function toggleFilter() {
-        setIsOpened(wasOpened => !wasOpened);
-    }
-    
-    const handleChange = (prop) => (event) => {
-        setValues({ ...values, [prop]: event.target.value });
-      };
+  const classes = useStyles();
 
-    function deleteFilters() {
-        setFormat('');
-				setAccess('');
-				setTopic('');
 
-    }
-    const handleAccessibility = (event) => {
+  useEffect (() => {
+    TagService.getAll()
+			.then((res) => {return res.json()})
+			.then((res) => {
+        console.log(res);
+        let arr = [];
+        res.forEach(tag => arr.push(tag.name)); 
+        setTags(arr);
+      })
+  }, [])
+
+  const [tags, setTags] = React.useState([]);
+  const [typeAccess, setAccess] = React.useState('');
+  const [typeFormat, setFormat] = React.useState('');
+  const [typeTopic, setTopic] = React.useState('');
+  const [isOpened, setIsOpened] = useState(false);
+
+  function toggleFilter() {
+    setIsOpened(wasOpened => !wasOpened);
+  }
+
+  const handleChange = (prop) => (event) => {
+    setValues({ ...values, [prop]: event.target.value });
+    search = event.target.value;
+    console.log(search);
+  };
+
+  function deleteFilters() {
+    setFormat('');
+    setAccess('');
+    setTopic('');
+
+  }
+  const handleAccessibility = (event) => {
     setAccess(event.target.value);
-    };
+  };
 
-		const handleTopic = (event) => {
-			setTopic(event.target.value);
-		};
+  const handleTopic = (event) => {
+    setTopic(event.target.value);
+  };
 
-    const handleFormat = (event) => {
-        setFormat(event.target.value);
-    };
-    const [values, setValues] = React.useState({
+  const handleFormat = (event) => {
+    setFormat(event.target.value);
+  };
+  const [values, setValues] = React.useState({
     amount: '',
     });
     return(
@@ -127,9 +134,10 @@ export default function MapFilters(){
 											limitTags={5}
 											style={{width:"70%", marginLeft:"auto",marginRight:"auto"}}
 											multiple
+                      onChange={(event, value) => tag_array = value}
 											id="tags-standard"
-											options={allLabels}
-											getOptionLabel={(option) => option.name}
+											options={tags}
+											getOptionLabel={(option) => option}
 											renderInput={(params) => (
 											<TextField
 												{...params}
@@ -144,6 +152,9 @@ export default function MapFilters(){
 							<Col xs={10} sm={10} md={10}></Col>
 						}
 					</Row>
+          <Row>
+            <Button onClick={() => props.handler(search, tag_array)}>Search</Button>
+          </Row>
         </>
     );
 }
