@@ -16,7 +16,7 @@ import Button from '@material-ui/core/Button'
 import Autocomplete from '@material-ui/lab/Autocomplete';import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function WorldDetails(props){
-    const { changePage, ...other } = props;
+    const { changePage, createWorld, ...other } = props;
     const allLabels=[
         {name:"Classes"},
         {name:"Meetings"},
@@ -30,6 +30,10 @@ export default function WorldDetails(props){
         {name:"Sociology"},
         {name:"Literature"},
     ];
+
+    const creation = () => {
+        createWorld();
+    }
     return(
         <Row style={{height:"100%", width:"100%"}}>
             <Col xs={2} sm={1} md={1}></Col>
@@ -90,7 +94,7 @@ export default function WorldDetails(props){
                         />
                     </Row>
                     <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px", marginBottom:"30px"}}>
-                        <Button onClick={changePage} variant="contained" color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
+                        <Button onClick={creation} variant="contained" color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
                             Create Map
                         </Button>
                     </Row>

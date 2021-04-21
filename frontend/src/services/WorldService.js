@@ -23,13 +23,17 @@ class WorldService {
 
 
         return fetch(API_BASE + url, {
-                method: 'GET',
-                mode: 'cors',
-                headers: {
-                    "Authorization" : "Bearer "+ AuthenticationService.getToken()
-                }
-            })
-}
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
+    }
+
+    create(name, accessibility, nUsers, labels, description){
+        
+    }
 
 }
 
