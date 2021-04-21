@@ -24,7 +24,7 @@ class WSettingsContent extends Component {
 				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
 				{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
 				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
-			]
+			],
 		};
 	constructor(props){
 		super(props);

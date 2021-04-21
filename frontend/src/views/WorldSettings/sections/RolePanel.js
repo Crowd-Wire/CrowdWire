@@ -17,7 +17,7 @@ export default function RolePanel(props){
 	Object.keys(roles).forEach(function(key) {
 		rolekeys.push(
 			<div id="context">
-				<RoleUserList setUsers={setUsers} roleName={key} value={roles[key]}/>
+				<RoleUserList setUsers={setUsers} roleName={key} value={roles[key]} allRoles={Object.keys(roles)}/>
 			</div>
 		);
 	});

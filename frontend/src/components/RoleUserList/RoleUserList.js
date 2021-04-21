@@ -7,10 +7,17 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import UserRow from 'components/UserRow/UserRow.js';
 import update from 'immutability-helper';
+import { useDrop } from 'react-dnd';
 
 export default function RoleUserList(props){
 
-    const {roleName, value, setUsers, ...other} = props;
+    const {roleName, value, setUsers, allRoles, ...other} = props;
+
+    const [, drop] = useDrop({
+        accept: "ACCEPT",
+        drop: () => ({name: "some name"}),
+    });
+
     const moveCard = useCallback((dragArray, hoverArray) => {
         const dragCard = value.users[dragArray[1]]; // outra vez?ah
         console.log(dragCard, dragArray, hoverArray);
@@ -26,7 +33,7 @@ export default function RoleUserList(props){
                         <ExpandMoreIcon/>
                 </Col>
             </Row>
-            <div id="droppable">
+            <div id="droppable" ref={drop}>
                 {value.users.map((user, index) => {
                     return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} moveCard={moveCard}></UserRow>
                 })
