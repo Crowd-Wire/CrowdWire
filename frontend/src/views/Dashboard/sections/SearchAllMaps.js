@@ -87,13 +87,10 @@ class SearchAllMaps extends Component{
 			
 		
 		search_handler = (search) => {
-			// maybe n meter as cenas no state pq n deve ser preciso para nada
-			console.log(search);
 			
 			WorldService.search(search, [])
 			.then((res) => { return res.json() })
-			.then( (res) => { this.setState({maps: res}) })
-			;
+			.then( (res) => { this.setState({maps: res}) });
 
 		}
 

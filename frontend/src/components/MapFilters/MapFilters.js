@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React, { useState, Component, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import SearchIcon from '@material-ui/icons/Search';
@@ -50,6 +50,11 @@ export default function MapFilters(props) {
   const classes = useStyles();
 
 
+  useEffect (() => {
+    setTags([{"name":"string"}, {"name":"test"}, {"name":"lixo"}])
+  }, [])
+
+  const [tags, setTags] = React.useState([]);
   const [typeAccess, setAccess] = React.useState('');
   const [typeFormat, setFormat] = React.useState('');
   const [typeTopic, setTopic] = React.useState('');
@@ -122,46 +127,9 @@ export default function MapFilters(props) {
                   className={classes.selectEmpty}
                   inputProps={{ 'aria-label': 'Without label' }}
                 >
-                  <MenuItem value="">
-                    <em>Accessibility</em>
-                  </MenuItem>
-                  <MenuItem value={'public'}>Public</MenuItem>
-                  <MenuItem value={'private'}>Private</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl className={classes.formControl}>
-                <Select
-                  value={typeFormat}
-                  onChange={handleFormat}
-                  displayEmpty
-                  className={classes.selectEmpty}
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <MenuItem value="">
-                    <em>Typology</em>
-                  </MenuItem>
-                  <MenuItem value={'Leisure'}>Leisure</MenuItem>
-                  <MenuItem value={'Meetings'}>Meetings</MenuItem>
-                  <MenuItem value={'Classes'}>Classes</MenuItem>
-                  <MenuItem value={'Conferences'}>Conferences</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl className={classes.formControl}>
-                <Select
-                  value={typeTopic}
-                  onChange={handleTopic}
-                  displayEmpty
-                  className={classes.selectEmpty}
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <MenuItem value="">
-                    <em>Topic</em>
-                  </MenuItem>
-                  <MenuItem value={'General'}>General</MenuItem>
-                  <MenuItem value={'Technology'}>Technology</MenuItem>
-                  <MenuItem value={'Biology'}>Biology</MenuItem>
-                  <MenuItem value={'Philosophy'}>Philosophy</MenuItem>
-                  <MenuItem value={'Geology'}>Geology</MenuItem>
+                  {tags.map((t, i) => {
+                    return (<MenuItem value={t.name}>{t.name}</MenuItem>)
+                  })}
                 </Select>
               </FormControl>
               <HighlightOffIcon title="Delete Filters" className={classes.filterIcon} onClick={deleteFilters} />
@@ -174,7 +142,7 @@ export default function MapFilters(props) {
       <Row>
         <Col>
           
-          <Button onClick={() => {props.handler(search); console.log(search) } }>asdkasdas</Button>
+          <Button onClick={() => {props.handler(search);} }>asdkasdas</Button>
         </Col>
       </Row>
     </>
