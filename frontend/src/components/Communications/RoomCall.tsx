@@ -113,6 +113,16 @@ export default class RoomCall extends React.Component<{}, State> {
     useCheckMediaAccess().then( (data) => {
       this.accessVideo = data[0]
       this.accessMic = data[1]
+      const toast_props = {
+        position: toast.POSITION.BOTTOM_RIGHT,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnFocusLoss: false,
+        pauseOnHover: false,
+        progress: undefined,
+      }
 
       if (this.accessMic) {
         useMuteStore.getState().setAudioMute(false)
@@ -121,16 +131,7 @@ export default class RoomCall extends React.Component<{}, State> {
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
           Microphone Detected 🎙️
         </span>
-        ,{
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          draggable: true,
-          pauseOnFocusLoss: false,
-          pauseOnHover: false,
-          progress: undefined,
-        });
+        ,toast_props);
       }
       if (this.accessVideo) {
         useMuteStore.getState().setVideoMute(false)
@@ -139,16 +140,7 @@ export default class RoomCall extends React.Component<{}, State> {
             <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
             Camera Detected 📹 
           </span>
-          , {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          draggable: true,
-          pauseOnFocusLoss: false,
-          pauseOnHover: false,
-          progress: undefined,
-        });
+          , toast_props);
       }
       this.setNavigatorToStream();
     }).catch((err)=> {
@@ -224,7 +216,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
           { Object.keys(this.state.consumerMap).length > 0 
             && Object.keys(this.state.consumerMap).map((peerId) => {
-              const { consumerAudio, consumerVideo,
+              const { consumerAudio, consumerVideo, consumerMedia,
                 volume: userVolume, active,
                 videoToggle, audioToggle
               } = this.state.consumerMap[peerId];
@@ -236,6 +228,7 @@ export default class RoomCall extends React.Component<{}, State> {
                     id={peerId}
                     audioTrack={consumerAudio ? consumerAudio._track : null}
                     videoTrack={consumerVideo ? consumerVideo._track : null}
+                    mediaTrack={consumerMedia ? consumerMedia._track : null}
                     volume={(userVolume / 200)}
                     videoToggle={videoToggle}
                     audioToggle={audioToggle}

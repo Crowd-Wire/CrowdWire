@@ -5,11 +5,10 @@ import { useRoomStore } from "../stores/useRoomStore";
 
 export const sendVoice = async () => {
   const { micId } = storeDevice.getState().micId;
-  const { set, mic, micStream } = useVoiceStore.getState();
+  let { set, mic, micStream } = useVoiceStore.getState();
   const { sendTransport, roomId } = useRoomStore.getState();
   const { audioMuted } = useMuteStore.getState();
 
-  console.log(audioMuted)
   if (!roomId || audioMuted)
     return;
 
@@ -23,7 +22,8 @@ export const sendVoice = async () => {
         audio: micId ? { deviceId: micId } : true,
         video: false
       }).then((micStream) => {
-        set({micStream: micStream, mic: micStream.getVideoTracks()[0]})
+        mic = micStream.getAudioTracks()[0];
+        set({micStream: micStream, mic: mic});
       })
     } catch (err) {
       set({ mic: null, micStream: null });
@@ -36,7 +36,7 @@ export const sendVoice = async () => {
     console.log("creating producer...");
     sendTransport.produce({
       track: mic,
-      appData: { mediaTag: "cam-audio" },
+      appData: { mediaTag: "audio" },
     }).then((producer) => {set({micProducer: producer})})
   }
 };

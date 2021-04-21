@@ -15,6 +15,7 @@ interface VideoAudioBoxProps {
   volume: number;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
+  mediaTrack?: MediaStreamTrack;
   active: boolean;
   videoToggle: boolean;
   audioToggle: boolean;
@@ -22,10 +23,12 @@ interface VideoAudioBoxProps {
 
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   username="anonymous", muted=false, id, volume,
-  audioTrack=null, videoTrack=null, active, audioToggle, videoToggle
+  audioTrack=null, videoTrack=null, mediaTrack=null,
+  active, audioToggle, videoToggle
 }) => {
+  const videoRef = useRef<any>(null);
+  const mediaRef = useRef<any>(null);
 
-  const myRef = useRef<any>(null);
   const [videoState, setVideoState] = useState(videoToggle)
   const [audioState, setAudioState] = useState(audioToggle)
 
@@ -35,12 +38,12 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
   const toggleAudio = () => {
     setAudioState(!audioState)
-    myRef.current.muted = audioState;
+    videoRef.current.muted = audioState;
   }
 
   useEffect(() => {
-    if (myRef.current) {
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
+    if (videoRef.current) {
+      videoRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
     }
   }, [volume]);
 
@@ -57,6 +60,18 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   }, [videoToggle, audioToggle])
 
   useEffect(() => {
+    let mediaStream = null;
+    if (mediaTrack) {
+      mediaStream = new MediaStream();
+      mediaStream.addTrack(mediaTrack);
+    }
+    if (mediaRef.current) {
+      mediaRef.current.muted = true;
+      mediaRef.current.srcObject = mediaStream;
+    }
+  }, [mediaTrack])
+
+  useEffect(() => {
     setVideoState(videoTrack ? !videoToggle : false)
     setAudioState(audioTrack ? !audioToggle : false)
 
@@ -68,17 +83,17 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
     if (audioTrack) {
       volumeStore.subscribe(() => {
-        if (myRef.current) {
-          myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
+        if (videoRef.current) {
+          videoRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
         }
       })
       mediaStream.addTrack(audioTrack);
     }
 
-    if (myRef.current) {
-      myRef.current.srcObject = mediaStream;
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-      myRef.current.muted = muted
+    if (videoRef.current) {
+      videoRef.current.srcObject = mediaStream;
+      videoRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
+      videoRef.current.muted = muted
     }
   }, [videoTrack, audioTrack])
   return (
@@ -88,11 +103,14 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
           <h4>{username}</h4>
           <div id={id+"border_div"}>
               { videoTrack ? (
-                <video width="100%" autoPlay id={id+"_video"} ref={myRef}
+                <video width="100%" autoPlay id={id+"_video"} ref={videoRef}
                   style={{display: videoState ? 'block' : 'none'}}/>
                 ) : audioTrack ? (
-                  <audio autoPlay id={id+"_audio"} ref={myRef}/>
+                  <audio autoPlay id={id+"_audio"} ref={videoRef}/>
                   ) : ''}
+              { mediaTrack ? (
+                <video width="100%" autoPlay id={id+"_video"} ref={mediaRef}/>
+              ) : ''}
           </div>
           { videoTrack && !videoToggle ?
               videoState ? 

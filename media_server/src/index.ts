@@ -1,6 +1,6 @@
 import "dotenv/config";
 import debugModule from "debug";
-import { MediaKind, Producer, Router, Worker } from "mediasoup/lib/types";
+import { Producer, Router, Worker } from "mediasoup/lib/types";
 import * as Sentry from "@sentry/node";
 import { MyRooms } from "./MyRoomState";
 import { closePeer } from "./utils/closePeer";
@@ -111,7 +111,8 @@ async function main() {
       for (const theirPeerId of Object.keys(state)) {
         const peerState = state[theirPeerId];
         if (theirPeerId === myPeerId || !peerState ||
-          (!peerState.producer?.has('audio') && !peerState.producer?.has('video'))) {
+          (!peerState.producer?.has('audio') && !peerState.producer?.has('video')
+          && !peerState.producer?.has('media'))) {
           continue;
         }
         try {
@@ -136,7 +137,7 @@ async function main() {
       send({
         topic: "@get-recv-tracks-done",
         uid,
-        d: { consumerParametersArr, roomId, peerId: myPeerId },
+        d: { consumerParametersArr, roomId, peerId: myPeerId},
       });
     },
     ["@send-track"]: async (
@@ -169,15 +170,15 @@ async function main() {
         return;
       }
       try {
-        if (previousProducer && previousProducer.has(kind)) {
-          previousProducer.get(kind)!.close();
+        if (previousProducer && previousProducer.has(appData.mediaTag)) {
+          previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
-            if (c.kind == kind ) c.close()
+            if (c.appData.mediaTag == appData.mediaTag ) c.close()
               // @todo give some time for frontends to get update, but this can be removed
               send({
                 rid: roomId,
                 topic: "close_consumer",
-                d: { producerId: previousProducer.get(kind)!.id, roomId },
+                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
               });
           })
         }
@@ -189,12 +190,13 @@ async function main() {
           appData: { ...appData, peerId: myPeerId, transportId },
         });
         
-        if (!rooms[roomId].state[myPeerId].producer) {
-          rooms[roomId].state[myPeerId].producer = new Map<MediaKind, Producer>();
-          rooms[roomId].state[myPeerId].producer!.set(kind, producer);
+        if (!state[myPeerId].producer) {
+          state[myPeerId].producer = new Map<string, Producer>();
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
         } else {
-          rooms[roomId].state[myPeerId].producer!.set(kind, producer);
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
         }
+
         for (const theirPeerId of Object.keys(state)) {
           if (theirPeerId === myPeerId) {
             continue;
@@ -216,7 +218,7 @@ async function main() {
             send({
               uid: theirPeerId,
               topic: "new-peer-producer",
-              d: { ...d, roomId, peerId: myPeerId },
+              d: { ...d, roomId, kind: appData.mediaTag, peerId: myPeerId },
             });
           } catch (e) {
             errLog(e.message);

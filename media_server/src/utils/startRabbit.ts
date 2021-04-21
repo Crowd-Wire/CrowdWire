@@ -93,6 +93,7 @@ type OutgoingMessageDataMap = {
   "new-peer-producer": {
     roomId: string;
     peerId: string;
+    kind: string;
   } & Consumer;
   you_left_room: {
     roomId: string;
