@@ -13,6 +13,7 @@ import { Consumer } from "./createConsumer";
 const retryInterval = 5000;
 export interface HandlerDataMap {
   "remove-speaker": { roomId: string; peerId: string };
+  "toggle-producer": { roomId: string; peerId: string; kind: MediaKind, pause: boolean };
   "destroy-room": { roomId: string };
   "close-peer": { roomId: string; peerId: string; kicked?: boolean };
   "@get-recv-tracks": {
@@ -89,7 +90,7 @@ type OutgoingMessageDataMap = {
     producerId: string;
     roomId: string;
   };
-  "new-peer-speaker": {
+  "new-peer-producer": {
     roomId: string;
     peerId: string;
   } & Consumer;
@@ -107,6 +108,7 @@ type OutgoingMessageDataMap = {
     peerId: string;
     routerRtpCapabilities: RtpCapabilities;
     recvTransportOptions: TransportOptions;
+    sendTransportOptions: TransportOptions;
   };
 } & {
   [Key in SendTrackDoneOperationName]: {

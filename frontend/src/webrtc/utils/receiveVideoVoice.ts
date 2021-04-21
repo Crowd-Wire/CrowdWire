@@ -1,5 +1,5 @@
 import { getSocket } from "../../services/socket";
-import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 
 export const receiveVideoVoice = (roomId) => {
   var socket = getSocket(1).socket;
@@ -8,7 +8,7 @@ export const receiveVideoVoice = (roomId) => {
     topic: "@get-recv-tracks",
     d: {
       roomId: roomId,
-      rtpCapabilities: useVoiceStore.getState().device!.rtpCapabilities,
+      rtpCapabilities: useRoomStore.getState().device!.rtpCapabilities,
     },
   }));
 };

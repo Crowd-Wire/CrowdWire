@@ -1,64 +1,70 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
-import volumeStore from "../../redux/globalVolumeStore.js";
-import { UserVolumeSlider } from "./UserVolumeSlider";
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import { useVideoStore } from "../../webrtc/stores/useVideoStore";
+import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useRoomStore } from "../../webrtc/stores/useRoomStore";
+import { useMuteStore } from "../../webrtc/stores/useMuteStore";
+import { wsend } from "../../services/socket.js";
+import { sendVoice } from "../../webrtc/utils/sendVoice";
+import { sendVideo } from "../../webrtc/utils/sendVideo";
 
-interface VideoAudioBoxProps {
+interface MyVideoAudioBoxProps {
   username?: string;
   id: string;
-  muted?: boolean;
-  volume: number;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
-  active: boolean;
-  videoToggle: boolean;
-  audioToggle: boolean;
 }
 
-export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
-  username="anonymous", muted=false, id, volume,
-  audioTrack=null, videoTrack=null, active, audioToggle, videoToggle
+export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
+  username="anonymous", id,
+  audioTrack=null, videoTrack=null
 }) => {
-
   const myRef = useRef<any>(null);
-  const [videoState, setVideoState] = useState(videoToggle)
-  const [audioState, setAudioState] = useState(audioToggle)
+  const [videoState, setVideoState] = useState(true)
+  const [audioState, setAudioState] = useState(true)
 
   const toggleVideo = () => {
     setVideoState(!videoState)
-  }
+    useMuteStore.getState().setVideoMute(videoState);
+    let { camProducer } = useVideoStore.getState();
+    let { roomId } = useRoomStore.getState();
 
+    sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
+
+    if (camProducer) {
+      if (videoState)
+        camProducer.pause();
+      else
+        camProducer.resume();
+      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoState } })
+    }
+  }
   const toggleAudio = () => {
     setAudioState(!audioState)
-    myRef.current.muted = audioState;
+    useMuteStore.getState().setAudioMute(audioState)
+    let { micProducer } = useVoiceStore.getState();
+    let { roomId } = useRoomStore.getState();
+
+    sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
+    
+    if (micProducer) {
+      if (audioState)
+        micProducer.pause();
+      else {
+        micProducer.resume();
+      }
+      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioState } });
+    }
   }
 
   useEffect(() => {
-    if (myRef.current) {
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);;
-    }
-  }, [volume]);
-
-  useEffect(() => {
-    if (active && !muted)
-      document.getElementById(id+"border_div").style.border = "thick solid #0000FF";
-    else
-      document.getElementById(id+"border_div").style.border = "0px";
-  }, [active]);
-
-  useEffect(() => {
-    setVideoState(videoTrack ? !videoToggle : false)
-    setAudioState(audioTrack ? !audioToggle : false)
-  }, [videoToggle, audioToggle])
-
-  useEffect(() => {
-    setVideoState(videoTrack ? !videoToggle : false)
-    setAudioState(audioTrack ? !audioToggle : false)
+    setVideoState(videoTrack ? true : false)
+    setAudioState(audioTrack ? true : false)
 
     const mediaStream = new MediaStream();
 
@@ -67,18 +73,12 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
     }
 
     if (audioTrack) {
-      volumeStore.subscribe(() => {
-        if (myRef.current) {
-          myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-        }
-      })
       mediaStream.addTrack(audioTrack);
     }
 
     if (myRef.current) {
       myRef.current.srcObject = mediaStream;
-      myRef.current.volume = volume * (volumeStore.getState().globalVolume / 100);
-      myRef.current.muted = muted
+      myRef.current.muted = true
     }
   }, [videoTrack, audioTrack])
   return (
@@ -94,21 +94,18 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                   <audio autoPlay id={id+"_audio"} ref={myRef}/>
                   ) : ''}
           </div>
-          { videoTrack && !videoToggle ?
+          { videoTrack ?
               videoState ? 
                 (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
               : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
             : (<VideocamOffIcon color={'action'}/>)
           }
-          { audioTrack && !audioToggle ?
+          { audioTrack ?
               audioState ? 
                 (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
               : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
             : (<MicOffIcon color={'action'}/>)
           }
-
-          <UserVolumeSlider userId={id} />
-
         </CardBody>
       </Card>
     </div>

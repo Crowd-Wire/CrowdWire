@@ -7,6 +7,7 @@ import { consumeAudio } from "../webrtc/utils/consumeAudio";
 import { consumeVideo } from "../webrtc/utils/consumeVideo";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
+import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
@@ -122,6 +123,9 @@ export const getSocket = (worldId) => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
+              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                sendVideo();
+              });
           })
           break;
         case "you-joined-as-speaker":
@@ -139,8 +143,10 @@ export const getSocket = (worldId) => {
         case "@get-recv-tracks-done":
           consumeAll(data.d.consumerParametersArr);
           break;
-        case "new-peer-speaker":
-          const { roomId, recvTransport } = useVoiceStore.getState();
+        case "new-peer-producer":
+          const { recvTransport } = useVoiceStore.getState();
+          const { roomId } = useRoomStore.getState();
+          
           console.log(data)
 
           if (recvTransport && roomId === data.d.roomId) {
@@ -158,6 +164,13 @@ export const getSocket = (worldId) => {
             useConsumerStore.getState().addActiveSpeaker(data.peerId)
           else
             useConsumerStore.getState().removeActiveSpeaker(data.peerId)
+          break;
+        case "toggle_peer_producer":
+          console.log(data)
+          if (data.kind == 'audio')
+            useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
+          else
+            useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
           break;
         default:
           const { handlerMap } = useWsHandlerStore.getState();
@@ -187,7 +200,7 @@ export const getSocket = (worldId) => {
 }
 
 export const wsend = (d) => {
-  if (socket || socket.readyState !== socket.CLOSED) {
+  if (socket && socket.readyState === socket.OPEN) {
     socket.send(JSON.stringify(d));
   }
 };
