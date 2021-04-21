@@ -21,7 +21,7 @@ import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
-
+import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -47,7 +47,12 @@ const routes = (isAuth) => [
 			{ path: "/comms", element: <Communications /> },
 			{ path: "/template-components", element: <ComponentsPage /> },
 			{ path: "/register", element: <RegisterPage /> },
-
+		],
+	},
+	{
+		path:"/",
+		children: [
+			{ path: "/create-world", element: <CreateWorld /> },
 		],
 	},
     { path: "/dashboard", element: <Dashboard /> },

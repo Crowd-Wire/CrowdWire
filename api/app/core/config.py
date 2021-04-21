@@ -10,7 +10,8 @@ class Settings(BaseSettings):
 
     # TODO: Change this
     # testing
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 2
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+    ACCESS_GUEST_TOKEN_EXPIRE_HOURS: int = 12  # 12 hours For Guests
 
     SCHEMA_NAME: str = "fastapi"
     POSTGRES_SERVER: str = ""

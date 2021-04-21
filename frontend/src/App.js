@@ -10,6 +10,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 export default () => {
   const isAuth = true;
   const routing = useRoutes(routes(isAuth));
-
+  
   return routing;
 }

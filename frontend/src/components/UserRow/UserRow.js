@@ -48,12 +48,12 @@ export default function UserRow(props){
             <Row 
                 style={{height:"35px", border:"solid #58B7B8 1px", borderRadius:"10px", marginTop:"3px"}}
             >
-                <Col sm={10} md={10} style={{marginTop:"auto", marginBottom:"auto"}}>
+                <Col xs={10} sm={10} md={10} style={{marginTop:"auto", marginBottom:"auto"}}>
                     <Typography style={{marginLeft:"30px"}}>
                         {user}
                     </Typography>
                 </Col>
-                <Col sm={2} md={2} style={{marginTop:"auto", marginBottom:"auto"}}>
+                <Col xs={2} sm={2} md={2} style={{marginTop:"auto", marginBottom:"auto"}}>
                     <MenuIcon/>
                 </Col>
             </Row>
