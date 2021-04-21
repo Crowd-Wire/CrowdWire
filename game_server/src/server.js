@@ -46,7 +46,7 @@ module.exports = (io, socket) => {
     });
 
 
-    socket.on(protocol.JOIN_USER, (packet) => {
+    socket.on(protocol.JOIN_USER, (playerId) => {
         user.m_player = new Player(
             MyMath.RandomInt(100, 400),
             MyMath.RandomInt(100, 400),
@@ -57,12 +57,12 @@ module.exports = (io, socket) => {
             const users = room.FindAnotherUsers(user.m_socket.id);
             const players = [];
             for (const id in users) {
-            players.push(users[id].m_player);
+                players.push(users[id].m_player);
             }
 
             return {
-            myid: user.m_player.id,
-            players: players
+                myid: user.m_player.id,
+                players: players
             };
         })();
 

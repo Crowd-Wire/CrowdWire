@@ -24,8 +24,8 @@ class ClientManager {
         this.s2cDelta = Date.now() - serverTime;
     };
 
-    joinUser = () => {
-        this.socket.emit(protocol.JOIN_USER);
+    joinUser = (playerId) => {
+        this.socket.emit(protocol.JOIN_USER, playerId);
     }
 }
 
