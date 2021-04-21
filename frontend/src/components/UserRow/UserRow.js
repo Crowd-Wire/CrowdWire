@@ -18,6 +18,12 @@ export default function UserRow(props){
         item: {
             name: "name"
         },
+        end: (item, monitor) => {
+            // item -> what we are dragging
+            // dropResult -> where we dropped this item
+            const dropResult = monitor.getDropResult();
+            if (dropResult && dropResult.name === )
+        }
         collect: (monitor) => ({
             isDragging: monitor.isDragging(),
         }),
