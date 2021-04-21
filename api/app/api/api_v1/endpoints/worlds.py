@@ -1,5 +1,5 @@
-from fastapi import HTTPException
-from typing import Optional, Any, Union
+from fastapi import HTTPException, Query
+from typing import Optional, Any, List, Union
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
@@ -125,3 +125,16 @@ def create_world(
         )
 
     return obj
+
+
+# TODO: add response model
+@router.get("/", response_model=List[schemas.WorldInDB])
+def search_world(
+        search: Optional[str] = "",
+        tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
+        db: Session = Depends(deps.get_db),
+        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+) -> Any:
+
+    # TODO: change this to work for guests
+    return crud.crud_world.filter(db=db, search=search, tags=tags)
