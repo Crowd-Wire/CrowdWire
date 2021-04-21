@@ -17,6 +17,8 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: "auto",
         marginRight: "auto",
         marginBottom: "30px",
+        height: "300px"
+        
     },
     media: {
         height: 140,
@@ -28,11 +30,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function MapCard(props){
+    const {title, desc, focusMap, ...other } = props;
     const history = useNavigate();
-    
+    console.log(title);
     const routeChange = () =>{ 
-      let path = `App`; 
-      history.push(path);
+      let wId=1
+      let path = `../world/`+wId; 
+      history(path);
     }
     const classes = useStyles();
     return(

@@ -36,7 +36,7 @@ class DashboardContent extends Component{
 							</div>
 						</Col>
 						<Col xs={1} sm={1} md={1}></Col>
-						<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.props.handler(true)} style={{fontSize:"2rem"}}/></Col>
+						<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.props.handler(false)} style={{fontSize:"2rem"}}/></Col>
 					</Row>
 
 					<Row style={{minHeight:"39%", marginTop:"1%", width:"100%"}}>

@@ -1,19 +1,16 @@
 import React from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import Input from '@material-ui/core/Input';
 import VolumeUp from '@material-ui/icons/VolumeUp';
 
 interface VolumeSliderProps {
-  label?: boolean;
   max?: number;
   volume: number;
   onVolume: (n: number) => void;
 }
 
 export const VolumeSlider: React.FC<VolumeSliderProps> = ({
-  label,
   max = 100,
   volume,
   onVolume,
@@ -37,9 +34,6 @@ export const VolumeSlider: React.FC<VolumeSliderProps> = ({
   return (
 
     <div className={classes.root}>
-      <Typography id="input-slider" gutterBottom>
-        Volume
-      </Typography>
       <Grid container spacing={2} alignItems="center">
         <Grid item>
           <VolumeUp />

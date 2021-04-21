@@ -68,6 +68,21 @@ async def world_movement(websocket: WebSocket, world_id: int) -> Any:
                     or topic == "@send-track":
                 payload['d']['peerId'] = user_id
                 await rabbit_handler.publish(json.dumps(payload))
+            elif topic == "toggle-producer":
+                room_id = payload['d']['roomId']
+                kind = payload['d']['kind']
+                pause = payload['d']['pause']
+                payload['d']['peerId'] = user_id
+                # pause in media server producer
+                await rabbit_handler.publish(json.dumps(payload))
+                # broadcast for peers to update UI toggle buttons
+                if user_id in manager.connections[world_id][room_id]:
+                    await manager.broadcast(world_id, room_id,
+                                            {'topic': 'toggle_peer_producer',
+                                             'peerId': user_id,
+                                             'kind': kind,
+                                             'pause': pause},
+                                            user_id)
             elif topic == "speaking_change":
                 room_id = payload['d']['roomId']
                 value = payload['d']['value']

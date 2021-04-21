@@ -7,7 +7,13 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { consumerAudio: Consumer; volume: number; consumerVideo: Consumer, active: boolean }
+        { consumerAudio: Consumer;
+          volume: number;
+          consumerVideo: Consumer;
+          active: boolean;
+          videoToggle: boolean;
+          audioToggle: boolean;
+        }
       >,
     },
     (set) => ({
@@ -30,9 +36,13 @@ export const useConsumerStore = create(
         set((s) => {
           let volume = 100;
           let otherConsumer = null;
+          let videoToggle = false;
+          let audioToggle = false;
           if (userId in s.consumerMap) {
             const x = s.consumerMap[userId];
             volume = x.volume;
+            videoToggle = x.videoToggle;
+            audioToggle = x.audioToggle;
             if (kind == "audio") {
               otherConsumer = x.consumerVideo;
               if (x.consumerAudio) x.consumerAudio.close();
@@ -45,14 +55,54 @@ export const useConsumerStore = create(
             return {
               consumerMap: {
                 ...s.consumerMap,
-                [userId]: { consumerAudio: c, volume, consumerVideo: otherConsumer, active: false },
+                [userId]: {
+                  consumerAudio: c,
+                  volume,
+                  consumerVideo: otherConsumer,
+                  active: false,
+                  videoToggle,
+                  audioToggle
+                },
               }
             };
           } else if (kind == "video") {
             return {
               consumerMap: {
                 ...s.consumerMap,
-                [userId]: { consumerVideo: c, volume, consumerAudio: otherConsumer, active: false },
+                [userId]: {
+                  consumerVideo: c,
+                  volume,
+                  consumerAudio: otherConsumer,
+                  active: false,
+                  videoToggle,
+                  audioToggle
+                },
+              }
+            };
+          }
+        }),
+      addAudioToggle: (userId: string, audioToggle: boolean) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            let user = {...s.consumerMap[userId]}
+            user.audioToggle = audioToggle
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      addVideoToggle: (userId: string, videoToggle: boolean) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            let user = {...s.consumerMap[userId]}
+            user.videoToggle = videoToggle
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
               }
             };
           }

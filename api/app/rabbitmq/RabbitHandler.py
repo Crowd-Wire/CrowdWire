@@ -26,7 +26,7 @@ async def on_message(message: IncomingMessage) -> None:
             if user_id in manager.users_ws:
                 user_ws = manager.users_ws[user_id]
                 await manager.send_personal_message(msg, user_ws)
-        elif topic == "new-peer-speaker":
+        elif topic == "new-peer-producer":
             # uid identifies to whom the message is suppost to be sent to
             # peerId identifies the new peerId that joined
             user_id = msg['uid']
@@ -34,6 +34,8 @@ async def on_message(message: IncomingMessage) -> None:
             if user_id in manager.users_ws:
                 user_ws = manager.users_ws[user_id]
                 await manager.send_personal_message(msg, user_ws)
+        elif topic == "close_consumer":
+            logger.info(msg)
         else:
             logger.error(f"Unknown topic \"{topic}\"")
 
