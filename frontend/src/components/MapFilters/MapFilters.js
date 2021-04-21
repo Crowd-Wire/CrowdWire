@@ -47,13 +47,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 let search = "";
+let tag_array = [];
 export default function MapFilters(props) {
 
   const classes = useStyles();
 
 
   useEffect (() => {
-    setTags([{"name":"string"}, {"name":"test"}, {"name":"lixo"}])
+    setTags(["string", "test", "lixo"])
   }, [])
 
   const [tags, setTags] = React.useState([]);
@@ -125,9 +126,10 @@ export default function MapFilters(props) {
 											limitTags={5}
 											style={{width:"70%", marginLeft:"auto",marginRight:"auto"}}
 											multiple
+                      onChange={(event, value) => tag_array = value}
 											id="tags-standard"
 											options={tags}
-											getOptionLabel={(option) => option.name}
+											getOptionLabel={(option) => option}
 											renderInput={(params) => (
 											<TextField
 												{...params}
@@ -143,7 +145,7 @@ export default function MapFilters(props) {
 						}
 					</Row>
           <Row>
-            <Button onClick={() => props.handler(search)}>Search</Button>
+            <Button onClick={() => props.handler(search, tag_array)}>Search</Button>
           </Row>
         </>
     );
