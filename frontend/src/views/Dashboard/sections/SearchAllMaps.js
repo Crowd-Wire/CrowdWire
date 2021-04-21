@@ -13,8 +13,9 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
-import MapFilters from 'components/MapFilters/MapFilters.js'
+import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import WorldService from 'services/WorldService';
 
 const useStyles = theme => ({
     root: {
@@ -46,12 +47,15 @@ const useStyles = theme => ({
 });
 
 class SearchAllMaps extends Component{
-	// state ={
-		// 	typeAccess: '',
-		// 	typeFormat: '',
-		// 	typeTopic: '',
-		// }
+
+	state ={
+		maps: [],
+		typeAccess: '',
+		typeFormat: '',
+		typeTopic: '',
+	}
 		
+	
     
     // handleChange = (prop) => (event) => {
 			//     setValues({ ...values, [prop]: event.target.value });
@@ -78,12 +82,28 @@ class SearchAllMaps extends Component{
 		focusMap = () => {
 			this.props.handler(false)
 		}
+
+
+			
+		
+		search_handler = (search) => {
+			// maybe n meter as cenas no state pq n deve ser preciso para nada
+			console.log(search);
+			
+			WorldService.search(search, [])
+			.then((res) => { return res.json() })
+			.then( (res) => { this.setState({maps: res}) })
+			;
+
+		}
+
+
 		render() {
 			const { classes } = this.props;
 			return(
 					<>
 						<Container style={{overflowX: "hidden"}}>
-							<MapFilters/>
+							<MapFilters handler={ this.search_handler }/>
 							{/* <Row style={{alignContent:"center", marginBottom:"30px"}}>
 								<Col xs={12} sm={12} md={6}>
 										<FormControl fullWidth className={classes.margin} variant="outlined" >
@@ -170,10 +190,9 @@ class SearchAllMaps extends Component{
 							</Row> */}
 							<hr/>
 							<Row>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
-									<MapCard focusMap={this.focusMap}/>
+								{this.state.maps.map((m, i) => {
+									return(<MapCard focusMap={this.focusMap} key={i} map={m}/>)
+								} )}
 							</Row>
 						</Container>
 					</>

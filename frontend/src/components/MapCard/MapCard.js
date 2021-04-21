@@ -43,14 +43,14 @@ export default function MapCard(props){
                 <CardMedia
                     className={classes.media}
                     image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
-                    title="Jungle"
+                    title={props.map.name}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                    Jungle
+                    {props.map.name}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                    This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users.
+                        {props.map.description}
                     </Typography>
                 </CardContent>
                 </CardActionArea>

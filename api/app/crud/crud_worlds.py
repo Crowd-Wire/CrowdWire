@@ -106,7 +106,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if not tags:
             tags = []
 
-        query = db.query(World).filter(World.public).filter(
+        query = db.query(World).filter(World.public).filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
             or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
         ).all()
 
