@@ -135,23 +135,23 @@ const flexstyle = makeStyles({
 const gameWindows = {
   0: {
     tabName: 'Red',
-    tabContent: <div style={{ width: '200px', height: '200px', backgroundColor: 'red', fontSize: '2rem' }}>0</div>
+    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'red', fontSize: '2rem' }}>0</div>
   },
   1: {
     tabName: 'Blue',
-    tabContent: <div style={{ width: '200px', height: '200px', backgroundColor: 'blue', fontSize: '2rem' }}>1</div>,
+    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'blue', fontSize: '2rem' }}>1</div>,
   },
   2: {
     tabName: 'Green',
-    tabContent: <div style={{ width: '200px', height: '200px', backgroundColor: 'green', fontSize: '2rem' }}>2</div>,
+    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'green', fontSize: '2rem' }}>2</div>,
   },
   3: {
     tabName: 'Yellow',
-    tabContent: <div style={{ width: '200px', height: '200px', backgroundColor: 'yellow', fontSize: '2rem' }}>3</div>,
+    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'yellow', fontSize: '2rem' }}>3</div>,
   },
   4: {
     tabName: 'Orange',
-    tabContent: <div style={{ width: '200px', height: '200px', backgroundColor: 'orange', fontSize: '2rem' }}>4</div>,
+    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'orange', fontSize: '2rem' }}>4</div>,
   },
   5: {
     tabName: 'Game',
@@ -196,15 +196,7 @@ const GameUITest = () => {
           Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore natus quisquam, dignissimos assumenda ratione magnam impedit quod delectus, voluptatum odio neque cupiditate rem porro blanditiis maxime doloribus quibusdam. Quam, officiis?
         </div>
         <div className={classes.content, classes.scrollableContent}>
-          Bacon ipsum dolor amet brisket ribeye pork shoulder doner beef cow bresaola ham hock capicola kevin pig. Pork loin rump capicola, fatback spare ribs prosciutto leberkas. Biltong drumstick sausage swine pig. Drumstick spare ribs meatball shoulder venison frankfurter, landjaeger kevin swine pork chicken. Ribeye cupim tongue, doner drumstick jowl meatloaf pork.
-
-          Shoulder beef t-bone landjaeger ground round biltong. Pork belly spare ribs fatback venison. Pork loin jerky rump tail corned beef shankle tri-tip fatback picanha flank bacon sausage porchetta sirloin. Kevin turkey pastrami beef ribs, ribeye burgdoggen boudin capicola jerky salami shank. Corned beef turkey turducken strip steak. Fatback drumstick ham, doner jerky landjaeger flank shank turducken strip steak sausage filet mignon ball tip ham hock.
-
-          Biltong frankfurter corned beef, jowl picanha chicken shank pork loin jerky. Turkey spare ribs biltong doner, short loin brisket boudin alcatra tri-tip pork ball tip. Salami pork chop cow ribeye, corned beef meatloaf spare ribs t-bone shoulder. Swine ham hock strip steak, drumstick rump shoulder pork chicken pork chop salami short loin beef ribs alcatra hamburger. Jowl doner tri-tip cow ham meatloaf prosciutto landjaeger ground round pork belly turkey venison. Tri-tip brisket filet mignon tongue.
-
-          Sausage flank sirloin drumstick. Porchetta picanha frankfurter chuck, short loin pork belly jerky pork loin beef ribs prosciutto ball tip rump tail pig. Ham hock bresaola shoulder leberkas. Drumstick pork belly shank burgdoggen.
-
-          Swine kielbasa beef ribs, brisket meatloaf shankle spare ribs. Alcatra shankle rump, ham hock tri-tip pancetta chuck andouille prosciutto pork loin short loin kevin. Jowl ham hock short ribs chicken. Tenderloin landjaeger strip steak, brisket doner pork belly ham hock. Sirloin rump pork loin pig, tail pork chop burgdoggen turkey ball tip short ribs prosciutto ham tri-tip pork porchetta. Jerky strip steak shoulder, fatback biltong pig bresaola tenderloin corned beef boudin ribeye beef.
+        <div style={{ width: '400px', height: '300px', backgroundColor: 'red', fontSize: '2rem' }}>0</div>
         </div>
       </div>
      
@@ -217,7 +209,7 @@ class GamePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      grid: [
+      grid2: [
         [
           [2],
           [[[0, 2, 4], [4]]]
@@ -232,31 +224,62 @@ class GamePage extends React.Component {
         ],
       ]
       // grid: [0, 1, 2, 3, 4, 5]
-    ,
-    grid2: [
-      [
-        {tabs: [2], size: 20},
-        [[[0, 2, 4], [4]]]
-      ],
-      [
-        [1],
-        [[[4], [0]]]
-      ],
-      [
-        [[[4, 2], [3]]],
-        [2]
-      ],
-    ]
-  }
+      ,
+      grid: [
+        {
+          size: 50,
+          grid: [
+            {size: 20, tabs: [1, 2, 3]},
+            {size: 20, tabs: [3]},
+            {size: 50, tabs: [1]},
+          ]
+        },
+        {id: 1, size: 50, tabs: [1]}
+      ]
+    }
   }
 
-  gridBuilder2 = (grid, depth = 0) => {
-    if (grid.every(n => Number.isInteger(n)))
+  gridRemoveTabs = (tabs, elemPath) => {
+    this.setState(state => {
+      let grid = state.grid;
+      let parent;
+      let elem = { grid };
+
+      // locate element
+      for (let p of elemPath) {
+        parent = elem;
+        elem = elem.grid[p];
+      }
+
+      if (elem.tabs === undefined) {
+        // assert
+        console.error("elemPath wrong")
+      }
+
+      // remove tabs from element
+      for (let tab of tabs) {
+        const index = elem.tabs.indexOf(tab);
+        if (index > -1)
+          elem.tabs.splice(index, 1);
+      }
+
+      // normalize
+      if (!elem.tabs.length) {
+        const index = parent.grid.indexOf(elem);
+        if (index > -1)
+          parent.grid.splice(index, 1);
+      }
+
+      return { grid };
+    })
+  }
+
+  gridBuild = (grid, depth = 0) => {
+    if (grid.hasOwnProperty('tabs'))
       return (
-        // <GameUITest/>
         <GameUITabs
           headerColor="gray"
-          tabs={grid.map(n => gameWindows[n])}
+          tabs={grid.tabs.map(t => gameWindows[t])}
         />
       );
     return (
@@ -283,6 +306,10 @@ class GamePage extends React.Component {
     let handlers = document.querySelectorAll('.handler');
     var dragginHandler;
 
+    document.addEventListener('keyup', (e) => {
+      if(e.key === 'r') this.gridRemoveTabs([], [])
+    });
+
     document.addEventListener('mousedown', function(e) {
       handlers.forEach((h) => {
         if (e.target === h)
@@ -293,6 +320,7 @@ class GamePage extends React.Component {
     document.addEventListener('mousemove', function(e) {
       if (dragginHandler == null)
         return;
+
 
       let boxA = dragginHandler.previousSibling; 
       let boxB = dragginHandler.nextSibling; 
@@ -441,15 +469,18 @@ class GamePage extends React.Component {
 
         {/* Game */}
         {/* <div style={{backgroundColor: "#ccc", height: '100vh', display: 'flex', flexFlow: 'row wrap', overflow: 'hidden' }}>
-          {gridBuilder(this.state.grid)}
+          {gridBuilder(this.state.grid2)}
         </div> */}
 
 
-        <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", height: '100vh', overflow: 'hidden'}}>
+        <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
           <div className={classes.wrapperRow} style={{ height: '33%' }}>
             
             <div className={classes.wrapperCol} style={{ width: '50%' }}>
-              <GameUITest/>
+              <GameUITabs
+                headerColor="gray"
+                tabs={[gameWindows[1]]}
+              />
             </div>
             <div className={classNames(classes.handlerCol, "handler")}></div>
             <div className={classes.wrapperCol} style={{ width: '50%' }}>
@@ -457,7 +488,7 @@ class GamePage extends React.Component {
             </div>
 
           </div>
-          <div className={classNames(classes.handlerRow, "handler")}></div>
+          <div data="indexlololo" className={classNames(classes.handlerRow, "handler")}></div>
           <div className={classes.wrapperRow} style={{ height: '33%' }}>
             <GameUITest/>
           </div>
@@ -465,16 +496,10 @@ class GamePage extends React.Component {
           <div className={classes.wrapperRow} style={{ height: '34%' }}>
             <GameUITest/>
           </div>
-        </div>
+        </div> 
 
 
-        {/* <div className={classNames(classes.wrapper, 'wrapper')}>
-          <div className={classNames(classes.box, "box box-A")}>A</div>
-          <div className={classNames(classes.handler, "handler handler-A")}></div>
-          <div className={classNames(classes.box, "box box-B")}>B</div>
-          <div className={classNames(classes.handler, "handler handler-B")}></div>
-          <div className={classNames(classes.box, "box box-C")}>C</div>
-        </div> */}
+    
 
       </>
     );

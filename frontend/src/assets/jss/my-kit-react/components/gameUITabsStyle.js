@@ -5,8 +5,13 @@ const gameUITabsStyle = {
   card: {
     backgroundColor: "rgba(200, 200, 200, .3)",
     margin: 0,
-    // height: "100%"
-    // overflow: 'hidden',
+    flexGrow: '1',
+      
+    display: 'flex',
+    flexDirection: 'column',
+    
+    /* for Firefox */
+    minHeight: '0',
   },
   cardHeader: {
     padding: "3px 0 0 0",
