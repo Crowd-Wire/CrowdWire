@@ -185,6 +185,7 @@ const gridBuilder = (grid, depth = 0) => {
 }
 
 
+
 const GameUITest = () => {
   const classes = flexstyle();
 
@@ -231,7 +232,46 @@ class GamePage extends React.Component {
         ],
       ]
       // grid: [0, 1, 2, 3, 4, 5]
-    }
+    ,
+    grid2: [
+      [
+        {tabs: [2], size: 20},
+        [[[0, 2, 4], [4]]]
+      ],
+      [
+        [1],
+        [[[4], [0]]]
+      ],
+      [
+        [[[4, 2], [3]]],
+        [2]
+      ],
+    ]
+  }
+  }
+
+  gridBuilder2 = (grid, depth = 0) => {
+    if (grid.every(n => Number.isInteger(n)))
+      return (
+        // <GameUITest/>
+        <GameUITabs
+          headerColor="gray"
+          tabs={grid.map(n => gameWindows[n])}
+        />
+      );
+    return (
+      grid.map((item, k) => (
+        <div className={depth % 2 == 0 ? this.props.classes.wrapperRow : this.props.classes.wrapperCol} key={k}>
+          {
+            item.map((grid, k) => (
+              <Grid container item xs key={k}> {/*style={{resize: 'both', overflow: 'auto'}}>*/}
+                {gridBuilder(grid, depth + 1)}
+              </Grid>
+            ))
+          }
+        </div>
+      ))
+    );
   }
 
   mouseDown = () => {
@@ -258,14 +298,15 @@ class GamePage extends React.Component {
       let boxB = dragginHandler.nextSibling; 
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
-        const combinedHeight = boxA.offsetHeight + boxB.offsetHeight;
+        // const totalHeightPerc = boxA.style.height
+        const totalHeight = boxA.offsetHeight + boxB.offsetHeight;
         const newHeight = e.clientY - boxA.offsetTop;
 
-        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + combinedHeight - e.clientY < 200)
+        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + totalHeight - e.clientY < 200)
           return;
 
         boxA.style.height = `${newHeight}px`;
-        boxB.style.height = `${combinedHeight-newHeight}px`;
+        boxB.style.height = `${totalHeight-newHeight}px`;
 
       } else {
         const combinedWidth = boxA.offsetWidth + boxB.offsetWidth;
@@ -407,21 +448,21 @@ class GamePage extends React.Component {
         <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", height: '100vh', overflow: 'hidden'}}>
           <div className={classes.wrapperRow} style={{ height: '33%' }}>
             
-            <div className={classes.wrapperCol}>
+            <div className={classes.wrapperCol} style={{ width: '50%' }}>
               <GameUITest/>
             </div>
             <div className={classNames(classes.handlerCol, "handler")}></div>
-            <div className={classes.wrapperCol}>
+            <div className={classes.wrapperCol} style={{ width: '50%' }}>
               <GameUITest/>
             </div>
 
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
-          <div className={classes.wrapperCol} style={{ height: '33%' }}>
+          <div className={classes.wrapperRow} style={{ height: '33%' }}>
             <GameUITest/>
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
-          <div className={classes.wrapperCol} style={{ height: '34%' }}>
+          <div className={classes.wrapperRow} style={{ height: '34%' }}>
             <GameUITest/>
           </div>
         </div>
