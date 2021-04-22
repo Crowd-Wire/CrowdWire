@@ -6,15 +6,13 @@ import CardBody from "../Card/CardBody.js";
 import { changeMicId, changeCamId } from "../../redux/commStore.js";
 import storeDevice from "../../redux/commStore.js";
 import storeVolume, { changeGlobalVolume } from "../../redux/globalVolumeStore.js";
-import { sendVoice } from "../../webrtc/utils/sendVoice";
-import { sendVideo } from "../../webrtc/utils/sendVideo";
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
-interface DeviceSettingsProps {}
+interface DeviceSettingsProps {
+  closeModal: any;
+}
 
-export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
-
+export const DeviceSettings: React.FC<DeviceSettingsProps> = (closeModal) => {
   const [micId, setMicId] = useState(storeDevice.getState().micId);
 	const [camId, setCamId] = useState(storeDevice.getState().camId);
 	const [globalVolume, setGlobalVolume] = useState(storeVolume.getState().globalVolume);
@@ -48,12 +46,10 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
   }, []);
 
   return (
-    <>
-			<Card>
+    <div className="modal-device">
+      <Card>
         <CardBody>
           <h4>Device's Settings</h4>
-          
-          <br/>
           <Row>
             <span style={{marginRight: '15px'}}>Camera Devices: </span>
               {optionsCamera.length === 0 ? <div>no cameras available</div> : null}
@@ -76,7 +72,6 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
                 </select>
               ) : null}
           </Row>
-          <br />
           <Row>
             <span style={{marginRight: '15px'}}>Microphone Devices: </span>
             {optionsMic.length === 0 ? <div>no mics available</div> : null}
@@ -99,19 +94,20 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
               </select>
             ) : null}
           </Row>
-          <br />
           <Row>
             <span style={{marginRight: '15px'}}>Global Speaker's Volume:</span>
+            
             <VolumeSlider volume={storeVolume.getState().globalVolume} onVolume={(n) => {
               setGlobalVolume(n)
               storeVolume.dispatch(changeGlobalVolume(n))
             }} />
           </Row>
-
-          <br />
+          <Button onClick={() => closeModal.closeModal()}>
+            Close
+          </Button>
 
         </CardBody>
       </Card>
-    </>
+    </div>
   );
 };

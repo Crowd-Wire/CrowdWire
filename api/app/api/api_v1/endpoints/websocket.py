@@ -68,6 +68,19 @@ async def world_movement(websocket: WebSocket, world_id: int) -> Any:
                     or topic == "@send-track":
                 payload['d']['peerId'] = user_id
                 await rabbit_handler.publish(json.dumps(payload))
+            elif topic == "close-media":
+                room_id = payload['d']['roomId']
+                payload['d']['peerId'] = user_id
+
+                # close in media server producer
+                await rabbit_handler.publish(json.dumps(payload))
+
+                # broadcast for peers to close this stream
+                if user_id in manager.connections[world_id][room_id]:
+                    await manager.broadcast(world_id, room_id,
+                                            {'topic': 'close_media',
+                                             'peerId': user_id},
+                                            user_id)
             elif topic == "toggle-producer":
                 room_id = payload['d']['roomId']
                 kind = payload['d']['kind']
