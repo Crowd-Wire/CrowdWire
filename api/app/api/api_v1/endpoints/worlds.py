@@ -83,7 +83,7 @@ async def update_world(
             detail=message,
         )
     # afterwards update data and clear cache
-    world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj,obj_in=world_in)
+    world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj, obj_in=world_in)
     if not world_obj_updated:
         raise HTTPException(
             status_code=400,
