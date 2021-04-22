@@ -50,8 +50,18 @@ const resizeStyle = {
     flex: '1 1 auto',
   },
 
+  wrapperCol: {
+    display: 'flex', 
+    flexDirection: 'column'
+  },
+
+  wrapperRow: {
+    display: 'flex', 
+    flexDirection: 'row'
+  },
+
   handlerCol: {
-    width: '2px',
+    width: '10px',
     padding: '0',
     cursor: 'ew-resize',
     flex: '0 0 auto',
@@ -66,7 +76,7 @@ const resizeStyle = {
   },
 
   handlerRow: {
-    height: '2px',
+    height: '10px',
     padding: '0',
     cursor: 'ns-resize',
     flex: '0 0 auto',
@@ -232,10 +242,8 @@ class GamePage extends React.Component {
   componentDidMount = () => {
     let handlers = document.querySelectorAll('.handler');
     var dragginHandler;
-    var start;
 
     document.addEventListener('mousedown', function(e) {
-      start = [e.clientX, e.clientY];
       handlers.forEach((h) => {
         if (e.target === h)
           dragginHandler = h;
@@ -248,17 +256,6 @@ class GamePage extends React.Component {
 
       let boxA = dragginHandler.previousSibling; 
       let boxB = dragginHandler.nextSibling; 
-
-
-       // Get offset
-       
-      //  var containerOffsetLeft = wrapper.offsetLeft;
-
-      //  // Get x-coordinate of pointer relative to container
-      //  var pointerRelativeXpos = e.clientX - containerOffsetLeft;
- 
-      //  var dragSize = e.clientX - startX;
- 
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
         const combinedHeight = boxA.offsetHeight + boxB.offsetHeight;
@@ -407,24 +404,24 @@ class GamePage extends React.Component {
         </div> */}
 
 
-        <div className="wrapper" style={{backgroundColor: "#ccc", height: '100vh',  display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-          <div className="wrapper" style={{display: 'flex', flexDirection: 'row', height: '33%' }}>
+        <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", height: '100vh', overflow: 'hidden'}}>
+          <div className={classes.wrapperRow} style={{ height: '33%' }}>
             
-            <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div className={classes.wrapperCol}>
               <GameUITest/>
             </div>
             <div className={classNames(classes.handlerCol, "handler")}></div>
-            <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div className={classes.wrapperCol}>
               <GameUITest/>
             </div>
 
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
-          <div className="wrapper" style={{display: 'flex', flexDirection: 'column', height: '33%', resize: 'vertical' }}>
+          <div className={classes.wrapperCol} style={{ height: '33%' }}>
             <GameUITest/>
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
-          <div className="wrapper" style={{display: 'flex', flexDirection: 'column', height: '34%', resize: 'vertical' }}>
+          <div className={classes.wrapperCol} style={{ height: '34%' }}>
             <GameUITest/>
           </div>
         </div>
