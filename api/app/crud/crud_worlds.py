@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
-from app.models import World, User
+from app.models import World, User, Tag
 from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
@@ -139,28 +139,33 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         obj = super().update(db, db_obj=db_obj, obj_in=update_data)
         return obj, strings.WORLD_UPDATE_SUCCESS
 
-    def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
+    def filter(self,
+               db: Session,
+               search: str,
+               tags: Optional[List[str]],
+               is_guest: bool = False,
+               ) -> List[World]:
 
-        # TODO: search world might need pagination
+        # TODO: search world might need pagination, (Vai ter de ter mesmo...)
         if not tags:
             tags = []
+        query = db.query(World).filter(World.public)
+        if is_guest:
+            query = query.filter(World.allow_guests.is_(True))
 
-        query = db.query(World).filter(World.public).filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
+        query = query.filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
             or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
-        ).all()
-
-        # TODO: try to find a solution in sqlalchemy
-
+        )
         if tags:
-            ret = []
-            for obj in query:
-                for obj_tag in obj.tags:
-                    if obj_tag.name in tags:
-                        ret.append(obj)
-                        break
-            return ret
-        return query
+            tags_lst = []
+            for tag_name in tags:
+                if tag_obj := crud_tag.get_by_name(db=db, name=tag_name, ):
+                    tags_lst.append(tag_obj)
 
+            query = query.join(World.tags).filter(Tag.name.in_(tags)).all()
+        logger.debug(query)
+
+        return query
 
 
 crud_world = CRUDWorld(World)
