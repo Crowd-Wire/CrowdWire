@@ -262,19 +262,13 @@ class GamePage extends React.Component {
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
         const combinedHeight = boxA.offsetHeight + boxB.offsetHeight;
-        console.log('combinedHeight', combinedHeight, '=', boxA.offsetHeight, '+', boxB.offsetHeight,  '-', boxA.offsetTop)
-        const totPercentage = parseInt(boxA.style.height.substr(0, boxA.style.height.length-1)) + parseInt(boxB.style.height.substr(0, boxB.style.height.length-1));
-        console.log('totPercentage', totPercentage)
-        const newHeight = ((e.clientY - boxA.offsetTop) / combinedHeight * totPercentage).toFixed(0);
-        console.log('(', e.clientY, '-', boxA.offsetTop, ')', '/', combinedHeight, '*', totPercentage)
-        console.log('newHeight', newHeight)
-        console.log('newHeight2', totPercentage-newHeight)
+        const newHeight = ((e.clientY - boxA.offsetTop)).toFixed(0);
 
-        if (e.clientY - boxA.offsetTop < 200)
+        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + combinedHeight - e.clientY < 200)
           return;
 
-        boxA.style.height = `${newHeight}%`;
-        boxB.style.height = `${totPercentage-newHeight}%`;
+        boxA.style.height = `${newHeight}px`;
+        boxB.style.height = `${combinedHeight-newHeight}px`;
 
       } else {
         let rand = Math.floor(Math.random() * 100);
@@ -414,11 +408,11 @@ class GamePage extends React.Component {
         <div className="wrapper" style={{backgroundColor: "#ccc", height: '100vh',  display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
           <div className="wrapper" style={{display: 'flex', flexDirection: 'row', height: '33%' }}>
             
-            <div style={{display: 'flex', flexDirection: 'column', width: '20%'}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
               <GameUITest/>
             </div>
             <div className={classNames(classes.handlerCol, "handler")}></div>
-            <div style={{display: 'flex', flexDirection: 'column', width: '80%'}}>
+            <div style={{display: 'flex', flexDirection: 'column'}}>
               <GameUITest/>
             </div>
 
