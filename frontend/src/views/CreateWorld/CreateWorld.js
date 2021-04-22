@@ -22,15 +22,6 @@ class CreateWorld extends Component {
   constructor(props){
     super(props);
   }
-  
-  
-  handleChange = (event) => {
-    const name = event.target.name;
-    // this.setState({
-      //   ...state,
-      //   [name]: event.target.value,
-      // });
-    };
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {

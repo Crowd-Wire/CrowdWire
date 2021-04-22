@@ -20,6 +20,7 @@ let desc = "";
 export default function WorldDetails(props){
     const { createWorld, ...other } = props;
     const [tags,setTags] = React.useState([]);
+    const [error, setError] = React.useState(-1);
     useEffect (() => {
         TagService.getAll()
                 .then((res) => {return res.json()})
@@ -36,15 +37,24 @@ export default function WorldDetails(props){
 
     const creation = () => {
         maxUsers = parseInt(maxUsers)
-        if(wName){
+        if(wName && wName.length<=30){
             if(maxUsers && Number.isInteger(maxUsers) && maxUsers>=0){
-                console.log(typeof wName);
-                createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
+                if(desc.length<=300){
+                    console.log(typeof wName);
+                    createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
+                    setError(-1);
+                    return;
+                }
+                console.log("Description is too long (300)");
+                setError(0);
                 return;
             }
-            console.log("users nao é numero "+ typeof maxUsers);
+            console.log("Invalid Quantity");
+            setError(1);
+            return;
         }
-        console.log(wName)
+        console.log("Invalid Name");
+        setError(2);
     }
 
     const onChangeValue = (event) => {
@@ -78,7 +88,8 @@ export default function WorldDetails(props){
                         <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                        <TextField id="outlined-basic" required onChange={onChangeTitle} label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
+                        <TextField error={error===2} id="outlined-basic" required onChange={onChangeTitle} label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
+                        
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"30px"}}>
                         <Col>
@@ -121,7 +132,8 @@ export default function WorldDetails(props){
                         </Col>
                         <Col xs={12} sm={12} md={5}>
                             <TextField
-                            onChange={onChangeMaxUsers}
+                                onChange={onChangeMaxUsers}
+                                error={error===1}
                                 style={{marginRight:"30px"}}
                                 id="standard-number"
                                 label="Max Online Users"
@@ -135,6 +147,7 @@ export default function WorldDetails(props){
                     <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
                         <TextField
                         onChange={onChangeDesc}
+                        error={error===0}
                         style={{width:"100%"}}
                         id="outlined-multiline-static"
                         multiline
