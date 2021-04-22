@@ -160,8 +160,11 @@ def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         db: Session = Depends(deps.get_db),
-        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
-
-    # TODO: change this to work for guests
-    return crud.crud_world.filter(db=db, search=search, tags=tags)
+    if not is_guest_user(user):
+        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags)
+    else:
+        logger.debug("guest")
+        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True)
+    return list_world_objs
