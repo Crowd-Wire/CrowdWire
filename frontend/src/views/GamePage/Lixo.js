@@ -262,7 +262,7 @@ class GamePage extends React.Component {
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
         const combinedHeight = boxA.offsetHeight + boxB.offsetHeight;
-        const newHeight = ((e.clientY - boxA.offsetTop)).toFixed(0);
+        const newHeight = e.clientY - boxA.offsetTop;
 
         if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + combinedHeight - e.clientY < 200)
           return;
@@ -271,12 +271,14 @@ class GamePage extends React.Component {
         boxB.style.height = `${combinedHeight-newHeight}px`;
 
       } else {
-        let rand = Math.floor(Math.random() * 100);
-        boxA.style.width = `${rand}%`;
-        boxB.style.width = `${100-rand}%`;
+        const combinedWidth = boxA.offsetWidth + boxB.offsetWidth;
+        const newWidth = e.clientX - boxA.offsetLeft;
 
-        console.log(boxB.offsetLeft)
-        console.log(e.clientX)
+        if (e.clientX - boxA.offsetLeft < 200 || boxA.offsetLeft + combinedWidth - e.clientX < 200)
+          return;
+
+        boxA.style.width = `${newWidth}px`;
+        boxB.style.width = `${combinedWidth-newWidth}px`;
       }
     });
 
