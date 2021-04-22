@@ -272,8 +272,7 @@ export default class RoomCall extends React.Component<{}, State> {
           </Carousel>
         </div>
 
-        <DeviceSettings />
-        
+       
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 

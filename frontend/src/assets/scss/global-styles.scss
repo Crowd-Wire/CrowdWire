@@ -1,4 +1,13 @@
 video {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.modal-device {
+  left: 0;
+  z-index: 1; /* Sit on top */
+  max-width:400px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }

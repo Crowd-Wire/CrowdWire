@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card } from '@material-ui/core';
-import CardBody from "../Card/CardBody.js";
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
+import SettingsIcon from '@material-ui/icons/Settings';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
@@ -16,6 +16,7 @@ import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
+import { DeviceSettings } from "./DeviceSettings";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
@@ -34,6 +35,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [videoPauseState, setVideoPauseState] = useState(true)
   const [audioPauseState, setAudioPauseState] = useState(true)
   const [mediaOffState, setMediaOffState] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+
+  function toggleModal() {
+    setShowModal(!showModal)
+  }
+  
 
   const toggleVideo = () => {
     setVideoPauseState(!videoPauseState)
@@ -119,14 +126,16 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       borderTop: '1px solid rgba(255,255,255,0.5)',
       borderLeft: '1px solid rgba(255,255,255,0.5)',
       backdropFilter: 'blur(3px)'
-      }}>
+    }}>
           <div style={{padding: 2, textAlign: 'center', fontSize: '1.3em', color: '#fff', fontWeight: 500}}>
             <span>{username}</span>
+            <SettingsIcon style={{'cursor': 'pointer', float: 'right'}}
+              onClick={() => toggleModal()}/>
           </div>
           <div id={id+"border_div"}>
               { videoTrack ? (
                 <video autoPlay id={id+"_video"} ref={myRef}
-                  style={{display: videoPauseState ? 'block' : 'none'}}/>
+                style={{display: videoPauseState ? 'block' : 'none'}}/>
                 ) : audioTrack ? (
                   <audio autoPlay id={id+"_audio"} ref={myRef}/>
                   ) : ''}
@@ -136,16 +145,16 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
             <Col sm={6}>
               { videoTrack ?
                   videoPauseState ? 
-                    (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
+                  (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
                   : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-                : (<VideocamOffIcon color={'action'}/>)
-              }
+                  : (<VideocamOffIcon color={'action'}/>)
+                }
               { audioTrack ?
                   audioPauseState ? 
-                    (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+                  (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
                   : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-                : (<MicOffIcon color={'action'}/>)
-              }
+                  : (<MicOffIcon color={'action'}/>)
+                }
             </Col>
 
             <Col style={{textAlign: 'right'}} sm={6}>
@@ -156,8 +165,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
               }
             </Col>
           </Row>
-
       </Card>
+      { showModal ? 
+        <DeviceSettings closeModal={toggleModal}/>
+      : ''}
     </div>
   );
 };
