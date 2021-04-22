@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 
 import { Typography } from "@material-ui/core";
 import Row from 'react-bootstrap/Row';
@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button'
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FormLabel from '@material-ui/core/FormLabel';
+import TagService from 'services/TagService';
 
 let wName = "";
 let maxUsers = -1;
@@ -18,19 +19,17 @@ let tag_array = [];
 let desc = "";
 export default function WorldDetails(props){
     const { createWorld, ...other } = props;
-    const allLabels=[
-        {name:"Classes"},
-        {name:"Meetings"},
-        {name:"Leisure"},
-        {name:"Conferences"},
-        {name:"Biology"},
-        {name:"Physics"},
-        {name:"Philosophy"},
-        {name:"Medicine"},
-        {name:"Maths"},
-        {name:"Sociology"},
-        {name:"Literature"},
-    ];
+    const [tags,setTags] = React.useState([]);
+    useEffect (() => {
+        TagService.getAll()
+                .then((res) => {return res.json()})
+                .then((res) => {
+            console.log(res);
+            let arr = [];
+            res.forEach(tag => arr.push(tag.name)); 
+            setTags(arr);
+          })
+      }, [])
 
     const [accessibility, setAccessibility] = React.useState("false");
     const [guests, setGuests] = React.useState("false");
@@ -109,8 +108,8 @@ export default function WorldDetails(props){
                                 multiple
                                 id="tags-standard"
                                 onChange={(event, value) => tag_array = value}
-                                options={allLabels}
-                                getOptionLabel={(option) => option.name}
+                                options={tags}
+                                getOptionLabel={(option) => option}
                                 renderInput={(params) => (
                                 <TextField
                                     {...params}

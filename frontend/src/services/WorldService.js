@@ -42,7 +42,7 @@ class WorldService {
                 'Content-Type': 'application/json',
             },
             // TODO: change hashed_password to password after backend update
-            body: JSON.stringify({name: wName, public: accessibility, allow_guests: guests, world_map:"", max_users:maxUsers})
+            body: JSON.stringify({name: wName, public: accessibility, allow_guests: guests, world_map:"", max_users:maxUsers, tags:tag_array})
         })
     }
 
