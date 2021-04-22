@@ -65,6 +65,33 @@ async def join_world(
     return world_user
 
 
+@router.put("/{world_id}", response_model=schemas.WorldMapInDB)
+async def update_world(
+        world_id: int,
+        world_in: schemas.WorldUpdate,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Updates a  specific World's Information
+    """
+    # first checking if this user can edit the world(creator only)
+    world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
+    if not world_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+    # afterwards update data and clear cache
+    world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj, obj_in=world_in)
+    if not world_obj_updated:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+    return world_obj_updated
+
+
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
 async def update_world_user_info(
         world_id: int,

@@ -42,7 +42,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             _user.worlds.append(world_user)
             await redis_connector.save_world_user_data(
                 world_id=_world.world_id,
-                user_id=_user.id,
+                user_id=_user.user_id,
                 data={'username': _user.name, 'avatar': assigned_avatar}
             )
         else:
