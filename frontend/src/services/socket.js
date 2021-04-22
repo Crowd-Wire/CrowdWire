@@ -42,8 +42,8 @@ async function flushConsumerQueue(_roomId) {
 
 async function consumeAll(consumerParametersArr) {
   try {
-    for (const { peerId, consumerParameters } of consumerParametersArr) {
-      if (!(await consumeStream(consumerParameters, peerId, consumerParameters.kind))) {
+    for (const { consumer, kind } of consumerParametersArr) {
+      if (!(await consumeStream(consumer.consumerParameters, consumer.peerId, kind))) {
         break;
       }
     }
@@ -123,7 +123,6 @@ export const getSocket = (worldId) => {
           break;
         case "you-joined-as-speaker":
           console.log(data)
-          console.log(data.d.sendTransportOptions)
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
@@ -135,10 +134,11 @@ export const getSocket = (worldId) => {
           })
           break;
         case "@get-recv-tracks-done":
+          console.log(data)
           consumeAll(data.d.consumerParametersArr);
           break;
         case "new-peer-producer":
-          console.log(data.d.kind)
+          console.log(data)
           if (useRoomStore.getState().recvTransport && useRoomStore.getState().roomId === data.d.roomId) {
             consumeStream(data.d.consumerParameters, data.d.peerId, data.d.kind );
           } else {
@@ -158,6 +158,10 @@ export const getSocket = (worldId) => {
             useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
           else
             useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
+          break;
+        case "close_media":
+          console.log(data)
+          useConsumerStore.getState().closeMedia(data.peerId)
           break;
         default:
           const { handlerMap } = useWsHandlerStore.getState();

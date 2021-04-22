@@ -33,7 +33,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const myRef = useRef<any>(null);
   const [videoPauseState, setVideoPauseState] = useState(true)
   const [audioPauseState, setAudioPauseState] = useState(true)
-  const [mediaOffStatetate, setMediaOffStatetate] = useState(true)
+  const [mediaOffState, setMediaOffState] = useState(true)
 
   const toggleVideo = () => {
     setVideoPauseState(!videoPauseState)
@@ -70,15 +70,26 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   const toggleMedia = () => {
-    setMediaOffStatetate(!mediaOffStatetate)
-    let { mediaProducer } = useMediaStore.getState();
+    let { mediaProducer, set } = useMediaStore.getState();
     
-    if (mediaOffStatetate)
-      sendMedia().then(() => mediaProducer = useMediaStore.getState().mediaProducer);
-    // else if (mediaProducer)
-      // TODO tratar do desligar
-        // mediaProducer.close
+    if (mediaOffState)
+      sendMedia().then((media) => {
+        if (media)
+          setMediaOffState(!mediaOffState)
+        });
+    else if (mediaProducer) {
+      mediaProducer.close()
+      set({media: null, mediaStream: null, mediaProducer: null})
+    }
   }
+
+  useEffect(() => {
+    let { roomId } = useRoomStore.getState();
+
+    setMediaOffState(useMediaStore.getState().media ? false : true)
+    wsend({ topic: "close-media", d: { roomId: roomId } })
+    console.log("sending close media")
+  }, [useMediaStore.getState().media])
 
   useEffect(() => {
     setVideoPauseState(videoTrack ? true : false)
@@ -102,7 +113,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   return (
     <div style={{maxHeight:'10%', maxWidth:400}}>
       <Card style={{padding: 3,
-      background: 'rgba(205, 245, 245, 0.7)',
+      background: 'rgba(215, 240, 240, 0.6)',
       overflow: 'hidden',
       boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
       borderTop: '1px solid rgba(255,255,255,0.5)',
@@ -138,8 +149,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
             </Col>
 
             <Col style={{textAlign: 'right'}} sm={6}>
-              <ScreenShareIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => toggleMedia()}/>
-              <StopScreenShareIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleMedia()}/>
+              { mediaOffState ? 
+                <ScreenShareIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => toggleMedia()}/>
+                :
+                <StopScreenShareIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleMedia()}/>
+              }
             </Col>
           </Row>
 

@@ -12,6 +12,8 @@ import { DeviceSettings } from "./DeviceSettings";
 import storeDevice from "../../redux/commStore.js";
 import { VideoAudioBox } from "./VideoAudioBox";
 import { MyVideoAudioBox } from "./MyVideoAudioBox";
+import { MyMediaStreamBox } from "./MyMediaStreamBox";
+import { MediaStreamBox } from "./MediaStreamBox";
 import logo from '../../assets/crowdwire_white_logo.png';
 
 import { getSocket, wsend } from "../../services/socket.js";
@@ -23,6 +25,7 @@ import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
+import { useMediaStore } from 'webrtc/stores/useMediaStore';
 
 interface State {
   chatToggle: boolean;
@@ -31,6 +34,7 @@ interface State {
   consumerMap: any;
   cam: any;
   mic: any;
+  media: any;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -42,7 +46,8 @@ export default class RoomCall extends React.Component<{}, State> {
       messages: [],
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam,
-      mic: useVoiceStore.getState().mic
+      mic: useVoiceStore.getState().mic,
+      media : useMediaStore.getState().media
     }
 
     useConsumerStore.subscribe((consumerMap) => {
@@ -58,6 +63,10 @@ export default class RoomCall extends React.Component<{}, State> {
       this.setState({mic});
       sendVoice();
     }, (state) => state.mic);
+
+    useMediaStore.subscribe((media) => {
+      this.setState({media});
+    }, (state) => state.media);
   }
   myId: string = 'myUsernameId';
   accessMic: boolean = false;
@@ -71,10 +80,6 @@ export default class RoomCall extends React.Component<{}, State> {
   
   setNavigatorToStream = () => {
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
-      console.log(stream)
-      console.log(stream.getVideoTracks()[0])
-      console.log(stream.getAudioTracks()[0])
-
       if (stream) {
         useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
         useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
@@ -150,7 +155,16 @@ export default class RoomCall extends React.Component<{}, State> {
 
   
   render () {
-    const numberUsers = Object.keys(this.state.consumerMap).length + 1;
+    let numberUsers = 1;
+    for (const value of Object.values(this.state.consumerMap)) {
+      //@ts-ignore
+      if (value.consumerMedia)
+        numberUsers += 2;
+      else
+        numberUsers += 1;
+    };
+    if (this.state.media)
+      numberUsers += 1;
     const gridSettings = {
       cols: numberUsers > 6 ? 6 : numberUsers,
       rows: numberUsers > 6 ? 2 : 1,
@@ -165,7 +179,7 @@ export default class RoomCall extends React.Component<{}, State> {
           rows: numberUsers > 3 ? 2 : 1,
           gap: 5,
           loop: true,
-          autoplay: false,
+          autoplay: 0,
           hideArrow: numberUsers > 6 ? false : true
         }
       ],
@@ -213,6 +227,15 @@ export default class RoomCall extends React.Component<{}, State> {
                 videoTrack={this.state.cam}
                 />
             </Carousel.Item>
+            { this.state.media ? 
+              <Carousel.Item key={this.myId+'_media'}>
+                <MyMediaStreamBox
+                  username={this.myId}
+                  id={this.myId+'_media'}
+                  mediaTrack={this.state.media}
+                />
+              </Carousel.Item>
+            : <span></span> }
 
             { Object.keys(this.state.consumerMap).length > 0 
               && Object.keys(this.state.consumerMap).map((peerId) => {
@@ -220,23 +243,32 @@ export default class RoomCall extends React.Component<{}, State> {
                   volume: userVolume, active,
                   videoToggle, audioToggle
                 } = this.state.consumerMap[peerId];
-                return (
-                  <Carousel.Item key={peerId+"_crs_item"}>
-                    <VideoAudioBox
-                      active={active}
-                      username={peerId}
-                      id={peerId}
-                      audioTrack={consumerAudio ? consumerAudio._track : null}
-                      videoTrack={consumerVideo ? consumerVideo._track : null}
-                      mediaTrack={consumerMedia ? consumerMedia._track : null}
-                      volume={(userVolume / 200)}
-                      videoToggle={videoToggle}
-                      audioToggle={audioToggle}
-                    />
-                  </Carousel.Item>
-                )
+                let item = <></>
+                if (consumerMedia)
+                  item = (<Carousel.Item key={peerId+"_crs_media_item"}>
+                  <MediaStreamBox
+                    username={peerId}
+                    id={peerId+'_media'}
+                    mediaTrack={consumerMedia._track}
+                  />
+                </Carousel.Item>)
+                return [
+                    (<Carousel.Item key={peerId+"_crs_item"}>
+                      <VideoAudioBox
+                        active={active}
+                        username={peerId}
+                        id={peerId}
+                        audioTrack={consumerAudio ? consumerAudio._track : null}
+                        videoTrack={consumerVideo ? consumerVideo._track : null}
+                        volume={(userVolume / 200)}
+                        videoToggle={videoToggle}
+                        audioToggle={audioToggle}
+                      />
+                    </Carousel.Item>),item
+                ]
               })
             }
+            
           </Carousel>
         </div>
 

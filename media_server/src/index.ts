@@ -67,6 +67,12 @@ async function main() {
           peer?.producer?.get(kind)?.resume();
       }
     },
+    ['close-media']: ({ roomId, peerId }) => {
+      if (roomId in rooms) {
+        const peer = rooms[roomId].state[peerId];
+        peer?.producer?.get('media')?.close();
+      }
+    },
     ["destroy-room"]: ({ roomId }) => {
       if (roomId in rooms) {
         for (const peer of Object.values(rooms[roomId].state)) {
@@ -117,16 +123,16 @@ async function main() {
         }
         try {
           const { producer } = peerState;
-          for (let value of producer.values()) {
+          for (let [key, value] of producer.entries()) {
             consumerParametersArr.push(
-              await createConsumer(
+              {'consumer': await createConsumer(
                 router,
                 value,
                 rtpCapabilities,
                 transport,
                 myPeerId,
                 state[theirPeerId]
-              )
+              ), 'kind': key}
             );
           }
         } catch (e) {

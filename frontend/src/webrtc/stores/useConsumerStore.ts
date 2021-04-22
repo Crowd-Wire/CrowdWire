@@ -109,6 +109,20 @@ export const useConsumerStore = create(
             };
           }
         }),
+      closeMedia: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            s.consumerMap[userId].consumerMedia?.close();
+            let user = {...s.consumerMap[userId]}
+            user.consumerMedia = null;
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
       addActiveSpeaker: (userId: string) =>
         set((s) => {
           if (s.consumerMap[userId]) {

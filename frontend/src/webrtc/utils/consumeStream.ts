@@ -18,6 +18,7 @@ export const consumeStream = async (consumerParameters: any, peerId: string, kin
       kind: kind,
     },
   });
+  console.log(consumer)
   useConsumerStore.getState().add(consumer, peerId, kind);
   
   if (kind == 'audio')

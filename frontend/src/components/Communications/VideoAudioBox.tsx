@@ -17,7 +17,6 @@ interface VideoAudioBoxProps {
   volume: number;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
-  mediaTrack?: MediaStreamTrack;
   active: boolean;
   videoToggle: boolean;
   audioToggle: boolean;
@@ -25,11 +24,10 @@ interface VideoAudioBoxProps {
 
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   username="anonymous", muted=false, id, volume,
-  audioTrack=null, videoTrack=null, mediaTrack=null,
+  audioTrack=null, videoTrack=null,
   active, audioToggle, videoToggle
 }) => {
   const videoRef = useRef<any>(null);
-  const mediaRef = useRef<any>(null);
 
   const [videoState, setVideoState] = useState(videoToggle)
   const [audioState, setAudioState] = useState(audioToggle)
@@ -62,18 +60,6 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   }, [videoToggle, audioToggle])
 
   useEffect(() => {
-    let mediaStream = null;
-    if (mediaTrack) {
-      mediaStream = new MediaStream();
-      mediaStream.addTrack(mediaTrack);
-    }
-    if (mediaRef.current) {
-      mediaRef.current.muted = true;
-      mediaRef.current.srcObject = mediaStream;
-    }
-  }, [mediaTrack])
-
-  useEffect(() => {
     setVideoState(videoTrack ? !videoToggle : false)
     setAudioState(audioTrack ? !audioToggle : false)
 
@@ -101,7 +87,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   return (
     <div style={{maxHeight:'10%', maxWidth:400}}>
       <Card style={{padding: 3,
-      background: 'rgba(255, 255, 255, 0.6)',
+      background: 'rgba(215, 240, 240, 0.6)',
       overflow: 'hidden',
       boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
       borderTop: '1px solid rgba(255,255,255,0.5)',
@@ -118,9 +104,6 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
               ) : audioTrack ? (
                 <audio autoPlay id={id+"_audio"} ref={videoRef}/>
                 ) : ''}
-            { mediaTrack ? (
-              <video autoPlay id={id+"_video"} ref={mediaRef}/>
-            ) : ''}
           </div>
 
           <Row>

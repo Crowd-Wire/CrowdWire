@@ -28,10 +28,19 @@ export const sendMedia = async () => {
   }
 
   if (media) {
-    console.log("creating producer...");
-    sendTransport.produce({
-      track: media,
-      appData: { mediaTag: "media" },
-    }).then((producer) => {set({mediaProducer: producer})})
+    try {
+      console.log("creating producer...");
+      sendTransport.produce({
+        track: media,
+        appData: { mediaTag: "media" },
+      }).then((producer) => {set({mediaProducer: producer})})
+      media.onended = function(event) {
+        useMediaStore.getState().mediaProducer.close();
+        set({media: null, mediaStream: null, mediaProducer: null})
+      }
+      return true;
+    } catch (err) {
+      console.log(err)
+    }
   }
 };
