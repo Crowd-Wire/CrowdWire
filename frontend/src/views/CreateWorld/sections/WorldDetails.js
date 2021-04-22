@@ -32,21 +32,29 @@ export default function WorldDetails(props){
         {name:"Literature"},
     ];
 
-    const [accessibility, setAccessibility] = React.useState(0);
+    const [accessibility, setAccessibility] = React.useState("false");
+    const [guests, setGuests] = React.useState("false");
 
     const creation = () => {
+        maxUsers = parseInt(maxUsers)
         if(wName){
             if(maxUsers && Number.isInteger(maxUsers) && maxUsers>=0){
-                createWorld(wName, accessibility, maxUsers, tag_array, desc);
+                console.log(typeof wName);
+                createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
                 return;
             }
-            console.log("users nao é numero")
+            console.log("users nao é numero "+ typeof maxUsers);
         }
         console.log(wName)
     }
 
     const onChangeValue = (event) => {
-        setAccessibility(parseInt(event.target.value));
+        console.log(typeof event.target.value)
+        setAccessibility(event.target.value);
+    }
+
+    const onChangeGuests = (event) => {
+        setGuests(event.target.value);
     }
 
     const onChangeTitle = (event) => {
@@ -74,43 +82,56 @@ export default function WorldDetails(props){
                         <TextField id="outlined-basic" required onChange={onChangeTitle} label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"30px"}}>
-                        <div style={{width:"100%", marginLeft:"30px", marginRight:"auto"}}>
-                        <FormLabel component="legend">Accessibility</FormLabel>
-                            <RadioGroup row name="accessibility" onChange={onChangeValue}>
-                            <FormControlLabel checked={accessibility === 0} value={0} control={<Radio />} label="Private" />
-                            <FormControlLabel checked={accessibility === 1} value={1}  control={<Radio />} label="Public" />
-                        </RadioGroup>
-                        </div>
+                        <Col>
+                            <div style={{width:"100%", marginLeft:"30px", marginRight:"auto"}}>
+                            <FormLabel component="legend">Accessibility</FormLabel>
+                                <RadioGroup row name="accessibility" onChange={onChangeValue}>
+                                <FormControlLabel checked={accessibility === "false"} value={"false"} control={<Radio />} label="Private" />
+                                <FormControlLabel checked={accessibility === "true"} value={"true"}  control={<Radio />} label="Public" />
+                            </RadioGroup>
+                            </div>
+                        </Col>
+                        <Col>
+                            <div style={{width:"100%", marginRight:"auto"}}>
+                            <FormLabel component="legend">Allow guests</FormLabel>
+                                <RadioGroup row name="accessibility" onChange={onChangeGuests}>
+                                <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Allow" />
+                                <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Deny" />
+                            </RadioGroup>
+                            </div>
+                        </Col>
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto"}}>
-                        <TextField
-                        onChange={onChangeMaxUsers}
-                            style={{marginLeft:"30px",marginRight:"auto"}}
-                            id="standard-number"
-                            label="Max Online Users"
-                            type="number"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                        />
-                    </Row>
-                    <Row style={{marginLeft:"auto", marginTop:"10px", marginRight:"auto"}}>
-                    <Autocomplete
-                        limitTags={3}
-                        style={{width:"90%", marginLeft:"30px",marginRight:"auto"}}
-                        multiple
-                        id="tags-standard"
-                        onChange={(event, value) => tag_array = value}
-                        options={allLabels}
-                        getOptionLabel={(option) => option.name}
-                        renderInput={(params) => (
-                        <TextField
-                            {...params}
-                            variant="standard"
-                            label="Labels"
-                        />
-                        )}
-                    />
+                        <Col xs={7} sm={7} md={7}>
+                            <Autocomplete
+                                limitTags={2}
+                                style={{marginLeft:"30px", width:"90%",marginRight:"auto"}}
+                                multiple
+                                id="tags-standard"
+                                onChange={(event, value) => tag_array = value}
+                                options={allLabels}
+                                getOptionLabel={(option) => option.name}
+                                renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    variant="standard"
+                                    label="Labels"
+                                />
+                                )}
+                            />
+                        </Col>
+                        <Col xs={12} sm={12} md={5}>
+                            <TextField
+                            onChange={onChangeMaxUsers}
+                                style={{marginRight:"30px"}}
+                                id="standard-number"
+                                label="Max Online Users"
+                                type="number"
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        </Col>
                     </Row>
                     <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px"}}>
                         <TextField

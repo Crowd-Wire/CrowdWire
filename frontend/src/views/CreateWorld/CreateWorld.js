@@ -33,8 +33,21 @@ class CreateWorld extends Component {
     };
 
 
-  createWorld = (wName, accessibility, maxUsers, tag_array, desc) => {
-    WorldService.create(wName, accessibility, maxUsers, tag_array, desc)
+  createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
+    if(accessibility){
+      accessibility = true;
+    }
+    else{
+      accessibility = false;
+    }    
+    if(guests){
+      guests = true;
+    }
+    else{
+      guests = false;
+    }
+    console.log(typeof guests, typeof accessibility);
+    WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"
     });

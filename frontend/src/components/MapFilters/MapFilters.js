@@ -60,8 +60,10 @@ export default function MapFilters(props) {
 			.then((res) => {
         console.log(res);
         let arr = [];
-        res.forEach(tag => arr.push(tag.name)); 
-        setTags(arr);
+        if(res.lenght>=1){
+          res.forEach(tag => arr.push(tag.name)); 
+          setTags(arr);
+        }
       })
   }, [])
 
