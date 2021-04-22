@@ -25,8 +25,6 @@ const GameUITabs = (props) => {
     setValue(value);
   };
   const { classes, headerColor, plainTabs, tabs } = props;
-console.log(classes);
-
 
   // const [{ opacity }, drag, preview] = useDrag(() => ({
 	// 	type: DragTypes.CARD,
@@ -34,28 +32,6 @@ console.log(classes);
 	// 		opacity: monitor.isDragging() ? 0.4 : 1,
 	// 	}), 
 	// }));
-
-  const resizeStyles = {
-    section: {
-    
-      /* for Firefox */
-    },
-    
-    content: {
-      margin: '10px',
-      background: '#BBDEFB',
-    },
-    
-    scrollableContent: {
-      background: 'white',
-      flexGrow: '1',
-      
-      overflow: 'auto',
-      
-      /* for Firefox */
-      minHeight: '0',
-    },
-  }
 
   return (
     <Card plain={plainTabs} classes={{ card: classes.card }} > {/*ref={preview}*/}
@@ -88,7 +64,7 @@ console.log(classes);
           ))}
         </Tabs>
       </CardHeader>
-      <CardBody classes={{ cardBody: classes.cardBody }} style={{...resizeStyles.content, ...resizeStyles.scrollableContent }} >
+      <CardBody classes={{ cardBody: classes.cardBody }} >
         {tabs.map((prop, key) => {
           if (key === value) {
             return <div key={key}>{prop.tabContent}</div>;
@@ -99,5 +75,5 @@ console.log(classes);
     </Card>
   )
 }
-console.log(styles);
+
 export default withStyles(styles)(GameUITabs);

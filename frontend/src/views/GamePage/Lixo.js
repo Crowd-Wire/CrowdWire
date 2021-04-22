@@ -18,6 +18,8 @@ import GridItem from "components/Grid/GridItem.js";
 import Grid from '@material-ui/core/Grid';
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 
+
+import "./Lixo.css";
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 
 // const gameUIStyle = {
@@ -25,111 +27,6 @@ import { makeStyles, withStyles } from '@material-ui/core/styles';
 //   zIndex: 2,
 // }
 
-
-
-const resizeStyle = {
-  wrapper: {
-    backgroundColor: '#fff',
-    color: '#444',
-
-    /* Use flexbox */
-    display: 'flex',
-  },
-  
-  box: {
-    backgroundColor: '#444',
-    color: '#fff',
-    borderRadius: '5px',
-    padding: '20px',
-    fontSize: '150%',
-
-    /* Use box-sizing so that element's outerwidth will match width property */
-    boxSizing: 'border-box',
-  
-    /* Allow box to grow and shrink, and ensure they are all equally sized */
-    flex: '1 1 auto',
-  },
-
-  wrapperCol: {
-    display: 'flex', 
-    flexDirection: 'column'
-  },
-
-  wrapperRow: {
-    display: 'flex', 
-    flexDirection: 'row'
-  },
-
-  handlerCol: {
-    width: '10px',
-    padding: '0',
-    cursor: 'ew-resize',
-    flex: '0 0 auto',
-    '&::before': {
-      content: "",
-      display: 'block',
-      width: '4px',
-      height: '100%',
-      background: 'red',
-      margin: '0 auto',
-    }
-  },
-
-  handlerRow: {
-    height: '10px',
-    padding: '0',
-    cursor: 'ns-resize',
-    flex: '0 0 auto',
-    '&::before': {
-      content: "",
-      display: 'block',
-      width: '4px',
-      height: '100%',
-      background: 'red',
-      margin: '0 auto',
-    }
-  }
-}
-
-const flexstyle = makeStyles({
-  container: {
-    background: '#3F51B5',
-  
-    /* give the outermost container a predefined size */
-    height: '100vh',
-    // flexGrow: '1',
-    
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  
-  section: {
-    margin: '10px',
-    background: '#2196F3',
-    flexGrow: '1',
-    
-    display: 'flex',
-    flexDirection: 'column',
-    
-    /* for Firefox */
-    minHeight: '0',
-  },
-  
-  content: {
-    margin: '10px',
-    background: '#BBDEFB',
-  },
-  
-  scrollableContent: {
-    background: 'white',
-    flexGrow: '1',
-    
-    overflow: 'auto',
-    
-    /* for Firefox */
-    minHeight: '0',
-  },
-})
 
 
 const gameWindows = {
@@ -160,81 +57,22 @@ const gameWindows = {
 }
 
 
-const gridBuilder = (grid, depth = 0) => {
-  if (grid.every(n => Number.isInteger(n)))
-    return (
-      // <GameUITest/>
-      <GameUITabs
-        headerColor="gray"
-        tabs={grid.map(n => gameWindows[n])}
-      />
-    );
-  return (
-    grid.map((item, k) => (
-      <Grid container alignItems="stretch" direction={depth % 2 == 0 ? "row" : "column"} spacing={1} key={k}>
-        {
-          item.map((grid, k) => (
-            <Grid container item xs key={k}> {/*style={{resize: 'both', overflow: 'auto'}}>*/}
-              {gridBuilder(grid, depth + 1)}
-            </Grid>
-          ))
-        }
-      </Grid>
-    ))
-  );
-}
-
-
-
-const GameUITest = () => {
-  const classes = flexstyle();
-
-  return (
-    // <div className={classes.container}>
-      <div className={classes.section}>
-        <div className={classes.content}>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore natus quisquam, dignissimos assumenda ratione magnam impedit quod delectus, voluptatum odio neque cupiditate rem porro blanditiis maxime doloribus quibusdam. Quam, officiis?
-        </div>
-        <div className={classes.content, classes.scrollableContent}>
-        <div style={{ width: '400px', height: '300px', backgroundColor: 'red', fontSize: '2rem' }}>0</div>
-        </div>
-      </div>
-     
-    // </div>
-  )
-}
-
 class GamePage extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      grid2: [
-        [
-          [2],
-          [[[0, 2, 4], [4]]]
-        ],
-        [
-          [1],
-          [[[4], [0]]]
-        ],
-        [
-          [[[4, 2], [3]]],
-          [2]
-        ],
-      ]
-      // grid: [0, 1, 2, 3, 4, 5]
-      ,
       grid: [
         {
           size: 50,
           grid: [
-            {size: 20, tabs: [1, 2, 3]},
+            {size: 30, tabs: [1, 2, 3]},
             {size: 20, tabs: [3]},
             {size: 50, tabs: [1]},
           ]
         },
-        {id: 1, size: 50, tabs: [1]}
+        {size: 25, tabs: [2]},
+        {size: 25, tabs: [4,2]}
       ]
     }
   }
@@ -274,23 +112,24 @@ class GamePage extends React.Component {
     })
   }
 
-  gridBuild = (grid, depth = 0) => {
-    if (grid.hasOwnProperty('tabs'))
-      return (
-        <GameUITabs
-          headerColor="gray"
-          tabs={grid.tabs.map(t => gameWindows[t])}
-        />
-      );
+  gridBuild = (grid=this.state.grid, depth=0) => {
+    if (depth > 3)
+      return 'ola';
+ 
     return (
-      grid.map((item, k) => (
-        <div className={depth % 2 == 0 ? this.props.classes.wrapperRow : this.props.classes.wrapperCol} key={k}>
-          {
-            item.map((grid, k) => (
-              <Grid container item xs key={k}> {/*style={{resize: 'both', overflow: 'auto'}}>*/}
-                {gridBuilder(grid, depth + 1)}
-              </Grid>
-            ))
+      grid.map((item, index) => (
+        <div 
+          key={index} style={depth % 2 == 0 ? { height: `${item.size}%` } : { width: `${item.size}%` }}
+          className={depth % 2 == 0 ? "wrapperRow" : "wrapperCol"}
+        >
+          { 
+            item.hasOwnProperty('tabs') ?
+              <GameUITabs
+                headerColor="gray"
+                tabs={item.tabs.map(t => gameWindows[t])}
+              />
+            :
+              this.gridBuild(item.grid, depth + 1)
           }
         </div>
       ))
@@ -352,92 +191,6 @@ class GamePage extends React.Component {
       dragginHandler = null;
     });
     
-    // node.parentNode.childNodes[];
-
-    return;
-    var handlerA = document.querySelector('.handler-A');
-    var handlerB = document.querySelector('.handler-B');
-
-    var wrapper = handlerA.closest('.wrapper');
-    var boxA = wrapper.querySelector('.box-A');
-    var boxB = wrapper.querySelector('.box-B');
-    var boxC = wrapper.querySelector('.box-C');
-
-    var isHandlerADragging = false;
-    var isHandlerBDragging = false;
-
-    let lenA;
-    let lenB;
-    let lenC;
-    let startX;
-
-    document.addEventListener('mousedown', function(e) {
-      // If mousedown event is fired from .handler, toggle flag to true
-      if (e.target === handlerA) {
-        isHandlerADragging = true;
-        
-      }
-      if (e.target === handlerB) {
-        isHandlerBDragging = true;
-      }
-      lenA = boxA.offsetWidth;
-      lenB = boxB.offsetWidth;
-      lenC = boxC.offsetWidth;
-      startX = e.clientX;
-    });
-    
-    document.addEventListener('mousemove', function(e) {
-      // Don't do anything if dragging flag is false
-      if (!isHandlerADragging && !isHandlerBDragging) {
-        return false;
-      }
-    
-      // Set boxA width properly
-
-      // Get offset
-      var containerOffsetLeft = wrapper.offsetLeft;
-
-      // Get x-coordinate of pointer relative to container
-      var pointerRelativeXpos = e.clientX - containerOffsetLeft;
-
-      var dragSize = e.clientX - startX;
-
-      // Resize box A
-      // * 8px is the left/right spacing between .handler and its inner pseudo-element
-      // * Set flex-grow to 0 to prevent it from growing
-      if (isHandlerADragging) {
-        console.log(lenC)
-        boxC.style.width = lenC + 'px';
-        boxC.style.flexShrink = 0;
-        boxC.style.flexGrow = 0;
-
-        // boxB.style.width = (pointerRelativeXpos - 8) + 'px';
-        boxB.style.width = (lenB - dragSize) + 'px';
-        boxB.style.flexGrow = 0;
-
-        boxA.style.flex = '1 1 auto';
-        // boxC.style.flexShrink = 1;
-        // console.log(boxC.offsetWidth);
-      }
-      if (isHandlerBDragging) {
-        boxA.style.width = lenA + 'px';
-        boxA.style.flexShrink = 0;
-        boxA.style.flexGrow = 0;
-
-        // boxB.style.width = (pointerRelativeXpos - 8) + 'px';
-        boxB.style.width = (lenB + dragSize) + 'px';
-        boxB.style.flexGrow = 0;
-
-        boxC.style.flex = '1 1 auto';
-      }
-      
-    });
-    
-    document.addEventListener('mouseup', function(e) {
-      // Turn off dragging flag when user mouse is up
-      isHandlerADragging = false;
-      isHandlerBDragging = false;
-    });
   }
 
 
@@ -472,8 +225,12 @@ class GamePage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
 
+        <div className={"wrapperCol"} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
+          {this.gridBuild()}
+        </div>
 
-        <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
+     
+        {/* <div className={classes.wrapperCol} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
           <div className={classes.wrapperRow} style={{ height: '33%' }}>
             
             <div className={classes.wrapperCol} style={{ width: '50%' }}>
@@ -484,19 +241,25 @@ class GamePage extends React.Component {
             </div>
             <div className={classNames(classes.handlerCol, "handler")}></div>
             <div className={classes.wrapperCol} style={{ width: '50%' }}>
-              <GameUITest/>
+              <GameUITabs
+                  headerColor="gray"
+                  tabs={[gameWindows[1], gameWindows[2]]}
+              />
             </div>
 
           </div>
           <div data="indexlololo" className={classNames(classes.handlerRow, "handler")}></div>
           <div className={classes.wrapperRow} style={{ height: '33%' }}>
-            <GameUITest/>
+            <GameUITabs
+                  headerColor="gray"
+                  tabs={[gameWindows[1], gameWindows[2]]}
+              />
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
           <div className={classes.wrapperRow} style={{ height: '34%' }}>
             <GameUITest/>
           </div>
-        </div> 
+        </div>  */}
 
 
     
@@ -515,5 +278,5 @@ const mapStateToProps = (state) => ({
 //   toggleGameUI: () => dispatch(toggleGameUI),
 // });
 
-export default withStyles(resizeStyle)(connect(mapStateToProps)(GamePage));
+export default connect(mapStateToProps)(GamePage);
 
