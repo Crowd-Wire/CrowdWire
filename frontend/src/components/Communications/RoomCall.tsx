@@ -2,7 +2,7 @@ import React, { createRef } from 'react';
 
 import { toast } from 'react-toastify';
 // Icons imports
-import { Button } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import ChatIcon from '@material-ui/icons/Chat';
 
 import ChatBox from "./ChatBox";
@@ -152,8 +152,8 @@ export default class RoomCall extends React.Component<{}, State> {
   render () {
     const numberUsers = Object.keys(this.state.consumerMap).length + 1;
     const gridSettings = {
-      cols: numberUsers > 6 ? 6 : numberUsers == 4 ? 2 : numberUsers > 4 ? 3 : numberUsers,
-      rows: numberUsers > 3 ? 2 : 1,
+      cols: numberUsers > 6 ? 6 : numberUsers,
+      rows: numberUsers > 6 ? 2 : 1,
       gap: 10,
       loop: true,
       hideArrow: numberUsers > 12 ? false : true,
@@ -165,7 +165,7 @@ export default class RoomCall extends React.Component<{}, State> {
           rows: numberUsers > 3 ? 2 : 1,
           gap: 5,
           loop: true,
-          autoplay: 0,
+          autoplay: false,
           hideArrow: numberUsers > 6 ? false : true
         }
       ],
@@ -202,42 +202,43 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
-            
-        <Carousel {...gridSettings}>
+        <div  style={{background: `url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeR9_w_NYXmCcY7oxymE0v2uaWX6s6dcwP8g&usqp=CAU")` , padding: 10}}>
+          <Carousel {...gridSettings}>
 
-          <Carousel.Item key={this.myId}> 
-            <MyVideoAudioBox
-              username={this.myId}
-              id={this.myId}
-              audioTrack={this.state.mic}
-              videoTrack={this.state.cam}
-              />
-          </Carousel.Item>
+            <Carousel.Item key={this.myId}>
+              <MyVideoAudioBox
+                username={this.myId}
+                id={this.myId}
+                audioTrack={this.state.mic}
+                videoTrack={this.state.cam}
+                />
+            </Carousel.Item>
 
-          { Object.keys(this.state.consumerMap).length > 0 
-            && Object.keys(this.state.consumerMap).map((peerId) => {
-              const { consumerAudio, consumerVideo, consumerMedia,
-                volume: userVolume, active,
-                videoToggle, audioToggle
-              } = this.state.consumerMap[peerId];
-              return (
-                <Carousel.Item key={peerId+"_crs_item"}>
-                  <VideoAudioBox
-                    active={active}
-                    username={peerId}
-                    id={peerId}
-                    audioTrack={consumerAudio ? consumerAudio._track : null}
-                    videoTrack={consumerVideo ? consumerVideo._track : null}
-                    mediaTrack={consumerMedia ? consumerMedia._track : null}
-                    volume={(userVolume / 200)}
-                    videoToggle={videoToggle}
-                    audioToggle={audioToggle}
-                  />
-                </Carousel.Item>
-              )
-            })
-          }
-        </Carousel>
+            { Object.keys(this.state.consumerMap).length > 0 
+              && Object.keys(this.state.consumerMap).map((peerId) => {
+                const { consumerAudio, consumerVideo, consumerMedia,
+                  volume: userVolume, active,
+                  videoToggle, audioToggle
+                } = this.state.consumerMap[peerId];
+                return (
+                  <Carousel.Item key={peerId+"_crs_item"}>
+                    <VideoAudioBox
+                      active={active}
+                      username={peerId}
+                      id={peerId}
+                      audioTrack={consumerAudio ? consumerAudio._track : null}
+                      videoTrack={consumerVideo ? consumerVideo._track : null}
+                      mediaTrack={consumerMedia ? consumerMedia._track : null}
+                      volume={(userVolume / 200)}
+                      videoToggle={videoToggle}
+                      audioToggle={audioToggle}
+                    />
+                  </Carousel.Item>
+                )
+              })
+            }
+          </Carousel>
+        </div>
 
         <DeviceSettings />
         

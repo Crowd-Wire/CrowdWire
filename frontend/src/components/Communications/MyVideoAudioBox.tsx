@@ -16,6 +16,8 @@ import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -98,33 +100,49 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div>
-      <Card>
-        <CardBody>
-          <h4>{username}</h4>
+    <div style={{maxHeight:'10%', maxWidth:400}}>
+      <Card style={{padding: 3,
+      background: 'rgba(205, 245, 245, 0.7)',
+      overflow: 'hidden',
+      boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+      borderTop: '1px solid rgba(255,255,255,0.5)',
+      borderLeft: '1px solid rgba(255,255,255,0.5)',
+      backdropFilter: 'blur(3px)'
+      }}>
+          <div style={{padding: 2, textAlign: 'center', fontSize: '1.3em', color: '#fff', fontWeight: 500}}>
+            <span>{username}</span>
+          </div>
           <div id={id+"border_div"}>
               { videoTrack ? (
-                <video width="100%" autoPlay id={id+"_video"} ref={myRef}
+                <video autoPlay id={id+"_video"} ref={myRef}
                   style={{display: videoPauseState ? 'block' : 'none'}}/>
                 ) : audioTrack ? (
                   <audio autoPlay id={id+"_audio"} ref={myRef}/>
                   ) : ''}
           </div>
-          { videoTrack ?
-              videoPauseState ? 
-                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
-              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-            : (<VideocamOffIcon color={'action'}/>)
-          }
-          { audioTrack ?
-              audioPauseState ? 
-                (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-              : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon color={'action'}/>)
-          }
-          <ScreenShareIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => toggleMedia()}/>
-          <StopScreenShareIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleMedia()}/>
-        </CardBody>
+
+          <Row>
+            <Col sm={6}>
+              { videoTrack ?
+                  videoPauseState ? 
+                    (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
+                  : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
+                : (<VideocamOffIcon color={'action'}/>)
+              }
+              { audioTrack ?
+                  audioPauseState ? 
+                    (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+                  : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+                : (<MicOffIcon color={'action'}/>)
+              }
+            </Col>
+
+            <Col style={{textAlign: 'right'}} sm={6}>
+              <ScreenShareIcon style={{'cursor': 'pointer'}} color={'action'} onClick={() => toggleMedia()}/>
+              <StopScreenShareIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleMedia()}/>
+            </Col>
+          </Row>
+
       </Card>
     </div>
   );

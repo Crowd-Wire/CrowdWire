@@ -7,6 +7,8 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 interface VideoAudioBoxProps {
   username?: string;
@@ -97,37 +99,50 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div>
-      <Card>
-        <CardBody>
-          <h4>{username}</h4>
-          <div id={id+"border_div"}>
-              { videoTrack ? (
-                <video width="100%" autoPlay id={id+"_video"} ref={videoRef}
-                  style={{display: videoState ? 'block' : 'none'}}/>
-                ) : audioTrack ? (
-                  <audio autoPlay id={id+"_audio"} ref={videoRef}/>
-                  ) : ''}
-              { mediaTrack ? (
-                <video width="100%" autoPlay id={id+"_video"} ref={mediaRef}/>
-              ) : ''}
+    <div style={{maxHeight:'10%', maxWidth:400}}>
+      <Card style={{padding: 3,
+      background: 'rgba(255, 255, 255, 0.6)',
+      overflow: 'hidden',
+      boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+      borderTop: '1px solid rgba(255,255,255,0.5)',
+      borderLeft: '1px solid rgba(255,255,255,0.5)',
+      backdropFilter: 'blur(3px)'
+      }}>
+          <div style={{textAlign: 'center', fontSize: '1.3em', color: '#fff', fontWeight: 500}}>
+            <span>{username}</span>
           </div>
-          { videoTrack && !videoToggle ?
-              videoState ? 
-                (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
-              : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-            : (<VideocamOffIcon color={'action'}/>)
-          }
-          { audioTrack && !audioToggle ?
-              audioState ? 
-                (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-              : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-            : (<MicOffIcon color={'action'}/>)
-          }
+          <div id={id+"border_div"}>
+            { videoTrack ? (
+              <video autoPlay id={id+"_video"} ref={videoRef}
+                style={{display: videoState ? 'block' : 'none'}}/>
+              ) : audioTrack ? (
+                <audio autoPlay id={id+"_audio"} ref={videoRef}/>
+                ) : ''}
+            { mediaTrack ? (
+              <video autoPlay id={id+"_video"} ref={mediaRef}/>
+            ) : ''}
+          </div>
 
-          <UserVolumeSlider userId={id} />
+          <Row>
+            <Col sm={5}>
+              { videoTrack && !videoToggle ?
+                  videoState ? 
+                    (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
+                  : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
+                : (<VideocamOffIcon color={'action'}/>)
+              }
+              { audioTrack && !audioToggle ?
+                  audioState ? 
+                    (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
+                  : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+                : (<MicOffIcon color={'action'}/>)
+              }
+            </Col>
 
-        </CardBody>
+            <Col sm={7} style={{textAlign: 'center'}}>
+              <UserVolumeSlider userId={id} />
+            </Col>
+          </Row>
       </Card>
     </div>
   );
