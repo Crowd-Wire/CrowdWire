@@ -6,6 +6,7 @@ INACTIVE_USER = "User is Inactive or the account has been banned."
 INVALID_TAG = "Invalid Tag. Tag does not exist."
 USER_NOT_PASSED = "User not passed as an argument"
 ACCESS_FORBIDDEN = "Access Forbidden for Guests. Not Implemented Yet."
+EDITION_FORBIDDEN = "Only the World Creator can edit it."
 WORLD_NOT_FOUND = "World Not Found or is not currently available."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."

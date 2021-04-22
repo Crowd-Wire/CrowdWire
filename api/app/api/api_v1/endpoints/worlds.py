@@ -6,7 +6,6 @@ from app import schemas, crud, models
 from app.api import dependencies as deps
 from loguru import logger
 from app.redis import redis_connector
-from app.redis.redis_decorator import cache
 from app.utils import is_guest_user
 from app.core import strings
 
@@ -76,10 +75,14 @@ async def update_world(
     """
     Updates a  specific World's Information
     """
-    await crud.crud_world.get.clear(crud.crud_world, world_id=world_id)
-    # TODO Check if world is available, and if the user has enough permision
-    # to edit the World
-    return None
+    world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
+    if not world_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+
+    return await crud.crud_world.update(db=db,db_obj=world_obj,obj_in=world_in)
 
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)

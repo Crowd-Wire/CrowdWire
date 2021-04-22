@@ -1,11 +1,11 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union, Dict, Any
 
 from sqlalchemy.orm import Session
 
 from app.core import strings
-from app.models import World
-from app.redis.redis_decorator import cache
+from app.models import World, User
+from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
 from app.crud.crud_tags import tag as crud_tag
@@ -17,14 +17,25 @@ from app.core import consts
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
-    @cache
+    def is_editable_to_user(self, db: Session, world_id: int, user_id: int):
+
+        world_obj = db.query(World).join(User).filter(
+            World.creator == user_id,
+            World.world_id == world_id,
+        ).first()
+        if not world_obj:
+            return None, strings.EDITION_FORBIDDEN
+        return world_obj, ""
+
+    @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         logger.info("------>")
         world_obj = db.query(World).filter(World.world_id == world_id).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
-    @cache
+
+    @cache(model="World")
     async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
 
         world_obj = db.query(World).filter(
@@ -36,7 +47,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-    @cache
+    @cache(model="World")
     async def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
         """
         Verify the availability of a world, given a  registered user.
@@ -58,10 +69,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
-
-
-
-
 
     def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Tuple[Optional[World], str]:
         """
@@ -103,6 +110,19 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         # _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
+
+    async def update(self, db: Session, *,
+                     db_obj: World,
+                     obj_in: Union[WorldUpdate, Dict[str, Any]]
+                     ) -> World:
+
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        # clear cache of the queries related to the object
+        await clear_cache_by_model("World", world_id=db_obj.world_id)
+        return super().update(db, db_obj=db_obj, obj_in=update_data)
 
 
 crud_world = CRUDWorld(World)
