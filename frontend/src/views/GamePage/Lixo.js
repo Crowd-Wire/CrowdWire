@@ -51,7 +51,7 @@ const resizeStyle = {
   },
 
   handlerCol: {
-    width: '20px',
+    width: '2px',
     padding: '0',
     cursor: 'ew-resize',
     flex: '0 0 auto',
@@ -66,7 +66,7 @@ const resizeStyle = {
   },
 
   handlerRow: {
-    height: '20px',
+    height: '2px',
     padding: '0',
     cursor: 'ns-resize',
     flex: '0 0 auto',
@@ -249,21 +249,40 @@ class GamePage extends React.Component {
       let boxA = dragginHandler.previousSibling; 
       let boxB = dragginHandler.nextSibling; 
 
-      console.log(boxA.style, boxB.style)
+
+       // Get offset
+       
+      //  var containerOffsetLeft = wrapper.offsetLeft;
+
+      //  // Get x-coordinate of pointer relative to container
+      //  var pointerRelativeXpos = e.clientX - containerOffsetLeft;
+ 
+      //  var dragSize = e.clientX - startX;
+ 
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
-        console.log(boxA.style.height, boxB.style.height)
-        let rand = Math.floor(Math.random() * 100);
-        boxA.style.height = `${rand}%`;
-        boxB.style.height = `${100-rand}%`;
-        console.log(rand, 100-rand)
+        const combinedHeight = boxA.offsetHeight + boxB.offsetHeight;
+        console.log('combinedHeight', combinedHeight, '=', boxA.offsetHeight, '+', boxB.offsetHeight,  '-', boxA.offsetTop)
+        const totPercentage = parseInt(boxA.style.height.substr(0, boxA.style.height.length-1)) + parseInt(boxB.style.height.substr(0, boxB.style.height.length-1));
+        console.log('totPercentage', totPercentage)
+        const newHeight = ((e.clientY - boxA.offsetTop) / combinedHeight * totPercentage).toFixed(0);
+        console.log('(', e.clientY, '-', boxA.offsetTop, ')', '/', combinedHeight, '*', totPercentage)
+        console.log('newHeight', newHeight)
+        console.log('newHeight2', totPercentage-newHeight)
+
+        if (e.clientY - boxA.offsetTop < 200)
+          return;
+
+        boxA.style.height = `${newHeight}%`;
+        boxB.style.height = `${totPercentage-newHeight}%`;
 
       } else {
-        console.log(boxA.style.width, boxB.style.width)
         let rand = Math.floor(Math.random() * 100);
         boxA.style.width = `${rand}%`;
         boxB.style.width = `${100-rand}%`;
-        console.log(rand, 100-rand)
+
+        console.log(boxB.offsetLeft)
+        console.log(e.clientX)
       }
     });
 
@@ -393,7 +412,8 @@ class GamePage extends React.Component {
 
 
         <div className="wrapper" style={{backgroundColor: "#ccc", height: '100vh',  display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
-          <div className="wrapper" style={{display: 'flex', flexDirection: 'row', height: '50%' }}>
+          <div className="wrapper" style={{display: 'flex', flexDirection: 'row', height: '33%' }}>
+            
             <div style={{display: 'flex', flexDirection: 'column', width: '20%'}}>
               <GameUITest/>
             </div>
@@ -401,9 +421,14 @@ class GamePage extends React.Component {
             <div style={{display: 'flex', flexDirection: 'column', width: '80%'}}>
               <GameUITest/>
             </div>
+
           </div>
           <div className={classNames(classes.handlerRow, "handler")}></div>
-          <div className="wrapper" style={{display: 'flex', flexDirection: 'column', height: '50%', resize: 'vertical' }}>
+          <div className="wrapper" style={{display: 'flex', flexDirection: 'column', height: '33%', resize: 'vertical' }}>
+            <GameUITest/>
+          </div>
+          <div className={classNames(classes.handlerRow, "handler")}></div>
+          <div className="wrapper" style={{display: 'flex', flexDirection: 'column', height: '34%', resize: 'vertical' }}>
             <GameUITest/>
           </div>
         </div>
