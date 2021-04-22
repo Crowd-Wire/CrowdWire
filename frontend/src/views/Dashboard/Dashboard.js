@@ -23,9 +23,7 @@ class Dashboard extends Component {
       focus: focused
     });
   }
-  unDo = () => {
-    console.log("fez?");
-    }
+
 
   render() {
     const { classes } = this.props;
@@ -34,9 +32,9 @@ class Dashboard extends Component {
         <CssBaseline />
         <DashDrawer/>
         {this.state.focus ? 
-          <SearchAllMaps handler = {this.handler} />
-          :
           <DashboardContent handler = {this.handler} />
+          :
+          <SearchAllMaps handler = {this.handler} />
         }
       </div>
     );

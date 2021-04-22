@@ -4,11 +4,15 @@ import { combine } from "zustand/middleware";
 export const useMuteStore = create(
   combine(
     {
-      muted: false,
+      audioMuted: true,
+      videoMuted: true,
     },
     (set) => ({
-      setMute: (muted: boolean) => {
-        set({ muted });
+      setAudioMute: (muted: boolean) => {
+        set({ audioMuted: muted });
+      },
+      setVideoMute: (muted: boolean) => {
+        set({ videoMuted: muted });
       },
     })
   )

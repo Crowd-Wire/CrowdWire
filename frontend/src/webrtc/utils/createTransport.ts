@@ -1,6 +1,6 @@
 import { TransportOptions } from "mediasoup-client/lib/types";
 import { getSocket } from "../../services/socket";
-import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 import { useWsHandlerStore } from "../stores/useWsHandlerStore";
 
 
@@ -10,7 +10,7 @@ export async function createTransport(
   transportOptions: TransportOptions
 ) {
   console.log(`create ${direction} transport`);
-  const { device, set } = useVoiceStore.getState();
+  const { device, set } = useRoomStore.getState();
   var socket = getSocket(1).socket;
 
   // ask the server to create a server-side transport object and send
@@ -40,25 +40,6 @@ export async function createTransport(
           callback();
         }
       });
-    // socket.onmessage = (event) => {
-    //   var data = JSON.parse(event.data);
-      
-    //   console.info(`[message] Data received for topic ${data.topic}`);
-
-    //   if (data.topic == `@connect-transport-${direction}-done`) {
-    //     if (data.d.error) {
-    //       console.log(`connect-transport ${direction} failed`, data.d.error);
-    //       if (data.d.error.includes("already called")) {
-    //         callback();
-    //       } else {
-    //         errback();
-    //       }
-    //     } else {
-    //       console.log(`connect-transport ${direction} success`);
-    //       callback();
-    //     }
-    //   }
-    // }
       
     if (socket.readyState === WebSocket.OPEN) {
       console.log('sending connect-transport')
@@ -92,21 +73,7 @@ export async function createTransport(
               callback({ id: d.id });
             }
           });
-        // socket.onmessage = (event) => {
-        //   var data = JSON.parse(event.data);
-          
-        //   console.info(`[message] Data received for topic ${data.topic}`);
-    
-        //   if (data.topic == `@send-track-${direction}-done`) {
-        //     if (data.d.error) {
-        //       console.log(`send-track ${direction} failed`, data.d.error);
-        //       errback();
-        //     } else {
-        //       console.log(`send-track-transport ${direction} success`);
-        //       callback({ id: data.d.id });
-        //     }
-        //   }
-        // }
+
         if (socket.readyState === WebSocket.OPEN) {
           socket.send(JSON.stringify({
             topic: "@send-track",
@@ -126,9 +93,6 @@ export async function createTransport(
     );
   }
 
-  // for this simple demo, any time a transport transitions to closed,
-  // failed, or disconnected, leave the room and reset
-  //
   transport.on("connectionstatechange", async (state) => {
     console.log(
       `${direction} transport ${transport.id} connectionstatechange ${state}`

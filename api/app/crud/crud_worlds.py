@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional, Tuple, Union, Dict, Any
+from typing import Optional, Tuple, Union, Dict, Any, List
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
@@ -8,7 +9,7 @@ from app.models import World, User
 from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
-from app.crud.crud_tags import tag as crud_tag
+from app.crud.crud_tags import crud_tag
 from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user
@@ -137,6 +138,29 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         await clear_cache_by_model("World", world_id=db_obj.world_id)
         obj = super().update(db, db_obj=db_obj, obj_in=update_data)
         return obj, strings.WORLD_UPDATE_SUCCESS
+
+    def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
+
+        # TODO: search world might need pagination
+        if not tags:
+            tags = []
+
+        query = db.query(World).filter(World.public).filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
+            or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
+        ).all()
+
+        # TODO: try to find a solution in sqlalchemy
+
+        if tags:
+            ret = []
+            for obj in query:
+                for obj_tag in obj.tags:
+                    if obj_tag.name in tags:
+                        ret.append(obj)
+                        break
+            return ret
+        return query
+
 
 
 crud_world = CRUDWorld(World)

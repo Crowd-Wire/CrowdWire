@@ -16,4 +16,4 @@ class CRUDTag(CRUDBase[Tag, TagCreate, TagUpdate]):
         return db.query(Tag).all()
 
 
-tag = CRUDTag(Tag)
+crud_tag = CRUDTag(Tag)

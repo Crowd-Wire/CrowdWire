@@ -2,15 +2,18 @@ import hark from "hark";
 import React, { useEffect } from "react";
 // import { useCurrentRoomStore } from "../stores/useCurrentRoomStore";
 import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 import { wsend } from "../../services/socket.js";
 
 interface ActiveSpeakerListenerProps {}
 
 export const ActiveSpeakerListener: React.FC<ActiveSpeakerListenerProps> = ({}) => {
-  const { micStream, roomId } = useVoiceStore();
   const isSafari = window['safari'] || navigator.userAgent.toLowerCase().indexOf("Safari") > -1;
-
+  
   useEffect(() => {
+    let { micStream } = useVoiceStore();
+    let { roomId } = useRoomStore();
+
     if (!roomId || !micStream || isSafari) {
       return;
     }
@@ -28,7 +31,7 @@ export const ActiveSpeakerListener: React.FC<ActiveSpeakerListenerProps> = ({}) 
     return () => {
       harker.stop();
     };
-  }, [micStream, roomId]);
+  }, [useVoiceStore.getState().micStream, useRoomStore.getState().roomId]);
 
   return null;
 };

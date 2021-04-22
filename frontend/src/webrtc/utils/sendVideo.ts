@@ -1,40 +1,42 @@
 import storeDevice from "../../redux/commStore.js";
-import { useVoiceStore } from "../stores/useVoiceStore";
+import { useRoomStore } from "../stores/useRoomStore";
 import { useVideoStore } from "../stores/useVideoStore";
+import { useMuteStore } from "../stores/useMuteStore";
 
 export const sendVideo = async () => {
   const { camId } = storeDevice.getState().camId;
-  const { set, cam } = useVideoStore.getState();
-  const { sendTransport } = useVoiceStore.getState();
+  const { set, cam, camStream } = useVideoStore.getState();
+  const { sendTransport, roomId } = useRoomStore.getState();
+  const { videoMuted } = useMuteStore.getState();
+  
+  if (!roomId || videoMuted)
+    return;
+
   if (!sendTransport) {
     console.log("no sendTransport in sendVoice");
     return;
   }
-  cam?.stop();
-  let camStream: MediaStream;
-  try {
-    camStream = await navigator.mediaDevices.getUserMedia({
-      video: camId ? { deviceId: camId } : true,
-      audio: false
-    });
-  } catch (err) {
-    set({ cam: null, camStream: null });
-    console.log(err);
-    return;
+
+  if (!camStream) {
+    try {
+      await navigator.mediaDevices.getUserMedia({
+        video: camId ? { deviceId: camId } : true,
+        audio: false
+      }).then((camStream) => {
+        set({camStream: camStream, cam: camStream.getVideoTracks()[0]})
+      })
+    } catch (err) {
+      set({ cam: null, camStream: null });
+      console.log(err);
+      return;
+    }
   }
 
-  const videoTracks = camStream.getVideoTracks();
-
-  if (videoTracks.length) {
+  if (cam) {
     console.log("creating producer...");
-    const track = videoTracks[0];
-    await sendTransport.produce({
-      track: track,
+    sendTransport.produce({
+      track: cam,
       appData: { mediaTag: "cam-video" },
-    })
-    set({ cam: track, camStream });
-    return;
+    }).then((producer) => {set({camProducer: producer})})
   }
-
-  set({ cam: null, camStream: null });
 };
