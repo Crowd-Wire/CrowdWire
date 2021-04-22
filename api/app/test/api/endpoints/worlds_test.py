@@ -7,7 +7,6 @@ from app.api.dependencies import get_current_user
 from app.core.strings import WORLD_NOT_FOUND
 from app.models import Tag
 from app.core import strings
-import json
 
 client = TestClient(app)
 
@@ -174,5 +173,3 @@ class TestWorlds(TestCase):
 
             assert response.status_code == 400
             assert response.json()['detail'] == strings.INVALID_TAG
-
-
