@@ -27,8 +27,18 @@ class RedisConnector:
     async def get(self, key: str) -> any:
         return await self.master.execute('get', key)
 
+    async def delete(self, key: Union[str, bytes]):
+        return await self.master.execute('del', key)
+
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
+
+    async def scan_match(self, matcher: str):
+        """
+        Scans all keys that contain a matcher string
+        """
+        regex = f"*{matcher}*"
+        return await self.master.execute('scan', 0, 'match', regex)
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)

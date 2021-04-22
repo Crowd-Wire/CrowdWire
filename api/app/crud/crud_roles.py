@@ -16,7 +16,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         """
         Create default roles when a world is created
         """
-        default_roles = [Role(world_id=world_id, name="default", is_default=True),
+        default_roles = [Role(world_id=world_id, name="default", is_default=True, role_manage=True),
                          Role(world_id=world_id, name="speaker"),
                          Role(world_id=world_id, name="moderator")]
         db.add_all(
