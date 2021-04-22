@@ -15,6 +15,7 @@
     "classnames": "2.2.6",
     "hark": "^1.2.3",
     "history": "^5.0.0",
+    "immutability-helper": "^3.1.1",
     "mediasoup-client": "^3.6.29",
     "moment": "2.26.0",
     "node-sass": "4.14.1",
@@ -22,6 +23,7 @@
     "phaser": "^3.52.0",
     "prop-types": "15.7.2",
     "react": "^16.14.0",
+    "react-beautiful-dnd": "^13.1.0",
     "react-bootstrap": "^1.5.1",
     "react-datetime": "2.16.3",
     "react-dnd": "^14.0.1",
@@ -38,6 +40,7 @@
     "react-swipeable-views": "0.13.9",
     "react-toastify": "^7.0.3",
     "redux": "^4.0.5",
+    "styled-components": "^4.4.1",
     "toastify": "^2.0.1",
     "zustand": "^3.4.1"
   },

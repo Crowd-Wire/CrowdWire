@@ -9,16 +9,52 @@ import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
 
 
 class WSettingsContent extends Component {
-	roles = {'Admin':[0,1,2,3,4,5,6,7], 'Speaker':[0,1,2,4,5,7],'Member':[0,1,2,7]};
-	users = ['Silvia','Marco','Teixeira'];
-	reports = [
-		{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
-		{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
-		{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
-	];
-	state = {value: 0};
+
+	state = 
+		{
+			value: 0,
+			roles: {
+				'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
+				'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
+				'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
+				'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
+			},
+			users: ['Silvia','Marco','Teixeira'],
+			reports: [
+				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
+				{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
+				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
+			],
+		};
+		
 	constructor(props){
 		super(props);
+	}
+	
+	setUsers = (item, rName) => {
+		this.setState(state => {
+			console.log(item, 1)
+
+			const roles = state.roles;
+			let flag = false;
+			for (let [key, value] of Object.entries(roles)) {
+				let users = value.users;	
+				for (let i=0; i < users.length; i++) {
+					if (users[i]['id'] == item.id) {
+						users.splice(i, 1);
+						flag = true;
+						break;
+						
+					}
+				}
+				if (flag) break;
+			}
+			console.log(item, 2)
+			roles[rName].users.splice(0, 0, item);
+			console.log(roles)
+
+			return { roles };
+		})
 	}
 
 	changeTab = (event, newValue) => {
@@ -26,7 +62,6 @@ class WSettingsContent extends Component {
 	};
 	
 	a11yProps(index) {
-		console.log("index"+index);
 		return {
 			id: `simple-tab-${index}`,
 			'aria-controls': `simple-tabpanel-${index}`,
@@ -48,8 +83,8 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel roles={this.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0}>CHEFAO</RolePanel>
-						<KickBanPanel users={this.users} reports={this.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
+						<RolePanel roles={this.state.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>
 		);
