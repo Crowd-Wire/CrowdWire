@@ -114,15 +114,29 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
     async def update(self, db: Session, *,
                      db_obj: World,
                      obj_in: Union[WorldUpdate, Dict[str, Any]]
-                     ) -> World:
+                     ) -> Tuple[Optional[World], str]:
 
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
+        if 'creator' in update_data:
+            del update_data['creator']
+
+        if 'tags' in update_data:
+            # TODO Check best way to do this
+            lst = []
+            # Obtain the Tag Objects
+            for tag_name in update_data['tags']:
+                if valid_tag := crud_tag.get_by_name(db=db, name=tag_name):
+                    lst.append(valid_tag)
+                else:
+                    return None, strings.INVALID_TAG
+            update_data['tags'] = lst
         # clear cache of the queries related to the object
         await clear_cache_by_model("World", world_id=db_obj.world_id)
-        return super().update(db, db_obj=db_obj, obj_in=update_data)
+        obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        return obj, strings.WORLD_UPDATE_SUCCESS
 
 
 crud_world = CRUDWorld(World)

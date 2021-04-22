@@ -75,14 +75,21 @@ async def update_world(
     """
     Updates a  specific World's Information
     """
+    # first checking if this user can edit the world(creator only)
     world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
     if not world_obj:
         raise HTTPException(
             status_code=400,
             detail=message,
         )
-
-    return await crud.crud_world.update(db=db,db_obj=world_obj,obj_in=world_in)
+    # afterwards update data and clear cache
+    world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj,obj_in=world_in)
+    if not world_obj_updated:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+    return world_obj_updated
 
 
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
