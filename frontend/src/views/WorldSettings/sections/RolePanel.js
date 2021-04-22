@@ -5,42 +5,33 @@ import Col from 'react-bootstrap/Col';
 import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import CheckIcon from '@material-ui/icons/Check';
+import RoleUserList from 'components/RoleUserList/RoleUserList.js';
 
 export default function RolePanel(props){
-	const { children, users, roles,value, index, ...other } = props;
-	console.log(index+","+value+children);
+	const { children, users, roles,value, index, setUsers , ...other } = props;
 	let rows = [];
 	let rolekeys = [];
-    for(let i=0; i<users.length; i++){
-      rows.push(
-		<Row style={{height:"50px"}}>
-			<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
-			<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-		</Row>
-	  );
-    }
+
 	Object.keys(roles).forEach(function(key) {
-		console.log(key,roles[key]);
 		rolekeys.push(
-			<Row style={{marginTop:"5px"}}>
-				<Typography variant="h5">{key}</Typography>
-			</Row>
+			<div id="context">
+				<RoleUserList setUsers={setUsers} roleName={key} value={roles[key]} allRoles={Object.keys(roles)}/>
+			</div>
 		);
 	});
 	return(
 		<div
-		role="tabpanel"
-		hidden={value !== index}
-		id={`simple-tabpanel-${index}`}
-		aria-labelledby={`simple-tab-${index}`}
-		{...other}
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
 		>
 			{value === index && (
 				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
-					<Col xs={3} sm={3} md={3} style = {{borderRight:"1px solid black",height:"100%"}}>
+					<Col xs={4} sm={4} md={4} style = {{borderRight:"1px solid black",height:"100%"}}>
 						<Row style={{ height:"10%"}}>
-							<Typography variant="h5" style={{marginTop:"10px", marginLeft:"10px"}}>Roles:</Typography>
+							<TextField id="filled-search" label="Search user" type="search" variant="filled" style={{width:"100%"}}/>
 						</Row>
 						<hr/>
 						<Row style={{overflowY:"auto", height:"65%"}}>
@@ -52,20 +43,8 @@ export default function RolePanel(props){
 							<Typography variant="h5" style={{margin:"auto"}}><AddIcon/>Add Role</Typography>
 						</Row>
 					</Col>
-					<Col xs={6} sm={6} md={6}>
+					<Col xs={8} sm={8} md={8}>
 						<UserPermissions/>				
-					</Col>
-					<Col xs={3} sm={3} md={3} style={{height:"100%", borderLeft:"solid 1px black"}}>
-						<Row style={{ height:"10%"}}>
-							<TextField id="filled-search" label="Search field" type="search" variant="filled" style={{width:"100%"}}/>
-							{/* <Typography variant="h5" style={{marginLeft:"10px", marginTop:"10px"}}>Users:</Typography> */}
-						</Row>
-						<hr/>
-						<Row style={{overflowY:"auto", height:"80%"}}>
-							<Col>
-								{rows}
-							</Col>
-						</Row>
 					</Col>
 				</Row>
 			)}
