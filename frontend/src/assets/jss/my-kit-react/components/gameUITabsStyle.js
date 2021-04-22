@@ -6,10 +6,8 @@ const gameUITabsStyle = {
     backgroundColor: "rgba(200, 200, 200, .3)",
     margin: 0,
     flexGrow: '1',
-      
     display: 'flex',
     flexDirection: 'column',
-    
     /* for Firefox */
     minHeight: '0',
   },

@@ -58,7 +58,7 @@ console.log(classes);
   }
 
   return (
-    <Card plain={plainTabs} classes={{ ...classes.card }} style={{...resizeStyles.section}}> {/*ref={preview}*/}
+    <Card plain={plainTabs} classes={{ card: classes.card }} > {/*ref={preview}*/}
       <CardHeader
         // ref={drag}
         classes={{ cardHeader: classes.cardHeader }}
