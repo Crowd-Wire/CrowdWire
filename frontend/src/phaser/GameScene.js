@@ -129,6 +129,7 @@ class GameScene extends Phaser.Scene {
 class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     speed = 500;
     step = 0;
+    lastVelocity;
 
     constructor(scene, x, y) {
         super(scene, x, y, 'player', 6);
@@ -185,15 +186,13 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 
         this.updateAnimation();
 
-        if (this.body.speed) {
-            this.step = 1;
-            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
-        } else if (this.step === 1) {
-            this.step = 2;
-            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
-        } else if (this.step === 2) {
-            this.step = 0;
+        if (this.step == 1 && !this.body.speed) {
             ws.sendMovement('1', this.body.center, this.body.velocity);
+            this.step = 0;
+        } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
+            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
+            this.lastVelocity = this.body.velocity.clone();
+            this.step = 1;
         }
     }
 
@@ -247,6 +246,8 @@ class OnlinePlayerSprite extends PlayerSprite {
     handlePlayerMovement = ({position, velocity}) => {
         this.updateAnimation(velocity);
         this.body.reset(position.x, position.y);
+        this.body.setVelocity(velocity.x, velocity.y);
+        console.log(velocity)
     }
 
     /**
