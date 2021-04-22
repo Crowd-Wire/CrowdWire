@@ -33,8 +33,8 @@ class CreateWorld extends Component {
     };
 
 
-  createWorld = () => {
-    //WorldService.create(name, accessibility, nUsers, labels, description)
+  createWorld = (wName, accessibility, maxUsers, tag_array, desc) => {
+    WorldService.create(wName, accessibility, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"
     });

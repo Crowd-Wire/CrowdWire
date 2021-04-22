@@ -32,7 +32,16 @@ class WorldService {
     }
 
     create(name, accessibility, nUsers, labels, description){
-        
+        console.log(name, accessibility, nUsers, labels, description);
+        return fetch(API_BASE + 'world-create', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            // TODO: change hashed_password to password after backend update
+            body: JSON.stringify({ name: name, accessibility: accessibility, maxUsers:nUsers, labels: labels, description: description })
+        })
     }
 
 }
