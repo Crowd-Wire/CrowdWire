@@ -34,27 +34,39 @@ export default function WorldDetails(props){
 
     const [accessibility, setAccessibility] = React.useState("false");
     const [guests, setGuests] = React.useState("false");
-
+    const [titleHelper, settitleHelper] = React.useState("");
+    const [maxUsersHelper, setMaxUsersHelper] = React.useState("");
+    const [descHelper, setDescHelper] = React.useState("");
     const creation = () => {
+        let send = true;
         maxUsers = parseInt(maxUsers)
-        if(wName && wName.length<=30){
-            if(maxUsers && Number.isInteger(maxUsers) && maxUsers>=0){
-                if(desc.length<=300){
-                    console.log(typeof wName);
-                    createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
-                    setError(-1);
-                    return;
-                }
-                console.log("Description is too long (300)");
-                setError(0);
-                return;
-            }
-            console.log("Invalid Quantity");
-            setError(1);
-            return;
+        if(!wName){
+            send=false;
+            settitleHelper("Title is mandatory");}
+        else if( wName.length>30){
+            send=false;
+            settitleHelper("Title is too big (30)");}
+        else
+            settitleHelper("");
+        if(!maxUsers){
+            send=false;
+            setMaxUsersHelper("Max users is mandatory");}
+        else if(!Number.isInteger(maxUsers) || maxUsers<=0){
+            send=false;
+            setMaxUsersHelper("Max users must be positive integer");}
+        else
+            setMaxUsersHelper("");
+
+        if(desc.length>300){
+            send=false;
+            setDescHelper("Description is too big (300)");
         }
-        console.log("Invalid Name");
-        setError(2);
+        else
+            setDescHelper("");
+        if(send){
+            console.log("sending");
+            createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
+        }
     }
 
     const onChangeValue = (event) => {
@@ -88,8 +100,16 @@ export default function WorldDetails(props){
                         <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"20px"}}>
-                        <TextField error={error===2} id="outlined-basic" required onChange={onChangeTitle} label="Name" style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}/>
-                        
+                            <TextField 
+                                error={error===2} 
+                                id="outlined-basic"
+                                helperText={titleHelper}
+                                required 
+                                onChange={onChangeTitle} 
+                                label="Name" 
+                                style={{maxWidth:"70%", marginLeft:"auto", marginRight:"auto"}}
+                            />
+
                     </Row>
                     <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"30px"}}>
                         <Col>
@@ -104,7 +124,7 @@ export default function WorldDetails(props){
                         <Col>
                             <div style={{width:"100%", marginRight:"auto"}}>
                             <FormLabel component="legend">Allow guests</FormLabel>
-                                <RadioGroup row name="accessibility" onChange={onChangeGuests}>
+                                <RadioGroup row name="guests" onChange={onChangeGuests}>
                                 <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Allow" />
                                 <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Deny" />
                             </RadioGroup>
@@ -134,6 +154,7 @@ export default function WorldDetails(props){
                             <TextField
                                 onChange={onChangeMaxUsers}
                                 error={error===1}
+                                helperText={maxUsersHelper}
                                 style={{marginRight:"30px"}}
                                 id="standard-number"
                                 label="Max Online Users"
@@ -148,6 +169,7 @@ export default function WorldDetails(props){
                         <TextField
                         onChange={onChangeDesc}
                         error={error===0}
+                        helperText={descHelper}
                         style={{width:"100%"}}
                         id="outlined-multiline-static"
                         multiline
