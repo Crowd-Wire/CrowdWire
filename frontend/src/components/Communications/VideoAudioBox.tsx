@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card } from '@material-ui/core';
-import CardBody from "../Card/CardBody.js";
 import volumeStore from "../../redux/globalVolumeStore.js";
 import { UserVolumeSlider } from "./UserVolumeSlider";
 import MicIcon from '@material-ui/icons/Mic';
@@ -85,16 +84,17 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div style={{maxHeight:'10%', maxWidth:400}}>
+    <div style={{height:'100%', maxWidth:400, width: '100%', overflow: 'auto', display: 'inline-block'}}>
       <Card style={{padding: 3,
-      background: 'rgba(215, 240, 240, 0.6)',
-      overflow: 'hidden',
-      boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
-      borderTop: '1px solid rgba(255,255,255,0.5)',
-      borderLeft: '1px solid rgba(255,255,255,0.5)',
-      backdropFilter: 'blur(3px)'
+        background: 'rgba(65, 90, 90, 0.5)',
+        overflow: 'hidden',
+        boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+        borderTop: '1px solid rgba(255,255,255,0.5)',
+        borderLeft: '1px solid rgba(255,255,255,0.5)',
+        backdropFilter: 'blur(3px)',
+        height: '100%'
       }}>
-          <div style={{textAlign: 'center', fontSize: '1.3em', color: '#fff', fontWeight: 500}}>
+          <div style={{textAlign: 'center', fontSize: 18, color: '#fff', fontWeight: 500}}>
             <span>{username}</span>
           </div>
           <div id={id+"border_div"}>
@@ -105,27 +105,27 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                 <audio autoPlay id={id+"_audio"} ref={videoRef}/>
                 ) : ''}
           </div>
+          
+          <div className="row col-sm-12" style={{position: 'absolute', bottom: 0}}>
+              <Col sm={5}>
+                { videoTrack && !videoToggle ?
+                    videoState ? 
+                      (<VideocamIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleVideo()}/>)
+                    : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
+                  : (<VideocamOffIcon color={'action'}/>)
+                }
+                { audioTrack && !audioToggle ?
+                    audioState ? 
+                      (<MicIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleAudio()}/>)
+                    : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+                  : (<MicOffIcon color={'action'}/>)
+                }
+              </Col>
 
-          <Row>
-            <Col sm={5}>
-              { videoTrack && !videoToggle ?
-                  videoState ? 
-                    (<VideocamIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleVideo()}/>)
-                  : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-                : (<VideocamOffIcon color={'action'}/>)
-              }
-              { audioTrack && !audioToggle ?
-                  audioState ? 
-                    (<MicIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleAudio()}/>)
-                  : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-                : (<MicOffIcon color={'action'}/>)
-              }
-            </Col>
-
-            <Col sm={7} style={{textAlign: 'center'}}>
-              <UserVolumeSlider userId={id} />
-            </Col>
-          </Row>
+              <Col sm={7} style={{textAlign: 'center', paddingRight: 2}}>
+                <UserVolumeSlider volColor={'white'} userId={id} />
+              </Col>
+          </div>
       </Card>
     </div>
   );

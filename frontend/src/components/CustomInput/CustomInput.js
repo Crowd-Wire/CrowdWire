@@ -61,7 +61,6 @@ export default function CustomInput(props) {
         <InputLabel
         className={classes.labelRoot + " " + labelClasses}
         htmlFor={id}
-        htmlFor="component-error"
           {...labelProps}
         >
           {labelText}

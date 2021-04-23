@@ -12,13 +12,13 @@ class WorldService {
         let url = 'worlds/';
         let query = [];
         
-        if(search != "")
+        if(search !== "")
             query.push('search='+search);
         
-        if(tags.length != 0)
+        if(tags.length !== 0)
             query.push('tags='+tags.join('&tags='));
 
-        if(query.length != 0)
+        if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
 
 

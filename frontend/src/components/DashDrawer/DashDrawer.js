@@ -2,7 +2,6 @@ import React from "react";
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
-import ExploreIcon from '@material-ui/icons/Explore';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -84,21 +83,21 @@ export default function DashDrawer(){
     console.log("perform query on all worlds;")
   }
 
-  const onClickJoinedWorlds = () => {
-    console.log(navigation.toString());
-    if(location.pathname!=="/dashboard")
-      navigation("/dashboard");
-  }
+  // const onClickJoinedWorlds = () => {
+  //   console.log(navigation.toString());
+  //   if(location.pathname!=="/dashboard")
+  //     navigation("/dashboard");
+  // }
 
   const onClickCreateWorld = () => {
     console.log(navigation.toString());
     navigation("../create-world");
   }
 
-  const onClickDefinitions = () => {
-    console.log(navigation.toString());
+  // const onClickDefinitions = () => {
+  //   console.log(navigation.toString());
 
-  }
+  // }
 
   const handleDrawerClose = () => {
     setOpen(false);

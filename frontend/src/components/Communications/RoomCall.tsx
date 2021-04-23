@@ -2,13 +2,11 @@ import React, { createRef } from 'react';
 
 import { toast } from 'react-toastify';
 // Icons imports
-import { Button, Grid } from '@material-ui/core';
-import ChatIcon from '@material-ui/icons/Chat';
+import { Button } from '@material-ui/core';
 
 import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
-import { DeviceSettings } from "./DeviceSettings";
 import storeDevice from "../../redux/commStore.js";
 import { VideoAudioBox } from "./VideoAudioBox";
 import { MyVideoAudioBox } from "./MyVideoAudioBox";
@@ -22,7 +20,7 @@ import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
-import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
+// import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
@@ -175,12 +173,13 @@ export default class RoomCall extends React.Component<{}, State> {
       responsiveLayout: [
         {
           breakpoint: 1200,
-          cols: numberUsers > 3 ? 3 : numberUsers,
-          rows: numberUsers > 3 ? 2 : 1,
+          cols: numberUsers > 4 ? 4 : numberUsers,
+          rows: numberUsers > 4 ? 2 : 1,
           gap: 5,
           loop: true,
           autoplay: 0,
-          hideArrow: numberUsers > 6 ? false : true
+          hideArrow: numberUsers > 6 ? false : true,
+          showDots: numberUsers > 8 ? true : false,
         }
       ],
       mobileBreakpoint: 600
@@ -188,17 +187,6 @@ export default class RoomCall extends React.Component<{}, State> {
     return (
       <React.Fragment>
         {/* <ActiveSpeakerListener/> */}
-        <div>
-          <h4>
-            Share Screen
-          </h4>
-        </div>
-
-        <div onClick={() => this.chatHandle(!this.state.chatToggle)} title="Chat">
-          <ChatIcon></ChatIcon>
-        </div>
-        <Button color="primary" onClick={this.setNavigatorToStream}>Add Component</Button>
-        <Button color="primary" onClick={() => this.reInitializeStream}>Re-initialize Stream</Button>
 
         <div className="row">
           <Button color="primary" onClick={() => {
@@ -216,7 +204,7 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
-        <div  style={{background: `url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeR9_w_NYXmCcY7oxymE0v2uaWX6s6dcwP8g&usqp=CAU")` , padding: 10}}>
+        <div  style={{padding: 10}}>
           <Carousel {...gridSettings}>
 
             <Carousel.Item key={this.myId}>
@@ -272,7 +260,7 @@ export default class RoomCall extends React.Component<{}, State> {
           </Carousel>
         </div>
 
-       
+      
 
         <ChatBox 
           chatToggle={this.state.chatToggle} 
@@ -281,7 +269,6 @@ export default class RoomCall extends React.Component<{}, State> {
           // myDetails={userDetails} 
           messages={this.state.messages}>
         </ChatBox>
-        
       </React.Fragment>
     );
   }

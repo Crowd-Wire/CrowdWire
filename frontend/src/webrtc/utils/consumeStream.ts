@@ -21,9 +21,9 @@ export const consumeStream = async (consumerParameters: any, peerId: string, kin
   console.log(consumer)
   useConsumerStore.getState().add(consumer, peerId, kind);
   
-  if (kind == 'audio')
+  if (kind === 'audio')
     useConsumerStore.getState().addAudioToggle(peerId, consumerParameters.producerPaused)
-  else if (kind == 'video')
+  else if (kind === 'video')
     useConsumerStore.getState().addVideoToggle(peerId, consumerParameters.producerPaused);
   
   console.log(useConsumerStore.getState())
