@@ -66,20 +66,20 @@ class GamePage extends React.Component {
         {
           size: 50,
           grid: [
-            {size: 30, tabs: [1, 2, 3]},
-            {size: 20, tabs: [3]},
-            {size: 50, tabs: [1]},
+            { size: 30, tabs: [1, 2, 3] },
+            { size: 20, tabs: [3] },
+            { size: 50, tabs: [1] },
           ]
         },
-        {size: 25, tabs: [2]},
-        {size: 25, tabs: [4,2]}
+        { size: 25, tabs: [2] },
+        { size: 25, tabs: [4, 2] }
       ]
     }
   }
 
   gridRemoveTabs = (tabs, elemPath) => {
     this.setState(state => {
-      let grid = state.grid;
+      const grid = state.grid;
       let parent;
       let elem = { grid };
 
@@ -112,38 +112,39 @@ class GamePage extends React.Component {
     })
   }
 
-  gridBuild = (grid=this.state.grid, depth=0, path=[]) => {
+  gridBuild = (grid = this.state.grid, depth = 0, path = []) => {
     const dimension = (depth % 2 == 0) ? "height" : "width";
     const wrapper = (depth % 2 == 0) ? "wrapperRow" : "wrapperCol";
     const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
     const handler = (depth % 2 == 0) ? "handlerRow" : "handlerCol";
-      
+
     return (
       grid.map((item, index) => {
         return (
           <>
             {
-              (index > 0) ? 
-                <div 
-                  className={classNames(handler, "handler")} 
-                  style={{[margin]: '-10px'}}
+              (index > 0) ?
+                <div
+                  key={`0${index}`}
+                  className={classNames(handler, "handler")}
+                  style={{ [margin]: '-10px' }}
                 ></div>
-              : null
+                : null
             }
-            <div 
+            <div
               key={index}
               data-path={path.concat(index).join('-')}
               data-size={item.size}
               style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
-              className={ wrapper }
+              className={wrapper}
             >
-              { 
+              {
                 item.hasOwnProperty('tabs') ?
                   <GameUITabs
                     headerColor="gray"
                     tabs={item.tabs.map(t => gameWindows[t])}
                   />
-                :
+                  :
                   this.gridBuild(item.grid, depth + 1, path.concat(index))
               }
             </div>
@@ -163,51 +164,88 @@ class GamePage extends React.Component {
     var dragginHandler;
 
     document.addEventListener('keyup', (e) => {
-      if(e.key === 'r') this.gridRemoveTabs([], [])
+      if (e.key === 'r') this.gridRemoveTabs([], [])
     });
 
-    document.addEventListener('mousedown', function(e) {
+    document.addEventListener('mousedown', (e) => {
       handlers.forEach((h) => {
         if (e.target === h)
           dragginHandler = h;
       })
     });
 
-    document.addEventListener('mousemove', function(e) {
+    document.addEventListener('mousemove', (e) => {
       if (dragginHandler == null)
         return;
 
 
-      let boxA = dragginHandler.previousSibling; 
-      let boxB = dragginHandler.nextSibling; 
+      let boxA = dragginHandler.previousSibling;
+      let boxB = dragginHandler.nextSibling;
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
-        // const totalHeightPerc = boxA.style.height
-        const totalHeight = boxA.offsetHeight + boxB.offsetHeight;
-        const newHeight = e.clientY - boxA.offsetTop;
+        const totalHeight = parseFloat(boxA.getAttribute('data-size')) + parseFloat(boxB.getAttribute('data-size'));
+        const boxAPath = boxA.getAttribute('data-path').split('-').map((p) => parseInt(p, 10));
+        const totalHeightPx = boxA.offsetHeight + boxB.offsetHeight;
+        const newHeightPx = e.clientY - boxA.offsetTop;
 
-        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + totalHeight - e.clientY < 200)
+        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + totalHeightPx - e.clientY < 200)
           return;
 
-        boxA.style.height = `${newHeight}px`;
-        boxB.style.height = `${totalHeight-newHeight}px`;
+        this.setState(state => {
+          const grid = state.grid;
+          let parent = { grid };
+
+          // locate parent element
+          for (let p of boxAPath.slice(0, -1)) {
+            parent = parent.grid[p];
+          }
+
+          const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
+          const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
+
+          console.log(parent, boxAObj, boxBObj)
+
+          boxAObj.size = parseFloat((newHeightPx / totalHeightPx * totalHeight)).toFixed(2);
+          boxBObj.size = totalHeight - boxAObj.size;
+
+          return { grid };
+        })
 
       } else {
-        const combinedWidth = boxA.offsetWidth + boxB.offsetWidth;
-        const newWidth = e.clientX - boxA.offsetLeft;
+        const totalWidth = parseFloat(boxA.getAttribute('data-size')) + parseFloat(boxB.getAttribute('data-size'));
+        const boxAPath = boxA.getAttribute('data-path').split('-').map((p) => parseInt(p, 10));
+        const totalWidthPx = boxA.offsetWidth + boxB.offsetWidth;
+        const newWidthPx = e.clientX - boxA.offsetLeft;
 
-        if (e.clientX - boxA.offsetLeft < 200 || boxA.offsetLeft + combinedWidth - e.clientX < 200)
+        if (e.clientX - boxA.offsetLeft < 200 || boxA.offsetLeft + totalWidthPx - e.clientX < 200)
           return;
 
-        boxA.style.width = `${newWidth}px`;
-        boxB.style.width = `${combinedWidth-newWidth}px`;
-      }
-    });
+        this.setState(state => {
+          const grid = state.grid;
+          let parent = { grid };
 
-    document.addEventListener('mouseup', function(e) {
+          // locate parent element
+          for (let p of boxAPath.slice(0, -1)) {
+            parent = parent.grid[p];
+          }
+
+          const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
+          const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
+
+          console.log(parent, boxAObj, boxBObj)
+
+          boxAObj.size = parseFloat((newWidthPx / totalWidthPx * totalWidth)).toFixed(2);
+          boxBObj.size = totalWidth - boxAObj.size;
+
+          return { grid };
+        })
+      }
+    })
+
+    document.addEventListener('mouseup', (e) => {
       dragginHandler = null;
     });
-    
+
   }
 
 
@@ -241,11 +279,11 @@ class GamePage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
 
-        <div className={"wrapperCol"} style={{backgroundColor: "#ddd", maxHeight: '100vh', height: '100%'}}>
+        <div className={"wrapperCol"} style={{ backgroundColor: "#ddd", maxHeight: '100vh', height: '100%' }}>
           {this.gridBuild()}
         </div>
 
-     
+
         {/* <div className={"wrapperCol"} style={{backgroundColor: "#ddd", maxHeight: '100vh', height: '100%'}}>
           <div className={"wrapperRow"} style={{ height: '33%' }}>
             
@@ -282,7 +320,7 @@ class GamePage extends React.Component {
         </div>  */}
 
 
-    
+
 
       </>
     );
