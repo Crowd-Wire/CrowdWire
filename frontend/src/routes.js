@@ -15,8 +15,7 @@ import GamePage from "views/GamePage/GamePage.js";
 import Dashboard from "views/Dashboard/Dashboard.js";
 import WorldSettings from "views/WorldSettings/WorldSettings.js"
 import UserSettings from "views/UserSettings/UserSettings.js"
-// import MapEditor from "views/MapEditor/MapEditor.js";
-import MapEditor from "views/GamePage/Lixo.js";
+import MapEditor from "views/MapEditor/MapEditor.js";
 import FAQs from "views/FAQs/FAQs.js";
 import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
