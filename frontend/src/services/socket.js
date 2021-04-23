@@ -3,10 +3,8 @@ import { createTransport } from "../webrtc/utils/createTransport";
 import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
 import { joinRoom } from "../webrtc/utils/joinRoom";
-import { consumeAudio } from "../webrtc/utils/consumeAudio";
-import { consumeVideo } from "../webrtc/utils/consumeVideo";
+import { consumeStream } from "../webrtc/utils/consumeStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
-import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
@@ -31,10 +29,7 @@ async function flushConsumerQueue(_roomId) {
       d: { peerId, consumerParameters },
     } of consumerQueue) {
       if (_roomId === roomId) {
-        if (consumerParameters.kind == "audio")
-          await consumeAudio(consumerParameters, peerId);
-        else
-          consumeVideo(consumerParameters, peerId)
+        await consumeStream(consumerParameters, peerId, consumerParameters.kind)
       }
     }
   } catch (err) {
@@ -46,11 +41,8 @@ async function flushConsumerQueue(_roomId) {
 
 async function consumeAll(consumerParametersArr) {
   try {
-    for (const { peerId, consumerParameters } of consumerParametersArr) {
-      if (consumerParameters.kind == "audio" && !(await consumeAudio(consumerParameters, peerId))) {
-        break;
-      }
-      if (consumerParameters.kind == "video" && !(await consumeVideo(consumerParameters, peerId))) {
+    for (const { consumer, kind } of consumerParametersArr) {
+      if (!(await consumeStream(consumer.consumerParameters, consumer.peerId, kind))) {
         break;
       }
     }
@@ -141,21 +133,15 @@ export const getSocket = (worldId) => {
           })
           break;
         case "@get-recv-tracks-done":
+          console.log(data)
           consumeAll(data.d.consumerParametersArr);
           break;
         case "new-peer-producer":
-          const { recvTransport } = useVoiceStore.getState();
-          const { roomId } = useRoomStore.getState();
-          
           console.log(data)
-
-          if (recvTransport && roomId === data.d.roomId) {
-            if (data.d.consumerParameters.kind == "audio")
-              consumeAudio(data.d.consumerParameters, data.d.peerId);
-            else
-              consumeVideo(data.d.consumerParameters, data.d.peerId);
+          if (useRoomStore.getState().recvTransport && useRoomStore.getState().roomId === data.d.roomId) {
+            consumeStream(data.d.consumerParameters, data.d.peerId, data.d.kind );
           } else {
-            consumerQueue = [...consumerQueue, { roomId, d: data.d }];
+            consumerQueue = [...consumerQueue, { roomId: data.d.roomId, d: data.d }];
           }
           break;
         case "active_speaker":
@@ -167,10 +153,14 @@ export const getSocket = (worldId) => {
           break;
         case "toggle_peer_producer":
           console.log(data)
-          if (data.kind == 'audio')
+          if (data.kind === 'audio')
             useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
           else
             useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
+          break;
+        case "close_media":
+          console.log(data)
+          useConsumerStore.getState().closeMedia(data.peerId)
           break;
         default:
           const { handlerMap } = useWsHandlerStore.getState();

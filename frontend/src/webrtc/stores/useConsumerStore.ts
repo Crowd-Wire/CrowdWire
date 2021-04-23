@@ -8,8 +8,9 @@ export const useConsumerStore = create(
       consumerMap: {} as Record<
         string,
         { consumerAudio: Consumer;
-          volume: number;
           consumerVideo: Consumer;
+          consumerMedia: Consumer;
+          volume: number;
           active: boolean;
           videoToggle: boolean;
           audioToggle: boolean;
@@ -35,50 +36,51 @@ export const useConsumerStore = create(
       add: (c: Consumer, userId: string, kind: string) =>
         set((s) => {
           let volume = 100;
-          let otherConsumer = null;
+          let consumerAudio = null;
+          let consumerVideo = null;
+          let consumerMedia = null;
           let videoToggle = false;
           let audioToggle = false;
+          
+          if (kind === 'audio')
+            consumerAudio = c;
+          else if (kind === 'video')
+            consumerVideo = c;
+          else
+            consumerMedia = c;
+
           if (userId in s.consumerMap) {
             const x = s.consumerMap[userId];
             volume = x.volume;
             videoToggle = x.videoToggle;
             audioToggle = x.audioToggle;
-            if (kind == "audio") {
-              otherConsumer = x.consumerVideo;
+            if (kind === "audio") {
+              consumerVideo = x.consumerVideo;
+              consumerMedia = x.consumerMedia;
               if (x.consumerAudio) x.consumerAudio.close();
-            } else if (kind == "video") {
-              otherConsumer = x.consumerAudio;
+            } else if (kind === "video") {
+              consumerAudio = x.consumerAudio;
+              consumerMedia = x.consumerMedia;
               if (x.consumerVideo) x.consumerVideo.close();
+            } else {
+              consumerAudio = x.consumerAudio;
+              consumerVideo = x.consumerVideo;
+              if (x.consumerMedia) x.consumerMedia.close();
             }
           }
-          if (kind == "audio") {
-            return {
-              consumerMap: {
-                ...s.consumerMap,
-                [userId]: {
-                  consumerAudio: c,
-                  volume,
-                  consumerVideo: otherConsumer,
-                  active: false,
-                  videoToggle,
-                  audioToggle
-                },
-              }
-            };
-          } else if (kind == "video") {
-            return {
-              consumerMap: {
-                ...s.consumerMap,
-                [userId]: {
-                  consumerVideo: c,
-                  volume,
-                  consumerAudio: otherConsumer,
-                  active: false,
-                  videoToggle,
-                  audioToggle
-                },
-              }
-            };
+          return {
+            consumerMap: {
+              ...s.consumerMap,
+              [userId]: {
+                consumerAudio,
+                consumerVideo,
+                consumerMedia,
+                volume,
+                active: false,
+                videoToggle,
+                audioToggle
+              },
+            }
           }
         }),
       addAudioToggle: (userId: string, audioToggle: boolean) =>
@@ -99,6 +101,20 @@ export const useConsumerStore = create(
           if (s.consumerMap[userId]) {
             let user = {...s.consumerMap[userId]}
             user.videoToggle = videoToggle
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      closeMedia: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            s.consumerMap[userId].consumerMedia?.close();
+            let user = {...s.consumerMap[userId]}
+            user.consumerMedia = null;
             return {
               consumerMap: {
                 ...s.consumerMap,
@@ -141,6 +157,9 @@ export const useConsumerStore = create(
             }
             if (value.consumerVideo && !value.consumerVideo.closed) {
               value.consumerVideo.close()
+            }
+            if (value.consumerMedia && !value.consumerMedia.closed) {
+              value.consumerMedia.close()
             }
           };
           return {

@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, Union, Dict, Any, List
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.core import strings
-from app.models import World
-from app.redis.redis_decorator import cache
+from app.models import World, User, Tag
+from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate
 from app.crud.base import CRUDBase
 from app.crud.crud_tags import crud_tag
@@ -18,15 +18,27 @@ from app.core import consts
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
-    @cache
+    def is_editable_to_user(self, db: Session, world_id: int, user_id: int):
+
+        world_obj = db.query(World).join(User).filter(
+            World.creator == user_id,
+            World.world_id == world_id,
+        ).first()
+        if not world_obj:
+            return None, strings.EDITION_FORBIDDEN
+        return world_obj, ""
+
+    @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+        logger.info("------>")
         world_obj = db.query(World).filter(World.world_id == world_id).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-    @cache
+    @cache(model="World")
     async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+
         world_obj = db.query(World).filter(
             World.world_id == world_id,
             World.public.is_(True),
@@ -36,7 +48,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-    @cache
+    @cache(model="World")
     async def get_available(self, db: Session, world_id: int, user_id: Optional[int]) -> Tuple[Optional[World], str]:
         """
         Verify the availability of a world, given a  registered user.
@@ -100,26 +112,59 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
         return db_world, strings.WORLD_CREATED_SUCCESS
 
-    def filter(self, db: Session, search: str, tags: Optional[List[str]]) -> List[World]:
+    async def update(self, db: Session, *,
+                     db_obj: World,
+                     obj_in: Union[WorldUpdate, Dict[str, Any]]
+                     ) -> Tuple[Optional[World], str]:
 
-        # TODO: search world might need pagination
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        if 'creator' in update_data:
+            del update_data['creator']
+
+        if 'tags' in update_data:
+            # TODO Check best way to do this
+            lst = []
+            # Obtain the Tag Objects
+            for tag_name in update_data['tags']:
+                if valid_tag := crud_tag.get_by_name(db=db, name=tag_name):
+                    lst.append(valid_tag)
+                else:
+                    return None, strings.INVALID_TAG
+            update_data['tags'] = lst
+        # clear cache of the queries related to the object
+        await clear_cache_by_model("World", world_id=db_obj.world_id)
+        obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        return obj, strings.WORLD_UPDATE_SUCCESS
+
+    def filter(self,
+               db: Session,
+               search: str,
+               tags: Optional[List[str]],
+               is_guest: bool = False,
+               ) -> List[World]:
+
+        # TODO: search world might need pagination, (Vai ter de ter mesmo...)
         if not tags:
             tags = []
+        query = db.query(World).filter(World.public)
+        if is_guest:
+            query = query.filter(World.allow_guests.is_(True))
 
-        query = db.query(World).filter(World.public).filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
+        query = query.filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
             or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
-        ).all()
-
-        # TODO: try to find a solution in sqlalchemy
-
+        )
         if tags:
-            ret = []
-            for obj in query:
-                for obj_tag in obj.tags:
-                    if obj_tag.name in tags:
-                        ret.append(obj)
-                        break
-            return ret
+            tags_lst = []
+            for tag_name in tags:
+                if tag_obj := crud_tag.get_by_name(db=db, name=tag_name, ):
+                    tags_lst.append(tag_obj)
+
+            query = query.join(World.tags).filter(Tag.name.in_(tags)).all()
+        logger.debug(query)
+
         return query
 
 

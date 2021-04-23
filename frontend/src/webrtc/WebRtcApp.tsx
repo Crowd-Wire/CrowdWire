@@ -5,7 +5,6 @@ import { useMuteStore } from "./stores/useMuteStore";
 import { useVoiceStore } from "./stores/useVoiceStore";
 import { useRoomStore } from "./stores/useRoomStore";
 import { useWsHandlerStore } from "./stores/useWsHandlerStore";
-import { consumeAudio } from "./utils/consumeAudio";
 import { createTransport } from "./utils/createTransport";
 import { joinRoom } from "./utils/joinRoom";
 import { receiveVideoVoice } from "./utils/receiveVideoVoice";
@@ -54,7 +53,6 @@ export const WebRtcApp: React.FC<App2Props> = () => {
         d: { peerId, consumerParameters },
       } of consumerQueue.current) {
         if (_roomId === roomId) {
-          await consumeAudio(consumerParameters, peerId);
         }
       }
     } catch (err) {
@@ -85,7 +83,6 @@ export const WebRtcApp: React.FC<App2Props> = () => {
         const { roomId, recvTransport } = useRoomStore.getState();
 
         if (recvTransport && roomId === d.roomId) {
-          await consumeAudio(d.consumerParameters, d.peerId);
         } else {
           consumerQueue.current = [...consumerQueue.current, { roomId, d: d }];
         }
