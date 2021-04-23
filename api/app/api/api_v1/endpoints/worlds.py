@@ -65,6 +65,33 @@ async def join_world(
     return world_user
 
 
+@router.put("/{world_id}", response_model=schemas.WorldMapInDB)
+async def update_world(
+        world_id: int,
+        world_in: schemas.WorldUpdate,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Updates a  specific World's Information
+    """
+    # first checking if this user can edit the world(creator only)
+    world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
+    if not world_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+    # afterwards update data and clear cache
+    world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj, obj_in=world_in)
+    if not world_obj_updated:
+        raise HTTPException(
+            status_code=400,
+            detail=message,
+        )
+    return world_obj_updated
+
+
 @router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
 async def update_world_user_info(
         world_id: int,
@@ -133,8 +160,11 @@ def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         db: Session = Depends(deps.get_db),
-        user: models.User = Depends(deps.get_current_user_authorizer(required=True))
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
-
-    # TODO: change this to work for guests
-    return crud.crud_world.filter(db=db, search=search, tags=tags)
+    if not is_guest_user(user):
+        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags)
+    else:
+        logger.debug("guest")
+        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True)
+    return list_world_objs

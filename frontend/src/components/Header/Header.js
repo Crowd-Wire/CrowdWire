@@ -8,7 +8,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import Button from "@material-ui/core/Button";
 import Hidden from "@material-ui/core/Hidden";
 import Drawer from "@material-ui/core/Drawer";
 import Typography from "@material-ui/core/Typography";
@@ -16,6 +15,8 @@ import Typography from "@material-ui/core/Typography";
 import Menu from "@material-ui/icons/Menu";
 // core components
 import styles from "assets/jss/material-kit-react/components/headerStyle.js";
+import logo from '../../assets/crowdwire_white_logo.png';
+
 
 const useStyles = makeStyles(styles);
 
@@ -54,14 +55,14 @@ export default function Header(props) {
         .classList.remove(classes[changeColorOnScroll.color]);
     }
   };
-  const { color, rightLinks, leftLinks, brand, fixed, absolute } = props;
+  const { color, rightLinks, leftLinks, fixed, absolute } = props;
   const appBarClasses = classNames({
     [classes.appBar]: true,
     [classes[color]]: color,
     [classes.absolute]: absolute,
     [classes.fixed]: fixed
   });
-  const brandComponent = <Typography variant="title"><img height={50} src="assets/img/apple-icon.png" alt="CrowdWire" height={50} /></Typography>;
+  const brandComponent = <Typography variant="h4"><img height={50} src={logo}/>CrowdWire</Typography>;
   return (
     <AppBar className={appBarClasses}>
       <Toolbar className={classes.container}>

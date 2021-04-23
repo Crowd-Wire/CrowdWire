@@ -5,7 +5,7 @@ import { useMuteStore } from "../stores/useMuteStore";
 
 export const sendVideo = async () => {
   const { camId } = storeDevice.getState().camId;
-  const { set, cam, camStream } = useVideoStore.getState();
+  let { set, cam, camStream } = useVideoStore.getState();
   const { sendTransport, roomId } = useRoomStore.getState();
   const { videoMuted } = useMuteStore.getState();
   
@@ -23,7 +23,8 @@ export const sendVideo = async () => {
         video: camId ? { deviceId: camId } : true,
         audio: false
       }).then((camStream) => {
-        set({camStream: camStream, cam: camStream.getVideoTracks()[0]})
+        cam = camStream.getVideoTracks()[0];
+        set({camStream: camStream, cam: cam})
       })
     } catch (err) {
       set({ cam: null, camStream: null });
@@ -36,7 +37,7 @@ export const sendVideo = async () => {
     console.log("creating producer...");
     sendTransport.produce({
       track: cam,
-      appData: { mediaTag: "cam-video" },
+      appData: { mediaTag: "video" },
     }).then((producer) => {set({camProducer: producer})})
   }
 };

@@ -1,16 +1,13 @@
-import React, {useRef} from "react";
-import { useDrag, useDrop } from 'react-dnd';
+import React from "react";
+import { useDrag } from 'react-dnd';
 import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import MenuIcon from '@material-ui/icons/Menu';
 import Col from 'react-bootstrap/Col';
 
-
-
 export default function UserRow(props){
 
-    const {user, index, id, moveCard, allRoles, style, setUsers, ...other} = props;
-
+    const {user, id, allRoles, style, setUsers} = props;
 
 
     const changeItemColumn = (currentItem, columnName) => {
