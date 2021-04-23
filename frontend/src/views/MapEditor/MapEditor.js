@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 // Settings
 
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
-
+import TilesTab from "./sections/TilesTab";
 
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
 import { withStyles } from '@material-ui/core/styles';
@@ -24,7 +24,7 @@ import { withStyles } from '@material-ui/core/styles';
 const gameWindows = {
   0: {
     tabName: 'Red',
-    tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'red', fontSize: '2rem' }}>0</div>
+    tabContent: <TilesTab />
   },
   1: {
     tabName: 'Blue',
@@ -59,8 +59,8 @@ class MapEditor extends React.Component {
           size: 50,
           grid: [
             { size: 30, tabs: [1, 2, 3] },
-            { size: 20, tabs: [3] },
-            { size: 50, tabs: [1] },
+            { size: 20, tabs: [0] },
+            { size: 50, tabs: [3] },
           ]
         },
         { size: 25, tabs: [2] },
