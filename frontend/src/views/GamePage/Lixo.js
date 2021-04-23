@@ -13,19 +13,11 @@ import MapEditorUI from "./Sections/MapEditorUI";
 // MapManager
 // Settings
 
-import GridContainer from "components/Grid/GridContainer.js";
-import GridItem from "components/Grid/GridItem.js";
-import Grid from '@material-ui/core/Grid';
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 
 
-import "./Lixo.css";
-import { makeStyles, withStyles } from '@material-ui/core/styles';
-
-// const gameUIStyle = {
-//   position: "absolute",
-//   zIndex: 2,
-// }
+import style from "assets/jss/my-kit-react/views/mapEditorStyle";
+import { withStyles } from '@material-ui/core/styles';
 
 
 
@@ -114,10 +106,11 @@ class GamePage extends React.Component {
 
   gridBuild = (grid = this.state.grid, depth = 0, path = []) => {
     const dimension = (depth % 2 == 0) ? "height" : "width";
-    const wrapper = (depth % 2 == 0) ? "wrapperRow" : "wrapperCol";
     const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
-    const handler = (depth % 2 == 0) ? "handlerRow" : "handlerCol";
-
+    
+    const wrapper = (depth % 2 == 0) ? this.props.classes.wrapperRow : this.props.classes.wrapperCol;
+    const handler = (depth % 2 == 0) ? this.props.classes.handlerRow : this.props.classes.handlerCol;
+    
     return (
       grid.map((item, index) => {
         return (
@@ -188,7 +181,7 @@ class GamePage extends React.Component {
         const totalHeightPx = boxA.offsetHeight + boxB.offsetHeight;
         const newHeightPx = e.clientY - boxA.offsetTop;
 
-        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + totalHeightPx - e.clientY < 200)
+        if (e.clientY - boxA.offsetTop < 100 || boxA.offsetTop + totalHeightPx - e.clientY < 100)
           return;
 
         this.setState(state => {
@@ -217,7 +210,7 @@ class GamePage extends React.Component {
         const totalWidthPx = boxA.offsetWidth + boxB.offsetWidth;
         const newWidthPx = e.clientX - boxA.offsetLeft;
 
-        if (e.clientX - boxA.offsetLeft < 200 || boxA.offsetLeft + totalWidthPx - e.clientX < 200)
+        if (e.clientX - boxA.offsetLeft < 100 || boxA.offsetLeft + totalWidthPx - e.clientX < 100)
           return;
 
         this.setState(state => {
@@ -279,48 +272,9 @@ class GamePage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
 
-        <div className={"wrapperCol"} style={{ backgroundColor: "#ddd", maxHeight: '100vh', height: '100%' }}>
+        <div className={this.props.classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: '100vh', height: '100%' }}>
           {this.gridBuild()}
         </div>
-
-
-        {/* <div className={"wrapperCol"} style={{backgroundColor: "#ddd", maxHeight: '100vh', height: '100%'}}>
-          <div className={"wrapperRow"} style={{ height: '33%' }}>
-            
-            <div className={"wrapperCol"} style={{ width: '50%' }}>
-              <GameUITabs
-                headerColor="gray"
-                tabs={[gameWindows[1]]}
-              />
-            </div>
-            
-            <div className={classNames("handlerCol", "handler")} style={{marginLeft: '-10px'}}></div>
-            <div className={"wrapperCol"} style={{ width: '50%' , marginLeft: '-10px'}}>
-              <GameUITabs
-                  headerColor="gray"
-                  tabs={[gameWindows[1], gameWindows[2]]}
-              />
-            </div>
-
-          </div>
-          <div data="indexlololo" className={classNames("handlerRow", "handler")} style={{marginTop: '-10px'}}></div>
-          <div className={"wrapperRow"} style={{ height: '33%' , marginTop: '-10px'}}>
-            <GameUITabs
-                  headerColor="gray"
-                  tabs={[gameWindows[1], gameWindows[2]]}
-              />
-          </div>
-          <div className={classNames("handlerRow", "handler")} style={{marginTop: '-10px'}}></div>
-          <div className={"wrapperRow"} style={{ height: '34%' , marginTop: '-10px'}}>
-              <GameUITabs
-                  headerColor="gray"
-                  tabs={[gameWindows[3], gameWindows[4]]}
-              />
-          </div>
-        </div>  */}
-
-
-
 
       </>
     );
@@ -336,5 +290,5 @@ const mapStateToProps = (state) => ({
 //   toggleGameUI: () => dispatch(toggleGameUI),
 // });
 
-export default connect(mapStateToProps)(GamePage);
+export default withStyles(style)(connect(mapStateToProps)(GamePage));
 
