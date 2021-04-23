@@ -26,15 +26,15 @@ const GameUITabs = (props) => {
   };
   const { classes, headerColor, plainTabs, tabs } = props;
 
-  const [{ opacity }, drag, preview] = useDrag(() => ({
-		type: DragTypes.CARD,
-		collect: (monitor) => ({
-			opacity: monitor.isDragging() ? 0.4 : 1,
-		}), 
-	}));
+  // const [{ opacity }, drag, preview] = useDrag(() => ({
+	// 	type: DragTypes.CARD,
+	// 	collect: (monitor) => ({
+	// 		opacity: monitor.isDragging() ? 0.4 : 1,
+	// 	}), 
+	// }));
 
   return (
-    <Card ref={preview} plain={plainTabs} classes={{ card: classes.card }} >
+    <Card plain={plainTabs} classes={{ card: classes.card }} > {/*ref={preview}*/}
       <CardHeader
         // ref={drag}
         classes={{ cardHeader: classes.cardHeader }}
@@ -51,7 +51,7 @@ const GameUITabs = (props) => {
         >
           {tabs.map((prop, key) => (
               <Tab 
-                ref={drag}
+                // ref={drag}
                 classes={{
                   root: classes.tabRootButton,
                   label: classes.tabLabel,
@@ -64,7 +64,7 @@ const GameUITabs = (props) => {
           ))}
         </Tabs>
       </CardHeader>
-      <CardBody classes={{ cardBody: classes.cardBody }}>
+      <CardBody classes={{ cardBody: classes.cardBody }} >
         {tabs.map((prop, key) => {
           if (key === value) {
             return <div key={key}>{prop.tabContent}</div>;

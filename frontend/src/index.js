@@ -29,7 +29,7 @@ ReactDOM.render(
           pauseOnFocusLoss
           draggable
           pauseOnHover={false}
-          />
+        />
       </Router>
     </DndProvider>
   </Provider>,
