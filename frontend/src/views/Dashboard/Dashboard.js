@@ -15,9 +15,7 @@ const useStyles = theme => ({
 });
 class Dashboard extends Component {
   state={focus: false};
-  constructor(props){
-    super(props);
-  }
+
   handler = (focused) => {
     this.setState({
       focus: focused

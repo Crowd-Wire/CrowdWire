@@ -32,17 +32,18 @@ export const MediaStreamBox: React.FC<MediaStreamBoxProps> = ({
   const classes = useStyles();
 
   return (
-    <div style={{maxHeight:'10%', maxWidth:400}}>
+    <div style={{height:'100%', maxWidth:400, width: '100%', overflow: 'auto', display: 'inline-block'}}>
       <Card style={{padding: 3,
-      background: 'rgba(65, 90, 90, 0.6)',
+      background: 'rgba(215, 240, 240, 0.5)',
       overflow: 'hidden',
       boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
       borderTop: '1px solid rgba(255,255,255,0.5)',
       borderLeft: '1px solid rgba(255,255,255,0.5)',
-      backdropFilter: 'blur(3px)'
+      backdropFilter: 'blur(3px)',
+      height: '100%'
       }}>
-          <div style={{padding: 2, textAlign: 'center', fontSize: '1.3em', color: '#fff', fontWeight: 500}}>
-            <span>{username}'s Stream</span>
+          <div style={{padding: 2, textAlign: 'center', fontSize: 18, color: '#3f51b5', fontWeight: 500}}>
+            <span>{username}'s Screen</span>
           </div>
           <div>
             <video autoPlay id={id+"_video"} ref={myRef}/>

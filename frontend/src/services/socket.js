@@ -5,7 +5,6 @@ import { sendVideo } from "../webrtc/utils/sendVideo";
 import { joinRoom } from "../webrtc/utils/joinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
-import { useVoiceStore } from "../webrtc/stores/useVoiceStore";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
@@ -154,7 +153,7 @@ export const getSocket = (worldId) => {
           break;
         case "toggle_peer_producer":
           console.log(data)
-          if (data.kind == 'audio')
+          if (data.kind === 'audio')
             useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
           else
             useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)

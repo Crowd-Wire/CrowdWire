@@ -42,9 +42,9 @@ export const useConsumerStore = create(
           let videoToggle = false;
           let audioToggle = false;
           
-          if (kind == 'audio')
+          if (kind === 'audio')
             consumerAudio = c;
-          else if (kind == 'video')
+          else if (kind === 'video')
             consumerVideo = c;
           else
             consumerMedia = c;
@@ -54,11 +54,11 @@ export const useConsumerStore = create(
             volume = x.volume;
             videoToggle = x.videoToggle;
             audioToggle = x.audioToggle;
-            if (kind == "audio") {
+            if (kind === "audio") {
               consumerVideo = x.consumerVideo;
               consumerMedia = x.consumerMedia;
               if (x.consumerAudio) x.consumerAudio.close();
-            } else if (kind == "video") {
+            } else if (kind === "video") {
               consumerAudio = x.consumerAudio;
               consumerMedia = x.consumerMedia;
               if (x.consumerVideo) x.consumerVideo.close();
