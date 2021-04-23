@@ -21,7 +21,8 @@ const gameUITabsStyle = {
     padding: 0,
     overflow: 'auto',
     minHeight: 0, // for Firefox
-    // flexGrow: 1
+    flexGrow: 1,
+    backgroundColor: "#777"
   },
   tabRootButton: {
     minHeight: "unset !important",

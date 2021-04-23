@@ -112,27 +112,44 @@ class GamePage extends React.Component {
     })
   }
 
-  gridBuild = (grid=this.state.grid, depth=0) => {
-    if (depth > 3)
-      return 'ola';
- 
+  gridBuild = (grid=this.state.grid, depth=0, path=[]) => {
+    const dimension = (depth % 2 == 0) ? "height" : "width";
+    const wrapper = (depth % 2 == 0) ? "wrapperRow" : "wrapperCol";
+    const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
+    const handler = (depth % 2 == 0) ? "handlerRow" : "handlerCol";
+      
     return (
-      grid.map((item, index) => (
-        <div 
-          key={index} style={depth % 2 == 0 ? { height: `${item.size}%` } : { width: `${item.size}%` }}
-          className={depth % 2 == 0 ? "wrapperRow" : "wrapperCol"}
-        >
-          { 
-            item.hasOwnProperty('tabs') ?
-              <GameUITabs
-                headerColor="gray"
-                tabs={item.tabs.map(t => gameWindows[t])}
-              />
-            :
-              this.gridBuild(item.grid, depth + 1)
-          }
-        </div>
-      ))
+      grid.map((item, index) => {
+        return (
+          <>
+            {
+              (index > 0) ? 
+                <div 
+                  className={classNames(handler, "handler")} 
+                  style={{[margin]: '-10px'}}
+                ></div>
+              : null
+            }
+            <div 
+              key={index}
+              data-path={path.concat(index).join('-')}
+              data-size={item.size}
+              style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
+              className={ wrapper }
+            >
+              { 
+                item.hasOwnProperty('tabs') ?
+                  <GameUITabs
+                    headerColor="gray"
+                    tabs={item.tabs.map(t => gameWindows[t])}
+                  />
+                :
+                  this.gridBuild(item.grid, depth + 1, path.concat(index))
+              }
+            </div>
+          </>
+        )
+      })
     );
   }
 
@@ -224,12 +241,12 @@ class GamePage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
 
-        {/* <div className={"wrapperCol"} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
+        <div className={"wrapperCol"} style={{backgroundColor: "#ddd", maxHeight: '100vh', height: '100%'}}>
           {this.gridBuild()}
-        </div> */}
+        </div>
 
      
-        <div className={"wrapperCol"} style={{backgroundColor: "#ccc", maxHeight: '100vh', height: '100%'}}>
+        {/* <div className={"wrapperCol"} style={{backgroundColor: "#ddd", maxHeight: '100vh', height: '100%'}}>
           <div className={"wrapperRow"} style={{ height: '33%' }}>
             
             <div className={"wrapperCol"} style={{ width: '50%' }}>
@@ -238,8 +255,9 @@ class GamePage extends React.Component {
                 tabs={[gameWindows[1]]}
               />
             </div>
-            <div className={classNames("handlerCol", "handler")}></div>
-            <div className={"wrapperCol"} style={{ width: '50%' }}>
+            
+            <div className={classNames("handlerCol", "handler")} style={{marginLeft: '-10px'}}></div>
+            <div className={"wrapperCol"} style={{ width: '50%' , marginLeft: '-10px'}}>
               <GameUITabs
                   headerColor="gray"
                   tabs={[gameWindows[1], gameWindows[2]]}
@@ -247,21 +265,21 @@ class GamePage extends React.Component {
             </div>
 
           </div>
-          <div data="indexlololo" className={classNames("handlerRow", "handler")}></div>
-          <div className={"wrapperRow"} style={{ height: '33%' }}>
+          <div data="indexlololo" className={classNames("handlerRow", "handler")} style={{marginTop: '-10px'}}></div>
+          <div className={"wrapperRow"} style={{ height: '33%' , marginTop: '-10px'}}>
             <GameUITabs
                   headerColor="gray"
                   tabs={[gameWindows[1], gameWindows[2]]}
               />
           </div>
-          <div className={classNames("handlerRow", "handler")}></div>
-          <div className={"wrapperRow"} style={{ height: '34%' }}>
+          <div className={classNames("handlerRow", "handler")} style={{marginTop: '-10px'}}></div>
+          <div className={"wrapperRow"} style={{ height: '34%' , marginTop: '-10px'}}>
               <GameUITabs
                   headerColor="gray"
                   tabs={[gameWindows[3], gameWindows[4]]}
               />
           </div>
-        </div> 
+        </div>  */}
 
 
     
