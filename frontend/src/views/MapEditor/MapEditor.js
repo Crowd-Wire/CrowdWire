@@ -96,8 +96,16 @@ class MapEditor extends React.Component {
       // normalize
       if (!elem.tabs.length) {
         const index = parent.grid.indexOf(elem);
-        if (index > -1)
-          parent.grid.splice(index, 1);
+        if (index > -1) {
+            // remove element
+            parent.grid.splice(index, 1);
+
+            // resize siblings
+            const grow = elem.size / parent.grid.length;
+            for (let e of parent.grid) {
+                e.size += grow;
+            }
+        }
       }
 
       return { grid };
@@ -157,8 +165,10 @@ class MapEditor extends React.Component {
     let handlers = document.querySelectorAll('.handler');
     var dragginHandler;
 
+    /* tests */
     document.addEventListener('keyup', (e) => {
-      if (e.key === 'r') this.gridRemoveTabs([], [])
+      if (e.key === 'r') this.gridRemoveTabs([4, 2], [2]);
+      if (e.key === 't') this.gridRemoveTabs([2], [0, 0]);
     });
 
     document.addEventListener('mousedown', (e) => {
