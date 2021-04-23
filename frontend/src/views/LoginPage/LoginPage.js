@@ -61,13 +61,14 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
+        console.log(res);
         localStorage.setItem("auth",JSON.stringify(
           {"token":res.access_token,
             "expire_date":res.expire_date}
           ));
         if(res.access_token!==undefined)
           this.setState({loggedIn:true})
-        else if(res.detail==="Incorrect email or password")
+        else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
         else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="username")
           this.setState({passwSt:"", emailSt:"Email Required"});
