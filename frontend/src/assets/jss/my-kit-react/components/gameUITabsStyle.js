@@ -3,6 +3,8 @@ import customTabsStyle from "assets/jss/material-kit-react/components/customTabs
 const gameUITabsStyle = {
   ...customTabsStyle,
   card: {
+    boxSizing: 'border-box',
+    padding: '5px',
     backgroundColor: "rgba(200, 200, 200, .3)",
     margin: 0,
     flexGrow: '1',
