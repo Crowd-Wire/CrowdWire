@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab";
+import Phaser from "views/GamePage/Sections/Phaser";
 
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
 import { withStyles } from '@material-ui/core/styles';
@@ -23,7 +24,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 const gameWindows = {
   0: {
-    tabName: 'Red',
+    tabName: 'Tiles',
     tabContent: <TilesTab />
   },
   1: {
@@ -44,7 +45,7 @@ const gameWindows = {
   },
   5: {
     tabName: 'Game',
-    tabContent: <></>,
+    tabContent: <Phaser />,
   },
 }
 
@@ -63,7 +64,7 @@ class MapEditor extends React.Component {
             { size: 50, tabs: [3] },
           ]
         },
-        { size: 25, tabs: [2] },
+        { size: 25, tabs: [5] },
         { size: 25, tabs: [4, 2] }
       ]
     }
