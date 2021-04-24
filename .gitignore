@@ -253,9 +253,6 @@ dmypy.json
 # profiling data
 .prof
 
-# leandro's start script
-start.sh
-
 # pycharm
 .idea/
 
