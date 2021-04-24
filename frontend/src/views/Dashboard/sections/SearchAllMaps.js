@@ -78,10 +78,11 @@ class SearchAllMaps extends Component {
 					this.setState({ maps: res }) 
 			});
 	}
-	componentDidUpdate(){
+	async componentDidUpdate(){
 		if(this.joined!=this.props.joined){
 			this.joined = this.props.joined;
-			WorldService.search(this.state.prevSearch, this.state.prevTags, this.props.joined, this.state.page)
+			await this.setState({prevSearch: "", prevTags: []});
+			WorldService.search("", [], this.props.joined, this.state.page)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()
