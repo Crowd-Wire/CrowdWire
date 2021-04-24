@@ -174,6 +174,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
     async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
         if not user_id:
             return None, strings.USER_NOT_PASSED
+        # Check first if the world Exists
         obj, msg = self.is_editable_to_user(db=db, world_id=world_id, user_id=user_id)
         if not obj:
             return obj, msg
@@ -183,7 +184,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         db.refresh(obj)
         await clear_cache_by_model("World", world_id=world_id)
         return obj, strings.WORLD_DELETED_SUCCESS
-
 
 
 crud_world = CRUDWorld(World)
