@@ -4,7 +4,7 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 from loguru import logger
 import json
 
-from app.core.consts.WebsocketProtocol import *
+from app.core.consts import WebsocketProtocol as protocol
 
 
 class ConnectionManager:
@@ -49,7 +49,8 @@ class ConnectionManager:
             for other_id in self.connections[world_id][room_id]:
                 # get position from redis
                 position = {'x': 50, 'y': 50}
-                await self.users_ws[user_id].send_json({'topic': JOIN_PLAYER, 'user_id': other_id, 'position': position})
+                await self.users_ws[user_id].send_json(
+                    {'topic': protocol.JOIN_PLAYER, 'user_id': other_id, 'position': position})
         
         self.connections \
             .setdefault(world_id, {}) \
@@ -60,7 +61,7 @@ class ConnectionManager:
         )
         await self.broadcast(
             world_id, room_id,
-            {'topic': JOIN_PLAYER, 'user_id': user_id, 'position': joiner_position},
+            {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': joiner_position},
             user_id
         )
 
@@ -79,7 +80,7 @@ class ConnectionManager:
             )
         await self.broadcast(
             world_id, room_id,
-            {'topic': LEAVE_PLAYER, 'user_id': user_id},
+            {'topic': protocol.LEAVE_PLAYER, 'user_id': user_id},
             user_id
         )
 
@@ -112,7 +113,7 @@ async def send_player_movement(world_id, user_id, payload):
     position = payload['position']
     await manager.broadcast(
         world_id, room_id,
-        {'topic': PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
+        {'topic': protocol.PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
         user_id
     )
 
@@ -126,9 +127,8 @@ async def join_as_new_peer_or_speaker(world_id, user_id, payload):
     join-as-speaker:
         this does the same as above, except it allows
         the user to speak, so, it returns two kinds of transport,
-        one for 
+        one for receiving and other for sending
     """
-    receiving and other for sending
     room_id = payload['d']['roomId']
     payload['d']['peerId'] = user_id
 
@@ -154,7 +154,7 @@ async def close_media(world_id, user_id, payload):
     # broadcast for peers to close this stream
     if user_id in manager.connections[world_id][room_id]:
         await manager.broadcast(world_id, room_id,
-                                {'topic': CLOSE_MEDIA,
+                                {'topic': protocol.CLOSE_MEDIA,
                                     'peerId': user_id},
                                 user_id)
 
@@ -168,7 +168,7 @@ async def toggle_producer(world_id, user_id, payload):
     # broadcast for peers to update UI toggle buttons
     if user_id in manager.connections[world_id][room_id]:
         await manager.broadcast(world_id, room_id,
-                                {'topic': TOGGLE_PEER_PRODUCER,
+                                {'topic': protocol.TOGGLE_PEER_PRODUCER,
                                     'peerId': user_id,
                                     'kind': kind,
                                     'pause': pause},
@@ -180,7 +180,8 @@ async def speaking_change(world_id, user_id, payload):
     logger.info(user_id)
     logger.info(manager.connections[world_id][room_id])
     if user_id in manager.connections[world_id][room_id]:
-        await manager.broadcast(world_id, room_id, {'topic': ACTIVE_SPEAKER, 'peerId': user_id, 'value': value}, user_id)
+        await manager.broadcast(world_id, room_id,
+            {'topic': protocol.ACTIVE_SPEAKER, 'peerId': user_id, 'value': value}, user_id)
 
 
 manager = ConnectionManager()
