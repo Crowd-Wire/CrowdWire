@@ -18,6 +18,7 @@ var globalVar = false;
 
 class GameScene extends Phaser.Scene {
     playerSprites = {};
+    inRangePlayers = new Set();
     count = 0;
 
     constructor() {
@@ -93,7 +94,7 @@ class GameScene extends Phaser.Scene {
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
                     this.playerSprites[id].disconnect();
-                    delete  this.playerSprites[id];
+                    delete this.playerSprites[id];
                 }
             }
         }
@@ -104,12 +105,29 @@ class GameScene extends Phaser.Scene {
 
         // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
-        if (bodies.length > 1) {
+        if (bodies.length - 1 != this.inRangePlayers.length && globalVar) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            // if (ws.socket.readyState === WebSocket.OPEN) {
-            //     ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
-            // }
+            const newBodies = bodies.filter((b) => b.gameObject instanceof OnlinePlayerSprite)
+                                    .map((b) => b.gameObject.id);
+
+            if (newBodies.length > this.inRangePlayers.length) {
+                // wire player
+                for (const id of newBodies) {
+                    if (!(this.inRangePlayers.has(id))) {
+                        this.inRangePlayers.add(id);
+                        ws.wirePlayer('1', id);
+                    }
+                }
+            } else {
+                // unwire player
+                for (const id of this.inRangePlayers) {
+                    if (!(id in newBodies)) {
+                        this.inRangePlayers.delete(id);
+                        ws.unwirePlayer('1', id);
+                    }
+                }
+            }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
