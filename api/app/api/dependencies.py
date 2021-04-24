@@ -69,14 +69,16 @@ async def get_current_user_for_invite(
         *,
         db: Session = Depends(get_db),
         current_user: models.User = Depends(get_current_user),
-) -> Tuple[Union[schemas.GuestUser, models.User], int]:
+) -> Tuple[Union[schemas.GuestUser, models.User], models.World]:
     try:
+        logger.debug(invite_token)
         payload = jwt.decode(
             invite_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
         )
         logger.debug(payload)
         token_data = schemas.InviteTokenPayload(**payload)
-    except (jwt.JWTError, ValidationError):
+    except (jwt.JWTError, ValidationError) as e :
+        logger.debug(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid Invite",
@@ -84,7 +86,7 @@ async def get_current_user_for_invite(
     world, msg = await crud.crud_world.get(db=db, world_id=token_data.world_id)
     if not world:
         raise HTTPException(status_code=404, detail=msg)
-    return current_user, token_data.world_id
+    return current_user, world
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency

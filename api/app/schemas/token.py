@@ -21,5 +21,8 @@ class TokenPayload(BaseModel):
     is_guest_user: Optional[bool] = False
 
 
-class InviteTokenPayload(Token):
+class InviteTokenPayload(BaseModel):
+    # Invites can only be done be registered users, therefore the subject
+    # is of type int and not UUID4(the type for guest users)
+    sub: int
     world_id: int

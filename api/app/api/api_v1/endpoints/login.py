@@ -49,8 +49,25 @@ def generate_invite_link(
         db: Session = Depends(dependencies.get_db),
         current_user: models.User = Depends(dependencies.get_current_user)
 ):
-    world_user_obj = crud.crud_world_user.can_generate_link(db=db, world_id=world_id, user_id=current_user.user_id)
-    return world_user_obj
+    """
+    Generate an invitation link( a token )
+    """
+    world_user_obj, msg = crud.crud_world_user.can_generate_link(
+        db=db,
+        world_id=world_id,
+        user_id=current_user.user_id
+    )
+    if not world_user_obj:
+        raise HTTPException(status_code=403, detail=msg)
+    access_token, expires = security.create_invite_token(
+        subject=current_user.user_id,
+        world_id=world_id
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires),
+    }
 
 
 @router.post("/login", response_model=schemas.Token)

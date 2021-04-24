@@ -26,7 +26,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         if not world_user_obj:
             return None, strings.INVITATION_FORBIDDEN
         logger.debug(world_user_obj)
-        return world_user_obj
+        return world_user_obj,""
 
     def get_user_joined(self, db: Session, world_id: int, user_id: int) -> World_User:
         """

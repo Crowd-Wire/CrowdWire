@@ -39,7 +39,21 @@ async def join_world_by_link(
         db: Session = Depends(deps.get_db),
         result=Depends(deps.get_current_user_for_invite)
 ):
-    return result
+    logger.info(invite_token)
+    user, world_obj = result
+    # If it's not the first time the user has joined the world, get it from redis(cache)
+    world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
+    if world_user:
+        return world_user
+    if not is_guest_user(user):
+        # Otherwise, goes to PostgreSQL database, for registered users
+        world_user = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+        return world_user
+    else:
+        # Saves on Redis for Guest Users
+        logger.debug('not cached:/')
+        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id)
+    return world_user
 
 
 @router.get("/{world_id}/users", response_model=schemas.World_UserInDB)
