@@ -163,8 +163,18 @@ class Player extends Phaser.GameObjects.Container {
         scene.physics.add.existing(this);
 
         // add sprite and text to scene and then container
-        let sprite = scene.add.sprite(0, 0, 'player', 6);
-        let text = scene.add.text(0, 0, 'Olá', { font: "bold 32px Arial", fill: "#fff" });
+        const sprite = scene.add.sprite(0, 0, 'player', 6);
+        const text = scene.add.bitmapText(0, -16, 'atari', '', 8)
+            .setOrigin(0.5)
+            .setCenterAlign()
+            .setInteractive();
+
+        text.setText([
+            'User 1',
+            '1 2',
+        ]);
+
+        console.log(text);
         this.addSprite(sprite);
         this.addText(text);
 
