@@ -81,11 +81,11 @@ export const getSocket = (worldId) => {
           console.error(`[error] socket closed before sendMovement`);
   }
 
-  const wirePlayer = async (roomId, playerId) => {
+  const wirePlayer = async (roomId, usersId) => {
     const payload = {
       topic: "WIRE_PLAYER",
-      room_id: roomId,
-      player_id: playerId,
+      // room_id: roomId,
+      users_id: usersId,
     }
     if (socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
@@ -93,16 +93,16 @@ export const getSocket = (worldId) => {
       console.error(`[error] socket closed before wirePlayer`);
   }
 
-  const unwirePlayer = async (roomId, playerId) => {
+  const unwirePlayer = async (roomId, usersId) => {
     const payload = {
       topic: "UNWIRE_PLAYER",
-      room_id: roomId,
-      player_id: playerId,
+      // room_id: roomId,
+      users_id: usersId,
     }
     if (socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else
-      console.error(`[error] socket closed before wirePlayer`);
+      console.error(`[error] socket closed before unwirePlayer`);
   }
 
   const sendComms = async (topic="", worldId="", userId="") => {
@@ -221,7 +221,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, sendComms, joinRoom};
+  return {socket, sendMovement, sendComms, joinRoom, wirePlayer, unwirePlayer};
 }
 
 export const wsend = async (d) => {

@@ -108,29 +108,31 @@ class GameScene extends Phaser.Scene {
 
         // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
-        if (bodies.length - 1 != this.inRangePlayers.length) {
-            this.player.body.debugBodyColor = 0x0099ff; // blue
-
-            const newBodies = bodies.filter((b) => b.gameObject instanceof OnlinePlayerSprite)
+        // console.log(bodies.length - 1, this.inRangePlayers.size)
+        if (bodies.length - 1 != this.inRangePlayers.size) {
+            const rangePlayers = bodies.filter((b) => b.gameObject instanceof OnlinePlayerSprite)
                                     .map((b) => b.gameObject.id);
-
-            if (newBodies.length > this.inRangePlayers.length) {
-                // wire player
-                for (const id of newBodies) {
-                    if (!(this.inRangePlayers.has(id))) {
-                        this.inRangePlayers.add(id);
-                        ws.wirePlayer('1', id);
-                    }
-                }
+            if (rangePlayers.length > this.inRangePlayers.size) {
+                // wire players
+                ws.wirePlayer('1', 
+                    rangePlayers.filter((id) => {
+                        const entered = !this.inRangePlayers.has(id);
+                        if (entered) this.inRangePlayers.add(id);
+                        return entered;
+                    })
+                );
             } else {
-                // unwire player
-                for (const id of this.inRangePlayers) {
-                    if (!(id in newBodies)) {
-                        this.inRangePlayers.delete(id);
-                        ws.unwirePlayer('1', id);
-                    }
-                }
+                // unwire players
+                ws.unwirePlayer('1', 
+                    this.inRangePlayers.filter((id) => {
+                        const left = !(id in rangePlayers);
+                        if (left) this.inRangePlayers.delete(id);
+                        return left;
+                    })
+                );
             }
+        } else if (bodies.length > 1) {
+            this.player.body.debugBodyColor = 0x0099ff; // blue
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
@@ -257,11 +259,12 @@ class OnlinePlayerSprite extends PlayerSprite {
     
     constructor(scene, x, y, id) {
         super(scene, x, y);
-        this.id = id;
 
-        if (this.id)
+        if (id)
             this.unsubscribe = usePlayerStore.subscribe(
                 this.handlePlayerMovement, state => state.players[this.id]);
+
+        this.id = id ? id : '-1'; // TODO: remove after testing
     }
 
     handlePlayerMovement = ({position, velocity}) => {

@@ -17,11 +17,14 @@ router = APIRouter()
 )
 async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
     user_id = await manager.connect(world_id, websocket)
-
     try:
         while True:
             payload = await websocket.receive_json()
             topic = payload['topic']
+
+            logger.info(
+                f"Received message with topic {topic}"
+            )
 
             if topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
@@ -32,10 +35,10 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
             elif topic == protocol.CHANGE_ROOM:
                 pass
             elif topic == protocol.WIRE_PLAYER:
-                await wh.wire_player(world_id, user_id, payload)
+                await wh.wire_players(world_id, user_id, payload)
 
             elif topic == protocol.UNWIRE_PLAYER:
-                await wh.unwire_player(world_id, user_id, payload)
+                await wh.unwire_players(world_id, user_id, payload)
 
             elif topic in (protocol.JOIN_AS_NEW_PEER, protocol.JOIN_AS_SPEAKER):
                 await wh.join_as_new_peer_or_speaker(world_id, user_id, payload)

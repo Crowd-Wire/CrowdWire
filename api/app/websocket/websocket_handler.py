@@ -1,3 +1,5 @@
+from typing import List
+
 from app.core.consts import WebsocketProtocol as protocol
 from app.websocket.connection_manager import manager
 from app.rabbitmq import rabbit_handler
@@ -24,23 +26,30 @@ async def send_player_movement(world_id, user_id, payload):
     )
 
 
-async def wire_player(world_id, user_id, payload):
-    room_id = payload['room_id']
-    player_id = payload['player_id']
+async def wire_players(world_id: str, user_id: List[str], payload: dict):
+    users_id = payload['users_id']
 
-    await redis_connector.sadd(f"lixo:{world_id}:{user_id}", 'bruno', 'pedro', 'daniel', 'mario')
-    n = await redis_connector.scard(f"lixo:{world_id}:{user_id}")
-    print(n)
-    b = await redis_connector.sismember(f"lixo:{world_id}:{user_id}", 'leandro')
-    print(b)
-    m = await redis_connector.smembers(f"lixo:{world_id}:{user_id}", encoding=None)
-    print(m)
+    # add nearby users to user:X:users
+    await redis_connector.sadd(f"world:{world_id}:user:{user_id}:users", *users_id)
+
+    # check if users already claimed proximity
+    for id_ in users_id:
+        if await redis_connector.sismember(f"world:{world_id}:user:{id_}:users", user_id):
+            # create new group or assign to right groups
+            ...
 
 
-async def unwire_player(world_id, user_id, payload):
-    room_id = payload['room_id']
-    player_id = payload['player_id']
-    ...
+async def unwire_players(world_id: str, user_id: List[str], payload: dict):
+    users_id = payload['users_id']
+
+    # remove faraway users from user:X:users
+    await redis_connector.srem(f"world:{world_id}:user:{user_id}:users", *users_id)
+
+    # check if users already claimed farness
+    for id_ in users_id:
+        if not await redis_connector.sismember(f"world:{world_id}:user:{id_}:users", user_id):
+            # remove group or simply remove from groups
+            ...
 
 
 async def join_as_new_peer_or_speaker(world_id, user_id, payload):

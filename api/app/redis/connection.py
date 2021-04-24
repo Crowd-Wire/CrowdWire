@@ -65,6 +65,10 @@ class RedisConnector:
         """Get all the members in a set"""
         return await self.master.execute('smembers', key, encoding=encoding)
 
+    async def srem(self, key: str, member: str, *members):
+        """Remove one or more members from a set"""
+        return await self.master.execute('srem', key, member, *members)
+
     async def save_world_user_data(self, world_id: int, user_id: Union[int, uuid4], data: dict):
         """
         saves a  new user that joined into a world,
