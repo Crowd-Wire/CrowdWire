@@ -32,6 +32,16 @@ async def get_world(
     return db_world
 
 
+@router.get("/invite/{invite_token}")
+async def join_world_by_link(
+        invite_token: str = None,
+        *,
+        db: Session = Depends(deps.get_db),
+        result=Depends(deps.get_current_user_for_invite)
+):
+    return result
+
+
 @router.get("/{world_id}/users", response_model=schemas.World_UserInDB)
 async def join_world(
         world_id: int,

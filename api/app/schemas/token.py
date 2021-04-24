@@ -19,3 +19,7 @@ class TokenPayload(BaseModel):
     # Guest Users ID is not an integer
     sub: Union[int, UUID4] = None
     is_guest_user: Optional[bool] = False
+
+
+class InviteTokenPayload(Token):
+    world_id: int

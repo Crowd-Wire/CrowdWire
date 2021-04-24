@@ -43,6 +43,16 @@ def register(
     }
 
 
+@router.post("/invitation/{world_id}")
+def generate_invite_link(
+        world_id: int,
+        db: Session = Depends(dependencies.get_db),
+        current_user: models.User = Depends(dependencies.get_current_user)
+):
+    world_user_obj = crud.crud_world_user.can_generate_link(db=db, world_id=world_id, user_id=current_user.user_id)
+    return world_user_obj
+
+
 @router.post("/login", response_model=schemas.Token)
 def login_access_token(
         db: Session = Depends(dependencies.get_db),
