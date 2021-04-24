@@ -103,9 +103,12 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         this.player.updateMovement();
 
+        if (!globalVar)
+            return;
+
         // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
-        if (bodies.length - 1 != this.inRangePlayers.length && globalVar) {
+        if (bodies.length - 1 != this.inRangePlayers.length) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
             const newBodies = bodies.filter((b) => b.gameObject instanceof OnlinePlayerSprite)

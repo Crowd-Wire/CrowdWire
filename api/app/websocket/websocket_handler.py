@@ -1,6 +1,7 @@
 from app.core.consts import WebsocketProtocol as protocol
 from app.websocket.connection_manager import manager
 from app.rabbitmq import rabbit_handler
+from app.redis.connection import redis_connector
 from loguru import logger
 
 import json
@@ -21,6 +22,25 @@ async def send_player_movement(world_id, user_id, payload):
         {'topic': protocol.PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
         user_id
     )
+
+
+async def wire_player(world_id, user_id, payload):
+    room_id = payload['room_id']
+    player_id = payload['player_id']
+
+    await redis_connector.sadd(f"lixo:{world_id}:{user_id}", 'bruno', 'pedro', 'daniel', 'mario')
+    n = await redis_connector.scard(f"lixo:{world_id}:{user_id}")
+    print(n)
+    b = await redis_connector.sismember(f"lixo:{world_id}:{user_id}", 'leandro')
+    print(b)
+    m = await redis_connector.smembers(f"lixo:{world_id}:{user_id}", encoding=None)
+    print(m)
+
+
+async def unwire_player(world_id, user_id, payload):
+    room_id = payload['room_id']
+    player_id = payload['player_id']
+    ...
 
 
 async def join_as_new_peer_or_speaker(world_id, user_id, payload):

@@ -21,6 +21,9 @@ class RedisConnector:
 
         self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
 
+    async def execute(self, *args, **kwargs) -> any:
+        return await self.master.execute(*args, **kwargs)
+
     async def key_exists(self, key: str):
         return await self.master.execute('exists', key)
 
@@ -40,14 +43,27 @@ class RedisConnector:
         regex = f"*{matcher}*"
         return await self.master.execute('scan', 0, 'match', regex)
 
-    async def execute(self, *args, **kwargs) -> any:
-        return await self.master.execute(*args, **kwargs)
-
     async def hget(self, key: str, field: str):
         return await self.master.execute('hget', key, field, encoding='utf-8')
 
     async def hset(self, key: str, field: str, value: str):
         return await self.master.execute('hset', key, field, value)
+
+    async def sadd(self, key: str, member: str, *members):
+        """Adds one or more members to a set"""
+        return await self.master.execute('sadd', key, member, *members)
+
+    async def scard(self, key: str):
+        """Get the number of members in a set"""
+        return await self.master.execute('scard', key)
+
+    async def sismember(self, key: str, member: str):
+        """Determine if a given value is a member of a set"""
+        return await self.master.execute('sismember', key, member)
+
+    async def smembers(self, key: str, *, encoding: object):
+        """Get all the members in a set"""
+        return await self.master.execute('smembers', key, encoding=encoding)
 
     async def save_world_user_data(self, world_id: int, user_id: Union[int, uuid4], data: dict):
         """

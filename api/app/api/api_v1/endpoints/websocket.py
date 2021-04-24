@@ -32,9 +32,10 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
             elif topic == protocol.CHANGE_ROOM:
                 pass
             elif topic == protocol.WIRE_PLAYER:
-                pass
+                await wh.wire_player(world_id, user_id, payload)
+
             elif topic == protocol.UNWIRE_PLAYER:
-                pass
+                await wh.unwire_player(world_id, user_id, payload)
 
             elif topic in (protocol.JOIN_AS_NEW_PEER, protocol.JOIN_AS_SPEAKER):
                 await wh.join_as_new_peer_or_speaker(world_id, user_id, payload)
