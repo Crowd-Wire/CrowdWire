@@ -9,10 +9,7 @@ import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 
-import store, {
-  connectPlayer, disconnectPlayer, movePlayer,
-  JOIN_PLAYER, LEAVE_PLAYER, PLAYER_MOVEMENT
-} from "redux/playerStore.js";
+import playerStore from "stores/usePlayerStore.ts";
 
 let commSocket;
 
@@ -59,15 +56,29 @@ let consumerQueue = [];
 
 export const getSocket = (worldId) => {
 
-  const sendPosition = (roomId, direction) => {
-    console.log(direction)
+  const joinRoom = async (roomId, position) => {
     const payload = {
-      topic: PLAYER_MOVEMENT,
-      room_id: roomId,
-      direction,
+        topic: "JOIN_PLAYER",
+        room_id: roomId,
+        position
     }
-    socket.send(JSON.stringify(payload));
-    //dispatch();
+    if (socket.readyState === WebSocket.OPEN)
+        await socket.send(JSON.stringify(payload));
+    else
+        console.error(`[error] socket closed before joinRoom`);
+  }
+
+  const sendMovement = async (roomId, position, velocity) => {
+      const payload = {
+          topic: "PLAYER_MOVEMENT",
+          room_id: roomId,
+          position,
+          velocity,
+      }
+      if (socket.readyState === WebSocket.OPEN)
+          await socket.send(JSON.stringify(payload));
+      else
+          console.error(`[error] socket closed before sendMovement`);
   }
 
   const sendComms = (topic="", worldId="", userId="") => {
@@ -100,15 +111,15 @@ export const getSocket = (worldId) => {
       console.info(`[message] Data received for topic ${data.topic}`);
 
       switch (data.topic) {
-        case JOIN_PLAYER:
-          store.dispatch(connectPlayer(data.user_id));
-          break;
-        case LEAVE_PLAYER:
-          store.dispatch(disconnectPlayer(data.user_id));
-          break;
-        case PLAYER_MOVEMENT:
-          store.dispatch(movePlayer(data.user_id, data.direction));
-          break;
+        case "JOIN_PLAYER":
+            playerStore.getState().connectPlayer(data.user_id, data.position);
+            break;
+        case "LEAVE_PLAYER":
+            playerStore.getState().disconnectPlayer(data.user_id);
+            break;
+        case "PLAYER_MOVEMENT":
+            playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
+            break;
         case "you-joined-as-peer":
           console.log(data)
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
@@ -186,7 +197,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendPosition, sendComms};
+  return {socket, sendMovement, sendComms, joinRoom};
 }
 
 export const wsend = (d) => {
