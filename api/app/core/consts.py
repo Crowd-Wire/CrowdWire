@@ -13,7 +13,7 @@ AVATAR_3 = "avatar_3"
 
 AVATARS_LIST = [AVATAR_1, AVATAR_2, AVATAR_3]
 
-# websocket protocol
+
 class WebsocketProtocol:
     JOIN_PLAYER = 'JOIN_PLAYER'
     PLAYER_MOVEMENT = 'PLAYER_MOVEMENT'
