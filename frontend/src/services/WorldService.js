@@ -3,7 +3,7 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, joined = false, page = 1) {
+    search(search, tags, joined = false, page) {
         /*
             search: string,
             tags: List[string]
