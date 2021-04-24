@@ -4,6 +4,8 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 from loguru import logger
 import json
 
+from app.core.consts.WebsocketProtocol import *
+
 
 class ConnectionManager:
     count = 0
@@ -47,7 +49,7 @@ class ConnectionManager:
             for other_id in self.connections[world_id][room_id]:
                 # get position from redis
                 position = {'x': 50, 'y': 50}
-                await self.users_ws[user_id].send_json({'topic': 'JOIN_PLAYER', 'user_id': other_id, 'position': position})
+                await self.users_ws[user_id].send_json({'topic': JOIN_PLAYER, 'user_id': other_id, 'position': position})
         
         self.connections \
             .setdefault(world_id, {}) \
@@ -58,7 +60,7 @@ class ConnectionManager:
         )
         await self.broadcast(
             world_id, room_id,
-            {'topic': 'JOIN_PLAYER', 'user_id': user_id, 'position': joiner_position},
+            {'topic': JOIN_PLAYER, 'user_id': user_id, 'position': joiner_position},
             user_id
         )
 
@@ -77,7 +79,7 @@ class ConnectionManager:
             )
         await self.broadcast(
             world_id, room_id,
-            {'topic': 'LEAVE_PLAYER', 'user_id': user_id},
+            {'topic': LEAVE_PLAYER, 'user_id': user_id},
             user_id
         )
 
@@ -97,6 +99,88 @@ class ConnectionManager:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, Room {room_id}"
             )
+
+
+async def join_player(world_id, user_id, payload):
+    room_id = payload['room_id']
+    position = payload['position']
+    await manager.connect_room(world_id, room_id, user_id, position)
+
+async def send_player_movement(world_id, user_id, payload):
+    room_id = payload['room_id'] 
+    velocity = payload['velocity']
+    position = payload['position']
+    await manager.broadcast(
+        world_id, room_id,
+        {'topic': PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
+        user_id
+    )
+
+async def join_as_new_peer_or_speaker(world_id, user_id, payload):
+    """
+    join-as-new-peer:
+        create a room if it doesnt exit and add that user to that room
+        then media server returns receive transport options to amqp
+        this should only allow to receive audio
+    
+    join-as-speaker:
+        this does the same as above, except it allows
+        the user to speak, so, it returns two kinds of transport,
+        one for 
+    """
+    receiving and other for sending
+    room_id = payload['d']['roomId']
+    payload['d']['peerId'] = user_id
+
+    if room_id in manager.connections[world_id][room_id]:
+        if user_id not in manager.connections[world_id][room_id]:
+            manager.connections[world_id][room_id].append(user_id)
+    else:
+        manager.connections[world_id][room_id] = [user_id]
+
+    await rabbit_handler.publish(json.dumps(payload))
+
+async def handle_transport_or_track(user_id, payload):
+    payload['d']['peerId'] = user_id
+    await rabbit_handler.publish(json.dumps(payload))
+
+async def close_media(world_id, user_id, payload):
+    room_id = payload['d']['roomId']
+    payload['d']['peerId'] = user_id
+
+    # close in media server producer
+    await rabbit_handler.publish(json.dumps(payload))
+
+    # broadcast for peers to close this stream
+    if user_id in manager.connections[world_id][room_id]:
+        await manager.broadcast(world_id, room_id,
+                                {'topic': CLOSE_MEDIA,
+                                    'peerId': user_id},
+                                user_id)
+
+async def toggle_producer(world_id, user_id, payload):
+    room_id = payload['d']['roomId']
+    kind = payload['d']['kind']
+    pause = payload['d']['pause']
+    payload['d']['peerId'] = user_id
+    # pause in media server producer
+    await rabbit_handler.publish(json.dumps(payload))
+    # broadcast for peers to update UI toggle buttons
+    if user_id in manager.connections[world_id][room_id]:
+        await manager.broadcast(world_id, room_id,
+                                {'topic': TOGGLE_PEER_PRODUCER,
+                                    'peerId': user_id,
+                                    'kind': kind,
+                                    'pause': pause},
+                                user_id)
+
+async def speaking_change(world_id, user_id, payload):
+    room_id = payload['d']['roomId']
+    value = payload['d']['value']
+    logger.info(user_id)
+    logger.info(manager.connections[world_id][room_id])
+    if user_id in manager.connections[world_id][room_id]:
+        await manager.broadcast(world_id, room_id, {'topic': ACTIVE_SPEAKER, 'peerId': user_id, 'value': value}, user_id)
 
 
 manager = ConnectionManager()
