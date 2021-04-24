@@ -172,7 +172,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
         # TODO: change page size and make it not hardcoded
-        return query.offset(4 * (page - 1)).limit(4).all()
+        return query.offset(10 * (page - 1)).limit(10).all()
 
     async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
         if not user_id:
