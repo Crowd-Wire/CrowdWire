@@ -62,12 +62,12 @@ class SearchAllMaps extends Component {
 
 	joined = this.props.joined;
 
+
 	search_handler = (search, tags) => {
 		// TODO: handle errors
 		WorldService.search(search, tags, this.props.joined)
 			.then((res) => { return res.json() })
-			.then((res) => { this.setState({ maps: res }) });
-
+      .then((res) => { this.setState({ maps: res }) });
 	}
 
 	componentDidMount(){

@@ -6,18 +6,17 @@ import CardBody from "../Card/CardBody.js";
 import { changeMicId, changeCamId } from "../../redux/commStore.js";
 import storeDevice from "../../redux/commStore.js";
 import storeVolume, { changeGlobalVolume } from "../../redux/globalVolumeStore.js";
-import { sendVoice } from "../../webrtc/utils/sendVoice";
-import { sendVideo } from "../../webrtc/utils/sendVideo";
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 
-interface DeviceSettingsProps {}
+interface DeviceSettingsProps {
+  closeModal: any;
+  volColor?: string;
+}
 
-export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
-
-  const [micId, setMicId] = useState(storeDevice.getState().micId);
-	const [camId, setCamId] = useState(storeDevice.getState().camId);
-	const [globalVolume, setGlobalVolume] = useState(storeVolume.getState().globalVolume);
+export const DeviceSettings: React.FC<DeviceSettingsProps> = ({closeModal, volColor='rgb(63, 81, 181)'}) => {
+  const [setMicId] = useState(storeDevice.getState().micId);
+	const [setCamId] = useState(storeDevice.getState().camId);
+	const [setGlobalVolume] = useState(storeVolume.getState().globalVolume);
 
   const [optionsMic, setOptionsMic] = useState<
     Array<{ id: string; label: string } | null>
@@ -48,15 +47,25 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
   }, []);
 
   return (
-    <>
-			<Card>
+    <div className="modal-device">
+      <Card style={{
+        height: 300,
+        padding: 3,
+        background: 'rgba(255, 255, 255, 0.8)',
+        overflow: 'hidden',
+        boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+        borderTop: '1px solid rgba(255,255,255,0.5)',
+        borderLeft: '1px solid rgba(255,255,255,0.5)',
+        backdropFilter: 'blur(3px)',
+        borderRadius: '5%',
+      }}>
         <CardBody>
-          <h4>Device's Settings</h4>
-          
-          <br/>
+          <div style={{textAlign: 'center'}}>
+            <h3 style={{color: '#3f51b5'}}>Device's Settings</h3>
+          </div>
           <Row>
-            <span style={{marginRight: '15px'}}>Camera Devices: </span>
-              {optionsCamera.length === 0 ? <div>no cameras available</div> : null}
+            <span style={{marginRight: '15px', fontWeight:400, color: '#3f51b5'}}>Camera Devices: </span>
+              {optionsCamera.length === 0 ? <span>No cameras available</span> : null}
               {optionsCamera.length ? (
                 <select
                   value={storeDevice.getState().camId}
@@ -76,10 +85,9 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
                 </select>
               ) : null}
           </Row>
-          <br />
           <Row>
-            <span style={{marginRight: '15px'}}>Microphone Devices: </span>
-            {optionsMic.length === 0 ? <div>no mics available</div> : null}
+            <span style={{paddingTop: '5px', marginRight: '15px', fontWeight:400, color: '#3f51b5'}}>Microphone Devices: </span>
+            {optionsMic.length === 0 ? <span>No mics available</span> : null}
             {optionsMic.length ? (
               <select
                 value={storeDevice.getState().micId}
@@ -99,19 +107,23 @@ export const DeviceSettings: React.FC<DeviceSettingsProps> = () => {
               </select>
             ) : null}
           </Row>
-          <br />
           <Row>
-            <span style={{marginRight: '15px'}}>Global Speaker's Volume:</span>
-            <VolumeSlider volume={storeVolume.getState().globalVolume} onVolume={(n) => {
+            <span style={{paddingTop: '5px', marginRight: '15px', fontWeight:400, color: '#3f51b5'}}>
+              My Speaker's Volume:
+            </span>
+            <VolumeSlider volColor={volColor} volume={storeVolume.getState().globalVolume} onVolume={(n) => {
               setGlobalVolume(n)
               storeVolume.dispatch(changeGlobalVolume(n))
             }} />
           </Row>
-
-          <br />
+          <div style={{textAlign: "center"}}>
+            <Button onClick={() => closeModal()} variant="outlined" color="primary">
+              Close
+            </Button>
+          </div>
 
         </CardBody>
       </Card>
-    </>
+    </div>
   );
 };

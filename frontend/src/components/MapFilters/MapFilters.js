@@ -68,9 +68,6 @@ export default function MapFilters(props) {
   }, [])
 
   const [tags, setTags] = React.useState([]);
-  const [typeAccess, setAccess] = React.useState('');
-  const [typeFormat, setFormat] = React.useState('');
-  const [typeTopic, setTopic] = React.useState('');
   const [isOpened, setIsOpened] = useState(false);
 
   function toggleFilter() {
@@ -83,23 +80,6 @@ export default function MapFilters(props) {
     console.log(search);
   };
 
-  function deleteFilters() {
-    setFormat('');
-    setAccess('');
-    setTopic('');
-
-  }
-  const handleAccessibility = (event) => {
-    setAccess(event.target.value);
-  };
-
-  const handleTopic = (event) => {
-    setTopic(event.target.value);
-  };
-
-  const handleFormat = (event) => {
-    setFormat(event.target.value);
-  };
   const [values, setValues] = React.useState({
     amount: '',
     });

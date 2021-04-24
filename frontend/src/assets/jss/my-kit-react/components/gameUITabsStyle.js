@@ -3,10 +3,15 @@ import customTabsStyle from "assets/jss/material-kit-react/components/customTabs
 const gameUITabsStyle = {
   ...customTabsStyle,
   card: {
+    boxSizing: 'border-box',
+    padding: '5px',
     backgroundColor: "rgba(200, 200, 200, .3)",
     margin: 0,
-    // height: "100%"
-    // overflow: 'hidden',
+    flexGrow: '1',
+    display: 'flex',
+    flexDirection: 'column',
+    /* for Firefox */
+    minHeight: '0',
   },
   cardHeader: {
     padding: "3px 0 0 0",
@@ -18,7 +23,8 @@ const gameUITabsStyle = {
     padding: 0,
     overflow: 'auto',
     minHeight: 0, // for Firefox
-    // flexGrow: 1
+    flexGrow: 1,
+    backgroundColor: "#777"
   },
   tabRootButton: {
     minHeight: "unset !important",

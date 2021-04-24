@@ -7,6 +7,8 @@ import Row from 'react-bootstrap/Row';
 import WorldDetails from 'views/CreateWorld/sections/WorldDetails.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
+import WorldService from 'services/WorldService.js';
+
 import IconButton from '@material-ui/core/IconButton';const useStyles = theme => ({
   root: {
     display: 'flex',
@@ -20,23 +22,29 @@ class CreateWorld extends Component {
   constructor(props){
     super(props);
   }
-  handler = (focused) => {
-    this.setState({
-      focus: focused
-    });
-  }
-  handleChange = (event) => {
-    const name = event.target.name;
-    // this.setState({
-    //   ...state,
-    //   [name]: event.target.value,
-    // });
-  };
-  changePage = () => {
+
+
+  createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
+    if(accessibility){
+      accessibility = true;
+    }
+    else{
+      accessibility = false;
+    }    
+    if(guests){
+      guests = true;
+    }
+    else{
+      guests = false;
+    }
+    console.log(typeof guests, typeof accessibility);
+    WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"
     });
   }
+
+
   render() {
     const { classes } = this.props;
     if(this.state.page==="details"){
@@ -58,7 +66,7 @@ class CreateWorld extends Component {
               </Col>
             </Row>
             <Row style={{width:"100%", marginLeft:"auto", marginRight:"auto", marginBottom:"3%"}}>
-                <WorldDetails changePage={this.changePage} />
+                <WorldDetails createWorld={this.createWorld} />
             </Row>
           </Col>
         </div>
