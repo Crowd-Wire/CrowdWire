@@ -1,6 +1,6 @@
 import "dotenv/config";
 import debugModule from "debug";
-import { Router, Worker } from "mediasoup/lib/types";
+import { Producer, Router, Worker } from "mediasoup/lib/types";
 import * as Sentry from "@sentry/node";
 import { MyRooms } from "./MyRoomState";
 import { closePeer } from "./utils/closePeer";
@@ -10,8 +10,8 @@ import { deleteRoom } from "./utils/deleteRoom";
 import { startMediasoup } from "./utils/startMediasoup";
 import { HandlerMap, startRabbit } from "./utils/startRabbit";
 
-const log = debugModule("shawarma:index");
-const errLog = debugModule("shawarma:ERROR");
+const log = debugModule("crowdwire:index");
+const errLog = debugModule("crowdwire:ERROR");
 
 const rooms: MyRooms = {};
 
@@ -20,6 +20,7 @@ async function main() {
     Sentry.init({
       dsn: process.env.SENTRY_DNS,
       enabled: !!process.env.SENTRY_DNS,
+      debug: true,
     });
   }
   // start mediasoup
@@ -53,8 +54,23 @@ async function main() {
     "remove-speaker": ({ roomId, peerId }) => {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
-        peer?.producer?.close();
-        peer?.sendTransport?.close();
+        peer?.producer?.get('audio')?.close();
+        // peer?.sendTransport?.close();
+      }
+    },
+    ['toggle-producer']: ({ roomId, peerId, kind, pause }) => {
+      if (roomId in rooms) {
+        const peer = rooms[roomId].state[peerId];
+        if (pause)
+          peer?.producer?.get(kind)?.pause();
+        else
+          peer?.producer?.get(kind)?.resume();
+      }
+    },
+    ['close-media']: ({ roomId, peerId }) => {
+      if (roomId in rooms) {
+        const peer = rooms[roomId].state[peerId];
+        peer?.producer?.get('media')?.close();
       }
     },
     ["destroy-room"]: ({ roomId }) => {
@@ -74,7 +90,7 @@ async function main() {
         if (Object.keys(rooms[roomId].state).length === 0) {
           deleteRoom(roomId, rooms);
         }
-        send({ uid, op: "you_left_room", d: { roomId, kicked: !!kicked } });
+        send({ uid, topic: "you_left_room", d: { roomId, kicked: !!kicked } });
       }
     },
     ["@get-recv-tracks"]: async (
@@ -83,6 +99,7 @@ async function main() {
       send,
       errBack
     ) => {
+
       if (!rooms[roomId]?.state[myPeerId]?.recvTransport) {
         errBack();
         return;
@@ -99,31 +116,34 @@ async function main() {
 
       for (const theirPeerId of Object.keys(state)) {
         const peerState = state[theirPeerId];
-        if (theirPeerId === myPeerId || !peerState || !peerState.producer) {
+        if (theirPeerId === myPeerId || !peerState ||
+          (!peerState.producer?.has('audio') && !peerState.producer?.has('video')
+          && !peerState.producer?.has('media'))) {
           continue;
         }
         try {
           const { producer } = peerState;
-          consumerParametersArr.push(
-            await createConsumer(
-              router,
-              producer,
-              rtpCapabilities,
-              transport,
-              myPeerId,
-              state[theirPeerId]
-            )
-          );
+          for (let [key, value] of producer.entries()) {
+            consumerParametersArr.push(
+              {'consumer': await createConsumer(
+                router,
+                value,
+                rtpCapabilities,
+                transport,
+                myPeerId,
+                state[theirPeerId]
+              ), 'kind': key}
+            );
+          }
         } catch (e) {
           errLog(e.message);
           continue;
         }
       }
-
       send({
-        op: "@get-recv-tracks-done",
+        topic: "@get-recv-tracks-done",
         uid,
-        d: { consumerParametersArr, roomId },
+        d: { consumerParametersArr, roomId, peerId: myPeerId},
       });
     },
     ["@send-track"]: async (
@@ -147,25 +167,26 @@ async function main() {
         return;
       }
       const { state } = rooms[roomId];
-      const { sendTransport, producer: previousProducer, consumers } = state[
-        myPeerId
-      ];
+      const { sendTransport, producer: previousProducer, consumers } =
+        state[myPeerId];
       const transport = sendTransport;
-
+      
       if (!transport) {
         errBack();
         return;
       }
       try {
-        if (previousProducer) {
-          previousProducer.close();
-          consumers.forEach((c) => c.close());
-          // @todo give some time for frontends to get update, but this can be removed
-          send({
-            rid: roomId,
-            op: "close_consumer",
-            d: { producerId: previousProducer.id, roomId },
-          });
+        if (previousProducer && previousProducer.has(appData.mediaTag)) {
+          previousProducer.get(appData.mediaTag)!.close();
+          consumers.forEach((c) => {
+            if (c.appData.mediaTag == appData.mediaTag ) c.close()
+              // @todo give some time for frontends to get update, but this can be removed
+              send({
+                rid: roomId,
+                topic: "close_consumer",
+                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
+              });
+          })
         }
 
         const producer = await transport.produce({
@@ -174,8 +195,14 @@ async function main() {
           paused,
           appData: { ...appData, peerId: myPeerId, transportId },
         });
+        
+        if (!state[myPeerId].producer) {
+          state[myPeerId].producer = new Map<string, Producer>();
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
+        } else {
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
+        }
 
-        rooms[roomId].state[myPeerId].producer = producer;
         for (const theirPeerId of Object.keys(state)) {
           if (theirPeerId === myPeerId) {
             continue;
@@ -193,34 +220,37 @@ async function main() {
               myPeerId,
               state[theirPeerId]
             );
+
             send({
               uid: theirPeerId,
-              op: "new-peer-speaker",
-              d: { ...d, roomId },
+              topic: "new-peer-producer",
+              d: { ...d, roomId, kind: appData.mediaTag, peerId: myPeerId },
             });
           } catch (e) {
             errLog(e.message);
           }
         }
         send({
-          op: `@send-track-${direction}-done` as const,
+          topic: `@send-track-${direction}-done` as const,
           uid,
           d: {
             id: producer.id,
             roomId,
+            peerId: myPeerId,
           },
         });
       } catch (e) {
         send({
-          op: `@send-track-${direction}-done` as const,
+          topic: `@send-track-${direction}-done` as const,
           uid,
           d: {
             error: e.message,
             roomId,
+            peerId: myPeerId,
           },
         });
         send({
-          op: "error",
+          topic: "error",
           d: "error connecting to voice server | " + e.message,
           uid,
         });
@@ -255,28 +285,28 @@ async function main() {
       } catch (e) {
         console.log(e);
         send({
-          op: `@connect-transport-${direction}-done` as const,
+          topic: `@connect-transport-${direction}-done` as const,
           uid,
           d: { error: e.message, roomId },
         });
         send({
-          op: "error",
+          topic: "error",
           d: "error connecting to voice server | " + e.message,
           uid,
         });
         return;
       }
       send({
-        op: `@connect-transport-${direction}-done` as const,
+        topic: `@connect-transport-${direction}-done` as const,
         uid,
-        d: { roomId },
+        d: { roomId, peerId: peerId },
       });
     },
     ["create-room"]: async ({ roomId }, uid, send) => {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
-      send({ op: "room-created", d: { roomId }, uid });
+      send({ topic: "room-created", d: { roomId }, uid });
     },
     ["add-speaker"]: async ({ roomId, peerId }, uid, send, errBack) => {
       if (!rooms[roomId]?.state[peerId]) {
@@ -291,10 +321,11 @@ async function main() {
       rooms[roomId].state[peerId].sendTransport = sendTransport;
 
       send({
-        op: "you-are-now-a-speaker",
+        topic: "you-are-now-a-speaker",
         d: {
           sendTransportOptions: transportToOptions(sendTransport),
           roomId,
+          peerId,
         },
         uid,
       });
@@ -303,13 +334,14 @@ async function main() {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
-      log("join-as-new-peer", peerId);
+      log("join-as-new-speaker", peerId);
 
       const { state, router } = rooms[roomId];
       const [recvTransport, sendTransport] = await Promise.all([
         createTransport("recv", router, peerId),
         createTransport("send", router, peerId),
       ]);
+      
       if (state[peerId]) {
         closePeer(state[peerId]);
       }
@@ -321,7 +353,7 @@ async function main() {
       };
 
       send({
-        op: "you-joined-as-speaker",
+        topic: "you-joined-as-speaker",
         d: {
           roomId,
           peerId,
@@ -338,25 +370,30 @@ async function main() {
       }
       log("join-as-new-peer", peerId);
       const { state, router } = rooms[roomId];
-      const recvTransport = await createTransport("recv", router, peerId);
+      const [recvTransport, sendTransport] = await Promise.all([
+        createTransport("recv", router, peerId),
+        createTransport("send", router, peerId),
+      ]);
+      
       if (state[peerId]) {
         closePeer(state[peerId]);
       }
 
       rooms[roomId].state[peerId] = {
-        recvTransport,
+        recvTransport: recvTransport,
+        sendTransport: sendTransport,
         consumers: [],
         producer: null,
-        sendTransport: null,
       };
 
       send({
-        op: "you-joined-as-peer",
+        topic: "you-joined-as-peer",
         d: {
           roomId,
           peerId,
           routerRtpCapabilities: rooms[roomId].router.rtpCapabilities,
           recvTransportOptions: transportToOptions(recvTransport),
+          sendTransportOptions: transportToOptions(sendTransport),
         },
         uid,
       });

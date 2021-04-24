@@ -10,7 +10,8 @@ class Settings(BaseSettings):
 
     # TODO: Change this
     # testing
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 2
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+    ACCESS_GUEST_TOKEN_EXPIRE_HOURS: int = 12  # 12 hours For Guests
 
     SCHEMA_NAME: str = "fastapi"
     POSTGRES_SERVER: str = ""
@@ -24,7 +25,8 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str = "user"
     RABBITMQ_PASSWORD: str = "bitnami"
     RABBITMQ_HOST: str = "localhost"
-    RABBITMQ_SENDING_QUEUE: str = "SendingQueue"
+    RABBITMQ_SENDING_QUEUE: str = "media_server_queue"
+    RABBITMQ_RECEIVING_QUEUE: str = "rest_api_queue"
     RABBITMQ_URI: str = f"amqp://" \
                         f"{RABBITMQ_USER}:{RABBITMQ_PASSWORD}" \
                         f"@{RABBITMQ_HOST}:5672/"

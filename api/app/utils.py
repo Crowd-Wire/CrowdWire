@@ -1,9 +1,34 @@
+from uuid import uuid4
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 # import emails
 # from emails.template import JinjaTemplate
 from jose import jwt
+
+from app import schemas, models
 from app.core.config import settings
+from app.core.consts import AVATARS_LIST
+from random import choice
+from loguru import logger
+
+
+def choose_avatar():
+    """
+    Chooses a random avatar from the available Ones
+    @return: a avatar filename
+    """
+    return choice(AVATARS_LIST)
+
+
+def is_guest_user(obj: Union[schemas.GuestUser, models.User]) -> bool:
+    return isinstance(obj, schemas.GuestUser)
+
+
+def generate_guest_username(user_id: uuid4) -> str:
+    logger.info(user_id.fields)
+    sub_uuid = str(user_id.fields[-1])[:8]
+    return f'Guest_{sub_uuid}'
+
 
 """
 def send_email(

@@ -16,7 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "^6.1.0",
+    "@sentry/node": "^6.2.5",
+    "@sentry/tracing": "^6.2.5",
     "amqplib": "^0.6.0",
     "cors": "^2.8.5",
     "debug": "^4.3.1",

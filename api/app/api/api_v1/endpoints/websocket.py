@@ -53,20 +53,60 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
             # this does the same as above, except it allows
             # the user to speak, so, it returns two kinds of transport,
             # one for receiving and other for sending
-            elif topic == "join-as-new-peer" or "join-as-speaker":
+            elif topic == "join-as-new-peer" or topic == "join-as-speaker":
                 room_id = payload['d']['roomId']
-                user_id = payload['d']['peerId']
-                
+                payload['d']['peerId'] = user_id
+
                 if room_id in manager.connections[world_id][room_id]:
-                    manager.connections[world_id][room_id].append(user_id)
+                    if user_id not in manager.connections[world_id][room_id]:
+                        manager.connections[world_id][room_id].append(user_id)
                 else:
                     manager.connections[world_id][room_id] = [user_id]
-                    
+
                 await rabbit_handler.publish(json.dumps(payload))
+            elif topic == "@connect-transport"\
+                    or topic == "@get-recv-tracks"\
+                    or topic == "@connect-transport-send-done"\
+                    or topic == "@send-track":
+                payload['d']['peerId'] = user_id
+                await rabbit_handler.publish(json.dumps(payload))
+            elif topic == "close-media":
+                room_id = payload['d']['roomId']
+                payload['d']['peerId'] = user_id
+
+                # close in media server producer
+                await rabbit_handler.publish(json.dumps(payload))
+
+                # broadcast for peers to close this stream
+                if user_id in manager.connections[world_id][room_id]:
+                    await manager.broadcast(world_id, room_id,
+                                            {'topic': 'close_media',
+                                             'peerId': user_id},
+                                            user_id)
+            elif topic == "toggle-producer":
+                room_id = payload['d']['roomId']
+                kind = payload['d']['kind']
+                pause = payload['d']['pause']
+                payload['d']['peerId'] = user_id
+                # pause in media server producer
+                await rabbit_handler.publish(json.dumps(payload))
+                # broadcast for peers to update UI toggle buttons
+                if user_id in manager.connections[world_id][room_id]:
+                    await manager.broadcast(world_id, room_id,
+                                            {'topic': 'toggle_peer_producer',
+                                             'peerId': user_id,
+                                             'kind': kind,
+                                             'pause': pause},
+                                            user_id)
+            elif topic == "speaking_change":
+                room_id = payload['d']['roomId']
+                value = payload['d']['value']
+                logger.info(user_id)
+                logger.info(manager.connections[world_id][room_id])
+                if user_id in manager.connections[world_id][room_id]:
+                    await manager.broadcast(world_id, room_id, {'topic': 'active_speaker', 'peerId': user_id, 'value': value}, user_id)
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
-        if room_id:
-            await manager.disconnect_room(world_id, room_id, user_id)
-        manager.disconnect(world_id, user_id)
-        
+        manager.disconnect(world_id, room_id, user_id)
+

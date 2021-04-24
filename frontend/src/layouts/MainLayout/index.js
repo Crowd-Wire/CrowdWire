@@ -3,14 +3,12 @@ import React from "react";
 import { Outlet } from 'react-router-dom';
 
 import Header from "components/Header/Header";
-import HeaderLinks from "components/Header/HeaderLinks";
 
 const MainLayout = (props) => {
   const {...rest} = props;
-  const dashboardRoutes = [];
   return (
       <div>
-          <Header
+          {/* <Header
             color="transparent"
             routes={dashboardRoutes}
             brand="Material Kit React"
@@ -21,8 +19,15 @@ const MainLayout = (props) => {
               color: "white"
             }}
             {...rest}
+          /> */}
+          <Header
+            absolute
+            color="transparent"
+            brand=""
+            size="sm"
+            // rightLinks={<HeaderLinks />}
+            {...rest}
           />
-
           {/* renders each page components 
           (it can be interpreted as the children) */}
           <Outlet />

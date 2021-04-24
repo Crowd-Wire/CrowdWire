@@ -21,7 +21,8 @@ class ConnectionManager:
         await websocket.accept()
         
         payload = await websocket.receive_json()
-        token = payload['token']
+        room_id = '' # TODO: ask cjico
+        # token = payload['token']
         # futurely, get token and retrieve it's id??? guests will have a G prepended, ig
         user_id = str(self.count)
         self.count += 1
