@@ -61,10 +61,7 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
-        localStorage.setItem("auth",JSON.stringify(
-          {"token":res.access_token,
-            "expire_date":res.expire_date}
-          ));
+        AuthenticationService.setToken(res);
         if(res.access_token!==undefined)
           this.setState({loggedIn:true})
         else if(res.detail==="Invalid email or password.")
@@ -83,11 +80,7 @@ class LoginPage extends React.Component {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
-        localStorage.setItem("auth",JSON.stringify(
-          {"token":res.access_token,
-          "expire_date":res.expire_date}
-          )
-        );
+        AuthenticationService.setToken(res);
         if(res.access_token!==undefined)
           this.setState({loggedIn:true}); 
       })
