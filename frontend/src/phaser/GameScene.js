@@ -124,7 +124,7 @@ class GameScene extends Phaser.Scene {
             } else {
                 // unwire players
                 ws.unwirePlayer('1', 
-                    this.inRangePlayers.filter((id) => {
+                    [...this.inRangePlayers].filter((id) => {
                         const left = !(id in rangePlayers);
                         if (left) this.inRangePlayers.delete(id);
                         return left;
