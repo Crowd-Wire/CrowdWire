@@ -10,7 +10,6 @@ from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
-from app.utils import is_guest_user
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 reusable_oauth2_optional = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
