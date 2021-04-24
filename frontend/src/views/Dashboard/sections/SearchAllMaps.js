@@ -63,9 +63,9 @@ class SearchAllMaps extends Component {
 	search_handler = (search, tags) => {
 
 		WorldService.search(search, tags)
-			.then((res) => { return res.json() })
+			.then((res) => { 		console.log(res);
+				return res.json() })
 			.then((res) => { this.setState({ maps: res }) });
-
 	}
 
 	componentDidMount(){
