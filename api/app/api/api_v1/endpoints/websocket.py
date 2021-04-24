@@ -3,6 +3,7 @@ from typing import Dict, List, Any, Tuple
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter
 from loguru import logger
 
+from app.core.consts import *
 from app.api.api_v1.endpoints.connection_manager import manager 
 from app.rabbitmq.RabbitHandler import rabbit_handler
 import json
@@ -16,7 +17,7 @@ router = APIRouter()
 @router.websocket(
     "/{world_id}",
 )
-async def world_movement(websocket: WebSocket, world_id: str) -> Any:
+async def websocket_handler(websocket: WebSocket, world_id: str) -> Any:
     user_id = await manager.connect(world_id, websocket)
     
     try:
@@ -24,12 +25,12 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
             payload = await websocket.receive_json()
             topic = payload['topic']
 
-            if topic == 'JOIN_PLAYER':
+            if topic == JOIN_PLAYER:
                 room_id = payload['room_id']
                 position = payload['position']
                 await manager.connect_room(world_id, room_id, user_id, position)
                 
-            elif topic == 'PLAYER_MOVEMENT':
+            elif topic == PLAYER_MOVEMENT:
                 room_id = payload['room_id']
                 velocity = payload['velocity']
                 position = payload['position']
@@ -38,11 +39,11 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
                     {'topic': 'PLAYER_MOVEMENT', 'user_id': user_id, 'velocity': velocity, 'position': position},
                     user_id
                 )
-            elif topic == 'CHANGE_ROOM':
+            elif topic == CHANGE_ROOM:
                 pass
-            elif topic == 'WIRE_PLAYER':
+            elif topic == WIRE_PLAYER:
                 pass
-            elif topic == 'UNWIRE_PLAYER':
+            elif topic == UNWIRE_PLAYER:
                 pass
             # join-as-new-peer:
             # create a room if it doesnt exit and add that user to that room
@@ -53,7 +54,7 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
             # this does the same as above, except it allows
             # the user to speak, so, it returns two kinds of transport,
             # one for receiving and other for sending
-            elif topic == "join-as-new-peer" or topic == "join-as-speaker":
+            elif topic in (JOIN_AS_NEW_PEER, JOIN_AS_SPEAKER):
                 room_id = payload['d']['roomId']
                 payload['d']['peerId'] = user_id
 
@@ -64,13 +65,10 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
                     manager.connections[world_id][room_id] = [user_id]
 
                 await rabbit_handler.publish(json.dumps(payload))
-            elif topic == "@connect-transport"\
-                    or topic == "@get-recv-tracks"\
-                    or topic == "@connect-transport-send-done"\
-                    or topic == "@send-track":
+            elif topic in (CONNECT_TRANSPORT, GET_RECV_TRACKS, CONNECT_TRANSPORT_SEND_DONE, SEND_TRACK):
                 payload['d']['peerId'] = user_id
                 await rabbit_handler.publish(json.dumps(payload))
-            elif topic == "close-media":
+            elif topic == CLOSE_MEDIA:
                 room_id = payload['d']['roomId']
                 payload['d']['peerId'] = user_id
 
@@ -83,7 +81,7 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
                                             {'topic': 'close_media',
                                              'peerId': user_id},
                                             user_id)
-            elif topic == "toggle-producer":
+            elif topic == TOGGLE_PRODUCER:
                 room_id = payload['d']['roomId']
                 kind = payload['d']['kind']
                 pause = payload['d']['pause']
@@ -98,7 +96,7 @@ async def world_movement(websocket: WebSocket, world_id: str) -> Any:
                                              'kind': kind,
                                              'pause': pause},
                                             user_id)
-            elif topic == "speaking_change":
+            elif topic == SPEAKING_CHANGE:
                 room_id = payload['d']['roomId']
                 value = payload['d']['value']
                 logger.info(user_id)
