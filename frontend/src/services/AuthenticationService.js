@@ -29,6 +29,13 @@ class AuthenticationService {
         return JSON.parse(localStorage.getItem("auth"))["token"];
     }
 
+    joinAsGuest(){
+        return fetch(API_BASE + 'join-guest/', {
+            method: 'POST',
+            mode: 'cors'
+        })
+    }
+
 }
 
 export default new AuthenticationService();

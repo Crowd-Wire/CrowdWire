@@ -61,7 +61,6 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
-        console.log(res);
         localStorage.setItem("auth",JSON.stringify(
           {"token":res.access_token,
             "expire_date":res.expire_date}
@@ -79,6 +78,22 @@ class LoginPage extends React.Component {
       }
     )    
   }
+
+  handleGuestJoin = () => {
+    AuthenticationService.joinAsGuest()
+      .then((res) => {return res.json()})
+      .then((res) => {
+        localStorage.setItem("auth",JSON.stringify(
+          {"token":res.access_token,
+          "expire_date":res.expire_date}
+          )
+        );
+        if(res.access_token!==undefined)
+          this.setState({loggedIn:true}); 
+      })
+
+  }
+
 
   render() {
     if (this.state.loggedIn) {
@@ -178,6 +193,9 @@ class LoginPage extends React.Component {
                               Register
                             </Button>
                           </Link>
+                          <span>OR</span> 
+                          {/* Change this pls */}
+                          <Button onClick={this.handleGuestJoin} size="md" simple color="primary"> Join as Guest</Button>
                         </Row>
                       </Col>
                     </CardFooter>
