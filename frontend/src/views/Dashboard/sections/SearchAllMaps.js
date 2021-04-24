@@ -60,20 +60,41 @@ class SearchAllMaps extends Component {
 		this.props.handler(false)
 	}
 
-	search_handler = (search, tags) => {
+	joined = this.props.joined;
 
-		WorldService.search(search, tags)
-			.then((res) => { 		console.log(res);
-				return res.json() })
-			.then((res) => { this.setState({ maps: res }) });
+
+	search_handler = (search, tags) => {
+		// TODO: handle errors
+		WorldService.search(search, tags, this.props.joined)
+			.then((res) => { return res.json() })
+      .then((res) => { this.setState({ maps: res }) });
 	}
 
 	componentDidMount(){
-		WorldService.search("", [])
-			.then((res) => { return res.json() })
-			.then((res) => { this.setState({ maps: res }) });
-
-			
+		WorldService.search("", [], this.props.joined)
+			.then((res) => {
+				if(res.status == 200) 
+					return res.json()
+			 })
+			.then((res) => {
+				if(res)
+					this.setState({ maps: res }) 
+			});
+	}
+	componentDidUpdate(){
+		
+		if(this.joined!=this.props.joined){
+			this.joined = this.props.joined;
+			WorldService.search("", [], this.props.joined)
+				.then((res) => {
+					if(res.status == 200) 
+						return res.json()
+				})
+				.then((res) => {
+					if(res)
+						this.setState({ maps: res }) 
+				});
+		}
 	}
 
 	render() {

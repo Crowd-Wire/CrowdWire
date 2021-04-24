@@ -53,15 +53,17 @@ export default function MapFilters(props) {
 
   const classes = useStyles();
 
-
   useEffect (() => {
     TagService.getAll()
-			.then((res) => {return res.json()})
 			.then((res) => {
-        console.log(res);
+        if(res.status == 200)
+          return res.json()
+      })
+			.then((res) => {
         let arr = [];
-        res.forEach(tag => arr.push(tag.name)); 
-        setTags(arr);
+        if(res)
+          res.forEach(tag => arr.push(tag.name)); 
+        setTags(arr);  
       })
   }, [])
 
