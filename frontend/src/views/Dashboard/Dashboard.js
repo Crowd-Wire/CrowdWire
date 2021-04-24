@@ -14,7 +14,7 @@ const useStyles = theme => ({
   },
 });
 class Dashboard extends Component {
-  state={focus: false};
+  state={focus: false, joined:false};
   constructor(props){
     super(props);
   }
@@ -24,17 +24,23 @@ class Dashboard extends Component {
     });
   }
 
+  // handler to change the state of the SearchAllMaps component based on the sidebar
+  sidebar_handler = (joined) => {
+    this.setState({
+      joined: joined
+    });
+  }
 
   render() {
     const { classes } = this.props;
     return(
       <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer/>
+        <DashDrawer handler={this.sidebar_handler}/>
         {this.state.focus ? 
           <DashboardContent handler = {this.handler} />
           :
-          <SearchAllMaps handler = {this.handler} />
+          <SearchAllMaps handler = {this.handler} joined={this.state.joined} />
         }
       </div>
     );

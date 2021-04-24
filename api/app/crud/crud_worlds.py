@@ -149,10 +149,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                page: int = 1
                ) -> List[World]:
 
-        # TODO: search world might need pagination, (Vai ter de ter mesmo...)
         if not tags:
             tags = []
 
+        # check if world banned
         if not joined:
             query = db.query(World).filter(World.public)
         else:
@@ -167,9 +167,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-        logger.debug(query)
-
-        return query.offset(2*(page-1)).limit(2).all()
+        # TODO: change page size and make it not hardcoded
+        return query.offset(4 * (page - 1)).limit(4).all()
 
 
 crud_world = CRUDWorld(World)

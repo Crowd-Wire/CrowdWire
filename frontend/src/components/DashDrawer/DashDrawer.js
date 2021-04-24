@@ -60,13 +60,13 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-  },
+  },  
   iconDrawer: {
     fill:"white"
   },
 }));
 
-export default function DashDrawer(){
+export default function DashDrawer(props){
   const navigation = useNavigate();
   const location = useLocation();
   const classes = useStyles();
@@ -81,13 +81,14 @@ export default function DashDrawer(){
     console.log(location.pathname);
     if(location.pathname!=="/dashboard")
       navigation("/dashboard");
-    console.log("perform query on all worlds;")
+    props.handler(false);
   }
 
   const onClickJoinedWorlds = () => {
     console.log(navigation.toString());
     if(location.pathname!=="/dashboard")
       navigation("/dashboard");
+    props.handler(true);
   }
 
   const onClickCreateWorld = () => {
@@ -141,7 +142,7 @@ export default function DashDrawer(){
         </div>
         <Divider />
         <List>
-          <ListItem button key='My Worlds' className={clsx(classes.drawer, {
+          <ListItem button key='My Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open,})}>
             <ListItemIcon>

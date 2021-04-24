@@ -168,6 +168,6 @@ def search_world(
             db=db, search=search, tags=tags, joined=joined, page=page, user_id=user.user_id
         )
     else:
-        logger.debug("guest")
+        # guest cannot access visited worlds
         list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True, page=page)
     return list_world_objs
