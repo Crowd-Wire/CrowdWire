@@ -19,10 +19,10 @@ from app.core import consts
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
     def is_editable_to_user(self, db: Session, world_id: int, user_id: int):
-
         world_obj = db.query(World).join(User).filter(
             World.creator == user_id,
             World.world_id == world_id,
+            World.status != consts.WORLD_DELETED_STATUS
         ).first()
         if not world_obj:
             return None, strings.EDITION_FORBIDDEN
@@ -31,7 +31,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         logger.info("------>")
-        world_obj = db.query(World).filter(World.world_id == world_id).first()
+        world_obj = db.query(World).filter(
+            World.world_id == world_id,
+            World.status != consts.WORLD_DELETED_STATUS
+        ).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
@@ -42,7 +45,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         world_obj = db.query(World).filter(
             World.world_id == world_id,
             World.public.is_(True),
-            World.allow_guests.is_(True)
+            World.allow_guests.is_(True),
+            World.status.isnot(consts.WORLD_DELETED_STATUS)
         ).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
@@ -166,6 +170,20 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         logger.debug(query)
 
         return query
+
+    async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
+        if not user_id:
+            return None, strings.USER_NOT_PASSED
+        # Check first if the world Exists
+        obj, msg = self.is_editable_to_user(db=db, world_id=world_id, user_id=user_id)
+        if not obj:
+            return obj, msg
+        obj.status = consts.WORLD_DELETED_STATUS
+        db.add(obj)
+        db.commit()
+        db.refresh(obj)
+        await clear_cache_by_model("World", world_id=world_id)
+        return obj, strings.WORLD_DELETED_SUCCESS
 
 
 crud_world = CRUDWorld(World)

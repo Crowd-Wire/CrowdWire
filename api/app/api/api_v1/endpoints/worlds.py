@@ -168,3 +168,21 @@ def search_world(
         logger.debug("guest")
         list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True)
     return list_world_objs
+
+
+@router.delete("/{world_id}", response_model=schemas.WorldInDB)
+async def delete_world(
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Deletes a world given an world_id, if the request is made by its creator
+    """
+    world_obj, message = await crud.crud_world.remove(db=db, world_id=world_id, user_id=user.user_id)
+    if not world_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=message
+        )
+    return world_obj
