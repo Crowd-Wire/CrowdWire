@@ -83,12 +83,15 @@ class GameScene extends Phaser.Scene {
     handleGroups = (groups) => {
         for (const [id, grps] of Object.entries(groups)) {
             if (id in this.remotePlayers) {
-                this.remotePlayers[id].setText(grps.join(', '));
+                let text = this.remotePlayers[id].getText();
+                text.setText([text.text.split('\n')[0], grps.join(', ')]);
             } else if (id in this.localPlayers) {
-                this.localPlayers[id].setText(grps.join(', '));
+                let text = this.localPlayers[id].getText();
+                text.setText([text.text.split('\n')[0],grps.join(', ')]);
             } else {
                 // own player
-                this.player.setText(grps.join(', '));
+                let text = this.player.getText();
+                text.setText([text.text.split('\n')[0], grps.join(', ')]);
             }
         }
     }
@@ -185,8 +188,8 @@ class Player extends Phaser.GameObjects.Container {
             .setOrigin(0.5)
             .setCenterAlign()
             .setText([
-                'User 1',
-                '1 2',
+                "Me",
+                'G???',
             ]);
         const circle = scene.add.circle(0, 0, 150)
             .setOrigin(0.5)
@@ -301,7 +304,10 @@ class LocalPlayer extends Player {
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
-
+        this.getText().setText([
+            `User ${this.id}`,
+            'G???',
+        ]);
     }
 }
 
@@ -321,6 +327,10 @@ class RemotePlayer extends Player {
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
+        this.getText().setText([
+            `User ${this.id}`,
+            'G???',
+        ]);
 
         this.unsubscribe = usePlayerStore.subscribe(
             this.handlePlayerMovement, state => state.players[this.id]);

@@ -62,7 +62,14 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
             joinable_groups.add(group_id)
 
     state = 0
+    # count = 0
+    # print(user_groups)
     while len(user_groups) > 0:
+        # print('\n', state, user_groups)
+        # await send_groups_snapshot(world_id)
+        # count += 1
+        # if count > 5:
+        #     break
         
         if state in (0, 1):
             state += 1
@@ -101,16 +108,16 @@ async def normalize_unwire(world_id: str, user_id: str, lost_users_id: List[str]
     ...
 
 
-async def send_groups_snapshot(world_id: str, user_id: List[str], websocket):
+async def send_groups_snapshot(world_id: str, websocket=None):
     groups = {}
     groups_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:groups")
     
     for key in groups_keys:
-        uid = re.match(r"*:user:(.+)+:groups", key)[0] # eww urrgh
+        uid = re.match(r".+:user:(.+):groups", key.decode("utf-8"))[1] # eww urrgh
         grps = await redis_connector.smembers(key)
-        print('\n\n',uid, grps, '\n')
         groups[uid] = grps
 
+    # print(groups)
     await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, websocket)
 
 
@@ -137,7 +144,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict, websocket):
             await normalize_wire(world_id, user_id, users_id)
 
     # TODO: remove after testing
-    await send_groups_snapshot(world_id, user_id, websocket)
+    await send_groups_snapshot(world_id, websocket)
 
 
 async def unwire_players(world_id: str, user_id: str, payload: dict, websocket):
@@ -162,7 +169,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict, websocket):
             ...
 
     # TODO: remove after testing
-    await send_groups_snapshot(world_id, user_id, websocket)
+    await send_groups_snapshot(world_id, websocket)
 
 
 async def join_as_new_peer_or_speaker(world_id: str, user_id: str, payload: dict):
