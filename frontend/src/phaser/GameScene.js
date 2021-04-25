@@ -51,6 +51,7 @@ class GameScene extends Phaser.Scene {
         // static players for range test
         this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
         this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
+        this.localPlayers['-2'] = new LocalPlayer(this, 600, 500, '-3');
 
         // main player
         this.player = new Player(this, 50, 50);
