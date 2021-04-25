@@ -47,8 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-let search = "";
-let tag_array = [];
+
 export default function MapFilters(props) {
 
   const classes = useStyles();
@@ -76,8 +75,8 @@ export default function MapFilters(props) {
 
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
-    search = event.target.value;
-    console.log(search);
+    props.changeSearch(event.target.value);
+    console.log(props.search);
   };
 
   const [values, setValues] = React.useState({
@@ -91,7 +90,7 @@ export default function MapFilters(props) {
 								<InputLabel htmlFor="outlined-margin-normal">Search Map</InputLabel>
 									<OutlinedInput
 										id="outlined-adornment-amount"
-										value={values.amount}
+										value={props.search}
 										onChange={handleChange('amount')}
 										startAdornment={<InputAdornment position="start"><SearchIcon/></InputAdornment>}
 										labelWidth={90}
@@ -115,8 +114,9 @@ export default function MapFilters(props) {
 										<Autocomplete
 											limitTags={5}
 											style={{width:"70%", marginLeft:"auto",marginRight:"auto"}}
-											multiple
-                      onChange={(event, value) => tag_array = value}
+                      multiple
+                      value={props.tag_array}
+                      onChange={(event, value) => props.changeTags(value)}
 											id="tags-standard"
 											options={tags}
 											getOptionLabel={(option) => option}
@@ -135,7 +135,7 @@ export default function MapFilters(props) {
 						}
 					</Row>
           <Row>
-            <Button onClick={() => props.handler(search, tag_array)}>Search</Button>
+            <Button onClick={() => props.handler()}>Search</Button>
           </Row>
         </>
     );
