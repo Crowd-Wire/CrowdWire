@@ -81,7 +81,6 @@ class GameScene extends Phaser.Scene {
     }
 
     handleGroups = (groups) => {
-        console.log(groups)
         for (const [id, grps] of Object.entries(groups)) {
             if (id in this.remotePlayers) {
                 this.remotePlayers[id].setText(grps.join(', '));

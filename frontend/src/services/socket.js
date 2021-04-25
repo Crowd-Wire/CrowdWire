@@ -145,7 +145,6 @@ export const getSocket = (worldId) => {
             playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "GROUPS_SNAPSHOT":
-            console.log(data)
             playerStore.getState().setGroups(data.groups);
             break;
         case "you-joined-as-peer":

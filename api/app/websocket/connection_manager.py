@@ -8,6 +8,7 @@ from app.core.consts import WebsocketProtocol as protocol
 
 class ConnectionManager:
     count = 0
+    group_count = -1 # TODO: remove
 
     def __init__(self):
         """
@@ -17,6 +18,10 @@ class ConnectionManager:
         self.connections: Dict[str, Dict[str, List[WebSocket]]] = {}
 
         self.users_ws: Dict[str, WebSocket] = {}
+
+    def get_next_group_id(): # TODO: remove
+        self.group_count += 1
+        return self.group_count
 
     async def connect(self, world_id: str, websocket: WebSocket) -> str:
         await websocket.accept()

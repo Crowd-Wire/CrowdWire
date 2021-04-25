@@ -42,7 +42,6 @@ const usePlayerStore = create(
             },
             setGroups: (grps: Record<string, string[]>) => {
                 return set(() => {
-                    console.log(grps)
                     return { groups: grps };
                 });
             },
