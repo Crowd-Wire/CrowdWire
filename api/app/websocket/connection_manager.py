@@ -19,7 +19,7 @@ class ConnectionManager:
 
         self.users_ws: Dict[str, WebSocket] = {}
 
-    def get_next_group_id(): # TODO: remove
+    def get_next_group_id(self): # TODO: remove
         self.group_count += 1
         return self.group_count
 

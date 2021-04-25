@@ -43,12 +43,12 @@ async def add_to_user(world_id: str, user_id: str, group_id: str, *groups_id: Li
 
 async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str]):
     user_groups = []
-    all_groups = {}
-    joinable_groups = {}
+    all_groups = set()
+    joinable_groups = set()
 
     for id_ in found_users_id:
         groups = await redis_connector.smembers(f"world:{world_id}:user:{id_}:groups")
-        user_groups.append((id_, groups))
+        user_groups.append((id_, set(groups)))
         all_groups.update(groups)
         # TODO: check joinable here?
 
@@ -57,7 +57,7 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
     # get joinable groups
     for group_id in all_groups:
         users = await redis_connector.smembers(f"world:{world_id}:group:{group_id}")
-        if users.issubset(found_users_id):
+        if set(users).issubset(set(found_users_id)):
             # joinable
             joinable_groups.add(group_id)
 
@@ -92,12 +92,12 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
             # no assignement was made last 2 iterations
             # create group
             await add_to_group(world_id, manager.get_next_group_id(), 
-                user_id, [user for user, groups in user_groups])
+                user_id, *[user for user, groups in user_groups])
             # normalized finished
             break
             
 
-async def normalize_unwire(user_id: str, lost_users_id: List[str]):
+async def normalize_unwire(world_id: str, user_id: str, lost_users_id: List[str]):
     ...
 
 
@@ -106,56 +106,60 @@ async def send_groups_snapshot(world_id: str, user_id: List[str], websocket):
     groups_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:groups")
     
     for key in groups_keys:
-        id_ = re.match(r"*:user:(.*):groups", key)[0] # eww
+        uid = re.match(r"*:user:(.+)+:groups", key)[0] # eww urrgh
         grps = await redis_connector.smembers(key)
-        print('\n\n',id_, grps, '\n')
-        groups[id_] = grps
+        print('\n\n',uid, grps, '\n')
+        groups[uid] = grps
 
     await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, websocket)
 
 
-async def wire_players(world_id: str, user_id: List[str], payload: dict, websocket):
+async def wire_players(world_id: str, user_id: str, payload: dict, websocket):
     users_id = payload['users_id']
 
     # add nearby users to user:X:users
     await redis_connector.sadd(f"world:{world_id}:user:{user_id}:users", *users_id)
 
     
-    for id_ in users_id:
-        if id_ not in manager.users_ws:
+    for uid in users_id:
+        if uid not in manager.users_ws:
             # check if local user TODO: remove after testing
 
             # add self to local user
-            await redis_connector.sadd(f"world:{world_id}:user:{id_}:users", user_id)
+            await redis_connector.sadd(f"world:{world_id}:user:{uid}:users", user_id)
+            # create new group or assign to right groups
+            await normalize_wire(world_id, user_id, users_id)
 
-        elif await redis_connector.sismember(f"world:{world_id}:user:{id_}:users", user_id):
+        elif await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
             # check if user already claimed proximity
 
             # create new group or assign to right groups
+            await normalize_wire(world_id, user_id, users_id)
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id, websocket)
 
 
-async def unwire_players(world_id: str, user_id: List[str], payload: dict, websocket):
+async def unwire_players(world_id: str, user_id: str, payload: dict, websocket):
     users_id = payload['users_id']
 
     # remove faraway users from user:X:users
     await redis_connector.srem(f"world:{world_id}:user:{user_id}:users", *users_id)
 
     
-    for id_ in users_id:
-        if id_ not in manager.users_ws:
+    for uid in users_id:
+        if uid not in manager.users_ws:
             # check if local user TODO: remove after testing
 
             # remove self from local user
-            await redis_connector.srem(f"world:{world_id}:user:{id_}:users", user_id)
+            await redis_connector.srem(f"world:{world_id}:user:{uid}:users", user_id)
+            ...
 
-
-        elif not await redis_connector.sismember(f"world:{world_id}:user:{id_}:users", user_id):
+        elif not await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
             # check if user already claimed farness
 
             # remove group or simply remove from groups
+            ...
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id, websocket)
