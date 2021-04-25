@@ -7,15 +7,16 @@ interface Vector {
     y: number;
 }
 
-interface PlayerMovement {
+interface Player {
     position: Vector;
     velocity: Vector;
 }
 
 const usePlayerStore = create(
     combine(
-        {
-            players: {} as Record<string, PlayerMovement>,
+        {   
+            groups: {} as Record<string, string[]>,
+            players: {} as Record<string, Player>,
         },
         (set) => ({
             connectPlayer: (id: string, position: Vector) => {
@@ -38,7 +39,13 @@ const usePlayerStore = create(
                     players[id] = { position: position, velocity: velocity };
                     return { players };
                 });
-            }
+            },
+            setGroups: (grps: Record<string, string[]>) => {
+                return set(() => {
+                    console.log(grps)
+                    return { groups: grps };
+                });
+            },
 
         })
     )

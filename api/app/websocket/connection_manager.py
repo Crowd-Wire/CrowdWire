@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from fastapi import WebSocket
 from loguru import logger
@@ -82,10 +82,10 @@ class ConnectionManager:
             user_id
         )
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    async def send_personal_message(self, message: Any, websocket: WebSocket):
         await websocket.send_json(message)
 
-    async def broadcast(self, world_id: str, room_id: str, payload: dict, sender_id: str):
+    async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:
             for user_id in self.connections[world_id][room_id]:
                 if user_id != sender_id:

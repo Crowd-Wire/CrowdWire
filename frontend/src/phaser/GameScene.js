@@ -18,6 +18,7 @@ var globalVar = false;
 
 class GameScene extends Phaser.Scene {
     remotePlayers = {};
+    localPlayers = {};
     inRangePlayers = new Set();
     count = 0;
 
@@ -48,8 +49,8 @@ class GameScene extends Phaser.Scene {
 
 
         // static players for range test
-        new RemotePlayer(this, 0, 500);
-        new RemotePlayer(this, 500, 600);
+        this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
+        this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
 
         // main player
         this.player = new Player(this, 50, 50);
@@ -73,7 +74,24 @@ class GameScene extends Phaser.Scene {
         
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
+        // TODO: remove after testing
+        this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({...state.groups}));
+
         this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
+    }
+
+    handleGroups = (groups) => {
+        console.log(groups)
+        for (const [id, grps] of Object.entries(groups)) {
+            if (id in this.remotePlayers) {
+                this.remotePlayers[id].setText(grps.join(', '));
+            } else if (id in this.localPlayers) {
+                this.localPlayers[id].setText(grps.join(', '));
+            } else {
+                // own player
+                this.player.setText(grps.join(', '));
+            }
+        }
     }
 
     handlePlayerConnection = (players, prevPlayers) => {
@@ -109,8 +127,8 @@ class GameScene extends Phaser.Scene {
         var bodies = this.physics.overlapCirc(
             this.player.body.center.x, this.player.body.center.y, 150, true, true)
         if (bodies.length - 1 != this.inRangePlayers.size) {
-            const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
-                                    .map((b) => b.gameObject.id);
+            const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
+                .map((b) => b.gameObject.id);
             if (rangePlayers.length > this.inRangePlayers.size) {
                 // wire players
                 ws.wirePlayer('1', 
@@ -149,7 +167,7 @@ class GameScene extends Phaser.Scene {
  * @param {number} y - The start vertical position in the scene.
  */
 class Player extends Phaser.GameObjects.Container {
-    speed = 500;
+    speed = 500;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
 
@@ -279,6 +297,16 @@ class Player extends Phaser.GameObjects.Container {
 }
 
 
+class LocalPlayer extends Player {
+
+    constructor(scene, x, y, id) {
+        super(scene, x, y);
+        this.id = id;
+
+    }
+}
+
+
 /**
  * The player sprite from remote users.
  * Receives new directions to update its movement.
@@ -289,18 +317,14 @@ class Player extends Phaser.GameObjects.Container {
  * @param {number} y - The start vertical position in the scene.
  */
 class RemotePlayer extends Player {
-    speed = 500; // 900 is the upperbound ig
     numUpdates = 0;
-    wasBlocked = false;
     
     constructor(scene, x, y, id) {
         super(scene, x, y);
+        this.id = id;
 
-        if (id)
-            this.unsubscribe = usePlayerStore.subscribe(
-                this.handlePlayerMovement, state => state.players[this.id]);
-
-        this.id = id ? id : '-1'; // TODO: remove after testing
+        this.unsubscribe = usePlayerStore.subscribe(
+            this.handlePlayerMovement, state => state.players[this.id]);
     }
 
     handlePlayerMovement = ({position, velocity}) => {

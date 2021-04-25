@@ -144,6 +144,10 @@ export const getSocket = (worldId) => {
         case "PLAYER_MOVEMENT":
             playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
+        case "GROUPS_SNAPSHOT":
+            console.log(data)
+            playerStore.getState().setGroups(data.groups);
+            break;
         case "you-joined-as-peer":
           console.log(data)
           joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {

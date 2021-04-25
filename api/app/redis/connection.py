@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, List, Union
 
 import aioredis
 from app.core.config import settings
@@ -36,12 +36,18 @@ class RedisConnector:
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
 
-    async def scan_match(self, matcher: str):
-        """
-        Scans all keys that contain a matcher string
-        """
-        regex = f"*{matcher}*"
-        return await self.master.execute('scan', 0, 'match', regex)
+    async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
+        """Scans keys that contain a matcher string"""
+        return await self.master.execute('scan', 0, 'match', f"*{matcher}*")
+
+    async def scan_match_all(self, matcher: str) -> List[str]:
+        """Scans keys that contain a matcher string"""
+        cursor = 0
+        all_keys = []
+        while cursor != b'0':
+            cursor, keys = await self.master.execute('scan', cursor, 'match', f"*{matcher}*")
+            all_keys.extend(keys)
+        return all_keys
 
     async def hget(self, key: str, field: str):
         return await self.master.execute('hget', key, field, encoding='utf-8')
@@ -61,9 +67,9 @@ class RedisConnector:
         """Determine if a given value is a member of a set"""
         return await self.master.execute('sismember', key, member)
 
-    async def smembers(self, key: str, *, encoding: object):
+    async def smembers(self, key: str):
         """Get all the members in a set"""
-        return await self.master.execute('smembers', key, encoding=encoding)
+        return await self.master.execute('smembers', key, encoding='utf-8')
 
     async def srem(self, key: str, member: str, *members):
         """Remove one or more members from a set"""
