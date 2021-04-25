@@ -74,8 +74,6 @@ class GameScene extends Phaser.Scene {
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
         this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
-
-        console.log(this.obstacles)
     }
 
     handlePlayerConnection = (players, prevPlayers) => {
@@ -108,8 +106,8 @@ class GameScene extends Phaser.Scene {
             return;
 
         // detect surrounding players
-        var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
-        // console.log(bodies.length - 1, this.inRangePlayers.size)
+        var bodies = this.physics.overlapCirc(
+            this.player.body.center.x, this.player.body.center.y, 150, true, true)
         if (bodies.length - 1 != this.inRangePlayers.size) {
             const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
                                     .map((b) => b.gameObject.id);
@@ -163,29 +161,31 @@ class Player extends Phaser.GameObjects.Container {
         scene.physics.add.existing(this);
 
         // add sprite and text to scene and then container
-        const sprite = scene.add.sprite(0, 0, 'player', 6);
-        const text = scene.add.bitmapText(0, -16, 'atari', '', 8)
+        const sprite = scene.add.sprite(0, 0, 'player', 6)
+            .setOrigin(0.5)
+            .setScale(3);
+        const text = scene.add.bitmapText(0, -48, 'atari', '', 24)
             .setOrigin(0.5)
             .setCenterAlign()
-            .setInteractive();
+            .setText([
+                'User 1',
+                '1 2',
+            ]);
+        const circle = scene.add.circle(0, 0, 150)
+            .setOrigin(0.5)
+            .setStrokeStyle(1, 0x1a65ac);
 
-        text.setText([
-            'User 1',
-            '1 2',
-        ]);
-
-        console.log(text);
         this.addSprite(sprite);
         this.addText(text);
+        this.add(circle);
+        
+        this.body.setSize(sprite.width * 3, sprite.height * 3)
+            .setOffset(-sprite.width/2 * 3, -sprite.height/2 * 3);
 
         // set some default physics properties
-        this.setScale(3);
-        // this.setCollideWorldBounds(true);
+        this.body.setCollideWorldBounds(true);
 
         this.body.onWorldBounds = true; // not sure if this is important
-
-        console.log(this.getSprite())
-        console.log(this.getSprite().anims)
 
         this.getSprite().anims.create({
             key: 'horizontal',
@@ -208,7 +208,6 @@ class Player extends Phaser.GameObjects.Container {
     }
 
     addSprite(sprite) {
-        console.log('add', sprite)
         this.addAt(sprite, 0);
     }
 
@@ -267,11 +266,11 @@ class Player extends Phaser.GameObjects.Container {
             this.getSprite().anims.play('down', true);
         }
         else if (velocity.x < 0) {
-            this.flipX = true;
+            this.getSprite().flipX = true;
             this.getSprite().anims.play('horizontal', true);
         }
         else if (velocity.x > 0) {
-            this.flipX = false;
+            this.getSprite().flipX = false;
             this.getSprite().anims.play('horizontal', true);
         } else {
             this.getSprite().anims.stop();
@@ -308,7 +307,6 @@ class RemotePlayer extends Player {
         this.updateAnimation(velocity);
         this.body.reset(position.x, position.y);
         this.body.setVelocity(velocity.x, velocity.y);
-        console.log(velocity)
     }
 
     /**
