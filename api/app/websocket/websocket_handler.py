@@ -10,14 +10,18 @@ from fastapi import WebSocket
 from loguru import logger
 
 
-async def join_player(world_id: str, user_id: str, payload: dict, websocket: Websocket):
+async def join_player(world_id: str, user_id: str, payload: dict):
     room_id = payload['room_id']
     position = payload['position']
     await manager.connect_room(world_id, room_id, user_id, position)
+    # send players snapshot
     players_snapshot = {}
     for uid in manager.connections[world_id][room_id]:
         players_snapshot[uid] = await redis_connector.get_user_position(world_id, room_id, uid)
-    await manager.send_personal_message(players_snapshot, websocket)
+        print(players_snapshot)
+    await manager.send_personal_message(
+        {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot}, manager.users_ws[user_id])
+    # store position on redis
     await redis_connector.set_user_position(world_id, room_id, user_id, position)
 
 
@@ -26,6 +30,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
     velocity = payload['velocity']
     position = payload['position']
     # store position on redis
+    await redis_connector.set_user_position(world_id, room_id, user_id, position)
 
     await manager.broadcast(
         world_id, room_id,
@@ -111,7 +116,7 @@ async def normalize_unwire(world_id: str, user_id: str, lost_users_id: List[str]
     ...
 
 
-async def send_groups_snapshot(world_id: str, websocket=None):
+async def send_groups_snapshot(world_id: str, user_id: str=None):
     groups = {}
     groups_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:groups")
     
@@ -120,11 +125,11 @@ async def send_groups_snapshot(world_id: str, websocket=None):
         grps = await redis_connector.smembers(key)
         groups[uid] = grps
 
-    print('final' if websocket != None else '', groups )
-    # await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, websocket)
+    print('final' if user_id != None else '', groups )
+    # await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, manager.users_ws[user_id])
 
 
-async def wire_players(world_id: str, user_id: str, payload: dict, websocket):
+async def wire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
 
     # add nearby users to user:X:users
@@ -148,10 +153,10 @@ async def wire_players(world_id: str, user_id: str, payload: dict, websocket):
             await normalize_wire(world_id, user_id, users_id)
 
     # TODO: remove after testing
-    await send_groups_snapshot(world_id, websocket)
+    await send_groups_snapshot(world_id, user_id)
 
 
-async def unwire_players(world_id: str, user_id: str, payload: dict, websocket):
+async def unwire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
 
     # remove faraway users from user:X:users
@@ -174,7 +179,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict, websocket):
             await normalize_unwire(world_id, user_id, users_id)
 
     # TODO: remove after testing
-    await send_groups_snapshot(world_id, websocket)
+    await send_groups_snapshot(world_id, user_id)
 
 
 async def join_as_new_peer_or_speaker(world_id: str, user_id: str, payload: dict):

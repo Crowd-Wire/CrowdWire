@@ -19,6 +19,15 @@ const usePlayerStore = create(
             players: {} as Record<string, Player>,
         },
         (set) => ({
+            connectPlayers: (snapshot: Record<string, Vector>) => {
+                return set((s) => {
+                    const players = {...s.players};
+                    for (const [id, position] of Object.entries(snapshot)) {
+                        players[id] = { position: position, velocity: { x: 0, y: 0 } };
+                    }
+                    return { players };
+                });
+            },
             connectPlayer: (id: string, position: Vector) => {
                 return set((s) => {
                     const players = {...s.players};

@@ -133,13 +133,14 @@ class RedisConnector:
 
     async def get_user_position(self, world_id: str, room_id: str, user_id: str):
         """Get last user position received"""
-        return await self.master.execute('hgetall',
+        pairs = await self.master.execute('hgetall',
             f"world:{world_id}:room:{room_id}:user:{user_id}:position")
+        return {k.decode(): v.decode() for k, v in zip(pairs[::2],pairs[1::2])}
 
     async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
         """Update last user position received"""
         return await self.master.execute('hmset', 
-            f"world:{world_id}:room:{room_id}:user:{user_id}:position", position)
+            f"world:{world_id}:room:{room_id}:user:{user_id}:position", 'x', position['x'], 'y', position['y'])
 
     async def get_user_users(self, world_id: str, user_id: str):
         """Get nearby users from a user"""
