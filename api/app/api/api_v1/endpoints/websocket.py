@@ -22,9 +22,10 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
             payload = await websocket.receive_json()
             topic = payload['topic']
 
-            logger.info(
-                f"Received message with topic {topic}"
-            )
+            if topic != "PLAYER_MOVEMENT":
+                logger.info(
+                    f"Received message with topic {topic}"
+                )
 
             if topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)

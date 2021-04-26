@@ -95,10 +95,10 @@ class ConnectionManager:
             for user_id in self.connections[world_id][room_id]:
                 if user_id != sender_id:
                     await self.users_ws[user_id].send_json(payload)
-            logger.info(
-                f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
-                f"{payload}"
-            )
+            # logger.info(
+            #     f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
+            #     f"{payload}"
+            # )
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, Room {room_id}"
