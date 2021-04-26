@@ -131,5 +131,46 @@ class RedisConnector:
 
         return None
 
+    async def get_user_position(self, world_id: str, room_id: str, user_id: str):
+        """Get last user position received"""
+        return await self.master.execute('hgetall',
+            f"world:{world_id}:room:{room_id}:user:{user_id}:position")
+
+    async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
+        """Update last user position received"""
+        return await self.master.execute('hmset', 
+            f"world:{world_id}:room:{room_id}:user:{user_id}:position", position)
+
+    async def get_user_users(self, world_id: str, user_id: str):
+        """Get nearby users from a user"""
+        return await self.smembers(f"world:{world_id}:user:{user_id}:users")
+
+    async def get_user_groups(self, world_id: str, user_id: str):
+        """Get groups from a user"""
+        return await self.smembers(f"world:{world_id}:user:{user_id}:groups")
+
+    async def get_group_users(self, world_id: str, group_id: str):
+        """Get users from a group"""
+        return await self.smembers(f"world:{world_id}:group:{group_id}")
+
+    async def add_users_to_user(self, world_id: str, user_id: str, found_user_id: str, *found_users_id: List[str]):
+        """Add one ore more found users to a user"""
+        found_users_id = [found_user_id, *found_users_id]
+        return await self.sadd(f"world:{world_id}:user:{user_id}:users", *found_users_id)
+
+    async def add_users_to_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
+        """Add one or more users to a groups"""
+        users_id = [user_id, *users_id]
+        await self.sadd(f"world:{world_id}:groups:{group_id}", *users_id)
+        for uid in users_id:
+            await self.sadd(f"world:{world_id}:user:{uid}:groups", group_id)
+
+    async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
+        """Add one or more groups to a user"""
+        groups_id = [group_id, *groups_id]
+        await self.sadd(f"world:{world_id}:user:{user_id}:groups", *groups_id)
+        for gid in groups_id:
+            await self.sadd(f"world:{world_id}:groups:{gid}", user_id)
+
 
 redis_connector = RedisConnector()
