@@ -24,7 +24,7 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
 
             if topic != "PLAYER_MOVEMENT":
                 logger.info(
-                    f"Received message with topic {topic}"
+                    f"Received message with topic {topic} from user {user_id}"
                 )
 
             if topic == protocol.JOIN_PLAYER:

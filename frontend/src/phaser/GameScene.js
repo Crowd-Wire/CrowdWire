@@ -134,13 +134,13 @@ class GameScene extends Phaser.Scene {
                 .map((b) => b.gameObject.id);
             if (rangePlayers.length > this.inRangePlayers.size) {
                 // wire players
-                // ws.wirePlayer('1', 
-                //     rangePlayers.filter((id) => {
-                //         const entered = !this.inRangePlayers.has(id);
-                //         if (entered) this.inRangePlayers.add(id);
-                //         return entered;
-                //     })
-                // );
+                ws.wirePlayer('1', 
+                    rangePlayers.filter((id) => {
+                        const entered = !this.inRangePlayers.has(id);
+                        if (entered) this.inRangePlayers.add(id);
+                        return entered;
+                    })
+                );
                 console.log('wire')
             } else {
                 // unwire players

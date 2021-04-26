@@ -56,6 +56,7 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
         
         if test_groups & set(group_id):
             logger.error('something fishy happening, did you flushdb?')
+    # TODO: fix joinable bad
 
     count = 0
     print('user_groups:', user_groups)
@@ -72,6 +73,7 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
             break
         print('\nstate:', state + 1, 'user_groups:', user_groups)
         await send_groups_snapshot(world_id)
+        await users_snapshot(world_id)
 
         state += 1
         
@@ -118,8 +120,21 @@ async def send_groups_snapshot(world_id: str, user_id: str=None):
         grps = await redis_connector.smembers(key)
         groups[uid] = grps
 
-    print('final' if user_id != None else '', groups )
-    # await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, manager.users_ws[user_id])
+    print('\nfinal redis_groups:' if user_id != None else 'redis_groups:', groups )
+    if user_id != None:
+        await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
+
+
+async def users_snapshot(world_id: str, user_id: str=None):
+    users = {}
+    users_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:users")
+
+    for key in users_keys:
+        uid = re.match(r".+:user:(.+):users", key.decode("utf-8"))[1] # eww urrgh
+        usrs = await redis_connector.smembers(key)
+        users[uid] = usrs
+
+    print('final redis_users:' if user_id != None else 'redis_users:', users )
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
@@ -147,6 +162,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)
+    await users_snapshot(world_id, 'final')
 
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
