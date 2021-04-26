@@ -40,6 +40,23 @@ class WorldService {
         })
     }
 
+    getWorldDetails(id) {
+        /*
+            id:int
+        */
+
+        let url = 'worlds/'+id;
+        let query = [];
+        
+        return fetch(API_BASE + url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
+    }
+
     create(wName, accessibility, guests, maxUsers, tag_array, desc){
         console.log(typeof guests, guests);
         console.log("desc is"+desc);

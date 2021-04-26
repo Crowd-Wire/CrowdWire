@@ -36,6 +36,11 @@ export default function MapCard(props){
       let path = `../world/`+map.world_id; 
       history(path);
     }
+
+    const goToDetails = () => {
+        history(`../`+map.world_id);
+    }
+
     const classes = useStyles();
     return(
         <>
@@ -60,7 +65,7 @@ export default function MapCard(props){
                 <Button  to="/App" size="small" color="primary" onClick={routeChange}>
                     Enter
                 </Button>
-                <Button onClick={() => props.focusMap(map)} size="small" color="primary">
+                <Button onClick={() => goToDetails()} size="small" color="primary">
                     More Details
                 </Button>
                 </CardActions>

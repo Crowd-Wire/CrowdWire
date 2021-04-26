@@ -38,6 +38,10 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
+	constructor(props){
+		super(props)
+		console.log(this.props);
+	}
 	state = {
 		maps: [],
 		search: "",
@@ -45,9 +49,9 @@ class SearchAllMaps extends Component {
 		page: 1
 	}
 
-	focusMap = () => {
-		this.props.handler(true)
-		console.log("entra aqui sequer??");
+	focusMap(id){
+		console.debug("entrou searchall");
+		this.props.handler(id);
 	}
 
 	joined = this.props.joined;
@@ -101,7 +105,6 @@ class SearchAllMaps extends Component {
 					this.setState({search:"", tags: []});
 				});
 		}
-		console.log(this.state.tags)
 	}
 
 	render() {

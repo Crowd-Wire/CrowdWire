@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
-import SearchAllMaps from 'views/DashSearch/sections/SearchAllMaps.js';
 import DashboardContent from 'views/DashWorldDetails/sections/DashboardContent.js';
 import DashDrawer from 'components/DashDrawer/DashDrawer.js';
+import WorldService from 'services/WorldService.js';
 import { withStyles } from '@material-ui/core/styles';
-
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const useStyles = theme => ({
   root: {
@@ -13,7 +13,8 @@ const useStyles = theme => ({
     height:'100%',width:'100%', overflow:"auto"
   },
 });
-class Dashboard extends Component {
+
+class DashWorldDetails extends Component {
 
   state={
     focus: false,
@@ -22,16 +23,19 @@ class Dashboard extends Component {
   };
   constructor(props){
     super(props);
+    this.details = WorldService.getWorldDetails(this.props.path);
   }
 
+  getLocation(){
+    return useLocation();
+  }
 
   handler = (focused) => {
-    console.debug("reaches here");
+      //NAVIGATE BACK TO DASHBOARD
     this.setState({
       focus: focused,
       fMap: null
     });
-    console.debug(this.state.focus);
   }
 
   // handler to change the state of the SearchAllMaps component based on the sidebar
@@ -47,14 +51,10 @@ class Dashboard extends Component {
       <div className={classes.root}>
         <CssBaseline />
         <DashDrawer handler={this.sidebar_handler}/>
-        {this.state.focus ? 
-          <DashboardContent handler = {this.handler} />
-          :
-          <SearchAllMaps handler = {this.handler} joined={this.state.joined} />
-        }
+          <DashboardContent handler = {this.handler} worldInfo={this.details} />
       </div>
     );
   };
 }
 
-export default withStyles(useStyles)(Dashboard);
+export default withStyles(useStyles)(DashWorldDetails);
