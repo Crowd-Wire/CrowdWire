@@ -3,10 +3,12 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags) {
+    search(search, tags, joined = false, page) {
         /*
             search: string,
             tags: List[string]
+            joined: boolean
+            page: int
         */
 
         let url = 'worlds/';
@@ -17,10 +19,17 @@ class WorldService {
         
         if(tags.length !== 0)
             query.push('tags='+tags.join('&tags='));
+        
+        // when joined searchs for the visited worlds
+        query.push('joined=' + joined);
+
+        // pagination
+        query.push('page=' + page);
 
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
 
+        
 
         return fetch(API_BASE + url, {
             method: 'GET',

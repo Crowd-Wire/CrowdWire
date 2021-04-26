@@ -148,12 +148,20 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                search: str,
                tags: Optional[List[str]],
                is_guest: bool = False,
+               joined: bool = False,
+               user_id: int = 0,
+               page: int = 1
                ) -> List[World]:
 
-        # TODO: search world might need pagination, (Vai ter de ter mesmo...)
         if not tags:
             tags = []
-        query = db.query(World).filter(World.public)
+
+        # check if world banned
+        if not joined:
+            query = db.query(World).filter(World.public)
+        else:
+            query = db.query(World).join(World.users).filter(User.user_id == user_id)
+
         if is_guest:
             query = query.filter(World.allow_guests.is_(True))
 
@@ -161,15 +169,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
         )
         if tags:
-            tags_lst = []
-            for tag_name in tags:
-                if tag_obj := crud_tag.get_by_name(db=db, name=tag_name, ):
-                    tags_lst.append(tag_obj)
+            query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-            query = query.join(World.tags).filter(Tag.name.in_(tags)).all()
-        logger.debug(query)
-
-        return query
+        # TODO: change page size and make it not hardcoded
+        return query.offset(10 * (page - 1)).limit(10).all()
 
     async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
         if not user_id:

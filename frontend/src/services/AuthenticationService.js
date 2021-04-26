@@ -29,6 +29,21 @@ class AuthenticationService {
         return JSON.parse(localStorage.getItem("auth"))["token"];
     }
 
+    setToken(auth) {
+        localStorage.setItem("auth",JSON.stringify(
+            {"token":auth.access_token,
+            "expire_date":auth.expire_date}
+            )
+        );
+    }
+
+    joinAsGuest(){
+        return fetch(API_BASE + 'join-guest/', {
+            method: 'POST',
+            mode: 'cors'
+        })
+    }
+
 }
 
 export default new AuthenticationService();

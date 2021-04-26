@@ -1,23 +1,12 @@
 import React, { useState, Component } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
-import SearchIcon from '@material-ui/icons/Search';
 import MapCard from 'components/MapCard/MapCard.js';
-import InputLabel from '@material-ui/core/InputLabel';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import FormControl from '@material-ui/core/FormControl';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import TuneIcon from '@material-ui/icons/Tune';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
-import TagService from 'services/TagService';
-
+import Pagination from '@material-ui/lab/Pagination';
 const useStyles = theme => ({
 	root: {
 		maxWidth: 345,
@@ -51,29 +40,58 @@ class SearchAllMaps extends Component {
 
 	state = {
 		maps: [],
-		typeAccess: '',
-		typeFormat: '',
-		typeTopic: '',
+		prevSearch: "",
+		prevTags: [],
+		page: 1
 	}
 
 	focusMap = () => {
 		this.props.handler(false)
 	}
 
-	search_handler = (search, tags) => {
+	joined = this.props.joined;
 
-		WorldService.search(search, tags)
-			.then((res) => { 		console.log(res);
-				return res.json() })
-			.then((res) => { this.setState({ maps: res }) });
+
+	search_handler = (search, tags) => {
+		this.state.prevSearch=search;
+		this.state.prevTags=tags
+		console.log(this.state.page)
+		WorldService.search(search, tags, this.props.joined, this.state.page)
+			.then((res) => { return res.json() })
+      .then((res) => { this.setState({ maps: res }) });
+	}
+	changePage = async (event, page) => {
+		await this.setState({page: page});
+		console.log(this.state.page);
+		this.search_handler(this.state.prevSearch, this.state.prevTags);
 	}
 
 	componentDidMount(){
-		WorldService.search("", [])
-			.then((res) => { return res.json() })
-			.then((res) => { this.setState({ maps: res }) });
 
-			
+		WorldService.search("", [], this.props.joined, 1)
+			.then((res) => {
+				if(res.status == 200) 
+					return res.json()
+			 })
+			.then((res) => {
+				if(res)
+					this.setState({ maps: res }) 
+			});
+	}
+	async componentDidUpdate(){
+		if(this.joined!=this.props.joined){
+			this.joined = this.props.joined;
+			await this.setState({prevSearch: "", prevTags: []});
+			WorldService.search("", [], this.props.joined, this.state.page)
+				.then((res) => {
+					if(res.status == 200) 
+						return res.json()
+				})
+				.then((res) => {
+					if(res)
+						this.setState({ maps: res }) 
+				});
+		}
 	}
 
 	render() {
@@ -87,6 +105,10 @@ class SearchAllMaps extends Component {
 						{this.state.maps.map((m, i) => {
 							return (<MapCard focusMap={this.focusMap} key={i} map={m} />)
 						})}
+					</Row>
+					<hr />
+					<Row style={{marginBottom:"30px"}}>
+						<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
 					</Row>
 				</Container>
 			</>

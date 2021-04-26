@@ -2,6 +2,9 @@ import * as Phaser from 'phaser';
 
 import { getSocket } from "services/socket";
 
+import usePlayerStore from "stores/usePlayerStore.ts";
+
+var ws = getSocket('1');
 
 const sceneConfig = {
     active: false,
@@ -9,17 +12,20 @@ const sceneConfig = {
     key: 'GameScene',
 };
 
+var globalVar = false;
+
+
 
 class GameScene extends Phaser.Scene {
-    flag = 0;
-    PLAYER_NUM = 10;
-    socket = getSocket(1).socket;
+    playerSprites = {};
+    count = 0;
 
     constructor() {
         super(sceneConfig);
     }
 
     create() {
+
         this.add.text(50, 70, "Key D to change scene.")
         this.text = this.add.text(50, 50, `${this.count}`)
 
@@ -27,12 +33,12 @@ class GameScene extends Phaser.Scene {
         let tiles = this.map.addTilesetImage('wall-tiles', 'tiles');
 
         let ground = this.map.createLayer('Ground', tiles, 0, 0);
-        let obstacles = this.map.createLayer('Objects', tiles, 0, 0);
+        this.obstacles = this.map.createLayer('Objects', tiles, 0, 0);
 
         // -1 makes all tiles on this layer collidable
-        obstacles.setCollisionByExclusion([-1]);
+        this.obstacles.setCollisionByExclusion([-1]);
 
-        /* create the map borders */
+        // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
         this.physics.world.bounds.height = this.map.heightInPixels;
 
@@ -40,55 +46,72 @@ class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
 
 
-        /* static player for range test */
-        new OnlinePlayerSprite(this, 100, 250);
+        // static players for range test
+        new OnlinePlayerSprite(this, 0, 500);
         new OnlinePlayerSprite(this, 500, 600);
 
-        /* players for follow test */
-        this.otherPlayers = [];
-        for (let i = 0; i < this.PLAYER_NUM; i++) {
-            this.otherPlayers[i] = new OnlinePlayerSprite(this, 50, 60);
-            this.otherPlayers[i].alpha = (i+1)/this.PLAYER_NUM;
-        }
-
         // main player
-        this.player = new PlayerSprite(this, 50, 60);
+        this.player = new PlayerSprite(this, 50, 50);
+        // connect to room
+        ws.joinRoom('1', {x: 50, y: 50});
 
-        
-        /* make camera follow player */
+        // make camera follow player
         this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
         this.cameras.main.startFollow(this.player);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        this.physics.add.collider(this.player, obstacles);
+        this.physics.add.collider(this.player, this.obstacles);
 
         this.input.keyboard.on('keydown-D', () => {
             this.scene.start('FillTilesScene');
         }, this);
+        this.input.keyboard.on('keydown-Q', () => {
+            globalVar = !globalVar;
+        }, this);
+        
+        this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
+
+        this.physics.add.collider(Object.values(this.playerSprites), this.obstacles);
+
+        console.log(this.obstacles)
+    }
+
+    handlePlayerConnection = (players, prevPlayers) => {
+        const storePlayers = usePlayerStore.getState().players;
+        
+        if (players.length > prevPlayers.length) {
+            // connection
+            for (const id of players) {
+                if (!(id in this.playerSprites)) {
+                    let position = usePlayerStore.getState().players[id].position;
+                    this.playerSprites[id] = new OnlinePlayerSprite(this, position.x, position.y, id);
+                    this.physics.add.collider(this.playerSprites[id], this.obstacles);
+                }
+            }
+        } else {
+            // disconnection
+            for (const id of prevPlayers) {
+                if (!(id in storePlayers)) {
+                    this.playerSprites[id].disconnect();
+                    delete  this.playerSprites[id];
+                }
+            }
+        }
     }
 
     update(time, delta) {
-        this.flag++;
         this.player.updateMovement();
 
-        /* detect surrounding players */
+        // detect surrounding players
         var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
         if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
 
-            if (this.socket.readyState === WebSocket.OPEN) {
-                console.log('sending proximity to', bodies[0].gameObject.id)
-                this.socket.send(JSON.stringify(bodies[0].gameObject.id));
-            }
+            // if (ws.socket.readyState === WebSocket.OPEN) {
+            //     ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
+            // }
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
-        }
-
-        /* follow player test */
-        if (this.PLAYER_NUM > 0)
-            this.otherPlayers[this.PLAYER_NUM-1].updateMovementByPosition({x: this.player.x, y: this.player.y}, this.flag)
-        for (let i=this.PLAYER_NUM-2; i >= 0; i--) {
-            this.otherPlayers[i].updateMovementByPosition({x: this.otherPlayers[i+1].x, y: this.otherPlayers[i+1].y}, this.flag)
         }
     }
 }
@@ -105,6 +128,8 @@ class GameScene extends Phaser.Scene {
  */
 class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     speed = 500;
+    step = 0;
+    lastVelocity;
 
     constructor(scene, x, y) {
         super(scene, x, y, 'player', 6);
@@ -154,36 +179,41 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
         if (this.scene.cursors.down.isDown)
             direction.y += 1;
 
-        this.updateAnimation(direction);
-
         // set normalized velocity (player doesn't move faster on diagonals)
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
 
-        if (direction.x || direction.y) 
-            if (this.socket.readyState === WebSocket.OPEN) {
-                console.log('sending velocity', this.body.velocity)
-                this.socket.send(JSON.stringify(this.body.velocity));
-            }
+        this.updateAnimation();
+
+        if (this.step == 1 && !this.body.speed) {
+            ws.sendMovement('1', this.body.center, this.body.velocity);
+            this.step = 0;
+        } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
+            ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
+            this.lastVelocity = this.body.velocity.clone();
+            this.step = 1;
+        }
     }
 
-    updateAnimation(direction) {
-        if (direction.y > 0) {
-            this.anims.play('down', true);
-        }
-        else if (direction.y < 0) {
+    updateAnimation(velocity) {
+        if (!velocity)
+            velocity = this.body.velocity;
+        
+        if (velocity.y < 0) {
             this.anims.play('up', true);
         }
-        else if (direction.x > 0) {
-            this.flipX = false;
-            this.anims.play('horizontal', true);
+        else if (velocity.y > 0) {
+            this.anims.play('down', true);
         }
-        else if (direction.x < 0) {
+        else if (velocity.x < 0) {
             this.flipX = true;
             this.anims.play('horizontal', true);
         }
-        else {
+        else if (velocity.x > 0) {
+            this.flipX = false;
+            this.anims.play('horizontal', true);
+        } else {
             this.anims.stop();
         }
     }
@@ -200,46 +230,32 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
  * @param {number} y - The start vertical position in the scene.
  */
 class OnlinePlayerSprite extends PlayerSprite {
-    static id = 0;
     speed = 500; // 900 is the upperbound ig
+    numUpdates = 0;
+    wasBlocked = false;
     
-    constructor(scene, x, y) {
+    constructor(scene, x, y, id) {
         super(scene, x, y);
-        this.id = OnlinePlayerSprite.id++;
+        this.id = id;
+
+        if (this.id)
+            this.unsubscribe = usePlayerStore.subscribe(
+                this.handlePlayerMovement, state => state.players[this.id]);
     }
 
-    updateMovementByPosition(position, flag) {
-        // simulate delay
-        if (flag % 6 != 0)
-            return;
-
-        var distance = Phaser.Math.Distance.Between(this.x, this.y, position.x, position.y);
-
-        //  4 is our distance tolerance, i.e. how close the source can get to the target
-        //  before it is considered as being there. The faster it moves, the more tolerance is required.
-        // console.log(distance,  this.speed * 2/100)
-        if (distance < this.speed * 2/100)
-        {
-            this.body.reset(position.x, position.y);
-            this.anims.stop();
-            return;
-        }
-
-        let direction;
-        direction = {x: position.x - this.x, y: position.y - this.y};
-
-        this.updateAnimation(direction);
-
-        // this.setPosition(position.x, position.y);
-        this.scene.physics.moveToObject(this, position, this.speed);
+    handlePlayerMovement = ({position, velocity}) => {
+        this.updateAnimation(velocity);
+        this.body.reset(position.x, position.y);
+        this.body.setVelocity(velocity.x, velocity.y);
+        console.log(velocity)
     }
 
-    updateMovementByDirection(direction) {
-        this.updateAnimation(direction);
-
-        this.body.setVelocityX(direction.x * this.speed);
-        this.body.setVelocityY(direction.y * this.speed);
-        this.body.velocity.normalize().scale(this.speed);
+    /**
+     * Destroys the object cleanly.
+     */
+    disconnect() {
+        this.unsubscribe();
+        this.destroy();
     }
 }
 

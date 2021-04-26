@@ -178,19 +178,22 @@ def create_world(
     return obj
 
 
-# TODO: add response model
 @router.get("/", response_model=List[schemas.WorldInDB])
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
+        joined: Optional[bool] = False,
+        page: Optional[int] = 1,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
     if not is_guest_user(user):
-        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags)
+        list_world_objs = crud.crud_world.filter(
+            db=db, search=search, tags=tags, joined=joined, page=page, user_id=user.user_id
+        )
     else:
-        logger.debug("guest")
-        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True)
+        # guest cannot access visited worlds
+        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True, page=page)
     return list_world_objs
 
 
