@@ -6,7 +6,6 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from loguru import logger
-from uuid import uuid4
 
 from app import crud, models, schemas
 from app.core import security
@@ -94,8 +93,7 @@ async def get_websockets_user(
         websocket: WebSocket,
         *,
         token: str,
-
-) -> Union[int, uuid4]:
+) -> str:
     try:
         payload = jwt.decode(
             token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
@@ -106,7 +104,7 @@ async def get_websockets_user(
         logger.debug(e)
         raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
-    return token_data.sub
+    return str(token_data.sub)
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency
