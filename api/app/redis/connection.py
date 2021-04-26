@@ -62,9 +62,9 @@ class RedisConnector:
 
     async def scard(self, key: str):
         """Get the number of members in a set"""
-        return await self.master.execute('scard', key)
+        return await self.master.execute('scard', key, encoding="utf-8")
 
-    async def sismember(self, key: str, member: str):
+    async def sismember(self, key: str, member: str) -> int:
         """Determine if a given value is a member of a set"""
         return await self.master.execute('sismember', key, member)
 
@@ -159,29 +159,46 @@ class RedisConnector:
         found_users_id = [found_user_id, *found_users_id]
         await self.sadd(f"world:{world_id}:user:{user_id}:users", *found_users_id)
 
-    async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
-        """Add one or more groups to a user"""
-        prev_groups_id = await self.smembers(f"world:{world_id}:user:{user_id}:groups")
-
-        # add groups to user
-        groups_id = [group_id, *groups_id]
-        await self.sadd(f"world:{world_id}:user:{user_id}:groups", *groups_id)
-        for gid in groups_id:
-            await self.sadd(f"world:{world_id}:group:{gid}", user_id)
-
-        # normalize groups
-        for p_gid in prev_groups_id:
-            users_id = set( await self.smembers(f"world:{world_id}:group:{p_gid}") )
-            for gid in groups_id:
-                if users_id.issubset(set( await self.smembers(f"world:{world_id}:group:{gid}") )):
-                    self.rem_group(p_gid)
-                    break
-
     async def add_users_to_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """Add one or more users to a groups"""
-        users_id = [user_id, *users_id]
+
+        # get groups from new user(s)
+        inter_groups_id = set()
         for uid in users_id:
-            await self.add_groups_to_user(world_id, uid, group_id)
+            inter_groups_id.update( await self.get_user_groups(world_id, uid) )
+
+        # add users to group
+        users_id = [user_id, *users_id]
+        await self.sadd(f"world:{world_id}:group:{group_id}", *users_id)
+        for uid in users_id:
+            await self.sadd(f"world:{world_id}:user:{uid}:groups", group_id)
+
+        # normalize
+
+        # get outer users talking to inner users
+        outer_users_id = set()
+        for gid in inter_groups_id:
+            outer_users_id.update( await self.get_group_users(world_id, gid) )
+        outer_users_id ^= set(users_id)
+
+        # check if outer user talks with all inner users
+        for uid in outer_users_id:
+            # get inner users with whom is talking
+            inrange_users_id = set()
+            for gid in inter_groups_id & set( await self.get_user_groups(world_id, uid) ):
+                inrange_users_id.update(set( await self.get_group_users(world_id, gid) ))
+
+            if inrange_users_id.issuperset(set( users_id )):
+                # remove redundant groups from outer user
+                await self.rem_groups_from_user(world_id, uid, *inter_groups_id)
+                # add this group
+                await self.add_groups_to_user(world_id, uid, group_id)
+
+    async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
+        """Add one or more groups to a user"""
+        groups_id = [group_id, *groups_id]
+        for gid in groups_id:
+            await self.add_users_to_group(world_id, gid, user_id)
 
     async def rem_group(self, world_id: str, group_id: str):
         """Remove group from world"""
@@ -193,19 +210,25 @@ class RedisConnector:
         lost_users_id = [lost_user_id, *lost_users_id]
         await self.srem(f"world:{world_id}:user:{user_id}:users", *lost_users_id)
 
-    async def rem_groups_from_user(self, user_id: str, group_id: str, groups_id: List[str]):
-        groups_id = [group_id, *groups_id]
-        await self.srem(f"world:{world_id}:user:{user_id}:groups", *groups_id)
-        for gid in groups_id:
-            await self.srem(f"world:{world_id}:group:{gid}", user_id)
-
-        # normalize?
-
     async def rem_users_from_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
-        """Add one or more users to a groups"""
+        """Remove one or more users from a group"""
+        
         users_id = [user_id, *users_id]
+        await self.srem(f"world:{world_id}:group:{group_id}", *users_id)
         for uid in users_id:
-            self.rem_groups_from_user(world_id, uid, group_id)
+            await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
+        
+        # normalize
+        nume = await self.scard(f"world:{world_id}:group:{group_id}")
+        logger.debug(f"{type(nume)} <-- string?")
+        if nume <= 1:
+            self.rem_group(world_id, group_id)
+
+    async def rem_groups_from_user(self, user_id: str, group_id: str, groups_id: List[str]):
+        """Remove one or more groups from a user"""
+        groups_id = [group_id, *groups_id]
+        for gid in groups_id:
+            self.rem_users_from_group(world_id, gid, user_id)
 
 
 redis_connector = RedisConnector()
