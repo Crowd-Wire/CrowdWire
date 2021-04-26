@@ -4,7 +4,7 @@ from fastapi import WebSocket
 from loguru import logger
 
 from app.core.consts import WebsocketProtocol as protocol
-
+from app.redis.connection import redis_connector
 
 class ConnectionManager:
     count = 0
@@ -47,13 +47,14 @@ class ConnectionManager:
         )
 
     async def connect_room(self, world_id: str, room_id: str, user_id: str, joiner_position: dict):
-
         if world_id in self.connections and room_id in self.connections[world_id]:
-            for other_id in self.connections[world_id][room_id]:
-                # get position from redis
-                position = {'x': 50, 'y': 50}
-                await self.users_ws[user_id].send_json(
-                    {'topic': protocol.JOIN_PLAYER, 'user_id': other_id, 'position': position})
+            # send players snapshot
+            players_snapshot = {}
+            for uid in self.connections[world_id][room_id]:
+                if uid != user_id:
+                    players_snapshot[uid] = await redis_connector.get_user_position(world_id, room_id, uid)
+            await self.users_ws[user_id].send_json(
+                {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot})
 
         self.connections \
             .setdefault(world_id, {}) \

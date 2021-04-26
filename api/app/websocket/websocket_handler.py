@@ -14,13 +14,6 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     room_id = payload['room_id']
     position = payload['position']
     await manager.connect_room(world_id, room_id, user_id, position)
-    # send players snapshot
-    players_snapshot = {}
-    for uid in manager.connections[world_id][room_id]:
-        players_snapshot[uid] = await redis_connector.get_user_position(world_id, room_id, uid)
-        print(players_snapshot)
-    await manager.send_personal_message(
-        {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot}, manager.users_ws[user_id])
     # store position on redis
     await redis_connector.set_user_position(world_id, room_id, user_id, position)
 

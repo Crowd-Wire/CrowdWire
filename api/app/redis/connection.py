@@ -131,11 +131,11 @@ class RedisConnector:
 
         return None
 
-    async def get_user_position(self, world_id: str, room_id: str, user_id: str):
+    async def get_user_position(self, world_id: str, room_id: str, user_id: str) -> dict:
         """Get last user position received"""
         pairs = await self.master.execute('hgetall',
             f"world:{world_id}:room:{room_id}:user:{user_id}:position")
-        return {k.decode(): v.decode() for k, v in zip(pairs[::2],pairs[1::2])}
+        return {k.decode(): float(v.decode()) for k, v in zip(pairs[::2],pairs[1::2])}
 
     async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
         """Update last user position received"""
