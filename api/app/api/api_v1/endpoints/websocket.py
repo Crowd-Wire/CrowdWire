@@ -22,6 +22,8 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
             payload = await websocket.receive_json()
             topic = payload['topic']
 
+            await wh.send_groups_snapshot(world_id, user_id)
+
             if topic != "PLAYER_MOVEMENT":
                 logger.info(
                     f"Received message with topic {topic} from user {user_id}"

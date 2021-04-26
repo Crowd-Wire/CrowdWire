@@ -120,19 +120,20 @@ async def send_groups_snapshot(world_id: str, user_id: str=None):
         grps = await redis_connector.smembers(key)
         groups[uid] = grps
 
-    print('\nfinal redis_groups:' if user_id != None else 'redis_groups:', groups )
-    if user_id != None:
+    if user_id in (None, 'final'):
+        print('\nfinal redis_groups:' if user_id != None else 'redis_groups:', groups )
+    else:
         await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
 
 
 async def users_snapshot(world_id: str, user_id: str=None):
     users = {}
-    users_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:users")
+    users_keys = await redis_connector.scan_match_all(f"world:{world_id}:group:*")
 
     for key in users_keys:
-        uid = re.match(r".+:user:(.+):users", key.decode("utf-8"))[1] # eww urrgh
+        gid = re.match(r".+:group:(.+)", key.decode("utf-8"))[1] # eww urrgh
         usrs = await redis_connector.smembers(key)
-        users[uid] = usrs
+        users[gid] = usrs
 
     print('final redis_users:' if user_id != None else 'redis_users:', users )
 
@@ -162,6 +163,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)
+    await send_groups_snapshot(world_id, 'final')
     await users_snapshot(world_id, 'final')
 
 
