@@ -15,16 +15,23 @@ const useStyles = theme => ({
 });
 class Dashboard extends Component {
 
-  state={focus: false, joined:false};
+  state={
+    focus: false,
+    joined:false,
+    fMap: null
+  };
   constructor(props){
     super(props);
   }
 
 
   handler = (focused) => {
+    console.debug("reaches here");
     this.setState({
-      focus: focused
+      focus: focused,
+      fMap: null
     });
+    console.debug(this.state.focus);
   }
 
   // handler to change the state of the SearchAllMaps component based on the sidebar

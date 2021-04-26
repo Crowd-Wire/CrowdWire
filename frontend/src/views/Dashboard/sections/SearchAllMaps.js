@@ -46,7 +46,8 @@ class SearchAllMaps extends Component {
 	}
 
 	focusMap = () => {
-		this.props.handler(false)
+		this.props.handler(true)
+		console.log("entra aqui sequer??");
 	}
 
 	joined = this.props.joined;
@@ -56,7 +57,8 @@ class SearchAllMaps extends Component {
 
 		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
 			.then((res) => { return res.json() })
-      .then((res) => { this.setState({ maps: res }) });
+      .then((res) => { 
+		this.setState({ maps: res }) });
 	}
 	changePage = async (event, page) => {
 		await this.setState({page: page});
@@ -111,7 +113,8 @@ class SearchAllMaps extends Component {
 					<hr />
 					<Row>
 						{this.state.maps.map((m, i) => {
-							return (<MapCard focusMap={this.focusMap} key={i} map={m} />)
+							console.log("map",m,"id",i);
+							return (<MapCard focusMap={this.focusMap} map={m} />)
 						})}
 					</Row>
 					<hr />
