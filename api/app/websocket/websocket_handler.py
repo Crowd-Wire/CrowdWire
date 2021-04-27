@@ -71,7 +71,7 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
         #     await send_groups_snapshot(world_id)
         if count > 10:
             break
-        print('\nstate:', state + 1, 'user_groups:', user_groups)
+        print('\n', count ,' state:', state + 1, 'user_groups:', user_groups)
         await send_groups_snapshot(world_id)
         await users_snapshot(world_id)
 
@@ -81,6 +81,10 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
             for user, groups in list(user_groups):
                 if len(groups & joinable_groups) == 1:
                     state = 0
+
+                    print('\n', count ,' state:', state, 'user_groups:', user_groups)
+                    await send_groups_snapshot(world_id)
+                    await users_snapshot(world_id)
 
                     # assign to group immediately
                     await redis_connector.add_groups_to_user(world_id, user_id, *groups)
@@ -93,6 +97,10 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
                     state = 0
                     group = next(iter(groups))
 
+                    print('\n', count ,' state:', state, 'user_groups:', user_groups)
+                    await send_groups_snapshot(world_id)
+                    await users_snapshot(world_id)
+
                     # assign to group
                     await redis_connector.add_groups_to_user(world_id, user_id, group)
                     filter(lambda u, g: not group in g, user_groups)
@@ -101,6 +109,11 @@ async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str])
         if state == 3:
             # no assignement was made last 2 iterations
             # create group
+
+            print('\n', count ,' state:', state, 'user_groups:', user_groups)
+            await send_groups_snapshot(world_id)
+            await users_snapshot(world_id)
+
             await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), 
                 user_id, *[user for user, groups in user_groups])
             # normalized finished
