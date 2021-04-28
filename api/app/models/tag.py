@@ -1,9 +1,9 @@
-from sqlalchemy.orm import relationship
+# from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
 from sqlalchemy import Column, String
 
-from app.models.world_tag import world_tag
+# from app.models.world_tag import world_tag
 
 
 class Tag(Base):
