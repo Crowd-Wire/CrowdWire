@@ -9,6 +9,8 @@ ACCESS_FORBIDDEN = "Access Forbidden for Guests. Not Implemented Yet."
 INVITATION_FORBIDDEN = "You do not have permission to generate invite links"
 EDITION_FORBIDDEN = "You dont have access to edit this world or it does not exist"
 WORLD_NOT_FOUND = "World Not Found or is not currently available."
+USER_NOT_FOUND = "User with this id was not found"
+USER_EDITION_FORBIDDEN = "You have no permission to edit this users account"
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."
