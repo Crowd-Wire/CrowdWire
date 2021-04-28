@@ -46,7 +46,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             World.world_id == world_id,
             World.public.is_(True),
             World.allow_guests.is_(True),
-            World.status.isnot(consts.WORLD_DELETED_STATUS)
+            World.status != consts.WORLD_DELETED_STATUS
         ).first()
         if not world_obj:
             return None, strings.WORLD_NOT_FOUND
@@ -138,6 +138,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                 else:
                     return None, strings.INVALID_TAG
             update_data['tags'] = lst
+        print(update_data)
         # clear cache of the queries related to the object
         await clear_cache_by_model("World", world_id=db_obj.world_id)
         obj = super().update(db, db_obj=db_obj, obj_in=update_data)
