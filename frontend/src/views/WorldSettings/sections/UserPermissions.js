@@ -8,10 +8,7 @@ import Row from 'react-bootstrap/Row';
 
 
 export default function UserPermissions() {
-  const [state, setState] = React.useState({
-
-    checkedG: true,
-  });
+  const [state, setState] = React.useState({checkedG: true});
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });

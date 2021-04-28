@@ -40,9 +40,28 @@ class WorldService {
         })
     }
 
+    getWorldDetails(path) {
+        let x = path.split("/");
+        
+        /*
+            id:int
+        */
+
+        let url = 'worlds/'+x[x.length-1];
+        let query = [];
+        console.log("url "+url);
+        return fetch(API_BASE + url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
+    }
+
     create(wName, accessibility, guests, maxUsers, tag_array, desc){
         console.log(typeof guests, guests);
-
+        console.log("desc is"+desc);
         return fetch(API_BASE + 'worlds/', {
             method: 'POST',
             mode: 'cors',
@@ -51,7 +70,7 @@ class WorldService {
                 'Content-Type': 'application/json',
             },
             // TODO: change hashed_password to password after backend update
-            body: JSON.stringify({name: wName, public: accessibility, allow_guests: guests, world_map:"", max_users:maxUsers, tags:tag_array})
+            body: JSON.stringify({name: wName, public: accessibility, allow_guests: guests, world_map:"", max_users:maxUsers, tags:tag_array, description: desc})
         })
     }
 

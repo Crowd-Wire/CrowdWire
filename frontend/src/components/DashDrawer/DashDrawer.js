@@ -77,7 +77,6 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    console.log(location.pathname);
     if(location.pathname!=="/dashboard")
       navigation("/dashboard");
     props.handler(false);
@@ -85,7 +84,6 @@ export default function DashDrawer(props){
 
 
   const onClickJoinedWorlds = () => {
-    console.log(navigation.toString());
     if(location.pathname!=="/dashboard")
       navigation("/dashboard");
     props.handler(true);
@@ -93,7 +91,6 @@ export default function DashDrawer(props){
 
 
   const onClickCreateWorld = () => {
-    console.log(navigation.toString());
     navigation("../create-world");
   }
 
@@ -164,7 +161,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key={Settings} style={{position: "fixed", bottom: addWorld}}
+          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create WOrld" style={{position: "fixed", bottom: addWorld}}
           onClick={onClickCreateWorld}>
             <ListItemIcon>
                 <AddCircleOutlined className={classes.iconDrawer}/>
@@ -175,7 +172,7 @@ export default function DashDrawer(props){
                 })}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key={Settings} style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
+            button key="Settings" style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
           <ListItemIcon>
               <Settings className={classes.iconDrawer}/>
           </ListItemIcon>

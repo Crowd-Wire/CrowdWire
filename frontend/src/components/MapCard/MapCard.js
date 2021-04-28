@@ -30,14 +30,17 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function MapCard(props){
-    const {title, desc, focusMap, ...other } = props;
+    const {map, focusMap, ...other } = props;
     const history = useNavigate();
-    console.log(title);
-    const routeChange = () =>{ 
-      let wId=1
-      let path = `../world/`+wId; 
+    const routeChange = () =>{
+      let path = `../world/`+map.world_id; 
       history(path);
     }
+
+    const goToDetails = () => {
+        history(`../`+map.world_id, {state:map.world_id});
+    }
+
     const classes = useStyles();
     return(
         <>
@@ -47,14 +50,14 @@ export default function MapCard(props){
                 <CardMedia
                     className={classes.media}
                     image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
-                    title={props.map.name}
+                    title={map.name}
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                    {props.map.name}
+                    {   map.name}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        {props.map.description}
+                        {map.description}
                     </Typography>
                 </CardContent>
                 </CardActionArea>
@@ -62,7 +65,7 @@ export default function MapCard(props){
                 <Button  to="/App" size="small" color="primary" onClick={routeChange}>
                     Enter
                 </Button>
-                <Button onClick={() => props.focusMap()} size="small" color="primary">
+                <Button onClick={() => goToDetails()} size="small" color="primary">
                     More Details
                 </Button>
                 </CardActions>

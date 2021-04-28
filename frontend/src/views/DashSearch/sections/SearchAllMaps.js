@@ -38,27 +38,32 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
+	constructor(props){
+		super(props)
+		console.log(this.props);
+	}
 	state = {
 		maps: [],
-		prevSearch: "",
-		prevTags: [],
+		search: "",
+		tags: [],
 		page: 1
 	}
 
-	focusMap = () => {
-		this.props.handler(false)
+	focusMap(id){
+		console.debug("entrou searchall");
+		this.props.handler(id);
+		
 	}
 
 	joined = this.props.joined;
 
 
-	search_handler = (search, tags) => {
-		this.state.prevSearch=search;
-		this.state.prevTags=tags
-		console.log(this.state.page)
-		WorldService.search(search, tags, this.props.joined, this.state.page)
+	search_handler = () => {
+
+		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
 			.then((res) => { return res.json() })
-      .then((res) => { this.setState({ maps: res }) });
+      .then((res) => { 
+		this.setState({ maps: res }) });
 	}
 	changePage = async (event, page) => {
 		await this.setState({page: page});
@@ -66,8 +71,16 @@ class SearchAllMaps extends Component {
 		this.search_handler(this.state.prevSearch, this.state.prevTags);
 	}
 
-	componentDidMount(){
+	changeTags = async (value) => {
+		await this.setState({tags: value});
+		console.log(this.state.tags);
+	}
 
+	changeSearch = (value) => {
+		this.setState({search: value});
+	}
+
+	componentDidMount(){
 		WorldService.search("", [], this.props.joined, 1)
 			.then((res) => {
 				if(res.status == 200) 
@@ -90,6 +103,7 @@ class SearchAllMaps extends Component {
 				.then((res) => {
 					if(res)
 						this.setState({ maps: res }) 
+					this.setState({search:"", tags: []});
 				});
 		}
 	}
@@ -99,11 +113,12 @@ class SearchAllMaps extends Component {
 		return (
 			<>
 				<Container style={{ overflowX: "hidden" }}>
-					<MapFilters handler={this.search_handler} />
+					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
 					<Row>
 						{this.state.maps.map((m, i) => {
-							return (<MapCard focusMap={this.focusMap} key={i} map={m} />)
+							console.log("map",m,"id",i);
+							return (<MapCard focusMap={this.focusMap} map={m} />)
 						})}
 					</Row>
 					<hr />
