@@ -20,7 +20,7 @@ class RedisConnector:
             password=settings.REDIS_SENTINEL_PASSWORD)
 
         self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        await self.master.execute('flushall')
+        # await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
