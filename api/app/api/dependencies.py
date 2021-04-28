@@ -1,11 +1,12 @@
 from typing import Generator, Callable, Union, Tuple
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, WebSocket
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from loguru import logger
+
 from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
@@ -76,7 +77,7 @@ async def get_current_user_for_invite(
         )
         logger.debug(payload)
         token_data = schemas.InviteTokenPayload(**payload)
-    except (jwt.JWTError, ValidationError) as e :
+    except (jwt.JWTError, ValidationError) as e:
         logger.debug(e)
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -86,6 +87,24 @@ async def get_current_user_for_invite(
     if not world:
         raise HTTPException(status_code=404, detail=msg)
     return current_user, world
+
+
+async def get_websockets_user(
+        websocket: WebSocket,
+        *,
+        token: str,
+) -> str:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        logger.debug(payload)
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError) as e:
+        logger.debug(e)
+        raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+
+    return str(token_data.sub)
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency

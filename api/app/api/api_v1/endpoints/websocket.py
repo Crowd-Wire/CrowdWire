@@ -1,8 +1,9 @@
-from typing import Any
+from typing import Any, Optional
 
 from app.websocket.connection_manager import manager
 from app.websocket import websocket_handler as wh
-from fastapi import WebSocket, WebSocketDisconnect, APIRouter
+from app.api import dependencies as deps
+from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 
@@ -15,8 +16,12 @@ router = APIRouter()
 @router.websocket(
     "/{world_id}",
 )
-async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
-    user_id = await manager.connect(world_id, websocket)
+async def world_websocket(
+        websocket: WebSocket, world_id: str,
+        token: Optional[str] = Query(None),
+        user_id: str = Depends(deps.get_websockets_user)
+) -> Any:
+    await manager.connect(world_id, websocket, user_id)
 
     try:
         while True:
