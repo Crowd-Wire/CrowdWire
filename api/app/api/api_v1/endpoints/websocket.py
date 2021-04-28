@@ -17,7 +17,7 @@ router = APIRouter()
 )
 async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
     user_id = await manager.connect(world_id, websocket)
-    
+
     try:
         while True:
             payload = await websocket.receive_json()

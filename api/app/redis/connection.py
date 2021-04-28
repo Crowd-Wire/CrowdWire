@@ -1,4 +1,4 @@
-from typing import Union, Optional, List, Union
+from typing import Optional, List, Union
 
 import aioredis
 from app.core.config import settings
@@ -134,13 +134,14 @@ class RedisConnector:
     async def get_user_position(self, world_id: str, room_id: str, user_id: str) -> dict:
         """Get last user position received"""
         pairs = await self.master.execute('hgetall',
-            f"world:{world_id}:room:{room_id}:user:{user_id}:position", encoding="utf-8")
-        return {k: float(v) for k, v in zip(pairs[::2],pairs[1::2])}
+                                          f"world:{world_id}:room:{room_id}:user:{user_id}:position", encoding="utf-8")
+        return {k: float(v) for k, v in zip(pairs[::2], pairs[1::2])}
 
     async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
         """Update last user position received"""
-        return await self.master.execute('hmset', 
-            f"world:{world_id}:room:{room_id}:user:{user_id}:position", 'x', position['x'], 'y', position['y'])
+        return await self.master.execute('hmset',
+                                         f"world:{world_id}:room:{room_id}:user:{user_id}:position", 'x', position['x'],
+                                         'y', position['y'])
 
     async def get_user_users(self, world_id: str, user_id: str):
         """Get nearby users from a user"""
@@ -174,7 +175,7 @@ class RedisConnector:
         # get groups from new user(s)
         inter_groups_id = set()
         for uid in users_id:
-            inter_groups_id.update( await self.get_user_groups(world_id, uid) )
+            inter_groups_id.update(await self.get_user_groups(world_id, uid))
         inter_groups_id.discard(group_id)
 
         logger.debug(f"inter_groups_id: {inter_groups_id}")
@@ -197,7 +198,7 @@ class RedisConnector:
 
                 logger.debug(f"for user {iuid}, near_users_id: {near_users_id}, all_users_id: {all_users_id}")
                 if near_users_id.issuperset(all_users_id):
-                    logger.debug(f"                          :+1")
+                    logger.debug("                          :+1")
                     mem_group_users_id[igid][1] += 1
 
         mem_group_users_id = dict(filter(lambda x: x[0] in inter_groups_id, mem_group_users_id.items()))
@@ -251,12 +252,12 @@ class RedisConnector:
 
     async def rem_users_from_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """Remove one or more users from a group"""
-        
+
         users_id = [user_id, *users_id]
         await self.srem(f"world:{world_id}:group:{group_id}", *users_id)
         for uid in users_id:
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
-        
+
         # normalize remove
 
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
@@ -267,11 +268,11 @@ class RedisConnector:
             left_users = await self.get_group_users(world_id, group_id)
             inter_groups_id = set()
             for uid in left_users:
-                inter_groups_id.update( await self.get_user_groups(world_id, uid) )
+                inter_groups_id.update(await self.get_user_groups(world_id, uid))
             inter_groups_id.discard(group_id)
 
             for igid in inter_groups_id:
-                if set( await self.get_group_users(igid) ).issuperset(set(left_users)):
+                if set(await self.get_group_users(igid)).issuperset(set(left_users)):
                     # remove this group
                     await self.rem_group(world_id, group_id)
                     break

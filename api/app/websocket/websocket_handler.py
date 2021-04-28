@@ -1,12 +1,10 @@
 import json
 import re
-from typing import List
 
 from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
 from app.websocket.connection_manager import manager
-from fastapi import WebSocket
 from loguru import logger
 
 
@@ -32,138 +30,18 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
     )
 
 
-async def normalize_wire(world_id: str, user_id: str, found_users_id: List[str]):
-    user_groups = []
-    all_groups = set()
-    joinable_groups = set()
-
-    return await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), 
-                user_id, *found_users_id)
-
-
-    for fuid in found_users_id:
-        groups = await redis_connector.get_user_groups(world_id, fuid)
-        user_groups.append((fuid, set(groups)))
-        all_groups.update(groups)
-        # TODO: check joinable here?
-
-    # user_groups.sort(key=lambda x: len(x[1]))
-
-    test_groups = set(await redis_connector.get_user_groups(world_id, user_id))
-
-    near_users_id = set(found_users_id)
-    for gid in await redis_connector.get_user_groups(world_id, user_id):
-        for uid in await redis_connector.get_group_users(world_id, gid):
-            near_users_id.add(uid)
-    print('near_users_id:', near_users_id)
-
-    # get joinable groups
-    for group_id in all_groups:
-        users = await redis_connector.get_group_users(world_id, group_id)
-        if set(users).issubset(near_users_id):
-            # joinable
-            joinable_groups.add(group_id)
-        
-        if test_groups & set(group_id):
-            logger.error('something fishy happening, did you flushdb?')
-    # TODO: fix joinable bad
-
-    found_groups_id = [(fuid, groups & joinable_groups) for fuid, groups in user_groups]
-
-    count = 0
-    print('user_groups:', found_groups_id)
-    print('all_groups:', all_groups)
-    print('joinable_groups:', joinable_groups)
-
-    state = 0
-    while found_groups_id:
-        count += 1
-        # if count % 1000 == 0:
-        #     print('\n', found_groups_id)
-        #     await send_groups_snapshot(world_id)
-        if count > 10:
-            break
-        print('\n', count ,' state:', state + 1, 'user_groups:', found_groups_id)
-        await send_groups_snapshot(world_id)
-        await users_snapshot(world_id)
-
-        state += 1
-        
-        if state == 1:
-            for _, groups in list(found_groups_id):
-                if len(groups) == 1:
-                    state = 0
-
-                    print('\n', count ,' state:', state, 'user_groups:', found_groups_id)
-                    await send_groups_snapshot(world_id)
-                    await users_snapshot(world_id)
-
-                    # assign to group immediately
-                    await redis_connector.add_groups_to_user(world_id, user_id, *groups)
-                    found_groups_id = list(filter(lambda x: not x[1] & groups, found_groups_id))
-                    break
-            
-        if state == 2:
-            # no assignement was made last iteration
-            for _, groups in list(found_groups_id):
-                if len(groups) > 1:
-                    state = 0
-                    group = next(iter(groups))
-
-                    print('\n', count ,' state:', state, 'user_groups:', found_groups_id)
-                    await send_groups_snapshot(world_id)
-                    await users_snapshot(world_id)
-
-                    # assign to group
-                    await redis_connector.add_groups_to_user(world_id, user_id, group)
-                    found_groups_id = list(filter(lambda x: not group in x[1], found_groups_id))
-                    break
-        
-        if state == 3:
-            # no assignement was made last 2 iterations
-            # there are users with no joinable group, create new group
-            # create group
-
-            print('\n', count ,' state:', state, 'user_groups:', found_groups_id)
-            await send_groups_snapshot(world_id)
-            await users_snapshot(world_id)
-
-            await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), 
-                user_id, *[fuid for fuid, groups in found_groups_id])
-            # normalized finished
-            break
-            
-
-async def normalize_unwire(world_id: str, user_id: str, lost_users_id: List[str]):
-    ...
-
-
-async def send_groups_snapshot(world_id: str, user_id: str=None):
+async def send_groups_snapshot(world_id: str, user_id: str):
     groups = {}
     groups_keys = await redis_connector.scan_match_all(f"world:{world_id}:user:*:groups")
-    
+
+    # TODO: change dis pls
     for key in groups_keys:
-        uid = re.match(r".+:user:(.+):groups", key.decode("utf-8"))[1] # eww urrgh
+        uid = re.match(r".+:user:(.+):groups", key.decode("utf-8"))[1]  # eww urrgh
         grps = await redis_connector.smembers(key)
         groups[uid] = grps
 
-    if user_id in (None, 'final'):
-        print('\nfinal redis_groups:' if user_id != None else 'redis_groups:', groups )
-    else:
-        logger.debug('Broadcasting GROUPS SNAPSHOT')
-        await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
-
-
-async def users_snapshot(world_id: str, user_id: str=None):
-    users = {}
-    users_keys = await redis_connector.scan_match_all(f"world:{world_id}:group:*")
-
-    for key in users_keys:
-        gid = re.match(r".+:group:(.+)", key.decode("utf-8"))[1] # eww urrgh
-        usrs = await redis_connector.smembers(key)
-        users[gid] = usrs
-
-    print('final redis_users:' if user_id != None else 'redis_users:', users )
+    logger.debug('Broadcasting GROUPS SNAPSHOT')
+    await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
@@ -171,7 +49,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     # add nearby users to user:X:users
     await redis_connector.add_users_to_user(world_id, user_id, *users_id)
-    
+
     add_users = set()
     for uid in users_id:
         # if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
@@ -181,13 +59,10 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     # create new group and let it normalize
     if add_users:
-        await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), 
-            user_id, *add_users)
+        await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(),
+                                                 user_id, *add_users)
 
-    # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)
-    await send_groups_snapshot(world_id, 'final')
-    await users_snapshot(world_id, 'final')
 
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
@@ -201,11 +76,10 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     # remove group or simply remove from groups
     rem_groups = set()
     for uid in users_id:
-        rem_groups.update( await redis_connector.get_user_groups(world_id, user_id) )
+        rem_groups.update(await redis_connector.get_user_groups(world_id, user_id))
     if rem_groups:
         await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups)
 
-    # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)
 
 

@@ -6,9 +6,10 @@ from loguru import logger
 from app.core.consts import WebsocketProtocol as protocol
 from app.redis.connection import redis_connector
 
+
 class ConnectionManager:
     count = 0
-    group_count = -1 # TODO: remove
+    group_count = -1  # TODO: remove
 
     def __init__(self):
         """
@@ -19,7 +20,7 @@ class ConnectionManager:
 
         self.users_ws: Dict[str, WebSocket] = {}
 
-    def get_next_group_id(self): # TODO: remove
+    def get_next_group_id(self):  # TODO: remove
         self.group_count += 1
         return str(self.group_count)
 
