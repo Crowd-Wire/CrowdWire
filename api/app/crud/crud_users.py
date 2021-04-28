@@ -20,6 +20,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         """
         return db.query(User).filter(User.user_id == id).first()
 
+    def can_update(self, request_user: User, db: Session, id: int) -> Tuple[Optional[User], str]:
+        user_obj = self.get(db=db, id=id)
+        if not user_obj:
+            return user_obj, strings.USER_NOT_FOUND
+        if request_user.user_id != id and not request_user.is_superuser:
+            return None, strings.USER_EDITION_FORBIDDEN
+        return user_obj, ""
+
     def create(self, db: Session, user_data: UserCreate, *args, **kwargs) -> Tuple[Optional[User], str]:
         """
         Creates an User
@@ -45,20 +53,31 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db_user, strings.USER_REGISTERED_SUCCESS
 
     def update(
-            self, db: Session, *, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]
-    ) -> User:
+            self, db: Session, db_obj: User,
+            obj_in: Union[UserUpdate, Dict[str, Any]], *args, **kwargs
+    ) -> Tuple[Optional[User], str]:
         """
         Updates a given user
         """
+        request_user = kwargs.get('request_user')
+        if not request_user or (request_user and not isinstance(request_user, User)):
+            return None, strings.USER_NOT_PASSED
 
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        if update_data["password"]:
+        if 'password' in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
+        # no need to return any error here
+        if not request_user.is_superuser:
+            if 'status' in update_data:
+                del update_data['status']
+            if 'is_guest_user' in update_data:
+                del update_data['is_guest_user']
+
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
     def authenticate(self, db: Session, *, email: str, password: str) -> Tuple[Optional[User], str]:

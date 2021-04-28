@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     register_date: Optional[datetime.datetime] = None
     birth: Optional[datetime.date] = None
     status: Optional[int] = None
-    is_guest_user: Optional[bool] = False
 
 
 class GuestUser(UserBase):
