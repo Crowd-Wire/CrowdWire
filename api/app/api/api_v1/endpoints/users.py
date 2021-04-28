@@ -1,15 +1,9 @@
 from typing import Union
-
 from fastapi import APIRouter, Depends, HTTPException
-from uuid import uuid4
-
-from pydantic import UUID4
 from sqlalchemy.orm import Session
-
 from app.api import dependencies as deps
 from app import schemas, models
 from app.crud import crud_user
-from app.utils import is_guest_user
 
 router = APIRouter()
 
