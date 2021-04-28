@@ -21,7 +21,7 @@ class ConnectionManager:
 
     def get_next_group_id(self): # TODO: remove
         self.group_count += 1
-        return self.group_count
+        return str(self.group_count)
 
     async def connect(self, world_id: str, websocket: WebSocket) -> str:
         await websocket.accept()

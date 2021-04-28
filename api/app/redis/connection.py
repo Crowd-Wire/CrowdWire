@@ -161,56 +161,149 @@ class RedisConnector:
 
     async def add_users_to_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """Add one or more users to a groups"""
+
         users_id = [user_id, *users_id]
         logger.debug(f'add_users_to_group({group_id}, {users_id})')
+
+        all_users_id = set(users_id) | set(await self.get_group_users(world_id, group_id))
+
+        logger.debug(f"users_id: {users_id},  all_users_id: {all_users_id}")
 
         # get groups from new user(s)
         inter_groups_id = set()
         for uid in users_id:
             inter_groups_id.update( await self.get_user_groups(world_id, uid) )
+        inter_groups_id.discard(group_id)
 
-        # add users to group
-        await self.sadd(f"world:{world_id}:group:{group_id}", *users_id)
+        logger.debug(f"inter_groups_id: {inter_groups_id}")
+
+        mem_group_users_id = {}
+
+        for igid in inter_groups_id:
+            if igid not in mem_group_users_id:
+                mem_group_users_id[igid] = [set(await self.get_group_users(world_id, igid)), 0]
+
+            for iuid in mem_group_users_id[igid][0]:
+                near_users_id = set() if iuid not in users_id else set(all_users_id)
+                for ugid in await self.get_user_groups(world_id, iuid):
+                    if ugid not in mem_group_users_id:
+                        if ugid == group_id:
+                            mem_group_users_id[group_id] = [set(all_users_id), 0]
+                        else:
+                            mem_group_users_id[ugid] = [set(await self.get_group_users(world_id, ugid)), 0]
+                    near_users_id |= mem_group_users_id[ugid][0]
+
+                logger.debug(f"for user {iuid}, near_users_id: {near_users_id}, all_users_id: {all_users_id}")
+                if near_users_id.issuperset(all_users_id):
+                    logger.debug(f"                          :+1")
+                    mem_group_users_id[igid][1] += 1
+
+        mem_group_users_id = dict(filter(lambda x: x[0] in inter_groups_id, mem_group_users_id.items()))
+
+        logger.debug(f"mem_group_users_id: {mem_group_users_id}")
+
+        # get lowest mergeable id
+        mergeable_groups_id = {group_id}
+        for mgid, (_, c) in mem_group_users_id.items():
+            if c == await self.scard(f"world:{world_id}:group:{mgid}"):
+                mergeable_groups_id.add(mgid)
+        lowest_group_id = min(mergeable_groups_id)
+        mergeable_groups_id.remove(lowest_group_id)
+
+        logger.debug(f"mergeable_groups_id: {mergeable_groups_id},  lowest_group_id: {lowest_group_id}")
+
+        for mgid in mergeable_groups_id:
+            if mgid == group_id:
+                mem_users_id = all_users_id
+            else:
+                mem_users_id = mem_group_users_id[mgid][0]
+            await self.rem_group(world_id, mgid)
+
+            # add users to lowest group
+            await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
+            for muid in mem_users_id:
+                await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
+
+        # add users to lowest group
+        # maybe be doing twicr
+        await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
         for uid in users_id:
-            await self.sadd(f"world:{world_id}:user:{uid}:groups", group_id)
+            await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+
+    
+
+        
 
         # normalize
-        if await self.scard(f"world:{world_id}:group:{group_id}") == len(users_id):
+        # if await self.scard(f"world:{world_id}:group:{group_id}") == len(users_id):## chanfe
+        #     logger.debug('normalize')
+        #     #
+        #     inner_users_dict = {}
+        #     for gid in list(inter_groups_id):
+        #         deleted = False
+        #         all_users_id = await self.get_group_users(world_id, gid)
+        #         inner_users_id = set(all_users_id) & set(users_id)
 
-            # get outer users talking to inner users
-            outer_users_id = set()
-            for gid in inter_groups_id:
-                outer_users_id.update( await self.get_group_users(world_id, gid) )
-            outer_users_id ^= set(users_id)
+        #         logger.debug(f'gid: {gid}  inner_users_dict: {inner_users_dict}  new: {[all_users_id, inner_users_id]}')
 
-            logger.debug(f"outer_users_id: {outer_users_id}, inter_groups_id: {inter_groups_id}")
+        #         for k, v in inner_users_dict.items():
+        #             logger.debug(f"{k}-{gid}  {v[1] | inner_users_id}   {set(users_id)}")
+        #             if v[1] | inner_users_id == set(users_id):
+        #                 logger.debug(':-O')
+        #                 deleted = False
+        #                 for uid in set(v[0]) ^ v[1]:
+        #                     if len( set( await self.get_user_groups(world_id, uid) ) & {k, gid} ) == 2:
+        #                         # user in both groups
+                                
+        #                         logger.debug('DELETE')
+        #                         await self.rem_groups_from_user(world_id, uid, k, gid)
+        #                         await self.add_users_to_group(world_id, group_id, uid)
+        #                         deleted = True
+        #                 if deleted:
+        #                     del inner_users_dict[k]
+        #                     break
+        #         if not deleted:
+        #             inner_users_dict[gid] = [all_users_id, inner_users_id]
 
-            # check if outer user talks with all inner users
-            for uid in outer_users_id:
-                # get inner users with whom is talking
-                inrange_users_id = set()
-                for gid in inter_groups_id & set( await self.get_user_groups(world_id, uid) ):
-                    inrange_users_id.update(set( await self.get_group_users(world_id, gid) ))
 
-                logger.debug(f"uid: {uid}, inrange_users_id: {inrange_users_id}")
 
-                if inrange_users_id.issuperset(set( users_id )):
-                    logger.debug(':-O')
-                    # remove redundant groups from outer user
-                    # await self.rem_groups_from_user(world_id, uid, *inter_groups_id)
-                    for gid in await self.get_user_groups(world_id, uid):
-                        group_users_id = await self.get_group_users(world_id, gid)
-                        if len( set(group_users_id) & set(users_id) ) == len(group_users_id) - 1:
-                            logger.debug(f"removing G {gid} from U {uid}")
-                            await self.rem_groups_from_user(world_id, uid, gid)
 
-                    # add this group
-                    await self.sadd(f"world:{world_id}:user:{uid}:groups", group_id)
-                    await self.sadd(f"world:{world_id}:group:{group_id}", uid)
+
+            # # get outer users talking to inner users
+            # outer_users_id = set()
+            # for gid in inter_groups_id:
+            #     outer_users_id.update( await self.get_group_users(world_id, gid) )
+            # outer_users_id ^= set(users_id)
+
+            # logger.debug(f"outer_users_id: {outer_users_id}, inter_groups_id: {inter_groups_id}")
+
+            # # check if outer user talks with all inner users
+            # for uid in outer_users_id:
+            #     # get inner users with whom is talking
+            #     inrange_users_id = set()
+            #     for gid in inter_groups_id & set( await self.get_user_groups(world_id, uid) ):
+            #         inrange_users_id.update(set( await self.get_group_users(world_id, gid) ))
+
+            #     logger.debug(f"uid: {uid}, inrange_users_id: {inrange_users_id}")
+
+            #     if inrange_users_id.issuperset(set( users_id )):
+            #         logger.debug(':-O')
+            #         # remove redundant groups from outer user
+            #         # await self.rem_groups_from_user(world_id, uid, *inter_groups_id)
+            #         for gid in await self.get_user_groups(world_id, uid):
+            #             group_users_id = await self.get_group_users(world_id, gid)
+            #             if len( set(group_users_id) & set(users_id) ) == len(group_users_id) - 1:
+            #                 logger.debug(f"removing G {gid} from U {uid}")
+            #                 await self.rem_groups_from_user(world_id, uid, gid)
+
+            #         # add this group
+            #         await self.sadd(f"world:{world_id}:user:{uid}:groups", group_id)
+            #         await self.sadd(f"world:{world_id}:group:{group_id}", uid)
 
     async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Add one or more groups to a user"""
         groups_id = [group_id, *groups_id]
+        logger.debug(f'add_groups_to_user({user_id}, {groups_id})')
         for gid in groups_id:
             await self.add_users_to_group(world_id, gid, user_id)
 
@@ -233,6 +326,7 @@ class RedisConnector:
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
         
         # normalize
+        # check if the group that left now belongs to another group
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
             await self.rem_group(world_id, group_id)
 
