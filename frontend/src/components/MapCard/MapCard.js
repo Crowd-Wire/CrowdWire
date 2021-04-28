@@ -38,7 +38,7 @@ export default function MapCard(props){
     }
 
     const goToDetails = () => {
-        history(`../`+map.world_id);
+        history(`../`+map.world_id, {state:map.world_id});
     }
 
     const classes = useStyles();

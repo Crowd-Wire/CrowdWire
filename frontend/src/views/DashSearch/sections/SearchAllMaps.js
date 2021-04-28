@@ -52,6 +52,7 @@ class SearchAllMaps extends Component {
 	focusMap(id){
 		console.debug("entrou searchall");
 		this.props.handler(id);
+		
 	}
 
 	joined = this.props.joined;

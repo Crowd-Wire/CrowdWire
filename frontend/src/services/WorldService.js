@@ -40,14 +40,16 @@ class WorldService {
         })
     }
 
-    getWorldDetails(id) {
+    getWorldDetails(path) {
+        let x = path.split("/");
+        
         /*
             id:int
         */
 
-        let url = 'worlds/'+id;
+        let url = 'worlds/'+x[x.length-1];
         let query = [];
-        
+        console.log("url "+url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
