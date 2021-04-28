@@ -81,6 +81,8 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
     }
 
+    // handler para testes
+    teste_player_id;
     handleGroups = (groups) => {
         for (const [id, grps] of Object.entries(groups)) {
             if (id in this.remotePlayers) {
@@ -91,9 +93,20 @@ class GameScene extends Phaser.Scene {
                 text.setText([text.text.split('\n')[0],grps.join(', ')]);
             } else {
                 // own player
+                this.teste_player_id = id;
                 let text = this.player.getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
             }
+        }
+        for (const id of Object.keys(this.remotePlayers)) {
+            if (!(id in groups)) {
+                let text = this.remotePlayers[id].getText();
+                text.setText([text.text.split('\n')[0], 'G???']);
+            }
+        }
+        if (!(this.teste_player_id in groups)) {
+            let text = this.player.getText();
+            text.setText([text.text.split('\n')[0], 'G???']);
         }
     }
 
@@ -144,13 +157,13 @@ class GameScene extends Phaser.Scene {
                 console.log('wire')
             } else {
                 // unwire players
-                // ws.unwirePlayer('1', 
-                //     [...this.inRangePlayers].filter((id) => {
-                //         const left = !rangePlayers.includes(id);
-                //         if (left) this.inRangePlayers.delete(id);
-                //         return left;
-                //     })
-                // );
+                ws.unwirePlayer('1', 
+                    [...this.inRangePlayers].filter((id) => {
+                        const left = !rangePlayers.includes(id);
+                        if (left) this.inRangePlayers.delete(id);
+                        return left;
+                    })
+                );
                 console.log('unwire')
             }
         } else if (bodies.length > 1) {

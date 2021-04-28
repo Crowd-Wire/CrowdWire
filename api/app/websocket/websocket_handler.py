@@ -150,6 +150,7 @@ async def send_groups_snapshot(world_id: str, user_id: str=None):
     if user_id in (None, 'final'):
         print('\nfinal redis_groups:' if user_id != None else 'redis_groups:', groups )
     else:
+        logger.debug('Broadcasting GROUPS SNAPSHOT')
         await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
 
 
@@ -171,22 +172,17 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     # add nearby users to user:X:users
     await redis_connector.add_users_to_user(world_id, user_id, *users_id)
     
+    add_users = set()
     for uid in users_id:
-        if uid not in manager.users_ws:
-            # check if local user TODO: remove after testing
-            logger.debug(f"User {user_id} does job for static User {uid}")      
+        # if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
+        # check if user already claimed proximity
+        logger.debug(f"User {user_id} confirmed User {uid} claimance")
+        add_users.add(uid)
 
-            # add self to local user
-            await redis_connector.add_users_to_user(world_id, uid, user_id)
-            # create new group or assign to right groups
-            await normalize_wire(world_id, user_id, users_id)
-
-        elif await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
-            # check if user already claimed proximity
-            logger.debug(f"User {user_id} confirmed User {uid} claimance")
-
-            # create new group or assign to right groups
-            await normalize_wire(world_id, user_id, users_id)
+    # create new group and let it normalize
+    if add_users:
+        await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), 
+            user_id, *add_users)
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)
@@ -198,23 +194,16 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
 
     # remove faraway users from user:X:users
-    await redis_connector.srem(f"world:{world_id}:user:{user_id}:users", *users_id)
+    await redis_connector.rem_users_from_user(world_id, user_id, *users_id)
 
+    # better no checking if user already claimed proximity
+
+    # remove group or simply remove from groups
+    rem_groups = set()
     for uid in users_id:
-        if uid not in manager.users_ws:
-            # check if local user TODO: remove after testing
-
-            # remove self from local user
-            await redis_connector.srem(f"world:{world_id}:user:{uid}:users", user_id)
-
-            # remove group or simply remove from groups
-            await normalize_wire(world_id, user_id, users_id)
-
-        elif not await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
-            # check if user already claimed farness
-
-            # remove group or simply remove from groups
-            await normalize_unwire(world_id, user_id, users_id)
+        rem_groups.update( await redis_connector.get_user_groups(world_id, user_id) )
+    if rem_groups:
+        await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups)
 
     # TODO: remove after testing
     await send_groups_snapshot(world_id, user_id)

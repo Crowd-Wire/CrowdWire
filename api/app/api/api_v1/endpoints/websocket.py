@@ -17,12 +17,11 @@ router = APIRouter()
 )
 async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
     user_id = await manager.connect(world_id, websocket)
+    
     try:
         while True:
             payload = await websocket.receive_json()
             topic = payload['topic']
-
-            await wh.send_groups_snapshot(world_id, user_id)
 
             if topic != "PLAYER_MOVEMENT":
                 logger.info(
@@ -31,6 +30,7 @@ async def world_websocket(websocket: WebSocket, world_id: str) -> Any:
 
             if topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
+                await wh.send_groups_snapshot(world_id, user_id)
 
             elif topic == protocol.PLAYER_MOVEMENT:
                 await wh.send_player_movement(world_id, user_id, payload)

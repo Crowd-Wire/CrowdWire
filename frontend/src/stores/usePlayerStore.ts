@@ -20,8 +20,8 @@ const usePlayerStore = create(
         },
         (set) => ({
             connectPlayers: (snapshot: Record<string, Vector>) => {
-                return set((s) => {
-                    const players = {...s.players};
+                return set(() => {
+                    const players = {};
                     for (const [id, position] of Object.entries(snapshot)) {
                         players[id] = { position: position, velocity: { x: 0, y: 0 } };
                     }
@@ -50,9 +50,10 @@ const usePlayerStore = create(
                 });
             },
             setGroups: (grps: Record<string, string[]>) => {
-                return set(() => {
-                    return { groups: grps };
-                });
+                return set((s) => {
+                    console.log('snapshot', grps)
+                    return { ...s, groups: grps };
+                }, true);
             },
 
         })
