@@ -32,5 +32,5 @@ jobs:
     - name: docker push
       run: |
         docker push dagomes/api:latest
-        docker push dagomes/mediasoup:latest
+        docker push dagomes/media_server:latest
         docker push dagomes/frontend:latest
