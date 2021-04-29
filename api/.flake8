@@ -6,6 +6,7 @@ per-file-ignores =
     __init__.py:F401
     app/db/base.py:F401
     app/api/api_v1/endpoints/websocket.py:C901
+    app/redis/connection.py:C901
 exclude =
     alembic
     .git

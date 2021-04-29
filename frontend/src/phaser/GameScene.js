@@ -12,7 +12,7 @@ const sceneConfig = {
     key: 'GameScene',
 };
 
-var globalVar = false;
+var globalVar = true;
 
 
 
@@ -81,7 +81,8 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
     }
 
-    // handler para testes
+    // TODO: remove after tests
+    // allows devs to see in frontend the groups assigned to the users
     teste_player_id;
     handleGroups = (groups) => {
         for (const [id, grps] of Object.entries(groups)) {
@@ -97,16 +98,6 @@ class GameScene extends Phaser.Scene {
                 let text = this.player.getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
             }
-        }
-        for (const id of Object.keys(this.remotePlayers)) {
-            if (!(id in groups)) {
-                let text = this.remotePlayers[id].getText();
-                text.setText([text.text.split('\n')[0], 'G???']);
-            }
-        }
-        if (!(this.teste_player_id in groups)) {
-            let text = this.player.getText();
-            text.setText([text.text.split('\n')[0], 'G???']);
         }
     }
 
@@ -142,7 +133,8 @@ class GameScene extends Phaser.Scene {
         // detect surrounding players
         var bodies = this.physics.overlapCirc(
             this.player.body.center.x, this.player.body.center.y, 150, true, true)
-        if (bodies.length - 1 != this.inRangePlayers.size) {
+        console.log(bodies.length - 1,this.inRangePlayers.size )
+        if (bodies.length && bodies.length - 1 != this.inRangePlayers.size) {
             const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
                 .map((b) => b.gameObject.id);
             if (rangePlayers.length > this.inRangePlayers.size) {
@@ -205,7 +197,7 @@ class Player extends Phaser.GameObjects.Container {
             .setCenterAlign()
             .setText([
                 "Me",
-                'G???',
+                '',
             ]);
         const circle = scene.add.circle(0, 0, 150)
             .setOrigin(0.5)

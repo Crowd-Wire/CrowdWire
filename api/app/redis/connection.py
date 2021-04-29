@@ -20,7 +20,7 @@ class RedisConnector:
             password=settings.REDIS_SENTINEL_PASSWORD)
 
         self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        # await self.master.execute('flushall')
+        await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -164,21 +164,13 @@ class RedisConnector:
         """Add one or more users to a groups"""
 
         users_id = [user_id, *users_id]
-        logger.debug(f'add_users_to_group({group_id}, {users_id})')
-
         all_users_id = set(users_id) | set(await self.get_group_users(world_id, group_id))
 
-        logger.debug(f"users_id: {users_id},  all_users_id: {all_users_id}")
-
-        # normalize add
-
-        # get groups from new user(s)
+        """Normalize groups before addition"""
         inter_groups_id = set()
         for uid in users_id:
             inter_groups_id.update(await self.get_user_groups(world_id, uid))
         inter_groups_id.discard(group_id)
-
-        logger.debug(f"inter_groups_id: {inter_groups_id}")
 
         mem_group_users_id = {}
 
@@ -196,24 +188,18 @@ class RedisConnector:
                             mem_group_users_id[ugid] = [set(await self.get_group_users(world_id, ugid)), 0]
                     near_users_id |= mem_group_users_id[ugid][0]
 
-                logger.debug(f"for user {iuid}, near_users_id: {near_users_id}, all_users_id: {all_users_id}")
                 if near_users_id.issuperset(all_users_id):
-                    logger.debug("                          :+1")
                     mem_group_users_id[igid][1] += 1
 
         mem_group_users_id = dict(filter(lambda x: x[0] in inter_groups_id, mem_group_users_id.items()))
 
-        logger.debug(f"mem_group_users_id: {mem_group_users_id}")
-
-        # get lowest mergeable id
+        # find lowest mergeable group id
         mergeable_groups_id = {group_id}
         for mgid, (_, c) in mem_group_users_id.items():
             if c == await self.scard(f"world:{world_id}:group:{mgid}"):
                 mergeable_groups_id.add(mgid)
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
-
-        logger.debug(f"mergeable_groups_id: {mergeable_groups_id},  lowest_group_id: {lowest_group_id}")
 
         for mgid in mergeable_groups_id:
             if mgid == group_id:
@@ -222,13 +208,13 @@ class RedisConnector:
                 mem_users_id = mem_group_users_id[mgid][0]
             await self.rem_group(world_id, mgid)
 
-            # add users to lowest group
+            # add users to lowest group id
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
                 await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
 
-        # add users to lowest group
-        # maybe be doing twicr
+        """Add users to the normalized group"""
+        # TODO: maybe doing twice? but no problem
         await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
         for uid in users_id:
             await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
@@ -253,18 +239,18 @@ class RedisConnector:
     async def rem_users_from_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """Remove one or more users from a group"""
 
+        """Remove users"""
         users_id = [user_id, *users_id]
         await self.srem(f"world:{world_id}:group:{group_id}", *users_id)
         for uid in users_id:
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
 
-        # normalize remove
-
+        """Normalize groups after remove"""
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
-            # remove this group
+            # remove group when one or none inner users
             await self.rem_group(world_id, group_id)
         else:
-            # check if the group that left now belongs to another group
+            # check if the group removed is now subgroup of another
             left_users = await self.get_group_users(world_id, group_id)
             inter_groups_id = set()
             for uid in left_users:
@@ -272,8 +258,8 @@ class RedisConnector:
             inter_groups_id.discard(group_id)
 
             for igid in inter_groups_id:
-                if set(await self.get_group_users(igid)).issuperset(set(left_users)):
-                    # remove this group
+                if set(await self.get_group_users(world_id, igid)).issuperset(set(left_users)):
+                    # remove redundant group
                     await self.rem_group(world_id, group_id)
                     break
 
