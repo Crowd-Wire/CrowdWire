@@ -26,12 +26,10 @@ class Dashboard extends Component {
 
 
   handler = (focused) => {
-    console.debug("reaches here");
     this.setState({
       focus: focused,
       fMap: null
     });
-    console.debug(this.state.focus);
   }
 
   // handler to change the state of the SearchAllMaps component based on the sidebar

@@ -40,7 +40,6 @@ class SearchAllMaps extends Component {
 
 	constructor(props){
 		super(props)
-		console.log(this.props);
 	}
 	state = {
 		maps: [],
@@ -50,7 +49,6 @@ class SearchAllMaps extends Component {
 	}
 
 	focusMap(id){
-		console.debug("entrou searchall");
 		this.props.handler(id);
 		
 	}
@@ -67,13 +65,11 @@ class SearchAllMaps extends Component {
 	}
 	changePage = async (event, page) => {
 		await this.setState({page: page});
-		console.log(this.state.page);
 		this.search_handler(this.state.prevSearch, this.state.prevTags);
 	}
 
 	changeTags = async (value) => {
 		await this.setState({tags: value});
-		console.log(this.state.tags);
 	}
 
 	changeSearch = (value) => {
@@ -117,7 +113,6 @@ class SearchAllMaps extends Component {
 					<hr />
 					<Row>
 						{this.state.maps.map((m, i) => {
-							console.log("map",m,"id",i);
 							return (<MapCard focusMap={this.focusMap} map={m} />)
 						})}
 					</Row>

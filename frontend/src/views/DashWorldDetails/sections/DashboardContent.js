@@ -48,7 +48,6 @@ class DashboardContent extends Component{
 		return x[0];
 	}
 	render(){
-		console.log("details",this.props.worldInfo);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%"}}>    
 				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>

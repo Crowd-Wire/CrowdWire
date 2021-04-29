@@ -25,7 +25,6 @@ class CreateWorld extends Component {
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
-    console.log(desc);
     if(accessibility){
       accessibility = true;
     }
@@ -38,7 +37,6 @@ class CreateWorld extends Component {
     else{
       guests = false;
     }
-    console.log(typeof guests, typeof accessibility);
     WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"
@@ -49,7 +47,6 @@ class CreateWorld extends Component {
   render() {
     const { classes } = this.props;
     if(this.state.page==="details"){
-      console.log("details");
       return(
         <div className={classes.root}>
           <CssBaseline />
