@@ -253,8 +253,8 @@ dmypy.json
 # profiling data
 .prof
 
-# leandro's start script
-start.sh
+# pycharm
+.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,node
 

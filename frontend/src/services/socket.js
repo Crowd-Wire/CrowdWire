@@ -8,6 +8,7 @@ import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
+import AuthenticationService from "services/AuthenticationService";
 
 import playerStore from "stores/usePlayerStore.ts";
 
@@ -116,7 +117,8 @@ export const getSocket = (worldId) => {
   }
 
   if (!socket) {
-      socket = new WebSocket(`${WS_BASE}/ws/${worldId}`);
+      const token = AuthenticationService.getToken();
+      socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
 
       socket.onopen = async (event) => {
           console.info("[open] Connection established");

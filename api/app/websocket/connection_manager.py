@@ -8,8 +8,8 @@ from app.redis.connection import redis_connector
 
 
 class ConnectionManager:
-    count = 0
-    group_count = -1  # TODO: remove
+    user_count = -1 # TODO: remove after tests
+    group_count = -1
 
     def __init__(self):
         """
@@ -20,18 +20,19 @@ class ConnectionManager:
 
         self.users_ws: Dict[str, WebSocket] = {}
 
-    def get_next_group_id(self):  # TODO: remove
+    # TODO: remove after tests
+    def get_next_user_id(self):
+        self.user_count += 1
+        return str(self.user_count)
+
+    def get_next_group_id(self):
         self.group_count += 1
         return str(self.group_count)
 
-    async def connect(self, world_id: str, websocket: WebSocket) -> str:
+    async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> str:
         await websocket.accept()
 
         await websocket.receive_json()
-        # token = payload['token']
-        # futurely, get token and retrieve it's id??? guests will have a G prepended, ig
-        user_id = str(self.count)
-        self.count += 1
 
         # store user's corresponding websocket
         self.users_ws[user_id] = websocket
@@ -70,7 +71,7 @@ class ConnectionManager:
             user_id
         )
 
-    async def disconnect_room(self, world_id: int, room_id: int, user_id: int):
+    async def disconnect_room(self, world_id: str, room_id: str, user_id: str):
         try:
             self.connections[world_id][room_id].remove(user_id)
             if not self.connections[world_id][room_id]:

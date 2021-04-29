@@ -12,7 +12,6 @@ import ProfilePage from "views/ProfilePage/ProfilePage.js";
 import LoginPage from "views/LoginPage/LoginPage.js";
 import RegisterPage from "views/RegisterPage/RegisterPage.js";
 import GamePage from "views/GamePage/GamePage.js";
-import Dashboard from "views/Dashboard/Dashboard.js";
 import WorldSettings from "views/WorldSettings/WorldSettings.js"
 import UserSettings from "views/UserSettings/UserSettings.js"
 import MapEditor from "views/MapEditor/MapEditor.js";
@@ -22,6 +21,9 @@ import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
+import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
+import DashSearch from "views/DashSearch/DashSearch.js";
+
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -55,7 +57,14 @@ const routes = (isAuth) => [
 			{ path: "/create-world", element: <CreateWorld /> },
 		],
 	},
-    { path: "/dashboard", element: <Dashboard /> },
+	{ 
+		path: "/dashboard", 
+		element: <Outlet/>,
+		children: [
+			{path: "/:id", element: <DashWorldDetails/>},
+			{path:"/search", element: <DashSearch/>}
+		]
+	},
     {
 		path: "/user",
 		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
