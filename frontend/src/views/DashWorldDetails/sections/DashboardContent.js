@@ -26,7 +26,8 @@ class DashboardContent extends Component{
 		width:"auto",
 		backgroundColor:"grey",
 		borderRadius:"10px",
-		padding:"5px", marginRight:"auto"
+		padding:"5px",
+		marginLeft:"5px"
 	};
 
 	tags = () => {
@@ -36,6 +37,7 @@ class DashboardContent extends Component{
 		for(let i = 0; i < this.props.worldInfo.tags.length;i++){
 			labels.push(<span style={this.spanStyle}>{this.props.worldInfo.tags[i].name}</span>);
 		}
+
 		return labels;
 	}
 
@@ -49,7 +51,7 @@ class DashboardContent extends Component{
 		console.log("details",this.props.worldInfo);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%"}}>    
-				<Row style={{ width:"100%", height:"50%", marginTop:"5%"}}>
+				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>
 					<Col xs={10} sm={10} md={10} style={{backgroundSize:"cover", borderRadius:"15px", backgroundRepeat:"no-repeat",backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")'}}>
 						<div style={{ position: 'absolute', bottom: 0, left: 0, borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", height:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
 							<Typography noWrap variant="h3" style={this.cardTextStyles} >
@@ -58,19 +60,21 @@ class DashboardContent extends Component{
 							<Typography variant="caption" style={this.cardTextStyles}>
 								Creation Date {this.date()}
 							</Typography>
-							<Row style={{width:"90%", marginRight:"auto", marginLeft:"auto", marginTop:"10px"}}>
-								<Col md={1}>
+							<Row style={{width:"90%", marginRight:"auto", marginLeft:"30px", marginTop:"20px"}}>
+								<Col xs={1} sm={1} md={1}>
 									<Typography variant="body1" className="align-middle" style={{color:"white", marginLeft:"5%", width:"80%", marginTop:"3%", fontWeight:"bold"}}>
 										<BookmarksIcon style={{backgroundColor:"white", borderRadius:"50%", padding:"2px", height:"30px",width:"30px", color:"black"}}/>
 									</Typography>
 								</Col>
-								<Col>
+								<Col xs={7} sm={7} md={7}>
 									<Row>
 										{this.tags()}
 									</Row>
 								</Col>
+								<Col>
+									<Typography style={{marginLeft:"auto", color:"white", marginTop:"10px"}}>Max Online Users: {this.props.worldInfo.max_users}</Typography>
+								</Col>
 							</Row>
-							<Typography style={{marginLeft:"5%", color:"white", marginTop:"10px"}}>Max Online Users: {this.props.worldInfo.max_users}</Typography>
 						</div>
 					</Col>
 					<Col xs={1} sm={1} md={1}></Col>

@@ -28,7 +28,7 @@ export default function DashboardContent(){
         <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
             <br/>
             <Row style={{width:"100%",height:"90%"}}>
-                <Col xs={12} sm={10} md={8} style={{marginBottom:"1%"}}>
+                <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
                     <Row>
 
                             <Button variant="success" className={classes.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
@@ -36,15 +36,13 @@ export default function DashboardContent(){
                             <Button variant="primary " className={classes.actionButtons}>Manage Map</Button>
 
                     </Row>
-                    <Row>
-                        <Typography variant="h2" className={classes.titleText}>Jungle</Typography>
+                    <Row style={{marginTop:"50px"}}>
                         <Typography variant="body1" className={classes.descText}>This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users.</Typography>
                     </Row>
                 </Col>
-                <Col xs={12} sm={10} md={2} style={{borderRadius:"15px"}}>
-                    <Row>
+                <Col xs={12} sm={10} md={6} style={{borderRadius:"15px"}}>
+                    <Row style={{backgroundColor:"yellow"}}>
                         <Button variant="danger" style={{marginLeft:"auto"}}>Delete World</Button>
-
                     </Row>
                 </Col>
             </Row>

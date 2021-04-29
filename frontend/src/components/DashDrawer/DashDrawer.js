@@ -94,10 +94,6 @@ export default function DashDrawer(props){
     navigation("/create-world");
   }
 
-  // const onClickDefinitions = () => {
-  //   console.log(navigation.toString());
-
-  // }
 
   const handleDrawerClose = () => {
     setOpen(false);
