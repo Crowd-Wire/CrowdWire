@@ -11,6 +11,7 @@ from loguru import logger
 from loguru._defaults import LOGURU_FORMAT
 from app.core.config import settings
 
+
 class InterceptHandler(logging.Handler):
     """
     Default handler from examples in loguru documentaion.

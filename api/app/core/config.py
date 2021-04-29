@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     REDIS_SENTINEL_HOST: str = os.getenv('REDIS_SENTINEL_HOST', 'localhost')
     REDIS_SENTINEL_PORT: int = 26379
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
-    REDIS_MASTER: str = os.getenv('REDIS_MASTER','mymaster')
+    REDIS_MASTER: str = os.getenv('REDIS_MASTER', 'mymaster')
 
 
 settings = Settings()
