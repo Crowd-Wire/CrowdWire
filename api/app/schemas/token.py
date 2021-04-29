@@ -24,5 +24,5 @@ class TokenPayload(BaseModel):
 class InviteTokenPayload(BaseModel):
     # Invites can only be done be registered users, therefore the subject
     # is of type int and not UUID4(the type for guest users)
-    sub: int
+    inviter: int
     world_id: int

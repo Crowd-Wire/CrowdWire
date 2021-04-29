@@ -3,7 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.api import dependencies as deps
 from app import schemas, models
+from app.core import strings
 from app.crud import crud_user
+from app.utils import is_guest_user
 
 router = APIRouter()
 
@@ -31,6 +33,8 @@ async def edit_user(
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user),
 ):
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
     user_obj, msg = crud_user.can_update(db=db, request_user=user, id=user_id)
     if not user_obj:
         raise HTTPException(status_code=400, detail=msg)
