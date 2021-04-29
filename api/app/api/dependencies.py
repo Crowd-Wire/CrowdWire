@@ -73,7 +73,7 @@ async def get_current_user_for_invite(
     try:
         logger.debug(invite_token)
         payload = jwt.decode(
-            invite_token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+            invite_token, settings.INVITE_SECRET_TOKEN, algorithms=[security.ALGORITHM]
         )
         logger.debug(payload)
         token_data = schemas.InviteTokenPayload(**payload)

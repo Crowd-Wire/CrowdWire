@@ -99,6 +99,8 @@ async def update_world(
     """
     Updates a  specific World's Information
     """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
     # first checking if this user can edit the world(creator only)
     world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
     if not world_obj:
@@ -168,6 +170,9 @@ def create_world(
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
     world_in.creator = user
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     obj, message = crud.crud_world.create(db=db, obj_in=world_in, user=user)
     if not obj:
         raise HTTPException(
@@ -206,6 +211,9 @@ async def delete_world(
     """
     Deletes a world given an world_id, if the request is made by its creator
     """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     world_obj, message = await crud.crud_world.remove(db=db, world_id=world_id, user_id=user.user_id)
     if not world_obj:
         raise HTTPException(

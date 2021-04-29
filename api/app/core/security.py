@@ -48,8 +48,8 @@ def create_invite_token(
     declared in settings
     """
     expire = check_expire_delta(expires_delta)
-    to_encode = {"exp": expire, "sub": str(subject), "world_id": world_id}
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
+    to_encode = {"exp": expire, "inviter": str(subject), "world_id": world_id}
+    encoded_jwt = jwt.encode(to_encode, settings.INVITE_SECRET_TOKEN, algorithm=ALGORITHM)
     return encoded_jwt, expire
 
 
