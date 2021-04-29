@@ -7,17 +7,27 @@ interface Vector {
     y: number;
 }
 
-interface PlayerMovement {
+interface Player {
     position: Vector;
     velocity: Vector;
 }
 
 const usePlayerStore = create(
     combine(
-        {
-            players: {} as Record<string, PlayerMovement>,
+        {   
+            groups: {} as Record<string, string[]>,
+            players: {} as Record<string, Player>,
         },
         (set) => ({
+            connectPlayers: (snapshot: Record<string, Vector>) => {
+                return set(() => {
+                    const players = {};
+                    for (const [id, position] of Object.entries(snapshot)) {
+                        players[id] = { position: position, velocity: { x: 0, y: 0 } };
+                    }
+                    return { players };
+                });
+            },
             connectPlayer: (id: string, position: Vector) => {
                 return set((s) => {
                     const players = {...s.players};
@@ -38,7 +48,13 @@ const usePlayerStore = create(
                     players[id] = { position: position, velocity: velocity };
                     return { players };
                 });
-            }
+            },
+            setGroups: (grps: Record<string, string[]>) => {
+                return set((s) => {
+                    console.log('snapshot', grps)
+                    return { ...s, groups: grps };
+                }, true);
+            },
 
         })
     )

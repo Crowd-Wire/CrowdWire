@@ -25,6 +25,7 @@ class CreateWorld extends Component {
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
+    console.log(desc);
     if(accessibility){
       accessibility = true;
     }

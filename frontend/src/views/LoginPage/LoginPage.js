@@ -90,7 +90,7 @@ class LoginPage extends React.Component {
 
   render() {
     if (this.state.loggedIn) {
-      return <Navigate to="../dashboard" />
+      return <Navigate to="../dashboard/search" />
     }
 
     return (

@@ -8,6 +8,7 @@ import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
+import AuthenticationService from "services/AuthenticationService";
 
 import playerStore from "stores/usePlayerStore.ts";
 
@@ -81,21 +82,47 @@ export const getSocket = (worldId) => {
           console.error(`[error] socket closed before sendMovement`);
   }
 
-  const sendComms = (topic="", worldId="", userId="") => {
+  const wirePlayer = async (roomId, usersId) => {
+    const payload = {
+      topic: "WIRE_PLAYER",
+      // room_id: roomId,
+      users_id: usersId,
+    }
+    if (socket.readyState === WebSocket.OPEN)
+      await socket.send(JSON.stringify(payload));
+    else
+      console.error(`[error] socket closed before wirePlayer`);
+  }
+
+  const unwirePlayer = async (roomId, usersId) => {
+    const payload = {
+      topic: "UNWIRE_PLAYER",
+      // room_id: roomId,
+      users_id: usersId,
+    }
+    console.log('unwire', usersId);
+    if (socket.readyState === WebSocket.OPEN)
+      await socket.send(JSON.stringify(payload));
+    else
+      console.error(`[error] socket closed before unwirePlayer`);
+  }
+
+  const sendComms = async (topic="", worldId="", userId="") => {
     const payload = {
       topic: topic,
       worldId: worldId,
       userId:userId,
     }
-    socket.send(JSON.stringify(payload));
+    await socket.send(JSON.stringify(payload));
   }
 
   if (!socket) {
-      socket = new WebSocket(`${WS_BASE}/ws/${worldId}`);
+      const token = AuthenticationService.getToken();
+      socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
 
-      socket.onopen = (event) => {
+      socket.onopen = async (event) => {
           console.info("[open] Connection established");
-          socket.send(JSON.stringify({token: '', room_id: '1'}));
+          await socket.send(JSON.stringify({token: '', room_id: '1'}));
           // const id = setInterval(() => {
           //     if (socket && socket.readyState !== socket.CLOSED) {
           //         socket.send("ping");
@@ -119,6 +146,12 @@ export const getSocket = (worldId) => {
             break;
         case "PLAYER_MOVEMENT":
             playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
+            break;
+        case "PLAYERS_SNAPSHOT":
+            playerStore.getState().connectPlayers(data.snapshot);
+            break;
+        case "GROUPS_SNAPSHOT":
+            playerStore.getState().setGroups(data.groups);
             break;
         case "you-joined-as-peer":
           console.log(data)
@@ -197,11 +230,11 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, sendComms, joinRoom};
+  return {socket, sendMovement, sendComms, joinRoom, wirePlayer, unwirePlayer};
 }
 
-export const wsend = (d) => {
+export const wsend = async (d) => {
   if (socket && socket.readyState === socket.OPEN) {
-    socket.send(JSON.stringify(d));
+    await socket.send(JSON.stringify(d));
   }
 };
