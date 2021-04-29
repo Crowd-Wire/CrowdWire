@@ -8,7 +8,7 @@ from app.redis.connection import redis_connector
 
 
 class ConnectionManager:
-    user_count = -1 # TODO: remove after tests
+    user_count = -1  # TODO: remove after tests
     group_count = -1
 
     def __init__(self):
