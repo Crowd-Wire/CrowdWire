@@ -2,9 +2,6 @@
 name: Push to DockerHub
 
 on:
-  push:
-      branches:
-          - develop
   pull_request:
       branches:
           - main
@@ -32,5 +29,5 @@ jobs:
     - name: docker push
       run: |
         docker push dagomes/api:latest
-        docker push dagomes/media_server:latest
+        docker push dagomes/mediaserver:latest
         docker push dagomes/frontend:latest
