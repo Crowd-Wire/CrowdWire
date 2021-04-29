@@ -6,7 +6,7 @@ import secrets
 
 
 class Settings(BaseSettings):
-    RUNNING_MODE = os.environ.get("RUNNING_MODE", None)
+    RUNNING_MODE: str = os.environ.get("RUNNING_MODE", None)
     PRODUCTION = RUNNING_MODE is not None and RUNNING_MODE.lower() == 'production'
     DEBUG = not PRODUCTION
     API_V1_STR: str = "/api/v1"
