@@ -9,6 +9,7 @@ from pprint import pformat
 # you can move it to typing.py module
 from loguru import logger
 from loguru._defaults import LOGURU_FORMAT
+from app.core.config import settings
 
 
 class InterceptHandler(logging.Handler):
@@ -92,6 +93,7 @@ def init_logging():
     logging.getLogger("uvicorn").handlers = [intercept_handler]
 
     # set logs output, level and format
+    level_log = logging.INFO if settings.PRODUCTION else logging.DEBUG
     logger.configure(
-        handlers=[{"sink": sys.stdout, "level": logging.DEBUG, "format": format_record}]
+        handlers=[{"sink": sys.stdout, "level": level_log, "format": format_record}]
     )
