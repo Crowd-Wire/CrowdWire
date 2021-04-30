@@ -49,7 +49,7 @@ class DashboardContent extends Component{
 	}
 	render(){
 		return(
-			<div style={{ padding: '10px', marginLeft:"5%"}}>    
+			<div style={{ padding: '10px', marginLeft:"5%", width:"100%"}}>    
 				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>
 					<Col xs={10} sm={10} md={10} style={{backgroundSize:"cover", borderRadius:"15px", backgroundRepeat:"no-repeat",backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")'}}>
 						<div style={{ position: 'absolute', bottom: 0, left: 0, borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", height:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>

@@ -58,6 +58,22 @@ class WorldService {
         })
     }
 
+    deleteWorld(id) {
+        /*
+            id:int
+        */
+
+        let url = 'worlds/'+id;
+        let query = [];
+        return fetch(API_BASE + url, {
+            method: 'DELETE',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
+    }
+
     create(wName, accessibility, guests, maxUsers, tag_array, desc){
         return fetch(API_BASE + 'worlds/', {
             method: 'POST',
