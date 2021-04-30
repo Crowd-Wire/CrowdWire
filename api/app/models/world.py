@@ -21,5 +21,5 @@ class World(Base):
     allow_guests = Column(Boolean, nullable=False)
     world_map = Column(LargeBinary, nullable=False)
     status = Column(Integer, nullable=False)
-    tags = relationship("Tag", lazy="subquery", secondary=world_tag, back_populates="worlds")
+    tags = relationship("Tag", lazy="subquery", secondary=world_tag)
     users = relationship("World_User", back_populates="world")

@@ -50,7 +50,7 @@ service:
   type: ClusterIP
   port: 8000
 
-
+running_mode: 'production'
   
 
 

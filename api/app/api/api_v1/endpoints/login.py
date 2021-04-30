@@ -16,6 +16,7 @@ from app.core import security, strings
 # verify_password_reset_token,
 # )
 from app.core.config import settings
+from app.utils import is_guest_user
 
 router = APIRouter()
 
@@ -52,6 +53,9 @@ def generate_invite_link(
     """
     Generate an invitation link( a token )
     """
+
+    if is_guest_user(current_user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
     world_user_obj, msg = crud.crud_world_user.can_generate_link(
         db=db,
         world_id=world_id,

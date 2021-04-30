@@ -32,6 +32,10 @@ spec:
       #Change this later to a for loop, puting here the values destroys the idea of templating
       {{- if and .Values.postgresql.enabled .Values.rabbitmq.enabled }}
         - env:
+          - name: RUNNING_MODE
+            value: {{ .Values.running_mode }}
+          - name: POSTGRES_SERVICE_NAME
+            value: {{ include "api.postgresservicename" . }}
           - name: POSTGRES_USER
             valueFrom:
               secretKeyRef:
@@ -47,6 +51,8 @@ spec:
               secretKeyRef:
                 key: postgresql-db
                 name: {{ include "api.postgresservicename" . }}
+          - name: RABBITMQ_SERVICE_NAME
+            value: {{ include "api.postgresservicename" . }}
           - name: RABBITMQ_USERNAME
             valueFrom:
               secretKeyRef:
@@ -62,6 +68,8 @@ spec:
               secretKeyRef:
                 key: rabbitmq-erlang-cookie
                 name: {{ include "api.rabbitmqservicename" . }}
+          - name: REDIS_SENTINEL_HOST
+            value: {{ include "api.rediservicename" . }}
 
       {{- end }}   
           name: {{ .Chart.Name }}

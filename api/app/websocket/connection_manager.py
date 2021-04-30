@@ -1,12 +1,15 @@
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from fastapi import WebSocket
 from loguru import logger
 
 from app.core.consts import WebsocketProtocol as protocol
+from app.redis.connection import redis_connector
 
 
 class ConnectionManager:
+    user_count = -1  # TODO: remove after tests
+    group_count = -1
 
     def __init__(self):
         """
@@ -17,8 +20,16 @@ class ConnectionManager:
 
         self.users_ws: Dict[str, WebSocket] = {}
 
-    async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> str:
+    # TODO: remove after tests
+    def get_next_user_id(self):
+        self.user_count += 1
+        return str(self.user_count)
 
+    def get_next_group_id(self):
+        self.group_count += 1
+        return str(self.group_count)
+
+    async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> str:
         await websocket.accept()
 
         await websocket.receive_json()
@@ -38,13 +49,14 @@ class ConnectionManager:
         )
 
     async def connect_room(self, world_id: str, room_id: str, user_id: str, joiner_position: dict):
-
         if world_id in self.connections and room_id in self.connections[world_id]:
-            for other_id in self.connections[world_id][room_id]:
-                # get position from redis
-                position = {'x': 50, 'y': 50}
-                await self.users_ws[user_id].send_json(
-                    {'topic': protocol.JOIN_PLAYER, 'user_id': other_id, 'position': position})
+            # send players snapshot
+            players_snapshot = {}
+            for uid in self.connections[world_id][room_id]:
+                if uid != user_id:
+                    players_snapshot[uid] = await redis_connector.get_user_position(world_id, room_id, uid)
+            await self.users_ws[user_id].send_json(
+                {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot})
 
         self.connections \
             .setdefault(world_id, {}) \
@@ -78,18 +90,18 @@ class ConnectionManager:
             user_id
         )
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    async def send_personal_message(self, message: Any, websocket: WebSocket):
         await websocket.send_json(message)
 
-    async def broadcast(self, world_id: str, room_id: str, payload: dict, sender_id: str):
+    async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:
             for user_id in self.connections[world_id][room_id]:
                 if user_id != sender_id:
                     await self.users_ws[user_id].send_json(payload)
-            logger.info(
-                f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
-                f"{payload}"
-            )
+            # logger.info(
+            #     f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
+            #     f"{payload}"
+            # )
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, Room {room_id}"

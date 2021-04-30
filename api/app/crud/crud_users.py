@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict, Optional, Union, Tuple
 
 from sqlalchemy.orm import Session
@@ -6,7 +7,7 @@ from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate
-from app.core import strings
+from app.core import strings, consts
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -38,12 +39,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if self.get_by_email(db=db, email=user_data.email):
             return None, strings.EMAIl_ALREADY_IN_USE
 
+        if user_data.status != consts.USER_NORMAL_STATUS:
+            return None, strings.INVALID_USER_CREATION_STATUS
+
         db_user = User(
             email=user_data.email,
             hashed_password=get_password_hash(user_data.hashed_password),
             name=user_data.name,
             birth=user_data.birth,
-            register_date=user_data.register_date,
+            register_date=datetime.datetime.now(),
             status=0,
             is_superuser=False
         )

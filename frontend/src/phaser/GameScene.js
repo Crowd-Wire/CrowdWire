@@ -12,12 +12,14 @@ const sceneConfig = {
     key: 'GameScene',
 };
 
-var globalVar = false;
+var globalVar = true;
 
 
 
 class GameScene extends Phaser.Scene {
-    playerSprites = {};
+    remotePlayers = {};
+    localPlayers = {};
+    inRangePlayers = new Set();
     count = 0;
 
     constructor() {
@@ -47,11 +49,13 @@ class GameScene extends Phaser.Scene {
 
 
         // static players for range test
-        new OnlinePlayerSprite(this, 0, 500);
-        new OnlinePlayerSprite(this, 500, 600);
+        this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
+        this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
+        this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
 
         // main player
-        this.player = new PlayerSprite(this, 50, 50);
+        this.player = new Player(this, 50, 50);
+
         // connect to room
         ws.joinRoom('1', {x: 50, y: 50});
 
@@ -71,9 +75,30 @@ class GameScene extends Phaser.Scene {
         
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
-        this.physics.add.collider(Object.values(this.playerSprites), this.obstacles);
+        // TODO: remove after testing
+        this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({...state.groups}));
 
-        console.log(this.obstacles)
+        this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
+    }
+
+    // TODO: remove after tests
+    // allows devs to see in frontend the groups assigned to the users
+    teste_player_id;
+    handleGroups = (groups) => {
+        for (const [id, grps] of Object.entries(groups)) {
+            if (id in this.remotePlayers) {
+                let text = this.remotePlayers[id].getText();
+                text.setText([text.text.split('\n')[0], grps.join(', ')]);
+            } else if (id in this.localPlayers) {
+                let text = this.localPlayers[id].getText();
+                text.setText([text.text.split('\n')[0],grps.join(', ')]);
+            } else {
+                // own player
+                this.teste_player_id = id;
+                let text = this.player.getText();
+                text.setText([text.text.split('\n')[0], grps.join(', ')]);
+            }
+        }
     }
 
     handlePlayerConnection = (players, prevPlayers) => {
@@ -82,18 +107,18 @@ class GameScene extends Phaser.Scene {
         if (players.length > prevPlayers.length) {
             // connection
             for (const id of players) {
-                if (!(id in this.playerSprites)) {
+                if (!(id in this.remotePlayers)) {
                     let position = usePlayerStore.getState().players[id].position;
-                    this.playerSprites[id] = new OnlinePlayerSprite(this, position.x, position.y, id);
-                    this.physics.add.collider(this.playerSprites[id], this.obstacles);
+                    this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
+                    this.physics.add.collider(this.remotePlayers[id], this.obstacles);
                 }
             }
         } else {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    this.playerSprites[id].disconnect();
-                    delete  this.playerSprites[id];
+                    this.remotePlayers[id].disconnect();
+                    delete this.remotePlayers[id];
                 }
             }
         }
@@ -102,14 +127,39 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         this.player.updateMovement();
 
-        // detect surrounding players
-        var bodies = this.physics.overlapCirc(this.player.body.x, this.player.body.y, 150, true, true)
-        if (bodies.length > 1) {
-            this.player.body.debugBodyColor = 0x0099ff; // blue
+        if (!globalVar)
+            return;
 
-            // if (ws.socket.readyState === WebSocket.OPEN) {
-            //     ws.socket.send(JSON.stringify(bodies[0].gameObject.id));
-            // }
+        // detect surrounding players
+        var bodies = this.physics.overlapCirc(
+            this.player.body.center.x, this.player.body.center.y, 150, true, true)
+        console.log(bodies.length - 1,this.inRangePlayers.size )
+        if (bodies.length && bodies.length - 1 != this.inRangePlayers.size) {
+            const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
+                .map((b) => b.gameObject.id);
+            if (rangePlayers.length > this.inRangePlayers.size) {
+                // wire players
+                ws.wirePlayer('1', 
+                    rangePlayers.filter((id) => {
+                        const entered = !this.inRangePlayers.has(id);
+                        if (entered) this.inRangePlayers.add(id);
+                        return entered;
+                    })
+                );
+                console.log('wire')
+            } else {
+                // unwire players
+                ws.unwirePlayer('1', 
+                    [...this.inRangePlayers].filter((id) => {
+                        const left = !rangePlayers.includes(id);
+                        if (left) this.inRangePlayers.delete(id);
+                        return left;
+                    })
+                );
+                console.log('unwire')
+            }
+        } else if (bodies.length > 1) {
+            this.player.body.debugBodyColor = 0x0099ff; // blue
         } else {
             this.player.body.debugBodyColor = 0xff9900; // orange
         }
@@ -126,44 +176,81 @@ class GameScene extends Phaser.Scene {
  * @param {number} x - The start horizontal position in the scene.
  * @param {number} y - The start vertical position in the scene.
  */
-class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
-    speed = 500;
+class Player extends Phaser.GameObjects.Container {
+    speed = 500;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
 
     constructor(scene, x, y) {
-        super(scene, x, y, 'player', 6);
+        super(scene, x, y);
 
-        // add sprite to the scene
+        // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
 
+        // add sprite and text to scene and then container
+        const sprite = scene.add.sprite(0, 0, 'player', 6)
+            .setOrigin(0.5)
+            .setScale(3);
+        const text = scene.add.bitmapText(0, -48, 'atari', '', 24)
+            .setOrigin(0.5)
+            .setCenterAlign()
+            .setText([
+                "Me",
+                '',
+            ]);
+        const circle = scene.add.circle(0, 0, 150)
+            .setOrigin(0.5)
+            .setStrokeStyle(1, 0x1a65ac);
+
+        this.addSprite(sprite);
+        this.addText(text);
+        this.add(circle);
+        
+        this.body.setSize(sprite.width * 3, sprite.height * 3)
+            .setOffset(-sprite.width/2 * 3, -sprite.height/2 * 3);
+
         // set some default physics properties
-        this.setScale(3);
-        this.setCollideWorldBounds(true);
+        this.body.setCollideWorldBounds(true);
 
         this.body.onWorldBounds = true; // not sure if this is important
 
-        this.anims.create({
+        this.getSprite().anims.create({
             key: 'horizontal',
-            frames: this.anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13]}),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13]}),
             frameRate: 10,
             repeat: -1
         });
-        this.anims.create({
+        this.getSprite().anims.create({
             key: 'up',
-            frames: this.anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14]}),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14]}),
             frameRate: 10,
             repeat: -1
         });
-        this.anims.create({
+        this.getSprite().anims.create({
             key: 'down',
-            frames: this.anims.generateFrameNumbers('player', { frames: [ 0, 6, 0, 12 ] }),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [ 0, 6, 0, 12 ] }),
             frameRate: 10,
             repeat: -1
         });
     }
 
+    addSprite(sprite) {
+        this.addAt(sprite, 0);
+    }
+
+    getSprite() {
+        return this.getAt(0);
+    }
+
+    addText(text) {
+        this.addAt(text, 1);
+    }
+
+    getText() {
+        return this.getAt(1);
+    }
+    
     updateMovement() {
         const direction = new Phaser.Math.Vector2();
 
@@ -201,21 +288,34 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
             velocity = this.body.velocity;
         
         if (velocity.y < 0) {
-            this.anims.play('up', true);
+            this.getSprite().anims.play('up', true);
         }
         else if (velocity.y > 0) {
-            this.anims.play('down', true);
+            this.getSprite().anims.play('down', true);
         }
         else if (velocity.x < 0) {
-            this.flipX = true;
-            this.anims.play('horizontal', true);
+            this.getSprite().flipX = true;
+            this.getSprite().anims.play('horizontal', true);
         }
         else if (velocity.x > 0) {
-            this.flipX = false;
-            this.anims.play('horizontal', true);
+            this.getSprite().flipX = false;
+            this.getSprite().anims.play('horizontal', true);
         } else {
-            this.anims.stop();
+            this.getSprite().anims.stop();
         }
+    }
+}
+
+
+class LocalPlayer extends Player {
+
+    constructor(scene, x, y, id) {
+        super(scene, x, y);
+        this.id = id;
+        this.getText().setText([
+            `User ${this.id}`,
+            'G???',
+        ]);
     }
 }
 
@@ -229,25 +329,25 @@ class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
  * @param {number} x - The start horizontal position in the scene.
  * @param {number} y - The start vertical position in the scene.
  */
-class OnlinePlayerSprite extends PlayerSprite {
-    speed = 500; // 900 is the upperbound ig
+class RemotePlayer extends Player {
     numUpdates = 0;
-    wasBlocked = false;
     
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
+        this.getText().setText([
+            `User ${this.id}`,
+            'G???',
+        ]);
 
-        if (this.id)
-            this.unsubscribe = usePlayerStore.subscribe(
-                this.handlePlayerMovement, state => state.players[this.id]);
+        this.unsubscribe = usePlayerStore.subscribe(
+            this.handlePlayerMovement, state => state.players[this.id]);
     }
 
     handlePlayerMovement = ({position, velocity}) => {
         this.updateAnimation(velocity);
         this.body.reset(position.x, position.y);
         this.body.setVelocity(velocity.x, velocity.y);
-        console.log(velocity)
     }
 
     /**
