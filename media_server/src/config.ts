@@ -97,6 +97,10 @@ export const config = {
         // { ip: '10.10.23.101', announcedIp: null },
       ] as TransportListenIp[],
       initialAvailableOutgoingBitrate: 800000,
+			minimumAvailableOutgoingBitrate : 600000,
+			maxSctpMessageSize              : 262144,
+			// Additional options that are not part of WebRtcTransportOptions.
+			maxIncomingBitrate              : 1500000
     },
   },
 } as const;

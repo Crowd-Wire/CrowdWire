@@ -54,11 +54,24 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
         # check if user already claimed proximity
         add_users.add(uid)
 
+    actions = {}
     # create new group and let it normalize
     if add_users:
-        await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(),
+        actions = await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(),
                                                  user_id, *add_users)
-
+    
+    # actions made to groups
+    logger.info(actions)
+    add_users = actions['add-users-to-room']
+    close_rooms = actions['close-room']
+    
+    if add_users:
+        print("adding users to room")
+        for add_action in add_users:
+            await join_as_new_peer_or_speaker(add_action['roomId'], add_action['peerId'])
+    if close_rooms:
+        print("closing rooms")
+        
     await send_groups_snapshot(world_id, user_id)
 
 
@@ -86,25 +99,19 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     await send_groups_snapshot(world_id, user_id)
 
 
-async def join_as_new_peer_or_speaker(world_id: str, user_id: str, payload: dict):
+async def join_as_new_peer_or_speaker(room_id: str, user_id: str):
     """
     join-as-new-peer:
         create a room if it doesnt exit and add that user to that room
         then media server returns receive transport options to amqp
-        this should only allow to receive audio
+        this should only allow to receive data
     join-as-speaker:
         this does the same as above, except it allows
         the user to speak, so, it returns two kinds of transport,
         one for receiving and other for sending
     """
-    room_id = payload['d']['roomId']
-    payload['d']['peerId'] = user_id
-
-    if room_id in manager.connections[world_id][room_id]:
-        if user_id not in manager.connections[world_id][room_id]:
-            manager.connections[world_id][room_id].append(user_id)
-    else:
-        manager.connections[world_id][room_id] = [user_id]
+    payload = { 'topic': "join-as-speaker",
+               'd': { 'roomId': room_id, 'peerId': user_id } }
 
     await rabbit_handler.publish(json.dumps(payload))
 

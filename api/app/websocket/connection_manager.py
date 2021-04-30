@@ -50,7 +50,7 @@ class ConnectionManager:
 
     async def connect_room(self, world_id: str, room_id: str, user_id: str, joiner_position: dict):
         if world_id in self.connections and room_id in self.connections[world_id]:
-            # send players snapshot
+            # send players snapshot 
             players_snapshot = {}
             for uid in self.connections[world_id][room_id]:
                 if uid != user_id:
@@ -90,8 +90,9 @@ class ConnectionManager:
             user_id
         )
 
-    async def send_personal_message(self, message: Any, websocket: WebSocket):
-        await websocket.send_json(message)
+    async def send_personal_message(self, message: Any, user_id):
+        if user_id in self.users_ws:
+            await self.users_ws[user_id].send_json(message)
 
     async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:

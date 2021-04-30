@@ -7,7 +7,9 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { consumerAudio: Consumer;
+        { 
+          roomId: string;
+          consumerAudio: Consumer;
           consumerVideo: Consumer;
           consumerMedia: Consumer;
           volume: number;
@@ -33,7 +35,7 @@ export const useConsumerStore = create(
             : s
         );
       },
-      add: (c: Consumer, userId: string, kind: string) =>
+      add: (c: Consumer, roomId:string, userId: string, kind: string) =>
         set((s) => {
           let volume = 100;
           let consumerAudio = null;
@@ -78,7 +80,8 @@ export const useConsumerStore = create(
                 volume,
                 active: false,
                 videoToggle,
-                audioToggle
+                audioToggle,
+                roomId
               },
             }
           }
@@ -149,23 +152,27 @@ export const useConsumerStore = create(
             };
           }
         }),
-      closeAll: () =>
+      closeRoom: (roomId) =>
         set((s) => {
           for (const value of Object.values(s.consumerMap)) {
-            if (value.consumerAudio && !value.consumerAudio.closed) {
-              value.consumerAudio.close()
-            }
-            if (value.consumerVideo && !value.consumerVideo.closed) {
-              value.consumerVideo.close()
-            }
-            if (value.consumerMedia && !value.consumerMedia.closed) {
-              value.consumerMedia.close()
-            }
-          };
+            if (value.roomId == roomId) {
+              if (value.consumerAudio && !value.consumerAudio.closed) {
+                value.consumerAudio.close()
+              }
+              if (value.consumerVideo && !value.consumerVideo.closed) {
+                value.consumerVideo.close()
+              }
+              if (value.consumerMedia && !value.consumerMedia.closed) {
+                value.consumerMedia.close()
+              }
+            };
+          }
           return {
-            consumerMap: {},
+            consumerMap: {
+              ...s.consumerMap
+            },
           };
-        }),
+        })
     })
   )
 );

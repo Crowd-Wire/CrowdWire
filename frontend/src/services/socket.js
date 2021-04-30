@@ -2,7 +2,7 @@ import { WS_BASE } from "config";
 import { createTransport } from "../webrtc/utils/createTransport";
 import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
-import { joinRoom } from "../webrtc/utils/joinRoom";
+import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
@@ -27,7 +27,7 @@ async function flushConsumerQueue(_roomId) {
       d: { peerId, consumerParameters },
     } of consumerQueue) {
       if (_roomId === roomId) {
-        await consumeStream(consumerParameters, peerId, consumerParameters.kind)
+        await consumeStream(consumerParameters, roomId, peerId, consumerParameters.kind,)
       }
     }
   } catch (err) {
@@ -39,8 +39,9 @@ async function flushConsumerQueue(_roomId) {
 
 async function consumeAll(consumerParametersArr) {
   try {
+    console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, consumer.peerId, kind))) {
+      if (!(await consumeStream(consumer.consumerParameters, consumer.roomId, consumer.peerId, kind))) {
         break;
       }
     }
@@ -59,22 +60,22 @@ export const getSocket = (worldId) => {
 
   const joinRoom = async (roomId, position) => {
     const payload = {
-        topic: "JOIN_PLAYER",
-        room_id: roomId,
-        position
+      topic: "JOIN_PLAYER",
+      room_id: roomId,
+      position
     }
     if (socket.readyState === WebSocket.OPEN)
-        await socket.send(JSON.stringify(payload));
+      await socket.send(JSON.stringify(payload));
     else
-        console.error(`[error] socket closed before joinRoom`);
+      console.error(`[error] socket closed before joinRoom`);
   }
 
   const sendMovement = async (roomId, position, velocity) => {
       const payload = {
-          topic: "PLAYER_MOVEMENT",
-          room_id: roomId,
-          position,
-          velocity,
+        topic: "PLAYER_MOVEMENT",
+        room_id: roomId,
+        position,
+        velocity,
       }
       if (socket.readyState === WebSocket.OPEN)
           await socket.send(JSON.stringify(payload));
@@ -155,24 +156,24 @@ export const getSocket = (worldId) => {
             break;
         case "you-joined-as-peer":
           console.log(data)
-          joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVideo();
+                sendVideo(data.d.roomId);
               });
           })
           break;
         case "you-joined-as-speaker":
           console.log(data)
-          joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVoice();
-                sendVideo();
+                sendVoice(data.d.roomId);
+                sendVideo(data.d.roomId);
               });
           })
           break;
@@ -182,10 +183,11 @@ export const getSocket = (worldId) => {
           break;
         case "new-peer-producer":
           console.log(data)
-          if (useRoomStore.getState().recvTransport && useRoomStore.getState().roomId === data.d.roomId) {
-            consumeStream(data.d.consumerParameters, data.d.peerId, data.d.kind );
+          const roomId = data.d.roomId;
+          if (useRoomStore.getState().rooms[roomId].recvTransport) {
+            consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
           } else {
-            consumerQueue = [...consumerQueue, { roomId: data.d.roomId, d: data.d }];
+            consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
           }
           break;
         case "active_speaker":

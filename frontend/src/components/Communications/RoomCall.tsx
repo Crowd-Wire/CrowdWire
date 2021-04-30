@@ -16,7 +16,6 @@ import logo from '../../assets/crowdwire_white_logo.png';
 
 import { getSocket, wsend } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
-import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
@@ -77,6 +76,8 @@ export default class RoomCall extends React.Component<{}, State> {
   }
   
   setNavigatorToStream = () => {
+    console.log(this.accessMic)
+    console.log(this.accessVideo)
     getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
       if (stream) {
         useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
@@ -153,7 +154,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
   
   render () {
-    let numberUsers = 1;
+    let numberUsers = 0;
     for (const value of Object.values(this.state.consumerMap)) {
       //@ts-ignore
       if (value.consumerMedia)
@@ -161,8 +162,8 @@ export default class RoomCall extends React.Component<{}, State> {
       else
         numberUsers += 1;
     };
-    if (this.state.media)
-      numberUsers += 1;
+    // if (this.state.media)
+    //   numberUsers += 1;
     const gridSettings = {
       cols: numberUsers > 6 ? 6 : numberUsers,
       rows: numberUsers > 6 ? 2 : 1,
@@ -190,13 +191,11 @@ export default class RoomCall extends React.Component<{}, State> {
 
         <div className="row">
           <Button color="primary" onClick={() => {
-            useRoomStore.getState().set({ roomId: '1' });
             wsend({topic: "join-as-new-peer", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport that allows to Receive data */}
             Join Room 1 and only Send Video
           </Button>
           <Button color="primary" onClick={() => {
-            useRoomStore.getState().set({ roomId: '1' });
             wsend({topic: "join-as-speaker", d: { roomId: '1' } })}}>
             {/* This will join a room and then create a Transport
             that allows to Receive data and another Transport to send data*/}
@@ -204,26 +203,10 @@ export default class RoomCall extends React.Component<{}, State> {
           </Button>
         </div>
 
-        <div  style={{padding: 10}}>
+        {numberUsers > 0 ? 
+        
+        (<div  style={{padding: 10}}>
           <Carousel {...gridSettings}>
-
-            <Carousel.Item key={this.myId}>
-              <MyVideoAudioBox
-                username={this.myId}
-                id={this.myId}
-                audioTrack={this.state.mic}
-                videoTrack={this.state.cam}
-                />
-            </Carousel.Item>
-            { this.state.media ? 
-              <Carousel.Item key={this.myId+'_media'}>
-                <MyMediaStreamBox
-                  username={this.myId}
-                  id={this.myId+'_media'}
-                  mediaTrack={this.state.media}
-                />
-              </Carousel.Item>
-            : <span></span> }
 
             { Object.keys(this.state.consumerMap).length > 0 
               && Object.keys(this.state.consumerMap).map((peerId) => {
@@ -258,10 +241,23 @@ export default class RoomCall extends React.Component<{}, State> {
             }
             
           </Carousel>
+        </div>) : '' }
+
+        <div style={{position: 'fixed', width:'17%', height: '35%', right: 10, bottom: 5}}>
+          <MyVideoAudioBox
+            username={this.myId}
+            id={this.myId}
+            audioTrack={this.state.mic}
+            videoTrack={this.state.cam}
+          />
+          { this.state.media ? 
+            <MyMediaStreamBox
+              username={this.myId}
+              id={this.myId+'_media'}
+              mediaTrack={this.state.media}
+            />
+          : '' }
         </div>
-
-      
-
         <ChatBox 
           chatToggle={this.state.chatToggle} 
           closeDrawer={() => this.chatHandle(false)} 

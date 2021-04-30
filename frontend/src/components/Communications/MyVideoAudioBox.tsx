@@ -46,7 +46,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setVideoPauseState(!videoPauseState)
     useMuteStore.getState().setVideoMute(videoPauseState);
     let { camProducer } = useVideoStore.getState();
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
 
@@ -55,14 +55,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         camProducer.pause();
       else
         camProducer.resume();
-      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoPauseState } })
+      for (let roomId in rooms)
+        wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoPauseState } })
     }
   }
   const toggleAudio = () => {
     setAudioPauseState(!audioPauseState)
     useMuteStore.getState().setAudioMute(audioPauseState)
     let { micProducer } = useVoiceStore.getState();
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
     
@@ -72,7 +73,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       else {
         micProducer.resume();
       }
-      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioPauseState } });
+      for (let roomId in rooms)
+        wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioPauseState } });
     }
   }
 
@@ -91,10 +93,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   useEffect(() => {
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     setMediaOffState(useMediaStore.getState().media ? false : true)
-    wsend({ topic: "close-media", d: { roomId: roomId } })
+    for (let roomId in rooms)
+      wsend({ topic: "close-media", d: { roomId: roomId } })
     console.log("sending close media")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useMediaStore.getState().media])
@@ -119,8 +122,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div>
-      <div style={{height:'100%', maxWidth:400, width: '100%', overflow: 'auto', display: 'inline-block'}}>
+      <div style={{height:'100%',width: '100%', overflow: 'auto', display: 'inline-block'}}>
         <Card style={{padding: 3,
         background: 'rgba(65, 90, 90, 0.5)',
         overflow: 'hidden',
@@ -135,7 +137,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
               <SettingsIcon style={{'cursor': 'pointer', float: 'right'}}
                 onClick={() => toggleModal()}/>
             </div>
-            <div id={id+"border_div"}>
+            <div id={id+"border_div"} style={{height:"76%", width: "100%"}}>
                 { videoTrack ? (
                   <video autoPlay id={id+"_video"} ref={myRef}
                   style={{display: videoPauseState ? 'block' : 'none'}}/>
@@ -171,10 +173,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
               </Row>
             </div>
         </Card>
-      </div>
-    { showModal ? 
-      <DeviceSettings closeModal={toggleModal}/>
-    : ''}
+      { showModal ? 
+        <DeviceSettings closeModal={toggleModal}/>
+      : ''}
     </div>
   );
 };

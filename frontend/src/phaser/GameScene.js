@@ -133,7 +133,6 @@ class GameScene extends Phaser.Scene {
         // detect surrounding players
         var bodies = this.physics.overlapCirc(
             this.player.body.center.x, this.player.body.center.y, 150, true, true)
-        console.log(bodies.length - 1,this.inRangePlayers.size )
         if (bodies.length && bodies.length - 1 != this.inRangePlayers.size) {
             const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
                 .map((b) => b.gameObject.id);
