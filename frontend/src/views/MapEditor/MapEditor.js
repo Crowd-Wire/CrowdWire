@@ -3,6 +3,7 @@ import React from "react";
 import classNames from 'classnames';
 
 import { connect } from "react-redux";
+import "./sections/style/captureStyle.css";
 
 // import gameUITypes from "consts/gameUITypes";
 // import { toggleGameUI } from "redux/store";
@@ -19,8 +20,13 @@ import Phaser from "views/GamePage/Sections/Phaser";
 import ScreenCapture from "views/MapEditor/sections/ScreenCapture.js";
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
 import { withStyles } from '@material-ui/core/styles';
-
-
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 
 const gameWindows = {
   0: {
@@ -71,6 +77,9 @@ class MapEditor extends React.Component {
       open: false,
       title: "gimmeatitle"
     }
+  }
+  hideModal = () => {
+    this.setState({open: false});        
   }
 
   handleScreenCapture = screenCapture => {
@@ -305,9 +314,45 @@ class MapEditor extends React.Component {
           <div className={classes.navbarItem}>Option3</div>
         </div>
 
-        <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 50px)', height: '100%' }}>
+        <div className={classes.wrapperCol} open={this.state.open}style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 50px)', height: '100%' }}>
           {this.gridBuild()}
         </div>
+        <Dialog
+                    open={this.state.open}
+                    TransitionComponent={this.transition}
+                    keepMounted
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                        The snapshot will be presented to the users when they are in the world searching page. Want to save it?
+                    </DialogContentText>
+                    {screenCapture && (
+                      <img src={screenCapture} style={{marginLeft:"auto", marginRight:"auto"}} alt="screen capture" />
+                    )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Col>
+                            <Row>
+                                <Button onClick={this.hideModal} color="default" style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    Discard
+                                </Button>
+                            </Row>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <Button 
+                                    onClick={this.hideModalandDelete}
+                                    color="primary" 
+                                    style={{marginLeft:"auto", marginRight:"auto"}}
+                                >
+                                    Save
+                                </Button>
+                            </Row>
+                        </Col>
+                    </DialogActions>
+                </Dialog>
         </>
         )}
       </ScreenCapture>
