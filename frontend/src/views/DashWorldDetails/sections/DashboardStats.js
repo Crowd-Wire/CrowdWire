@@ -72,7 +72,7 @@ class DashboardStats extends Component{
 
                             </Row>
                             <Row style={{marginTop:"50px"}}>
-                                <Typography variant="body1" className={this.descText}>{this.props.details.description}</Typography>
+                                <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
                             </Row>
                         </Col>
                         <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>

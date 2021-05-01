@@ -7,6 +7,9 @@ import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
 import Pagination from '@material-ui/lab/Pagination';
+import Typography from '@material-ui/core/Typography';
+
+
 const useStyles = theme => ({
 	root: {
 		maxWidth: 345,
@@ -112,14 +115,22 @@ class SearchAllMaps extends Component {
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
 					<Row>
-						{this.state.maps.map((m, i) => {
+						{this.state.maps ? 
+						this.state.maps.map((m, i) => {
 							return (<MapCard focusMap={this.focusMap} map={m} />)
-						})}
+						})
+						:
+						<Typography>No worlds with these specifications.</Typography>
+					}
 					</Row>
 					<hr />
-					<Row style={{marginBottom:"30px"}}>
-						<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
-					</Row>
+					{this.state.maps===null || this.state.maps.length===0 ?
+						<></>
+						:
+						<Row style={{marginBottom:"30px"}}>
+							<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
+						</Row>
+					}
 				</Container>
 			</>
 		);
