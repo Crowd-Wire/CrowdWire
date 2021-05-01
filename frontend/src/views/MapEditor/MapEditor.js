@@ -16,7 +16,7 @@ import { connect } from "react-redux";
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab";
 import Phaser from "views/GamePage/Sections/Phaser";
-
+import ScreenCapture from "views/MapEditor/sections/ScreenCapture.js";
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
 import { withStyles } from '@material-ui/core/styles';
 
@@ -66,9 +66,42 @@ class MapEditor extends React.Component {
         },
         { size: 25, tabs: [5] },
         { size: 25, tabs: [4, 2] }
-      ]
+      ],
+      screenCapture: "",
+      open: false,
+      title: "gimmeatitle"
     }
   }
+
+  handleScreenCapture = screenCapture => {
+    console.log(screenCapture);
+    this.setState(
+      {
+        screenCapture
+      },
+      () => {
+        screenCapture && this.openModal();
+      }
+    );
+  };
+
+  openModal = () => {
+    this.setState({ open: true });
+  };
+
+  closeModal = () => {
+    this.setState({ open: false, screenCapture: "" });
+  };
+
+  handleOnChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  handleSave = () => {
+    console.log(this.state.title, this.state.screenCapture);
+  };
 
   gridRemoveTabs = (tabs, elemPath) => {
     this.setState(state => {
@@ -256,15 +289,18 @@ class MapEditor extends React.Component {
 
   render() {
     const {classes} = this.props;
-
+    const { screenCapture } = this.state;
+    console.log("nothing"+screenCapture);
     return (
-      <>
+      <ScreenCapture onEndCapture={this.handleScreenCapture}>
+        {({ onStartCapture }) => (
+          <>
         {/* Game */}
         {/* <div style={{backgroundColor: "#ccc", height: '100vh', display: 'flex', flexFlow: 'row wrap', overflow: 'hidden' }}>
           {gridBuilder(this.state.grid2)}
         </div> */}
         <div className={classes.navbar} style={{display: 'flex'}}>
-          <div className={classes.navbarItem}>Option1</div>
+          <div className={classes.navbarItem} onClick={ onStartCapture }>Option1</div>
           <div className={classes.navbarItem}>Option2</div>
           <div className={classes.navbarItem}>Option3</div>
         </div>
@@ -272,8 +308,9 @@ class MapEditor extends React.Component {
         <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 50px)', height: '100%' }}>
           {this.gridBuild()}
         </div>
-
-      </>
+        </>
+        )}
+      </ScreenCapture>
     );
   }
 }

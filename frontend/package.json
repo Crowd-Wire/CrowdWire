@@ -15,6 +15,7 @@
     "classnames": "2.2.6",
     "hark": "^1.2.3",
     "history": "^5.0.0",
+    "html2canvas": "^1.0.0-rc.7",
     "immutability-helper": "^3.1.1",
     "mediasoup-client": "^3.6.29",
     "moment": "2.26.0",
