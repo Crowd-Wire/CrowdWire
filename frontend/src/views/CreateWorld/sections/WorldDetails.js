@@ -25,7 +25,6 @@ export default function WorldDetails(props){
         TagService.getAll()
                 .then((res) => {return res.json()})
                 .then((res) => {
-            console.log(res);
             let arr = [];
             res.forEach(tag => arr.push(tag.name)); 
             setTags(arr);
@@ -64,13 +63,11 @@ export default function WorldDetails(props){
         else
             setDescHelper("");
         if(send){
-            console.log("sending");
             createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
         }
     }
 
     const onChangeValue = (event) => {
-        console.log(typeof event.target.value)
         setAccessibility(event.target.value);
     }
 

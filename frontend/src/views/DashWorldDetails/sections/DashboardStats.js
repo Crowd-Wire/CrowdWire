@@ -1,76 +1,124 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, {Component} from "react";
 import { Typography } from "@material-ui/core";
-import Container from 'react-bootstrap/Container';
+import { createBrowserHistory } from 'history';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import TextField from '@material-ui/core/TextField';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import Slide from '@material-ui/core/Slide';
+import WorldService from "services/WorldService";
+import DeleteIcon from '@material-ui/icons/Delete';
 
-const useStyles = makeStyles((theme) => ({
-    actionButtons:{
-        marginRight:theme.spacing(1),
-    },
-    descText:{
+class DashboardStats extends Component{
+    
+    constructor(props){
+        super(props);
+        this.state = {
+            show: false
+        }
+    }
+    
+    transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="up" ref={ref} {...props} />;
+    });
+
+    actionButtons = {
+        marginRight:"10px",
+    };
+    descText = {
         marginLeft:"5%",
         color:"white",
-    },
-    titleText:{
+    };
+
+    titleText = {
         marginLeft:"5%"
+    };
+    
+    hideModal = () => {
+        console.log("false now");
+        this.setState({show: false});        
     }
-}));
 
-export default function DashboardContent(){
-    const classes = useStyles();
-    return(
-    <>    
-        <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
-            <br/>
-            <Row style={{width:"100%",height:"90%"}}>
-                <Col xs={12} sm={10} md={8} style={{marginBottom:"1%"}}>
-                    <Row>
+    hideModalandDelete = () => {
+        WorldService.deleteWorld(this.props.details.world_id);
+        console.log("false now");
+        this.setState({show: false});
+        let hist = createBrowserHistory();
+        hist.back();
+    }
+    
+    showModal = () => {
+        this.setState({show: true});        
+    }
+    
+    
+    render(){
+        console.log(this.props.details);
+        return(
+            <>    
+                <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
+                    <br/>
+                    <Row style={{width:"100%",height:"90%"}}>
+                        <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
+                            <Row>
 
-                            <Button variant="success" className={classes.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
-                            <Button variant="primary" className={classes.actionButtons}>Edit Map</Button>
-                            <Button variant="primary " className={classes.actionButtons}>Manage Map</Button>
+                                    <Button variant="success" className={this.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
+                                    <Button variant="primary" className={this.actionButtons}>Edit Map</Button>
+                                    <Button variant="primary " className={this.actionButtons}>Manage Map</Button>
 
+                            </Row>
+                            <Row style={{marginTop:"50px"}}>
+                                <Typography variant="body1" className={this.descText}>{this.props.details.description}</Typography>
+                            </Row>
+                        </Col>
+                        <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>
+                            <Row>
+                                <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"auto"}}>Delete World</Button>
+                            </Row>
+                        </Col>
                     </Row>
-                    <Row>
-                        <Typography variant="h2" className={classes.titleText}>Jungle</Typography>
-                        <Typography variant="body1" className={classes.descText}>This map was created with the purpose of gathering people to explore the ruins of the lost temple and convey a near life-like experience to users.</Typography>
-                    </Row>
-                </Col>
-                <Col xs={12} sm={10} md={4} style={{borderRadius:"15px", minWidth:"320px", maxWidth:"380px"}}>
-                    <Container style={{height:"245px", borderRadius:"15px", backgroundColor:"#1C2541"}}>
-                        <Typography style={{color:"white", marginBottom: '15px', fontSize:"1.5rem"}}>Friends Online (1)</Typography>
-                        <Container style={{height:"60%",overflowY:"scroll"}}>
-                            <Row style={{marginBottom:"2%", borderRadius:"10% / 50%" ,alignContent:"center", background:"linear-gradient(to right, rgba(255,255,255,1),transparent", height:"33%",width:"95%"}}>
-                                <Col xs={2} sm={2} md={2} lg={2} style={{alignSelf:"initial",height:"100%", alignContent:"initial"}}>
-                                    <img alt="" src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
-                                </Col>
-                                <Col xs={1} sm={1} md={1} lg={1}></Col>
-                                <Col xs={8} sm={8} md={8} lg={8}><Typography>Mateus Silva</Typography></Col>
+                </div>
+                <Dialog
+                    open={this.state.show}
+                    TransitionComponent={this.transition}
+                    keepMounted
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                >
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                        Are you sure you want to delete this world?
+                    </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Col>
+                            <Row>
+                                <Button onClick={this.hideModal} color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    Disagree
+                                </Button>
                             </Row>
-                            <Row style={{marginBottom:"2%", borderRadius:"10% / 50%" ,alignContent:"center", background:"linear-gradient(to right, rgba(255,255,255,1),transparent", height:"33%",width:"95%"}}>
-                                <Col xs={2} sm={2} md={2} lg={2} style={{alignSelf:"initial",height:"100%", alignContent:"initial"}}>
-                                    <img alt="" src="https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZXxlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80" style={{position:"absolute", top:"5%",left:"5%", alignSelf:"initial", width:"100%", height:"90%", borderRadius:"50%", objectFit:"cover"}}></img>
-                                </Col>
-                                <Col xs={1} sm={1} md={1} lg={1}></Col>
-                                <Col xs={8} sm={8} md={8} lg={8}><Typography>Mateus Silva</Typography></Col>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <Button 
+                                    onClick={this.hideModalandDelete}
+                                    startIcon={<DeleteIcon />} 
+                                    color="secondary" 
+                                    style={{marginLeft:"auto", marginRight:"auto"}}
+                                >
+                                    Agree
+                                </Button>
                             </Row>
-
-                        </Container>
-                        <Container style={{marginTop:"5px"}}>
-                            <Row style={{position:"relative", alignContent:"center", padding:"2px", backgroundColor:"#5BC0BE", borderRadius:"10px",height:"2%"}}>
-                                <TextField size="small" placeholder="Invite friend to world" style={{width:"100%", marginLeft:"2%", marginRight:"2%"}}/>
-                            </Row>
-                        </Container>
-
-                    </Container>
-                </Col>
-            </Row>
-        </div>
-    </>
-    );
+                        </Col>
+                    </DialogActions>
+                </Dialog>
+            </>
+        );
+    }
 }
+
+export default (DashboardStats);
