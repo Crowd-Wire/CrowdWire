@@ -7,8 +7,11 @@ from app.core.logging import init_logging
 from fastapi.middleware.cors import CORSMiddleware
 from app.rabbitmq import rabbit_handler
 from app.redis import redis_connector
+from starlette.middleware.sessions import SessionMiddleware
 
 app = FastAPI(debug=True)
+app.add_middleware(SessionMiddleware, secret_key="!secret")
+
 origins = [
     "http://localhost:3000",
 ]

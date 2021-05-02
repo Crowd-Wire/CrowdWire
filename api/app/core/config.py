@@ -2,7 +2,6 @@ from pydantic import BaseSettings, PostgresDsn
 from typing import Optional
 import secrets
 
-
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
@@ -37,6 +36,8 @@ class Settings(BaseSettings):
     REDIS_SENTINEL_PASSWORD: str = 'password'
     REDIS_MASTER: str = 'mymaster'
 
+    CLIENT_ID: str
+    CLIENT_SECRET: str
     # searches this file to find the variables
     class Config:
         env_file = ".env"

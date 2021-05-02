@@ -4,10 +4,13 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from starlette.config import Config
+from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
+from starlette.responses import HTMLResponse, RedirectResponse
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -17,6 +20,7 @@ from app.core import security, strings
 # )
 from app.core.config import settings
 from app.utils import is_guest_user
+from loguru import logger
 
 router = APIRouter()
 
@@ -127,6 +131,70 @@ def test_token(
     Test access token
     """
     return current_user
+
+
+# Google Login
+
+# TODO: change this to get the secrets from the environment variables
+config = Config('.env')
+oauth = OAuth(config)
+
+CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+
+oauth.register(
+    name='google',
+    client_id=settings.CLIENT_ID,
+    client_secret=settings.CLIENT_SECRET,
+    server_metadata_url=CONF_URL,
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
+)
+
+@router.route('/login/google')
+async def google_login(request: Request):
+    print(request)
+    redirect_uri = request.url_for('auth')
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
+@router.get('/auth/google')
+async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
+    logger.debug(request)
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError as error:
+        logger.debug(error)
+        return HTMLResponse(f'<h1>{error.error}</h1>')
+    user = await oauth.google.parse_id_token(request, token)
+    logger.debug(user)
+
+    # TODO: check if sub is already stored in the db
+    user_db = crud.crud_user.get_by_email(db=db, email=user.email)
+    if not user_db:
+        # user does not have birth information
+        user_create = schemas.UserCreateGoogle(
+            email=user.email, name=user.name, sub=user.sub
+        )
+        user_db, msg = crud.crud_user.create_google(db=db, user=user_create)
+
+        if not user_db:
+            raise HTTPException(status_code=400, detail=msg)
+
+
+    logger.debug(user_db.email)
+    logger.debug(user_db.user_id)
+    access_token, expires = security.create_access_token(user_db.user_id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires)
+    }
+
+
+
+    return "token"
 
 
 """

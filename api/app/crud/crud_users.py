@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
-from app.schemas.users import UserCreate, UserUpdate
+from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
 from app.core import strings, consts
 
 
@@ -55,6 +55,31 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.commit()
         db.refresh(db_user)
         return db_user, strings.USER_REGISTERED_SUCCESS
+
+    def create_google(self, db: Session, user: UserCreateGoogle):
+
+        if self.get_sub(db=db, sub=user.sub):
+            return None, strings.GOOGLE_USER_ALREADY_REGISTERED
+
+        db_user = User(
+            email=user.email,
+            name=user.name,
+            status=0,
+            register_date=datetime.datetime.now(),
+            is_superuser=False,
+            birth=user.birth,
+            sub=user.sub
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return db_user, strings.USER_REGISTERED_SUCCESS
+
+    def get_sub(self, db: Session, sub: int):
+
+        return db.query(User).filter(User.sub == sub).first()
+
 
     def update(
             self, db: Session, db_obj: User,

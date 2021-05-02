@@ -12,6 +12,7 @@ WORLD_NOT_FOUND = "World Not Found or is not currently available."
 USER_NOT_FOUND = "User with this id was not found"
 USER_EDITION_FORBIDDEN = "You have no permission to edit this users account"
 INVALID_USER_CREATION_STATUS = "Cannot register a user with that status"
+GOOGLE_USER_ALREADY_REGISTERED = "This google account is already registered"
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."

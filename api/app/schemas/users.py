@@ -32,6 +32,11 @@ class UserCreate(UserBase):
     email: EmailStr
     hashed_password: str
 
+class UserCreateGoogle(UserBase):
+    name: str
+    email: EmailStr
+    sub: str
+
 
 # schema for User Update
 class UserUpdate(UserBase):
