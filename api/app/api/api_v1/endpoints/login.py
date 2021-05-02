@@ -10,7 +10,7 @@ from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -151,6 +151,7 @@ oauth.register(
     }
 )
 
+
 @router.route('/login/google')
 async def google_login(request: Request):
     print(request)
@@ -181,9 +182,6 @@ async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
         if not user_db:
             raise HTTPException(status_code=400, detail=msg)
 
-
-    logger.debug(user_db.email)
-    logger.debug(user_db.user_id)
     access_token, expires = security.create_access_token(user_db.user_id)
 
     return {
@@ -192,10 +190,7 @@ async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
         "expire_date": str(expires)
     }
 
-
-
     return "token"
-
 
 """
 @router.post("/password-recovery/{email}", response_model=schemas.Msg)

@@ -80,7 +80,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
         return db.query(User).filter(User.sub == sub).first()
 
-
     def update(
             self, db: Session, db_obj: User,
             obj_in: Union[UserUpdate, Dict[str, Any]], *args, **kwargs
