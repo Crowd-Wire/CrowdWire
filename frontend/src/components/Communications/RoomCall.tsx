@@ -189,20 +189,6 @@ export default class RoomCall extends React.Component<{}, State> {
       <React.Fragment>
         {/* <ActiveSpeakerListener/> */}
 
-        <div className="row">
-          <Button color="primary" onClick={() => {
-            wsend({topic: "join-as-new-peer", d: { roomId: '1' } })}}>
-            {/* This will join a room and then create a Transport that allows to Receive data */}
-            Join Room 1 and only Send Video
-          </Button>
-          <Button color="primary" onClick={() => {
-            wsend({topic: "join-as-speaker", d: { roomId: '1' } })}}>
-            {/* This will join a room and then create a Transport
-            that allows to Receive data and another Transport to send data*/}
-            Join Room 1 and Send Video Audio
-          </Button>
-        </div>
-
         {numberUsers > 0 ? 
         
         (<div  style={{padding: 10}}>
@@ -224,18 +210,22 @@ export default class RoomCall extends React.Component<{}, State> {
                   />
                 </Carousel.Item>)
                 return [
-                    (<Carousel.Item key={peerId+"_crs_item"}>
-                      <VideoAudioBox
-                        active={active}
-                        username={peerId}
-                        id={peerId}
-                        audioTrack={consumerAudio ? consumerAudio._track : null}
-                        videoTrack={consumerVideo ? consumerVideo._track : null}
-                        volume={(userVolume / 200)}
-                        videoToggle={videoToggle}
-                        audioToggle={audioToggle}
-                      />
-                    </Carousel.Item>),item
+                    (
+                      <Carousel.Item key={peerId+"_crs_item"}>
+                        <div key={peerId+"_crs_item"} style={{width: '20%'}}>
+                          <VideoAudioBox
+                            active={active}
+                            username={peerId}
+                            id={peerId}
+                            audioTrack={consumerAudio ? consumerAudio._track : null}
+                            videoTrack={consumerVideo ? consumerVideo._track : null}
+                            volume={(userVolume / 200)}
+                            videoToggle={videoToggle}
+                            audioToggle={audioToggle}
+                          />
+                        </div>
+                      </Carousel.Item>
+                    ),item
                 ]
               })
             }
@@ -243,7 +233,7 @@ export default class RoomCall extends React.Component<{}, State> {
           </Carousel>
         </div>) : '' }
 
-        <div style={{position: 'fixed', width:'17%', height: '35%', right: 10, bottom: 5}}>
+        <div style={{position: 'fixed', width:'18%', height: 'auto', right: 10, bottom: 5}}>
           <MyVideoAudioBox
             username={this.myId}
             id={this.myId}
