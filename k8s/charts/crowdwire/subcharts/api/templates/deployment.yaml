@@ -28,67 +28,66 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-      #Check out the changes to the Secrets in the Redis, Postgres Charts!
-      #Change this later to a for loop, puting here the values destroys the idea of templating
-      {{- if and .Values.postgresql.enabled .Values.rabbitmq.enabled }}
-        - env:
-          - name: RUNNING_MODE
-            value: {{ .Values.running_mode }}
-          - name: POSTGRES_SERVICE_NAME
-            value: {{ include "api.postgresservicename" . }}
-          - name: POSTGRES_USER
-            valueFrom:
-              secretKeyRef:
-                key: postgresql-user
-                name: {{ include "api.postgresservicename" . }}
-          - name: POSTGRES_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: postgresql-password
-                name: {{ include "api.postgresservicename" . }}
-          - name: POSTGRES_DB
-            valueFrom:
-              secretKeyRef:
-                key: postgresql-db
-                name: {{ include "api.postgresservicename" . }}
-          - name: RABBITMQ_SERVICE_NAME
-            value: {{ include "api.postgresservicename" . }}
-          - name: RABBITMQ_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: rabbitmq-username
+      - env:
+        - name: RUNNING_MODE
+          value: {{ .Values.running_mode }}
+    #Check out the changes to the Secrets in the Redis, Postgres Charts!
+    #Change this later to a for loop, puting here the values destroys the idea of templating
+    {{- if and .Values.postgresql.enabled .Values.rabbitmq.enabled }}
+        - name: POSTGRES_SERVICE_NAME
+          value: {{ include "api.postgresservicename" . }}
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-user
+              name: {{ include "api.postgresservicename" . }}
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-password
+              name: {{ include "api.postgresservicename" . }}
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-db
+              name: {{ include "api.postgresservicename" . }}
+        - name: RABBITMQ_SERVICE_NAME
+          value: {{ include "api.postgresservicename" . }}
+        - name: RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              key: rabbitmq-username
+              name: {{ include "api.rabbitmqservicename" . }}
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+                key: rabbitmq-password
                 name: {{ include "api.rabbitmqservicename" . }}
-          - name: RABBITMQ_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                  key: rabbitmq-password
-                  name: {{ include "api.rabbitmqservicename" . }}
-          - name: RABBITMQ_ERL_COOKIE
-            valueFrom:
-              secretKeyRef:
-                key: rabbitmq-erlang-cookie
-                name: {{ include "api.rabbitmqservicename" . }}
-          - name: REDIS_SENTINEL_HOST
-            value: {{ include "api.rediservicename" . }}
+        - name: RABBITMQ_ERL_COOKIE
+          valueFrom:
+            secretKeyRef:
+              key: rabbitmq-erlang-cookie
+              name: {{ include "api.rabbitmqservicename" . }}
+        - name: REDIS_SENTINEL_HOST
+          value: {{ include "api.rediservicename" . }}
+        {{- end }}   
+        name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 8000
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /docs
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 30 
 
-      {{- end }}   
-          name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: 8000
-              protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: /docs
-              port: 8000
-            initialDelaySeconds: 5
-            periodSeconds: 30 
-
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
