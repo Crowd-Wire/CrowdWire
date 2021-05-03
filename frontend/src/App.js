@@ -11,7 +11,12 @@ export default () => {
   const changeAuth = (auth) => {
     setAuth(auth);
   }
-  const [isAuth, setAuth] = React.useState(false);
+  const startAuth = () => {
+    if(localStorage.getItem("auth")["token"]!==null)
+      return true;
+    return false;
+  }
+  const [isAuth, setAuth] = React.useState(startAuth());
   const routing = useRoutes(routes(isAuth, changeAuth));
   
   return routing;
