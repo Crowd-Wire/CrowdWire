@@ -56,7 +56,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.refresh(db_user)
         return db_user, strings.USER_REGISTERED_SUCCESS
 
-    def create_google(self, db: Session, user: UserCreateGoogle):
+    def create_google(self, db: Session, user: UserCreateGoogle) -> Tuple[Optional[User], str]:
 
         if self.get_sub(db=db, sub=user.sub):
             return None, strings.GOOGLE_USER_ALREADY_REGISTERED
@@ -76,9 +76,31 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
         return db_user, strings.USER_REGISTERED_SUCCESS
 
-    def get_sub(self, db: Session, sub: int):
+    def get_sub(self, db: Session, sub: int) -> Optional[User]:
 
         return db.query(User).filter(User.sub == sub).first()
+
+    def google_auth(self, db: Session, user) -> Tuple[Optional[User], str]:
+        """
+        Verifies if the google user already exists and returns it else creates user.
+        A User cannot be normally registered in the application and then try to login with google.
+        """
+
+        user_db = self.get_sub(db=db, sub=user.sub)
+
+        if self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
+            # If there is already an account with that google email that is not linked to google
+            return None, strings.GOOGLE_EMAIL_ALREADY_REGISTERED
+
+        if not user_db:
+            # User is not registered
+            # Create an account
+            user_create = schemas.UserCreateGoogle(
+                email=user.email, name=user.name, sub=user.sub
+            )
+            return crud.crud_user.create_google(db=db, user=user_create)
+
+        return user_db, strings.AUTHENTICATION_SUCCESS
 
     def update(
             self, db: Session, db_obj: User,

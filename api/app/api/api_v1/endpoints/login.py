@@ -154,33 +154,29 @@ oauth.register(
 
 @router.route('/login/google')
 async def google_login(request: Request):
-    print(request)
+    """
+    The request will be redirected to google and the result will be sent to /auth/google endpoint
+    """
     redirect_uri = request.url_for('auth')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
 @router.get('/auth/google')
 async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
-    logger.debug(request)
+    """
+    Receives the information from the google operation and returns the application token.
+    """
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as error:
-        logger.debug(error)
-        return HTMLResponse(f'<h1>{error.error}</h1>')
+        return {"error" :  "Invalid Authentication"}
+
     user = await oauth.google.parse_id_token(request, token)
-    logger.debug(user)
 
-    # TODO: check if sub is already stored in the db
-    user_db = crud.crud_user.get_by_email(db=db, email=user.email)
+    user_db, msg = crud.crud_user.google_auth(db=db, user=user)
+
     if not user_db:
-        # user does not have birth information
-        user_create = schemas.UserCreateGoogle(
-            email=user.email, name=user.name, sub=user.sub
-        )
-        user_db, msg = crud.crud_user.create_google(db=db, user=user_create)
-
-        if not user_db:
-            raise HTTPException(status_code=400, detail=msg)
+        raise HTTPException(status_code=400, detail=msg)
 
     access_token, expires = security.create_access_token(user_db.user_id)
 
