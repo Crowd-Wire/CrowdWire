@@ -39,9 +39,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if self.get_by_email(db=db, email=user_data.email):
             return None, strings.EMAIl_ALREADY_IN_USE
 
-        if user_data.status != consts.USER_NORMAL_STATUS:
-            return None, strings.INVALID_USER_CREATION_STATUS
-
         db_user = User(
             email=user_data.email,
             hashed_password=get_password_hash(user_data.hashed_password),
