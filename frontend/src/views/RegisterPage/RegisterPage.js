@@ -18,13 +18,12 @@ import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardFooter from "components/Card/CardFooter.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-
 import styles from "assets/jss/material-kit-react/views/loginPage.js";
 import { withStyles } from "@material-ui/core/styles";
-
 import image from "assets/img/bg8.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const useStyles = makeStyles(styles);
 
@@ -33,9 +32,7 @@ class RegisterPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { cardAnimaton: "", navigate: false }
-
-    this.state = {}
+    this.state = { cardAnimaton: "", loggedIn: false }
   }
 
 
@@ -49,11 +46,30 @@ class RegisterPage extends React.Component {
 
   );
 
+  handleLogin = (mail, password) => {
+    AuthenticationService.login(
+      mail, password
+    )
+    .then(
+      (res) => {
+        return res.json();
+      }
+    )
+    .then(
+      (res) => {
+        AuthenticationService.setToken(res);
+        if(res.access_token!==undefined){
+          this.setState({loggedIn:true})
+          this.props.changeAuth(true);
+        }
+      }
+    ) 
+  }
+
   handleSubmit = () => {
     
     let pass = document.getElementById("cpass").value;
     let cpass = document.getElementById("pass").value;
-    
     if(pass === cpass){
 
       AuthenticationService.register(
@@ -64,25 +80,33 @@ class RegisterPage extends React.Component {
       )
       .then(
         (res) => {
+          console.log("chegou aqui "+res);
           return res.json();
         }
-      )
+        )
       .then(
         (res) => {
-          localStorage.setItem("token",JSON.stringify(res.access_token));
-        }
-      )
-      .catch(
-        (error) => {
-          // TODO: change state to show error;
-        }
-      );
+          console.log("e aqui"+res.access_token);
+          this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
+      }
+    )
+    .catch(
+      (error) => {
+        console.log("e aqui agora com erro");
+        console.log("error is "+error);
+
+        // TODO: change state to show error;
+      }
+    );
 
     }
     
   }
 
   render() {
+    if (this.state.loggedIn) {
+      return <Navigate to="/dashboard/search" />
+    }
     return (
       <div>
         <div

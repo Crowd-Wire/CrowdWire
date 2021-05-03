@@ -8,12 +8,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.rabbitmq import rabbit_handler
 from app.redis import redis_connector
 from starlette.middleware.sessions import SessionMiddleware
+from app.core.config import settings
 
-app = FastAPI(debug=True)
-app.add_middleware(SessionMiddleware, secret_key="!secret")
+if settings.PRODUCTION:
+    app = FastAPI(root_path=settings.API_V1_STR)
+else:
+    app = FastAPI(debug=True)
 
 origins = [
-    "http://localhost:3000",
+    "*",
 ]
 
 app.add_middleware(
@@ -22,6 +25,8 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+    SessionMiddleware,
+    secret_key="!secret"
 )
 db = SessionLocal()
 init_db(db)

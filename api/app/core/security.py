@@ -31,7 +31,6 @@ def create_access_token(
     Creates jwt token with expiration date declared in settings
     """
     expire = check_expire_delta(expires_delta)
-
     to_encode = {"exp": expire, "sub": str(subject), "is_guest_user": is_guest_user}
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt, expire

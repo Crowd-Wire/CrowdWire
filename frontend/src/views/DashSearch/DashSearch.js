@@ -27,7 +27,6 @@ class DashSearch extends Component {
   handler(id){
     //navigate to designated world details
     const nav = useNavigate();
-    console.log("map id is "+id);
     nav("../"+id);
   }
 

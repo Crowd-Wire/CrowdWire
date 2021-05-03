@@ -9,7 +9,9 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
 import WorldService from 'services/WorldService.js';
 
-import IconButton from '@material-ui/core/IconButton';const useStyles = theme => ({
+import IconButton from '@material-ui/core/IconButton';
+
+const useStyles = theme => ({
   root: {
     display: 'flex',
     backgroundImage: `url(${img})`,
@@ -25,7 +27,6 @@ class CreateWorld extends Component {
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
-    console.log(desc);
     if(accessibility){
       accessibility = true;
     }
@@ -38,18 +39,16 @@ class CreateWorld extends Component {
     else{
       guests = false;
     }
-    console.log(typeof guests, typeof accessibility);
     WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"
     });
   }
-
-
+  
+  
   render() {
     const { classes } = this.props;
     if(this.state.page==="details"){
-      console.log("details");
       return(
         <div className={classes.root}>
           <CssBaseline />

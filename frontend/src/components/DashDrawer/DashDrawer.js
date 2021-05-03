@@ -77,27 +77,23 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard")
-      navigation("/dashboard");
+    if(location.pathname!=="/dashboard/search")
+      navigation("/dashboard/search");
     props.handler(false);
   }
 
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard")
-      navigation("/dashboard");
+    if(location.pathname!=="/dashboard/search")
+      navigation("/dashboard/search");
     props.handler(true);
   }
 
 
   const onClickCreateWorld = () => {
-    navigation("../create-world");
+    navigation("/create-world");
   }
 
-  // const onClickDefinitions = () => {
-  //   console.log(navigation.toString());
-
-  // }
 
   const handleDrawerClose = () => {
     setOpen(false);
