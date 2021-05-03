@@ -25,6 +25,8 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+app.add_middleware(
     SessionMiddleware,
     secret_key="!secret"
 )
