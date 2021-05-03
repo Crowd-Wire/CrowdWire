@@ -23,7 +23,7 @@ class RoleCreate(RoleBase):
     name: str
 
 
-class RoleUpdate(BaseModel):
+class RoleUpdate(RoleBase):
     pass
 
 
