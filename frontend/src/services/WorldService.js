@@ -87,6 +87,17 @@ class WorldService {
         })
     }
 
+    InviteJoin(inviteToken){
+        // change url
+        return fetch(API_BASE + 'worlds/invite/' + inviteToken, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer " + AuthenticationService.getToken()
+            }
+        })
+    }
+
 }
 
 export default new WorldService();

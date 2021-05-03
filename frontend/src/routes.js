@@ -23,7 +23,7 @@ import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
-
+import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -49,6 +49,7 @@ const routes = (isAuth, changeAuth) => [
 			{ path: "/comms", element: <Communications /> },
 			{ path: "/template-components", element: <ComponentsPage /> },
 			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
+			{ path: "/join", element: <InviteJoinPage/>}
 		],
 	},
 	{
