@@ -8,8 +8,11 @@ import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default () => {
-  const isAuth = true;
-  const routing = useRoutes(routes(isAuth));
+  const changeAuth = (auth) => {
+    setAuth(auth);
+  }
+  const [isAuth, setAuth] = React.useState(false);
+  const routing = useRoutes(routes(isAuth, changeAuth));
   
   return routing;
 }
