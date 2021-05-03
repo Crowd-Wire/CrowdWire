@@ -88,17 +88,17 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
         user_db = self.get_sub(db=db, sub=user.sub)
 
-        if self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
+        if user_db and self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
             # If there is already an account with that google email that is not linked to google
             return None, strings.GOOGLE_EMAIL_ALREADY_REGISTERED
 
         if not user_db:
             # User is not registered
             # Create an account
-            user_create = schemas.UserCreateGoogle(
+            user_create = UserCreateGoogle(
                 email=user.email, name=user.name, sub=user.sub
             )
-            return crud.crud_user.create_google(db=db, user=user_create)
+            return crud_user.create_google(db=db, user=user_create)
 
         return user_db, strings.AUTHENTICATION_SUCCESS
 

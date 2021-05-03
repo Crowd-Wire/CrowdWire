@@ -10,7 +10,6 @@ from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
-from starlette.responses import HTMLResponse
 
 # from app.core.security import get_password_hash
 # from app.utils import (
@@ -20,7 +19,6 @@ from starlette.responses import HTMLResponse
 # )
 from app.core.config import settings
 from app.utils import is_guest_user
-from loguru import logger
 
 router = APIRouter()
 
@@ -168,8 +166,8 @@ async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
     """
     try:
         token = await oauth.google.authorize_access_token(request)
-    except OAuthError as error:
-        return {"error" :  "Invalid Authentication"}
+    except OAuthError:
+        return {"error": "Invalid Authentication"}
 
     user = await oauth.google.parse_id_token(request, token)
 
