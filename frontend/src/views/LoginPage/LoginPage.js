@@ -72,6 +72,7 @@ class LoginPage extends React.Component {
           this.setState({passwSt:"Password Required", emailSt:""});
         else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
           this.setState({passwSt:"Password Required", emailSt:"Email Required"});
+        this.props.changeAuth(true);
       }
     )    
   }
