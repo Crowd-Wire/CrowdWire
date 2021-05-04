@@ -31,7 +31,6 @@ export default function DashWorldDetails(){
     });
   }, [])
   const handler = () => {
-      console.log("cenas");
       history.back();
   }
   const [joined,setJoined] = React.useState(false);

@@ -7,6 +7,9 @@ import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
 import Pagination from '@material-ui/lab/Pagination';
+import Typography from '@material-ui/core/Typography';
+
+
 const useStyles = theme => ({
 	root: {
 		maxWidth: 345,
@@ -40,7 +43,6 @@ class SearchAllMaps extends Component {
 
 	constructor(props){
 		super(props)
-		console.log(this.props);
 	}
 	state = {
 		maps: [],
@@ -50,7 +52,6 @@ class SearchAllMaps extends Component {
 	}
 
 	focusMap(id){
-		console.debug("entrou searchall");
 		this.props.handler(id);
 		
 	}
@@ -67,13 +68,11 @@ class SearchAllMaps extends Component {
 	}
 	changePage = async (event, page) => {
 		await this.setState({page: page});
-		console.log(this.state.page);
 		this.search_handler(this.state.prevSearch, this.state.prevTags);
 	}
 
 	changeTags = async (value) => {
 		await this.setState({tags: value});
-		console.log(this.state.tags);
 	}
 
 	changeSearch = (value) => {
@@ -116,15 +115,22 @@ class SearchAllMaps extends Component {
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
 					<Row>
-						{this.state.maps.map((m, i) => {
-							console.log("map",m,"id",i);
+						{this.state.maps!==null && this.state.maps.length!==0 ? 
+						this.state.maps.map((m, i) => {
 							return (<MapCard focusMap={this.focusMap} map={m} />)
-						})}
+						})
+						:
+						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
+					}
 					</Row>
 					<hr />
-					<Row style={{marginBottom:"30px"}}>
-						<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
-					</Row>
+					{this.state.maps===null || this.state.maps.length===0 ?
+						<></>
+						:
+						<Row style={{marginBottom:"30px"}}>
+							<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
+						</Row>
+					}
 				</Container>
 			</>
 		);

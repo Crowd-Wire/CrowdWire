@@ -33,7 +33,7 @@ export default function MapCard(props){
     const {map, focusMap, ...other } = props;
     const history = useNavigate();
     const routeChange = () =>{
-      let path = `../world/`+map.world_id; 
+      let path = `/world/`+map.world_id; 
       history(path);
     }
 
