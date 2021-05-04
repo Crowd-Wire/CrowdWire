@@ -25,6 +25,8 @@ import styles from "assets/jss/material-kit-react/views/loginPage.js";
 import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
+import { toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 class LoginPage extends React.Component {
 
@@ -44,9 +46,22 @@ class LoginPage extends React.Component {
   }
 
   timer = setTimeout(() => {
-    this.setState({cardAnimaton:""})},700
+    this.setState({cardAnimaton:""})},300
 
   );
+
+  notify = (authType) => {
+    if(authType==="Auth"){
+      toast.success("Login Successful!", {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+    else if(authType==="Guest"){
+      toast.info("Joined as Guest!", {
+        position: toast.POSITION.TOP_CENTER
+      });
+    }
+  };
 
   handleSubmit = () => {
 
@@ -62,8 +77,10 @@ class LoginPage extends React.Component {
     .then(
       (res) => {
         AuthenticationService.setToken(res);
-        if(res.access_token!==undefined)
+        if(res.access_token!==undefined){
           this.setState({loggedIn:true})
+          this.notify("Auth");
+        }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
         else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="username")
@@ -81,8 +98,10 @@ class LoginPage extends React.Component {
       .then((res) => {return res.json()})
       .then((res) => {
         AuthenticationService.setToken(res);
-        if(res.access_token!==undefined)
+        if(res.access_token!==undefined){
           this.setState({loggedIn:true}); 
+          this.notify("Guest");
+        }
       })
 
   }

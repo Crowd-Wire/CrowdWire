@@ -33,9 +33,15 @@ class RegisterPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { cardAnimaton: "", navigate: false }
-
-    this.state = {}
+    this.state = { 
+      cardAnimaton: "", 
+      navigate: false,
+      emailHelperText: "",
+      nameHemplerText: "",
+      passHelperText: "",
+      cPassHelperText: "",
+      birthdayHelperText: ""
+    }
   }
 
 
@@ -50,25 +56,50 @@ class RegisterPage extends React.Component {
   );
 
   handleSubmit = () => {
-    
+    let email = document.getElementById("email").value
     let pass = document.getElementById("cpass").value;
     let cpass = document.getElementById("pass").value;
-    
-    if(pass === cpass){
+    let name = document.getElementById("name").value;
+    let date = document.getElementById("date").value;
+    let dDate = new Date(date);
+    let passed = true;
 
+    console.log(new Date().toISOString());
+    console.log(dDate.toISOString());
+
+    if(pass !== cpass){
+      this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
+      passed = false;
+    }
+    if(!email){
+      this.setState({emailHelperText:"Email needed to register."});
+      passed = false;
+    }
+    if(!name){
+      this.setState({nameHelperText:"Name needed to register."});
+      passed = false;
+    }
+    if(dDate > new Date()){
+      this.setState({birthdayHelperText:"Birthdays are in the past."});
+      passed = false;
+    }
+
+    if(passed){
       AuthenticationService.register(
-        document.getElementById("email").value,
+        email,
         pass,
-        document.getElementById("name").value,
-        document.getElementById("date").value
+        name,
+        date
       )
       .then(
         (res) => {
-          return res.json();
+          res = res.json();
+          return res;
         }
       )
       .then(
         (res) => {
+          console.log("aaaaaa");
           localStorage.setItem("token",JSON.stringify(res.access_token));
         }
       )
@@ -77,9 +108,7 @@ class RegisterPage extends React.Component {
           // TODO: change state to show error;
         }
       );
-
     }
-    
   }
 
   render() {
