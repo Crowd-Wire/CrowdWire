@@ -17,8 +17,8 @@ class BootScene extends Phaser.Scene {
     preload() {
         // map tiles
         this.load.image('wall-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wall-tiles.png`);
-        this.load.image('room-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/tile_properties.png`);
-        this.load.image('table-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table_tiles.png`)
+        this.load.image('room-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/util-tiles.png`);
+        this.load.image('table-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-tiles.png`)
         // map in json format
         this.load.tilemapTiledJSON('map', `${process.env.PUBLIC_URL}/assets/tilemaps/maps/conferencemap.json`);
         // our two characters???
