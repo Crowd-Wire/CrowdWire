@@ -49,7 +49,6 @@ const routes = (isAuth, changeAuth) => [
 			{ path: "/comms", element: <Communications /> },
 			{ path: "/template-components", element: <ComponentsPage /> },
 			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
-			{ path: "/join", element: <InviteJoinPage/>}
 		],
 	},
 	{
@@ -57,6 +56,7 @@ const routes = (isAuth, changeAuth) => [
 		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage/>},
 		],
 	},
 	{ 

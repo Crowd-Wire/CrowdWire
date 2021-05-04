@@ -8,7 +8,8 @@ import {
     Link,
     useLocation
   } from "react-router-dom";
-
+import {Col, Row, Card} from 'react-bootstrap';
+import Image from "assets/img/bg8.png";
 
 export default function InviteJoinPage(props){
     const navigate = useNavigate();
@@ -16,28 +17,36 @@ export default function InviteJoinPage(props){
     let qs = new URLSearchParams(useLocation().search);
 
     useEffect(() => {
-
-
         if(AuthenticationService.getToken()){
-            // TODO: handle error 
             let invite = qs.get("invite");
             if(invite){
                 WorldService.InviteJoin(invite)
-                .then((res) => {return res.json()})
-                .then((res) => navigate("/world/"+res.world_id));
+                .then((res) => {
+                    if(res.status == 401 || res.status == 403)
+                        navigate("/login");            
+                    return res.json();
+                })
+                .then((res) => {
+                    if(res && res.world_id)
+                        navigate("/world/"+res.world_id);
+                });
             }
-            console.log(invite);    
-        
         }else{
             navigate("/login");
         }
     }, []);
 
     return (
-        <div className="container">
-            <h1>Invalid World Invite Link!</h1>     
-        </div>
-
+        <Row style={{height: "100%", backgroundImage: "url("+Image+")", backgroundSize: "cover"}} className="align-items-center">
+            <Col xs={1} md={2}>
+            </Col>
+            <Col xs={4} md={8}>
+                <Card style={{padding: "4rem 8rem"}}>
+                    <h1 style={{margin:"auto"}}>Invalid Invite Link!</h1>
+                </Card>
+            </Col>
+            <Col xs={1} md={2}></Col>
+        </Row>
 
     )
 }
