@@ -18,13 +18,12 @@ import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardFooter from "components/Card/CardFooter.js";
 import CustomInput from "components/CustomInput/CustomInput.js";
-
 import styles from "assets/jss/material-kit-react/views/loginPage.js";
 import { withStyles } from "@material-ui/core/styles";
-
 import image from "assets/img/bg8.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const useStyles = makeStyles(styles);
 
@@ -55,6 +54,26 @@ class RegisterPage extends React.Component {
 
   );
 
+  handleLogin = (mail, password) => {
+    AuthenticationService.login(
+      mail, password
+    )
+    .then(
+      (res) => {
+        return res.json();
+      }
+    )
+    .then(
+      (res) => {
+        AuthenticationService.setToken(res);
+        if(res.access_token!==undefined){
+          this.setState({loggedIn:true})
+          this.props.changeAuth(true);
+        }
+      }
+    ) 
+  }
+
   handleSubmit = () => {
     let email = document.getElementById("email").value
     let pass = document.getElementById("cpass").value;
@@ -64,8 +83,7 @@ class RegisterPage extends React.Component {
     let dDate = new Date(date);
     let passed = true;
 
-    console.log(new Date().toISOString());
-    console.log(dDate.toISOString());
+    console.log(typeof date);
 
     if(pass !== cpass){
       this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
@@ -86,32 +104,40 @@ class RegisterPage extends React.Component {
 
     if(passed){
       AuthenticationService.register(
-        email,
+        document.getElementById("email").value,
         pass,
-        name,
-        date
+        document.getElementById("name").value,
+        document.getElementById("date").value
       )
       .then(
         (res) => {
-          res = res.json();
-          return res;
+          console.log(res.status);
+          return res.json();
         }
-      )
+        )
       .then(
         (res) => {
-          console.log("aaaaaa");
-          localStorage.setItem("token",JSON.stringify(res.access_token));
-        }
-      )
-      .catch(
-        (error) => {
-          // TODO: change state to show error;
-        }
-      );
+          console.log(res);
+          if(true)
+          this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
+      }
+    )
+    .catch(
+      (error) => {
+        console.log("e aqui agora com erro");
+        console.log("error is "+error);
+
+        // TODO: change state to show error;
+      }
+    );
+
     }
   }
 
   render() {
+    if (this.state.loggedIn) {
+      return <Navigate to="/dashboard/search" />
+    }
     return (
       <div>
         <div

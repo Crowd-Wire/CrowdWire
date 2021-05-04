@@ -9,7 +9,9 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
 import WorldService from 'services/WorldService.js';
 
-import IconButton from '@material-ui/core/IconButton';const useStyles = theme => ({
+import IconButton from '@material-ui/core/IconButton';
+
+const useStyles = theme => ({
   root: {
     display: 'flex',
     backgroundImage: `url(${img})`,
@@ -42,8 +44,8 @@ class CreateWorld extends Component {
       page: "edit"
     });
   }
-
-
+  
+  
   render() {
     const { classes } = this.props;
     if(this.state.page==="details"){

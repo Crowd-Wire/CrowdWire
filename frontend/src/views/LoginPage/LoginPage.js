@@ -76,10 +76,11 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
-        AuthenticationService.setToken(res);
+        console.log(res)
         if(res.access_token!==undefined){
-          this.setState({loggedIn:true})
           this.notify("Auth");
+          AuthenticationService.setToken(res);
+          this.setState({loggedIn:true})
         }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
@@ -89,6 +90,7 @@ class LoginPage extends React.Component {
           this.setState({passwSt:"Password Required", emailSt:""});
         else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
           this.setState({passwSt:"Password Required", emailSt:"Email Required"});
+        this.props.changeAuth(true);
       }
     )    
   }

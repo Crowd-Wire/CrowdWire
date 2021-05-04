@@ -26,7 +26,7 @@ class AuthenticationService {
         })
     }
     getToken() {
-        if(localStorage.getItem("auth"))
+        if(localStorage.getItem("auth")!==null)
             return JSON.parse(localStorage.getItem("auth"))["token"];
         return null;
     }
