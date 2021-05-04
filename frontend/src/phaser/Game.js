@@ -24,12 +24,12 @@ const gameConfig = {
       // mode: Phaser.DOM.ENVELOP,
       // autoCenter: Phaser.DOM.CENTER_BOTH,
 
-      // mode: Phaser.Scale.FIT,
+      //mode: Phaser.Scale.FIT,
 
-      // mode: Phaser.Scale.RESIZE,
+      mode: Phaser.Scale.RESIZE,
 
-      mode: Phaser.DOM.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      //mode: Phaser.DOM.FIT,
+      //autoCenter: Phaser.Scale.CENTER_BOTH,
 
       width: '100%',
       height: '100%',
