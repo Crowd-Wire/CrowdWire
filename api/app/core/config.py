@@ -50,9 +50,7 @@ class Settings(BaseSettings):
     # searches this file to find the variables
     class Config:
         env_file = ".env"
-        
-    
-      
+
 
 
 settings = Settings()
