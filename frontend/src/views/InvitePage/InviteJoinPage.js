@@ -11,6 +11,9 @@ import {
 import {Col, Row, Card} from 'react-bootstrap';
 import Image from "assets/img/bg8.png";
 
+import GenerateInviteCard from '../../components/InGame/GenerateInviteCard.js';
+
+
 export default function InviteJoinPage(props){
     const navigate = useNavigate();
 
@@ -44,6 +47,8 @@ export default function InviteJoinPage(props){
                 <Card style={{padding: "4rem 8rem"}}>
                     <h1 style={{margin:"auto"}}>Invalid Invite Link!</h1>
                 </Card>
+                <GenerateInviteCard/>
+
             </Col>
             <Col xs={1} md={2}></Col>
         </Row>
