@@ -9,16 +9,19 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import WorldService from "services/WorldService";
 import DeleteIcon from '@material-ui/icons/Delete';
-
+import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
+import TextField from '@material-ui/core/TextField';
 class DashboardStats extends Component{
     
     constructor(props){
         super(props);
         this.state = {
-            show: false
+            show: false,
+            dialog:false
         }
     }
     
@@ -54,7 +57,16 @@ class DashboardStats extends Component{
     showModal = () => {
         this.setState({show: true});        
     }
-    
+
+
+    hideDialog = () => {
+        console.log("false now");
+        this.setState({dialog: false});        
+    }
+
+    showDialog = () => {
+        this.setState({dialog: true});        
+    }
     
     render(){
         console.log(this.props.details);
@@ -68,7 +80,7 @@ class DashboardStats extends Component{
 
                                     <Button variant="success" className={this.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
                                     <Button variant="primary" className={this.actionButtons}>Edit Map</Button>
-                                    <Button variant="primary " className={this.actionButtons}>Manage Map</Button>
+                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showDialog()}}>Manage Map</Button>
 
                             </Row>
                             <Row style={{marginTop:"50px"}}>
@@ -114,6 +126,38 @@ class DashboardStats extends Component{
                                 </Button>
                             </Row>
                         </Col>
+                    </DialogActions>
+                </Dialog>
+
+                <Dialog
+                    open={this.state.dialog}
+                    TransitionComponent={this.transition}
+                    keepMounted
+                    aria-labelledby="alert-dialog-slide-title"
+                    aria-describedby="alert-dialog-slide-description"
+                    maxWidth="xl"
+                >
+                    <DialogContent style={{minWidth:"400px"}}>
+                    <DialogTitle id="alert-dialog-slide-description" style={{marginLeft:"auto", marginRight:"auto", textAlign:"center"}}>
+                        World Profile
+                    </DialogTitle>
+                        <Col>
+                            <Row style={{marginBottom:"15px"}}>
+                                <Col>
+                                    <Carousel/>
+                                </Col>
+                            </Row>
+                            <Row>
+                                <TextField style={{marginLeft:"auto", marginRight:"auto"}} id="outlined-basic" label="username" variant="outlined" />
+                            </Row>
+                        </Col>
+                    </DialogContent>
+                    <DialogActions>
+                        <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                            <Button onClick={this.hideDialog} color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
+                                Disagree
+                            </Button>
+                        </Row>
                     </DialogActions>
                 </Dialog>
             </>
