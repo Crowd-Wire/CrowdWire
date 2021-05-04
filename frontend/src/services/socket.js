@@ -100,7 +100,6 @@ export const getSocket = (worldId) => {
       // room_id: roomId,
       users_id: usersId,
     }
-    console.log('unwire', usersId);
     if (socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else

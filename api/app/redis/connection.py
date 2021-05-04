@@ -21,7 +21,7 @@ class RedisConnector:
 
         self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
-        # await self.master.execute('flushall')
+        await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -216,10 +216,12 @@ class RedisConnector:
 
         """Add users to the normalized group"""
         # TODO: maybe doing twice? but no problem
-        await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
-        for uid in users_id:
-            await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+        if not mergeable_groups_id:
+            await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
+            for uid in users_id:
+                await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
 
+    
     async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Add one or more groups to a user"""
         groups_id = [group_id, *groups_id]
