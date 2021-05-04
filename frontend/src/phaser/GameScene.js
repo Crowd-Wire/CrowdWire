@@ -27,18 +27,23 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-
         this.add.text(50, 70, "Key D to change scene.")
         this.text = this.add.text(50, 50, `${this.count}`)
 
         this.map = this.add.tilemap('map');
-        let tiles = this.map.addTilesetImage('wall-tiles', 'tiles');
 
-        let ground = this.map.createLayer('Ground', tiles, 0, 0);
-        this.obstacles = this.map.createLayer('Objects', tiles, 0, 0);
+        const wallTileset = this.map.addTilesetImage('wall-tiles');
+        const roomTileset = this.map.addTilesetImage('tile_properties', 'room-tiles');
+        const tableTileset = this.map.addTilesetImage('table_tiles', 'table-tiles');
+
+        this.map.createLayer('Ground', wallTileset);
+        this.roomLayer = this.map.createLayer('Rooms', roomTileset);
+        this.wallLayer = this.map.createLayer('Walls', wallTileset);
+        this.objectLayer = this.map.createLayer('Objects', tableTileset);
 
         // -1 makes all tiles on this layer collidable
-        this.obstacles.setCollisionByExclusion([-1]);
+        this.wallLayer.setCollisionByExclusion([-1]);
+        this.objectLayer.setCollisionByExclusion([-1]);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -60,11 +65,13 @@ class GameScene extends Phaser.Scene {
         ws.joinRoom('1', {x: 50, y: 50});
 
         // make camera follow player
-        this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-        this.cameras.main.startFollow(this.player);
+        //this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+        this.cameras.main.startFollow(this.player)
+            .setBackgroundColor("#0C1117")//'#080C10');
+            .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        this.physics.add.collider(this.player, this.obstacles);
+        this.physics.add.collider(this.player, [this.wallLayer, this.objectLayer]);
 
         this.input.keyboard.on('keydown-D', () => {
             this.scene.start('FillTilesScene');
@@ -78,7 +85,7 @@ class GameScene extends Phaser.Scene {
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({...state.groups}));
 
-        this.physics.add.collider(Object.values(this.remotePlayers), this.obstacles);
+        this.physics.add.collider(Object.values(this.remotePlayers), this.wallLayer);
     }
 
     // TODO: remove after tests
@@ -110,7 +117,7 @@ class GameScene extends Phaser.Scene {
                 if (!(id in this.remotePlayers)) {
                     let position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
-                    this.physics.add.collider(this.remotePlayers[id], this.obstacles);
+                    this.physics.add.collider(this.remotePlayers[id], this.wallLayer);
                 }
             }
         } else {
@@ -125,15 +132,19 @@ class GameScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        this.player.updateMovement();
-
+        this.player.update();
+        
         if (!globalVar)
             return;
 
+        const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y)
+        
+        if (tile)
+            console.log(tile.properties.type, tile.properties.id);
+        
         // detect surrounding players
         var bodies = this.physics.overlapCirc(
             this.player.body.center.x, this.player.body.center.y, 150, true, true)
-        console.log(bodies.length - 1,this.inRangePlayers.size )
         if (bodies.length && bodies.length - 1 != this.inRangePlayers.size) {
             const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
                 .map((b) => b.gameObject.id);
@@ -146,7 +157,6 @@ class GameScene extends Phaser.Scene {
                         return entered;
                     })
                 );
-                console.log('wire')
             } else {
                 // unwire players
                 ws.unwirePlayer('1', 
@@ -156,7 +166,6 @@ class GameScene extends Phaser.Scene {
                         return left;
                     })
                 );
-                console.log('unwire')
             }
         } else if (bodies.length > 1) {
             this.player.body.debugBodyColor = 0x0099ff; // blue
@@ -191,7 +200,7 @@ class Player extends Phaser.GameObjects.Container {
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, 'player', 6)
             .setOrigin(0.5)
-            .setScale(3);
+            .setScale(2);
         const text = scene.add.bitmapText(0, -48, 'atari', '', 24)
             .setOrigin(0.5)
             .setCenterAlign()
@@ -207,8 +216,8 @@ class Player extends Phaser.GameObjects.Container {
         this.addText(text);
         this.add(circle);
         
-        this.body.setSize(sprite.width * 3, sprite.height * 3)
-            .setOffset(-sprite.width/2 * 3, -sprite.height/2 * 3);
+        this.body.setSize(sprite.width * 2, sprite.height)
+            .setOffset(-sprite.width/2 * 2, 0);
 
         // set some default physics properties
         this.body.setCollideWorldBounds(true);
@@ -250,6 +259,15 @@ class Player extends Phaser.GameObjects.Container {
     getText() {
         return this.getAt(1);
     }
+
+    update() {
+        this.updateMovement();
+        this.updateAnimation();
+    }
+
+    updateRoom() {
+
+    }
     
     updateMovement() {
         const direction = new Phaser.Math.Vector2();
@@ -270,8 +288,6 @@ class Player extends Phaser.GameObjects.Container {
         this.body.setVelocityX(direction.x * this.speed);
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
-
-        this.updateAnimation();
 
         if (this.step == 1 && !this.body.speed) {
             ws.sendMovement('1', this.body.center, this.body.velocity);
