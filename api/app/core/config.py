@@ -44,5 +44,15 @@ class Settings(BaseSettings):
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
     REDIS_MASTER: str = os.getenv('REDIS_MASTER', 'mymaster')
 
+    CLIENT_ID: str
+    CLIENT_SECRET: str
+
+    # searches this file to find the variables
+    class Config:
+        env_file = ".env"
+        
+    
+      
+
 
 settings = Settings()
