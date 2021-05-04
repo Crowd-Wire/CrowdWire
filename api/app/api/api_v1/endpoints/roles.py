@@ -64,3 +64,23 @@ async def edit_role_in_world(
     role_in.world_id = world_id
     role_obj_upd, _ = await crud_role.update(db=db, db_obj=role, obj_in=role_in)
     return role_obj_upd
+
+
+@router.delete("/{role_id}", response_model=schemas.RoleInDB)
+async def delete_role_in_world(
+        role_id: int,
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    role, msg = await crud_role.can_acess_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    if not role:
+        raise HTTPException(status_code=400, detail=msg)
+
+    role_obj_deleted, msg = await crud_role.remove(db=db, role_id=role_id, world_id=world_id, user_id=user.user_id)
+    if not role_obj_deleted:
+        raise HTTPException(status_code=400, detail=msg)
+    return role_obj_deleted

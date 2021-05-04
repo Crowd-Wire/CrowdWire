@@ -178,6 +178,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if not user_id:
             return None, strings.USER_NOT_PASSED
         # Check first if the world Exists
+        # For Statistics Purposes we do not really delete the worlds, since
+        # we would lose all the data
         obj, msg = self.is_editable_to_user(db=db, world_id=world_id, user_id=user_id)
         if not obj:
             return obj, msg

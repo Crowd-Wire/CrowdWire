@@ -32,6 +32,13 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             return None, strings.ROLES_NOT_FOUND
         return role, ""
 
+    @cache(model="Role")
+    async def get_by_role_id(self, db: Session, role_id: int) -> Tuple[Optional[Role], str]:
+        role = db.query(Role).filter(Role.role_id == role_id).first()
+        if not role:
+            return None, strings.ROLES_NOT_FOUND
+        return role, ""
+
     def get_by_name(self, db: Session, world_id: int, name: str) -> Tuple[Optional[Role], str]:
         """
         Gets roles by Name
@@ -76,6 +83,10 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         role, msg = self.get_by_name(db=db, world_id=obj_in.world_id, name=obj_in.name)
         if not role:
             return None, strings.ROLE_NAME_ALREADY_IN_USE
+        # TODO: See this better
+        if obj_in.is_default:
+            return None, strings.ROLE_DEFAULT_ALREADY_EXISTS
+
         await clear_cache_by_model(model_name="Role", world_id=obj_in.world_id)
         role_obj = super().create(db=db, obj_in=obj_in)
         return role_obj, ""
@@ -100,9 +111,37 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             db_obj: Role,
             obj_in: Union[RoleUpdate, Dict[str, Any]],
     ) -> Tuple[Optional[Role], str]:
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        # Worth is return a error here?
+        if 'is_default' in update_data and update_data['is_default']:
+            update_data['is_default'] = False
         await clear_cache_by_model('Role', world_id=Role.role_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
+
+    async def remove(self, db: Session, *, role_id: int, world_id: int = None, user_id: int = None)\
+            -> Tuple[Optional[Role], str]:
+        # TODO: Check a better way to fix this circular import
+        from app.crud.crud_world_users import crud_world_user
+        if world_id and role_id:
+            role, msg = await crud_role.get_by_role_id(db=db, role_id=role_id)
+            if not role:
+                return None, strings.ROLES_NOT_FOUND
+            if role.is_default:
+                return None, strings.ROLE_DEFAULT_DELETE_FORBIDDEN
+            default_role = self.get_world_default(db=db, world_id=world_id)
+            # Before Deleting, change the role to the default one
+            crud_world_user.change_roles(
+                db=db, world_id=world_id,
+                role_to_change_id=default_role.role_id,
+                role_changed_id=role_id)
+            role_obj = super().remove(db=db, id=role_id)
+            return role_obj, strings.ROLE_DELETED_SUCCESS
+        print("test")
+        return None, ""
 
 
 crud_role = CRUDRole(Role)
