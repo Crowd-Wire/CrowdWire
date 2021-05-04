@@ -33,17 +33,16 @@ class GameScene extends Phaser.Scene {
         this.map = this.add.tilemap('map');
 
         const wallTileset = this.map.addTilesetImage('wall-tiles');
-        const roomTileset = this.map.addTilesetImage('tile_properties', 'room-tiles');
-        const tableTileset = this.map.addTilesetImage('table_tiles', 'table-tiles');
+        const utilTileset = this.map.addTilesetImage('util-tiles');
+        const tableTileset = this.map.addTilesetImage('table-tiles');
 
         this.map.createLayer('Ground', wallTileset);
-        this.roomLayer = this.map.createLayer('Rooms', roomTileset);
-        this.wallLayer = this.map.createLayer('Walls', wallTileset);
-        this.objectLayer = this.map.createLayer('Objects', tableTileset);
+        this.roomLayer = this.map.createLayer('Room', utilTileset);
+        this.map.createLayer('Object', wallTileset).setDepth(1000);
+        this.collisionLayer = this.map.createLayer('Collision', [wallTileset, tableTileset]);
 
         // -1 makes all tiles on this layer collidable
-        this.wallLayer.setCollisionByExclusion([-1]);
-        this.objectLayer.setCollisionByExclusion([-1]);
+        this.collisionLayer.setCollisionByExclusion([-1]);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -71,7 +70,7 @@ class GameScene extends Phaser.Scene {
             .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        this.physics.add.collider(this.player, [this.wallLayer, this.objectLayer]);
+        this.physics.add.collider(this.player, this.collisionLayer);
 
         this.input.keyboard.on('keydown-D', () => {
             this.scene.start('FillTilesScene');
@@ -85,7 +84,7 @@ class GameScene extends Phaser.Scene {
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({...state.groups}));
 
-        this.physics.add.collider(Object.values(this.remotePlayers), this.wallLayer);
+        this.physics.add.collider(Object.values(this.remotePlayers), this.collisionLayer);
     }
 
     // TODO: remove after tests
@@ -117,7 +116,7 @@ class GameScene extends Phaser.Scene {
                 if (!(id in this.remotePlayers)) {
                     let position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
-                    this.physics.add.collider(this.remotePlayers[id], this.wallLayer);
+                    this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
                 }
             }
         } else {
