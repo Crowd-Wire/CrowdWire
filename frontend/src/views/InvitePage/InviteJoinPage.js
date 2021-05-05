@@ -47,8 +47,6 @@ export default function InviteJoinPage(props){
                 <Card style={{padding: "4rem 8rem"}}>
                     <h1 style={{margin:"auto"}}>Invalid Invite Link!</h1>
                 </Card>
-                <GenerateInviteCard/>
-
             </Col>
             <Col xs={1} md={2}></Col>
         </Row>
