@@ -87,6 +87,30 @@ class WorldService {
         })
     }
 
+    inviteJoin(inviteToken){
+        // change url
+        return fetch(API_BASE + 'worlds/invite/' + inviteToken, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer " + AuthenticationService.getToken()
+            }
+        })
+    }
+
+    generateLink(world_id){
+
+        return fetch(API_BASE + 'invitation/' + world_id, {
+            method: 'POST',
+            mode: 'cors',
+            headers:{
+                "Authorization" : "Bearer " + AuthenticationService.getToken()
+            }
+        })
+        
+    }
+
+
 }
 
 export default new WorldService();

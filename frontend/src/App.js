@@ -12,7 +12,7 @@ export default () => {
     setAuth(auth);
   }
   const startAuth = () => {
-    if(localStorage.getItem("auth")!==null)
+    if(localStorage.getItem("auth") && localStorage.getItem("auth")["token"]!==null)
       return true;
     return false;
   }
