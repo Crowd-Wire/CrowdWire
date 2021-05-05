@@ -110,15 +110,12 @@ class ConnectionManager:
 
     async def broadcast_to_user_rooms(self, world_id: str, payload: Any, sender_id: str):
         try:
-            logger.info(sender_id)
             group_ids = await redis_connector.get_user_groups(world_id, sender_id)
-            logger.info(group_ids)
+
             for room_id in group_ids:
                 user_ids = await redis_connector.get_group_users(world_id, room_id)
-                logger.info(user_ids)
                 for user_id in user_ids:
                     if user_id != sender_id:
-                        logger.info(user_id)
                         await self.send_personal_message(payload, user_id)
         except KeyError:
             logger.error(
