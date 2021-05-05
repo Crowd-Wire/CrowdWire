@@ -18,7 +18,6 @@ export default function GenerateInviteCard() {
         WorldService.generateLink(1)
         .then( (res) => {return res.json()})
         .then( (res) => {
-            console.log(res);
             if(res.access_token)
                 setLink(URL_BASE + 'join?invite=' + res.access_token);
             else
