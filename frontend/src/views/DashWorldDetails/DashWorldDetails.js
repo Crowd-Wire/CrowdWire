@@ -41,7 +41,7 @@ export default function DashWorldDetails(){
 return(
     <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer handler={sidebar_handler}/>
+        <DashDrawer handler={sidebar_handler} changeAuth={this.props.changeAuth}/>
         <DashboardContent handler = {handler} worldInfo={worldInfo} />
     </div>
     );

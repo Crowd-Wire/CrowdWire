@@ -8,8 +8,10 @@ import WorldDetails from 'views/CreateWorld/sections/WorldDetails.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
 import WorldService from 'services/WorldService.js';
+import { createBrowserHistory } from 'history';
+import IconButton from '@material-ui/core/IconButton';
 
-import IconButton from '@material-ui/core/IconButton';const useStyles = theme => ({
+const useStyles = theme => ({
   root: {
     display: 'flex',
     backgroundImage: `url(${img})`,
@@ -42,8 +44,11 @@ class CreateWorld extends Component {
       page: "edit"
     });
   }
-
-
+  goBack(){
+    const history = createBrowserHistory();
+    history.back();
+  } 
+  
   render() {
     const { classes } = this.props;
     if(this.state.page==="details"){
@@ -55,11 +60,9 @@ class CreateWorld extends Component {
               <Col md={1}></Col>
               <Col>
                 <Row style={{ height:"100%", marginLeft:"auto", marginRight:"auto"}}>
-                  <Link to="/dashboard" style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px", marginTop:"auto", marginBottom:"auto"}}>
-                    <IconButton style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px"}}>
-                      <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"black", marginBottom:"auto"}}/>
-                    </IconButton>
-                  </Link>
+                  <IconButton style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px"}} onClick={() => {this.goBack()}}>
+                    <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"black", marginBottom:"auto"}}/>
+                  </IconButton>
                 </Row>
               </Col>
             </Row>

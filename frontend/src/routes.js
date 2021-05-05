@@ -23,7 +23,7 @@ import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
-
+import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -36,33 +36,41 @@ import { useNavigate } from 'react-router-dom';
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-const routes = (isAuth) => [
+const routes = (isAuth, changeAuth) => [
 	{
 		path: "/",
 		element: <MainLayout />,
 		children: [
             { path: "/", element: <LandingPage /> },
-            { path: "/login", element: <LoginPage /> },
             { path: "/contacts", element: <ContactUs /> },
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
 			{ path: "/comms", element: <Communications /> },
 			{ path: "/template-components", element: <ComponentsPage /> },
-			{ path: "/register", element: <RegisterPage /> },
+		],
+	},
+	{
+		path: "/",
+		element: isAuth ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		children: [
+            { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
+			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
 		],
 	},
 	{
 		path:"/",
+		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage/>},
 		],
 	},
 	{ 
 		path: "/dashboard", 
-		element: <Outlet/>,
+		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch/>}
+			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
+			{path:"/search", element: <DashSearch changeAuth={changeAuth}/>}
 		]
 	},
     {
