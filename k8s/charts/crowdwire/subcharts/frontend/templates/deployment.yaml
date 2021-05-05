@@ -45,6 +45,15 @@ spec:
             protocol: TCP
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+                - name:  {{ include "frontend.fullname" . }}-config-volume
+                  mountPath: /usr/share/nginx/html/env-config.js
+                  subPath: env-config.js
+                  readOnly: true
+      volumes:
+        - name: {{ include "frontend.fullname" . }}-config-volume
+          configMap:
+            name: {{ include "frontend.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

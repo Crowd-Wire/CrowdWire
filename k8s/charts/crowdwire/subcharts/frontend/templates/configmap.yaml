@@ -1,0 +1,12 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "frontend.fullname" . }}
+  annotations:
+    # https://github.com/helm/helm/blob/master/docs/charts_hooks.md
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+    "helm.sh/hook": pre-install, pre-upgrade
+data: 
+  env-config.js: 
+  {{- toYaml .Values.configValues | nindent 4 }}
