@@ -23,7 +23,7 @@ import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
-
+import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import { useNavigate } from 'react-router-dom';
 
 /**
@@ -56,6 +56,7 @@ const routes = (isAuth, changeAuth) => [
 		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage/>},
 		],
 	},
 	{ 
