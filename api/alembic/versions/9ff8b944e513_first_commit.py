@@ -1,8 +1,8 @@
 """First Commit
 
-Revision ID: 6a7141df72c8
+Revision ID: 9ff8b944e513
 Revises: 
-Create Date: 2021-04-19 14:30:11.801455
+Create Date: 2021-05-05 15:25:23.578492
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '6a7141df72c8'
+revision = '9ff8b944e513'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,11 +28,12 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=50), nullable=False),
     sa.Column('email', sa.String(length=100), nullable=False),
-    sa.Column('hashed_password', sa.String(length=256), nullable=False),
+    sa.Column('hashed_password', sa.String(length=256), nullable=True),
     sa.Column('birth', sa.Date(), nullable=True),
     sa.Column('register_date', sa.DateTime(), nullable=False),
     sa.Column('status', sa.Integer(), nullable=False),
     sa.Column('is_superuser', sa.Boolean(), nullable=False),
+    sa.Column('sub', sa.String(length=50), nullable=True),
     sa.PrimaryKeyConstraint('user_id'),
     sa.UniqueConstraint('email'),
     schema='fastapi'
@@ -150,5 +151,4 @@ def downgrade():
     op.drop_table('user', schema='fastapi')
     op.drop_table('tag', schema='fastapi')
     op.execute("drop schema fastapi")
-
     # ### end Alembic commands ###
