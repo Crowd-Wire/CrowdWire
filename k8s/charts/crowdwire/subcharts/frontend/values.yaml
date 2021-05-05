@@ -58,6 +58,10 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+configValues: |
+  window.REACT_APP_RUNNING_MODE = 'production'
+  window.REACT_APP_API_IP = '20.74.40.44'
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little

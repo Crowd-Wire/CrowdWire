@@ -24,9 +24,10 @@ COPY ./env.sh .
 COPY .env .
 
 # Add bash
-RUN apk add --no-cache bash
+#RUN apk add --no-cache bash
 
 # Make our shell script executable
-RUN chmod +x env.sh
+#RUN chmod +x env.sh
 # start app
-CMD ["/bin/bash", "-c", "./env.sh && nginx -g \"daemon off;\""]
+#"/bin/bash", "-c", "./env.sh &&
+CMD [ "nginx", "-g", "daemon off;"]
