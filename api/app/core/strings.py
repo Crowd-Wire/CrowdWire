@@ -29,5 +29,3 @@ WORLD_DELETED_SUCCESS = "Success Deleting World"
 ROLE_UPDATED_SUCCESS = "Success Updating Role"
 ROLE_DELETED_SUCCESS = "Success Deleting Role"
 ROLE_CHANGED_SUCCESS = "Changed Role with Success"
-
-
