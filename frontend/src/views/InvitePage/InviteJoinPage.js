@@ -23,9 +23,9 @@ export default function InviteJoinPage(props){
         if(AuthenticationService.getToken()){
             let invite = qs.get("invite");
             if(invite){
-                WorldService.InviteJoin(invite)
+                WorldService.inviteJoin(invite)
                 .then((res) => {
-                    if(res.status == 401 || res.status == 403)
+                    if(res.status == 401)
                         navigate("/login");            
                     return res.json();
                 })
