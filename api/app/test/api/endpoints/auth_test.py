@@ -5,17 +5,17 @@ from unittest import TestCase
 from app.models import User, World_User
 from app.api.dependencies import get_current_user
 from app.schemas import GuestUser
-from pydantic import UUID4
 from datetime import datetime
 # class used by fastapi for tests
 client = TestClient(app)
 
+
 async def override_dependency_user(token: str = None):
     return User(user_id=1)
 
+
 async def override_dependency_guest():
     return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6")
-
 
 
 class TestAuth(TestCase):
@@ -190,7 +190,9 @@ class TestAuth(TestCase):
             assert response.json()['detail'] == "error"
 
     def test_join_as_guest(self):
-
+        """
+        Expects 200 OK when joining as guest.
+        """
         response = client.post(
             "/join-guest"
         )
