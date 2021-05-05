@@ -24,6 +24,8 @@ import image from "assets/img/bg8.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
 import { useNavigate, Navigate } from "react-router-dom";
+import { toast } from 'react-toastify';
+import Typography from "@material-ui/core/Typography"
 
 const useStyles = makeStyles(styles);
 
@@ -32,7 +34,15 @@ class RegisterPage extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { cardAnimaton: "", loggedIn: false }
+    this.state = { 
+      cardAnimaton: "", 
+      navigate: false,
+      emailHelperText: "",
+      nameHelperText: "",
+      passHelperText: "",
+      cPassHelperText: "",
+      birthdayHelperText: ""
+    }
   }
 
 
@@ -45,6 +55,12 @@ class RegisterPage extends React.Component {
   }, 700
 
   );
+
+  notify = () => {
+    toast.success("Register Successful! 🎉", {
+      position: toast.POSITION.TOP_CENTER
+    });
+  };
 
   handleLogin = (mail, password) => {
     AuthenticationService.login(
@@ -59,6 +75,7 @@ class RegisterPage extends React.Component {
       (res) => {
         AuthenticationService.setToken(res);
         if(res.access_token!==undefined){
+          this.notify();
           this.setState({loggedIn:true})
           this.props.changeAuth(true);
         }
@@ -67,40 +84,78 @@ class RegisterPage extends React.Component {
   }
 
   handleSubmit = () => {
-    
+    let email = document.getElementById("email").value
     let pass = document.getElementById("cpass").value;
     let cpass = document.getElementById("pass").value;
-    if(pass === cpass){
+    let name = document.getElementById("name").value;
+    let date = document.getElementById("date").value;
+    let dDate = new Date(date);
+    let passed = true;
 
+
+    if(pass !== cpass){
+      console.log(this.state.passHelperText)
+      this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
+      passed = false;
+    }
+    else if(!pass){
+      this.setState({passHelperText: "Password needed to register."});
+      passed = false;
+    }
+    else
+      this.setState({passHelperText: "",cPassHelperText:""});
+
+    if(!email){
+      this.setState({emailHelperText:"Email needed to register."});
+      passed = false;
+    }
+    else
+      this.setState({emailHelperText:""});
+    if(!name){
+      console.log("name required")
+      this.setState({nameHelperText:"Name needed to register."});
+      passed = false;
+    }
+    else
+      this.setState({nameHelperText:""});
+
+    if(dDate > new Date()){
+      console.log("date must be past")
+      this.setState({birthdayHelperText:"Birthdays are in the past."});
+      passed = false;
+    }
+    else
+      this.setState({birthdayHelperText:""});
+
+    if(passed){
       AuthenticationService.register(
-        document.getElementById("email").value,
+        email,
         pass,
-        document.getElementById("name").value,
-        document.getElementById("date").value
+        name,
+        date
       )
       .then(
         (res) => {
-          console.log("chegou aqui "+res);
+          console.log(res.status);
           return res.json();
         }
         )
       .then(
         (res) => {
-          console.log("e aqui"+res.access_token);
+          console.log(res);
+          if(true)
           this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
       }
     )
     .catch(
       (error) => {
-        console.log("e aqui agora com erro");
-        console.log("error is "+error);
+        console.log(error);
 
         // TODO: change state to show error;
       }
     );
 
     }
-    
   }
 
   render() {
@@ -139,6 +194,7 @@ class RegisterPage extends React.Component {
                     <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
                       <CustomInput
+                        helperText={this.state.emailHelperText}
                         labelText="Email..."
                         id="email"
                         formControlProps={{
@@ -153,7 +209,13 @@ class RegisterPage extends React.Component {
                           )
                         }}
                       />
+                      {this.state.emailHelperText!==""?
+                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.emailHelperText}</Typography>
+                        :
+                        <></>
+                      }
                       <CustomInput
+                        helperText={this.state.nameHelperText}
                         labelText="Name..."
                         id="name"
                         formControlProps={{
@@ -168,7 +230,13 @@ class RegisterPage extends React.Component {
                           )
                         }}
                       />
+                      {this.state.nameHelperText!==""?
+                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.nameHelperText}</Typography>
+                        :
+                        <></>
+                      }
                       <CustomInput
+                        helperText={this.state.passHelperText}
                         labelText="Password"
                         id="pass"
                         formControlProps={{
@@ -186,7 +254,13 @@ class RegisterPage extends React.Component {
                           autoComplete: "off"
                         }}
                       />
+                      {this.state.passHelperText!==""?
+                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.passHelperText}</Typography>
+                        :
+                        <></>
+                      }
                       <CustomInput
+                        helperText={this.state.cPassHelperText}
                         labelText="Confirm Password"
                         id="cpass"
                         formControlProps={{
@@ -204,7 +278,14 @@ class RegisterPage extends React.Component {
                           autoComplete: "off"
                         }}
                       />
+                      {this.state.cPassHelperText!==""?
+                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.cPassHelperText}</Typography>
+                        :
+                        <></>
+                      }
+                      <br/>
                       <TextField
+                        helperText={this.state.birthdayHelperText}
                         style={{ marginLeft: "auto", marginRight: "auto" }}
                         id="date"
                         label="Birthday"

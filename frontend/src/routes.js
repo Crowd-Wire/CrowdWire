@@ -42,12 +42,18 @@ const routes = (isAuth, changeAuth) => [
 		element: <MainLayout />,
 		children: [
             { path: "/", element: <LandingPage /> },
-            { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
             { path: "/contacts", element: <ContactUs /> },
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
 			{ path: "/comms", element: <Communications /> },
 			{ path: "/template-components", element: <ComponentsPage /> },
+		],
+	},
+	{
+		path: "/",
+		element: isAuth ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		children: [
+            { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
 			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
 		],
 	},
@@ -63,8 +69,8 @@ const routes = (isAuth, changeAuth) => [
 		path: "/dashboard", 
 		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch/>}
+			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
+			{path:"/search", element: <DashSearch changeAuth={changeAuth}/>}
 		]
 	},
     {
