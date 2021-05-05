@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from app.api.api_v1.endpoints import websocket, users, login, worlds, tags, roles
+from app.api.api_v1.endpoints import websocket, users, authentication, worlds, tags, roles
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["users"])
-api_router.include_router(login.router)
+api_router.include_router(authentication.router)
 api_router.include_router(
     websocket.router, prefix="/ws", tags=["websockets"]
 )

@@ -6,7 +6,7 @@ from app.models import User, World_User
 from app.api.dependencies import get_current_user
 from app.schemas import GuestUser
 from datetime import datetime
-# class used by fastapi for tests
+
 client = TestClient(app)
 
 
@@ -184,7 +184,6 @@ class TestAuth(TestCase):
             response = client.post(
                 "/invitation/1",
             )
-            print(response.json())
             assert response.status_code == 403
             assert mock_post.call_count == 1
             assert response.json()['detail'] == "error"
@@ -196,7 +195,6 @@ class TestAuth(TestCase):
         response = client.post(
             "/join-guest"
         )
-        print(response.json()['token_type'])
         assert response.status_code == 200
         assert response.json()['guest_uuid'] and response.json()['access_token']
         assert datetime.strptime(response.json()['expire_date'], "%Y-%m-%d %H:%M:%S.%f") > datetime.now()
