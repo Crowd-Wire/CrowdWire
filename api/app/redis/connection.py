@@ -1,11 +1,12 @@
 from typing import Optional, List, Union
 
 import aioredis
-from app.core.config import settings
+# from app.core.config import settings
 from app.utils import generate_guest_username, choose_avatar
 from app import schemas
 from uuid import uuid4
 from loguru import logger
+
 
 class RedisConnector:
 
@@ -163,7 +164,7 @@ class RedisConnector:
         Returns a dictionary with actions made to groups and users
         """
 
-        actions = { "add-users-to-room": [], "close-room": [] }
+        actions = {"add-users-to-room": [], "close-room": []}
         users_id = [user_id, *users_id]
         all_users_id = set(users_id) | set(await self.get_group_users(world_id, group_id))
 
@@ -201,7 +202,7 @@ class RedisConnector:
                 mergeable_groups_id.add(mgid)
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
-                
+
         for mgid in mergeable_groups_id:
             actions['close-room'].append({'worldId': world_id, 'roomId': group_id})
 
@@ -215,16 +216,16 @@ class RedisConnector:
             # add users to lowest group id
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
-                actions[ "add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
+                actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
                 await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
 
         """Add users to the normalized group"""
         if not mergeable_groups_id:
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
             for uid in users_id:
-                actions[ "add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
+                actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
                 await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
-        
+
         return actions
 
     async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
@@ -258,7 +259,7 @@ class RedisConnector:
 
         """Normalize groups after remove"""
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
-            actions.append({ 'worldId': world_id, 'roomId': group_id })
+            actions.append({'worldId': world_id, 'roomId': group_id})
             # remove group when one or none inner users
             await self.rem_group(world_id, group_id)
         else:
@@ -272,23 +273,19 @@ class RedisConnector:
             for igid in inter_groups_id:
                 if set(await self.get_group_users(world_id, igid)).issuperset(set(left_users)):
                     # remove redundant group
-                    actions.append({ 'worldId': world_id, 'roomId': group_id })
+                    actions.append({'worldId': world_id, 'roomId': group_id})
                     await self.rem_group(world_id, group_id)
                     break
 
         return actions
 
-
     async def rem_groups_from_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
-        """Remove one or more groups from a user"""
-        """Returns a dictionary with actions made to groups and users"""
-
+        """Remove one or more groups from a user
+        Returns a dictionary with actions made to groups and users"""
         actions = {}
-
         groups_id = [group_id, *groups_id]
         for gid in groups_id:
             actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
-
         return actions
 
 

@@ -78,7 +78,7 @@ class RabbitHandler:
                 self.queue_to_receive, durable=True
             )
             await queue.consume(on_message)
-            
+
     async def join_as_new_peer_or_speaker(self) -> None:
         print("aqui")
 

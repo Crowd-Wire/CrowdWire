@@ -57,8 +57,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     actions = {}
     # create new group and let it normalize
     if add_users:
-        actions = await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(),
-                                                 user_id, *add_users)
+        actions = await redis_connector.add_users_to_group(
+            world_id, manager.get_next_group_id(),
+            user_id, *add_users)
 
     # actions made to groups
     await handle_actions(actions)
@@ -84,7 +85,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         # remove user from groups where the faraway users are
         # rem user_id from rem_groups_ids
         # return close rooms aswell
-        await handle_actions({'rem-user-from-groups': { 'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id }})
+        await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id}})
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
         # add user to a new group with the still nearby users
@@ -123,22 +124,22 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
         the user to speak, so, it returns two kinds of transport,
         one for receiving and other for sending
     """
-    payload = { 'topic': "join-as-speaker",
-               'd': { 'roomId': room_id, 'peerId': user_id } }
+    payload = {'topic': "join-as-speaker",
+               'd': {'roomId': room_id, 'peerId': user_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 
 
 async def destroy_room(word_id: str, room_id: str):
-    payload = { 'topic': "destroy-room",
-               'd': { 'roomId': room_id } }
+    payload = {'topic': "destroy-room",
+               'd': {'roomId': room_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 
 
 async def remove_user(word_id: str, room_ids: list, user_id: str):
-    payload = { 'topic': "remove-user-from-groups",
-               'd': { 'roomIds': list(room_ids), 'peerId': user_id } }
+    payload = {'topic': "remove-user-from-groups",
+               'd': {'roomIds': list(room_ids), 'peerId': user_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 
@@ -149,7 +150,7 @@ async def handle_transport_or_track(user_id: str, payload: dict):
 
 
 async def close_media(world_id: str, user_id: str, payload: dict):
-    payload['d'] = { 'peerId': user_id }
+    payload['d'] = {'peerId': user_id}
 
     groupIds = await redis_connector.get_user_groups(world_id, user_id)
     logger.info(groupIds)
@@ -199,4 +200,3 @@ async def speaking_change(world_id: str, user_id: str, payload: dict):
             'peerId': user_id,
             'value': value},
         user_id)
-

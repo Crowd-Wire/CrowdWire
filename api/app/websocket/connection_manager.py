@@ -50,7 +50,7 @@ class ConnectionManager:
 
     async def connect_room(self, world_id: str, room_id: str, user_id: str, joiner_position: dict):
         if world_id in self.connections and room_id in self.connections[world_id]:
-            # send players snapshot 
+            # send players snapshot
             players_snapshot = {}
             for uid in self.connections[world_id][room_id]:
                 if uid != user_id:
