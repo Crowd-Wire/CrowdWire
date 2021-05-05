@@ -81,6 +81,7 @@ class LoginPage extends React.Component {
           this.notify("Auth");
           AuthenticationService.setToken(res);
           this.setState({loggedIn:true})
+          this.props.changeAuth(true);
         }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
@@ -90,7 +91,6 @@ class LoginPage extends React.Component {
           this.setState({passwSt:"Password Required", emailSt:""});
         else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
           this.setState({passwSt:"Password Required", emailSt:"Email Required"});
-        this.props.changeAuth(true);
       }
     )    
   }
@@ -99,10 +99,11 @@ class LoginPage extends React.Component {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
-        AuthenticationService.setToken(res);
         if(res.access_token!==undefined){
-          this.setState({loggedIn:true}); 
           this.notify("Guest");
+          AuthenticationService.setToken(res);
+          this.setState({loggedIn:true}); 
+          this.props.changeAuth(true);
         }
       })
 

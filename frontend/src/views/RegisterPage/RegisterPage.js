@@ -149,7 +149,6 @@ class RegisterPage extends React.Component {
     )
     .catch(
       (error) => {
-        console.log("e aqui agora com erro");
         console.log(error);
 
         // TODO: change state to show error;

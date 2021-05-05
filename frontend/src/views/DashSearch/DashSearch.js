@@ -42,7 +42,7 @@ class DashSearch extends Component {
     return(
       <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer handler={this.sidebar_handler}/>
+        <DashDrawer handler={this.sidebar_handler} changeAuth={this.props.changeAuth}/>
           <SearchAllMaps handler = {this.handler} joined={this.state.joined} />
       </div>
     );
