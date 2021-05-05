@@ -3,7 +3,6 @@ import { useRoomStore } from "../stores/useRoomStore";
 import { useVideoStore } from "../stores/useVideoStore";
 import { useMuteStore } from "../stores/useMuteStore";
 import { Transport } from "mediasoup-client/lib/Transport";
-import { AnyIfEmpty } from "react-redux";
 
 export const sendVideo = async (roomId:string = null) => {
   const { camId } = storeDevice.getState().camId;
@@ -50,7 +49,15 @@ export const sendVideo = async (roomId:string = null) => {
       sendTransport.produce({
         track: cam,
         appData: { mediaTag: "video" },
-      }).then((producer) => {set({camProducer: producer})})
+      })
+      .then((producer) => {set({camProducer: producer})})
+      .catch((err) => {
+        console.log(err)
+        cam.onended = function(event) {
+          useVideoStore.getState().camProducer.close();
+          set({cam: null, camStream: null, camProducer: null})
+        }
+      })
     });
 
   }

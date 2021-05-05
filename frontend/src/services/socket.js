@@ -11,6 +11,7 @@ import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 import AuthenticationService from "services/AuthenticationService";
 
 import playerStore from "stores/usePlayerStore.ts";
+import GameScene from "phaser/GameScene";
 
 let commSocket;
 
@@ -183,28 +184,33 @@ export const getSocket = (worldId) => {
           break;
         case "new-peer-producer":
           console.log(data)
-          const roomId = data.d.roomId;
-          if (useRoomStore.getState().rooms[roomId].recvTransport) {
-            consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
-          } else {
-            consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
+          // check if tile im currently on is a conference type or not
+          // else check if player is in range
+          console.log(GameScene.inRangePlayers.has(data.d.peerId))
+          if (GameScene.inRangePlayers.has(data.d.peerId)) {
+            const roomId = data.d.roomId;
+            if (useRoomStore.getState().rooms[roomId].recvTransport) {
+              consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
+            } else {
+              consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
+            }
           }
           break;
-        case "active_speaker":
+        case "active-speaker":
           console.log(data)
           if (data.value)
             useConsumerStore.getState().addActiveSpeaker(data.peerId)
           else
             useConsumerStore.getState().removeActiveSpeaker(data.peerId)
           break;
-        case "toggle_peer_producer":
+        case "toggle-peer-producer":
           console.log(data)
           if (data.kind === 'audio')
             useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
           else
             useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
           break;
-        case "close_media":
+        case "close-media":
           console.log(data)
           useConsumerStore.getState().closeMedia(data.peerId)
           break;

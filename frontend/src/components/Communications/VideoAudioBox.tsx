@@ -106,37 +106,39 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
           <div style={{
               position: 'absolute',
-              top:5,
+              top:2,
               padding: 2,
               textAlign: 'center',
               fontSize: '1.2em',
-              color: '#fff',
-              width: '100%',
+              color: 'white',
+              width: '98%',
               fontWeight: 500,
-              WebkitTextStroke: '0.5px #0063cc'
+              backgroundColor: 'rgba(0,0,0, 0.2)',
             }}>
             <span>{username}</span>
           </div>
           
-          <div className="row" style={{position: 'absolute', fontSize: '1em', bottom: 5, width: '100%', paddingLeft: '1%'}}>
+          <div style={{position: 'relative', fontSize: '1em', bottom: 0, width: '100%', paddingLeft: '2px'}}>
+            <Row>
               <Col sm={5}>
                 { videoTrack && !videoToggle ?
                     videoState ? 
-                      (<VideocamIcon style={{'cursor': 'pointer', color: '#0063cc'}} onClick={() => toggleVideo()}/>)
+                      (<VideocamIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleVideo()}/>)
                     : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
                   : (<VideocamOffIcon color={'action'}/>)
                 }
                 { audioTrack && !audioToggle ?
                     audioState ? 
-                      (<MicIcon style={{'cursor': 'pointer', color: '#0063cc'}} onClick={() => toggleAudio()}/>)
+                      (<MicIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleAudio()}/>)
                     : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
                   : (<MicOffIcon color={'action'}/>)
                 }
               </Col>
 
-              <Col sm={7} style={{textAlign: 'center'}}>
-                <UserVolumeSlider volColor={'#0063cc'} userId={id} />
+              <Col sm={7} style={{textAlign: 'center', maxHeight: 30}}>
+                <UserVolumeSlider volColor={'white'} userId={id} />
               </Col>
+            </Row>
           </div>
       </Card>
     </div>

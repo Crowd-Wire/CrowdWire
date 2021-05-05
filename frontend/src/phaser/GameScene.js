@@ -1,8 +1,11 @@
+import { Copyright } from '@material-ui/icons';
 import * as Phaser from 'phaser';
 
 import { getSocket } from "services/socket";
 
 import usePlayerStore from "stores/usePlayerStore.ts";
+
+import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 
 var ws = getSocket('1');
 
@@ -19,7 +22,7 @@ var globalVar = true;
 class GameScene extends Phaser.Scene {
     remotePlayers = {};
     localPlayers = {};
-    inRangePlayers = new Set();
+    static inRangePlayers = new Set();
     count = 0;
 
     constructor() {
@@ -133,15 +136,15 @@ class GameScene extends Phaser.Scene {
         // detect surrounding players
         var bodies = this.physics.overlapCirc(
             this.player.body.center.x, this.player.body.center.y, 150, true, true)
-        if (bodies.length && bodies.length - 1 != this.inRangePlayers.size) {
+        if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
             const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
                 .map((b) => b.gameObject.id);
-            if (rangePlayers.length > this.inRangePlayers.size) {
+            if (rangePlayers.length > GameScene.inRangePlayers.size) {
                 // wire players
                 ws.wirePlayer('1', 
                     rangePlayers.filter((id) => {
-                        const entered = !this.inRangePlayers.has(id);
-                        if (entered) this.inRangePlayers.add(id);
+                        const entered = !GameScene.inRangePlayers.has(id);
+                        if (entered) GameScene.inRangePlayers.add(id);
                         return entered;
                     })
                 );
@@ -149,9 +152,15 @@ class GameScene extends Phaser.Scene {
             } else {
                 // unwire players
                 ws.unwirePlayer('1', 
-                    [...this.inRangePlayers].filter((id) => {
+                    [...GameScene.inRangePlayers].filter((id) => {
                         const left = !rangePlayers.includes(id);
-                        if (left) this.inRangePlayers.delete(id);
+                        if (left) {
+                            GameScene.inRangePlayers.delete(id);
+                            // close media connections to this user
+                            console.log(useConsumerStore.getState())
+                            useConsumerStore.getState().closePeer(id);
+                            console.log(useConsumerStore.getState())
+                        };
                         return left;
                     })
                 );

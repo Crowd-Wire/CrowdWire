@@ -1,6 +1,7 @@
 import { Consumer } from "mediasoup-client/lib/types";
 import create from "zustand";
 import { combine } from "zustand/middleware";
+import { useRoomStore } from "./useRoomStore";
 
 export const useConsumerStore = create(
   combine(
@@ -154,7 +155,8 @@ export const useConsumerStore = create(
         }),
       closeRoom: (roomId) =>
         set((s) => {
-          for (const value of Object.values(s.consumerMap)) {
+          let to_del_users = [];
+          for (const [key, value] of Object.entries(s.consumerMap)) {
             if (value.roomId == roomId) {
               if (value.consumerAudio && !value.consumerAudio.closed) {
                 value.consumerAudio.close()
@@ -165,8 +167,50 @@ export const useConsumerStore = create(
               if (value.consumerMedia && !value.consumerMedia.closed) {
                 value.consumerMedia.close()
               }
+              to_del_users.push(key)
             };
           }
+          to_del_users.forEach((x) => delete s.consumerMap[x])
+
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          };
+        }),
+      checkRoomToClose: (roomId) =>
+        set((s) => {
+          let to_close = true;
+          for (const [key, value] of Object.entries(s.consumerMap)) {
+            if (value.roomId == roomId) {
+              to_close = false;
+              break;
+            };
+          }
+          if (to_close) useRoomStore.getState().removeRoom(roomId);
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          }
+        }),
+      closePeer: (userId) =>
+        set((s) => {
+          let user = s.consumerMap[userId]
+          if (user) {
+            if (user.consumerAudio && !user.consumerAudio.closed) {
+              user.consumerAudio.close()
+            }
+            if (user.consumerVideo && !user.consumerVideo.closed) {
+              user.consumerVideo.close()
+            }
+            if (user.consumerMedia && !user.consumerMedia.closed) {
+              user.consumerMedia.close()
+            }
+            delete s.consumerMap[userId];
+            useConsumerStore.getState().checkRoomToClose(user.roomId);
+          }
+          console.log(s.consumerMap)
           return {
             consumerMap: {
               ...s.consumerMap

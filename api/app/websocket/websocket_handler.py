@@ -59,19 +59,10 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     if add_users:
         actions = await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(),
                                                  user_id, *add_users)
-    
+
     # actions made to groups
-    logger.info(actions)
-    add_users = actions['add-users-to-room']
-    close_rooms = actions['close-room']
-    
-    if add_users:
-        print("adding users to room")
-        for add_action in add_users:
-            await join_as_new_peer_or_speaker(add_action['roomId'], add_action['peerId'])
-    if close_rooms:
-        print("closing rooms")
-        
+    await handle_actions(actions)
+
     await send_groups_snapshot(world_id, user_id)
 
 
@@ -91,15 +82,37 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
 
     if rem_groups_id:
         # remove user from groups where the faraway users are
-        await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id)
+        # rem user_id from rem_groups_ids
+        # return close rooms aswell
+        await handle_actions({'rem-user-from-groups': { 'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id }})
+        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
         # add user to a new group with the still nearby users
-        await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id])
+        await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
     await send_groups_snapshot(world_id, user_id)
 
 
-async def join_as_new_peer_or_speaker(room_id: str, user_id: str):
+async def handle_actions(actions: dict):
+    logger.info(actions)
+
+    if 'add-users-to-room' in actions:
+        add_users = actions['add-users-to-room']
+        for add_action in add_users:
+            await join_as_new_peer_or_speaker(add_action['worldId'], add_action['roomId'], add_action['peerId'])
+    if 'close-room' in actions:
+        close_rooms = actions['close-room']
+        logger.info(close_rooms)
+        for close_action in close_rooms:
+            logger.info(close_action)
+            await destroy_room(close_action['worldId'], close_action['roomId'])
+    if 'rem-user-from-groups' in actions:
+        rem_action = actions['rem-user-from-groups']
+        logger.info(rem_action)
+        await remove_user(rem_action['worldId'], rem_action['groupIds'], rem_action['peerId'])
+
+
+async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
     """
     join-as-new-peer:
         create a room if it doesnt exit and add that user to that room
@@ -116,48 +129,74 @@ async def join_as_new_peer_or_speaker(room_id: str, user_id: str):
     await rabbit_handler.publish(json.dumps(payload))
 
 
+async def destroy_room(word_id: str, room_id: str):
+    payload = { 'topic': "destroy-room",
+               'd': { 'roomId': room_id } }
+
+    await rabbit_handler.publish(json.dumps(payload))
+
+
+async def remove_user(word_id: str, room_ids: list, user_id: str):
+    payload = { 'topic': "remove-user-from-groups",
+               'd': { 'roomIds': list(room_ids), 'peerId': user_id } }
+
+    await rabbit_handler.publish(json.dumps(payload))
+
+
 async def handle_transport_or_track(user_id: str, payload: dict):
     payload['d']['peerId'] = user_id
     await rabbit_handler.publish(json.dumps(payload))
 
 
 async def close_media(world_id: str, user_id: str, payload: dict):
-    room_id = payload['d']['roomId']
-    payload['d']['peerId'] = user_id
+    payload['d'] = { 'peerId': user_id }
 
-    # close in media server producer
-    await rabbit_handler.publish(json.dumps(payload))
+    groupIds = await redis_connector.get_user_groups(world_id, user_id)
+    logger.info(groupIds)
+
+    for roomId in groupIds:
+        payload['d']['roomId'] = roomId
+        # close in media server producer
+        await rabbit_handler.publish(json.dumps(payload))
 
     # broadcast for peers to close this stream
-    if user_id in manager.connections[world_id][room_id]:
-        await manager.broadcast(world_id, room_id,
-                                {'topic': protocol.CLOSE_MEDIA,
-                                 'peerId': user_id},
-                                user_id)
+    await manager.broadcast_to_user_rooms(
+        world_id,
+        {'topic': protocol.CLOSE_MEDIA,
+            'peerId': user_id},
+        user_id)
 
 
 async def toggle_producer(world_id: str, user_id: str, payload: dict):
-    room_id = payload['d']['roomId']
     kind = payload['d']['kind']
     pause = payload['d']['pause']
     payload['d']['peerId'] = user_id
-    # pause in media server producer
-    await rabbit_handler.publish(json.dumps(payload))
+
+    groupIds = await redis_connector.get_user_groups(world_id, user_id)
+    logger.info(groupIds)
+
+    for roomId in groupIds:
+        payload['d']['roomId'] = roomId
+        # pause in media server producer
+        await rabbit_handler.publish(json.dumps(payload))
+
     # broadcast for peers to update UI toggle buttons
-    if user_id in manager.connections[world_id][room_id]:
-        await manager.broadcast(world_id, room_id,
-                                {'topic': protocol.TOGGLE_PEER_PRODUCER,
-                                 'peerId': user_id,
-                                 'kind': kind,
-                                 'pause': pause},
-                                user_id)
+    await manager.broadcast_to_user_rooms(
+        world_id,
+        {'topic': protocol.TOGGLE_PEER_PRODUCER,
+            'peerId': user_id,
+            'kind': kind,
+            'pause': pause},
+        user_id)
 
 
 async def speaking_change(world_id: str, user_id: str, payload: dict):
-    room_id = payload['d']['roomId']
     value = payload['d']['value']
-    logger.info(user_id)
-    logger.info(manager.connections[world_id][room_id])
-    if user_id in manager.connections[world_id][room_id]:
-        await manager.broadcast(world_id, room_id,
-                                {'topic': protocol.ACTIVE_SPEAKER, 'peerId': user_id, 'value': value}, user_id)
+
+    await manager.broadcast_to_user_rooms(
+        world_id,
+        {'topic': protocol.ACTIVE_SPEAKER,
+            'peerId': user_id,
+            'value': value},
+        user_id)
+

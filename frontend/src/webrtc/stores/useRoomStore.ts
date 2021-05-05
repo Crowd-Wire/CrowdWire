@@ -47,14 +47,7 @@ export const useRoomStore = create(
         }),
       removeRoom: (roomId: string) =>
         set((s) => {
-          useConsumerStore.getState().closeRoom(roomId);
-
-          if (s.rooms[roomId].recvTransport)
-            s.rooms[roomId].recvTransport.close()
-          if (s.rooms[roomId].sendTransport)
-            s.rooms[roomId].sendTransport.close()
-
-          delete s.rooms.keyname;
+          if (s.rooms[roomId]) delete s.rooms[roomId];
           return {
             rooms: {
               ...s.rooms
@@ -65,10 +58,6 @@ export const useRoomStore = create(
       addTransport: (direction: string, transport: Transport, roomId: string) =>
         set((s) => {
           if (direction === "recv") {
-            console.log(s.rooms)
-            console.log(roomId)
-            console.log(s.rooms[roomId])
-            console.log(s.rooms)
             return {
               rooms: {
                 ...s.rooms,

@@ -57,7 +57,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       else
         camProducer.resume();
       for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoPauseState } })
+        wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
     }
   }
   const toggleAudio = () => {
@@ -75,7 +75,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         micProducer.resume();
       }
       for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioPauseState } });
+        wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
     }
   }
 
@@ -98,7 +98,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
     setMediaOffState(useMediaStore.getState().media ? false : true)
     for (let roomId in rooms)
-      wsend({ topic: "close-media", d: { roomId: roomId } })
+      wsend({ topic: "close-media" })
     console.log("sending close media")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useMediaStore.getState().media])
@@ -160,31 +160,32 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
             <div style={{
               position: 'absolute',
-              top: 5,
+              top: 2,
               paddingRight: 2,
               textAlign: 'center',
               fontSize: '1.2em',
               color: '#fff',
               fontWeight: 500,
-              width: '95%',
-              WebkitTextStroke: '0.5px #0063cc'
+              width: '98%',
+              WebkitTextStroke: '0.5px white',
+              backgroundColor: 'rgba(0,0,0, 0.3)',
             }}>
               <span>{username}</span>
-              <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "#0063cc"}}
+              <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
                 onClick={() => toggleModal()}/>
             </div>
-            <div style={{position: 'absolute', width:'95%', bottom:5, fontSize: '1em'}}>
+            <div style={{position: 'relative', width:'96%', bottom:0, fontSize: '1em'}}>
               <Row>
                 <Col sm={6}>
                   { videoTrack ?
                       videoPauseState ? 
-                      (<VideocamIcon style={{'cursor': 'pointer', color:'#0063cc'}} onClick={() => toggleVideo()}/>)
+                      (<VideocamIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleVideo()}/>)
                       : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
                       : (<VideocamOffIcon color={'action'}/>)
                     }
                   { audioTrack ?
                       audioPauseState ? 
-                      (<MicIcon style={{'cursor': 'pointer', color:'#0063cc'}} onClick={() => toggleAudio()}/>)
+                      (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon color={'action'}/>)
                     }
@@ -192,7 +193,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
                 <Col style={{textAlign: 'right'}} sm={6}>
                     { mediaOffState ? 
-                      <ScreenShareIcon style={{'cursor': 'pointer', color:'#0063cc'}} onClick={() => toggleMedia()}/>
+                      <ScreenShareIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleMedia()}/>
                       :
                       <StopScreenShareIcon style={{'cursor': 'pointer'}} color="secondary" onClick={() => toggleMedia()}/>
                     }

@@ -12,7 +12,7 @@ async def on_message(message: IncomingMessage) -> None:
         msg = message.body.decode()
         msg = json.loads(msg)
         topic = msg['topic']
-        logger.info(" [x] Received message for topic  %r" % topic)
+        # logger.info(" [x] Received message for topic  %r" % topic)
 
         if topic == 'you-joined-as-peer'\
                 or topic == 'you-joined-as-speaker'\
@@ -20,7 +20,9 @@ async def on_message(message: IncomingMessage) -> None:
                 or topic == "@send-track-send-done"\
                 or topic == "@connect-transport-recv-done"\
                 or topic == "@connect-transport-send-done":
-                    
+
+            if 'error' in msg['d']:
+                return
             user_id = msg['d']['peerId']
 
             await manager.send_personal_message(msg, user_id)
@@ -31,6 +33,8 @@ async def on_message(message: IncomingMessage) -> None:
 
             await manager.send_personal_message(msg, user_id)
         elif topic == "close_consumer":
+            logger.info(msg)
+        elif topic == "error":
             logger.info(msg)
         else:
             logger.error(f"Unknown topic \"{topic}\"")
