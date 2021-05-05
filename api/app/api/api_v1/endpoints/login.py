@@ -115,7 +115,7 @@ def join_as_guest():
     )
     return {
         "access_token": access_token,
-        "token_type": 'Bearer',
+        "token_type": 'bearer',
         "expire_date": str(expires),
         "guest_uuid": _uuid
     }
