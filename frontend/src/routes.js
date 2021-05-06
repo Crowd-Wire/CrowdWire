@@ -70,7 +70,7 @@ const routes = (isAuth, changeAuth) => [
 		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
-			{path:"/search", element: <DashSearch changeAuth={changeAuth}/>}
+			{path:"/search", element: <DashSearch isAuth={isAuth} changeAuth={changeAuth}/>}
 		]
 	},
     {

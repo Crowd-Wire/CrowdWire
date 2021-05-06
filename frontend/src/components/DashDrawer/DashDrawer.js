@@ -165,16 +165,20 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
-          onClick={onClickCreateWorld}>
-            <ListItemIcon>
-                <AddCircleOutlined className={classes.iconDrawer}/>
-            </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
-                className={clsx(classes.menuButton, {
-                    [classes.hide]: !open,
-                })}/>
-          </ListItem>
+          { props.isAuth==="GUEST" ?
+            <></>
+            :
+            <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
+            onClick={onClickCreateWorld}>
+              <ListItemIcon>
+                  <AddCircleOutlined className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
+                  className={clsx(classes.menuButton, {
+                      [classes.hide]: !open,
+                  })}/>
+            </ListItem>
+          }
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Settings" style={{position: "fixed", bottom: definitions}}>
           <ListItemIcon>
