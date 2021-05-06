@@ -23,7 +23,7 @@ class RedisConnector:
             password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
-        # await self.master.execute('flushall')
+        await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
