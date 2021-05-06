@@ -125,6 +125,9 @@ class TestRoles(TestCase):
             assert mock_post.call_count == 1
 
     def test_edit_role_in_world_user_forbidden(self):
+        """
+        Expects 403 forbidden for users withour permission.
+        """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
         with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
@@ -140,6 +143,9 @@ class TestRoles(TestCase):
             assert response.json()['detail'] == "error"
 
     def test_edit_role_in_world_guest_forbidden(self):
+        """
+        Expects 403 forbidden for guest users.
+        """
 
         app.dependency_overrides[get_current_user] = override_dependency_guest
 
@@ -151,6 +157,9 @@ class TestRoles(TestCase):
         assert response.status_code == 403
 
     def test_edit_role_in_world_bad_data_format(self):
+        """
+        Expects 400 bad request when giving an invalid role.
+        """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
         with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
@@ -197,6 +206,9 @@ class TestRoles(TestCase):
                     assert mock_put.call_count == 1
 
     def test_delete_role_in_world_guest_forbidden(self):
+        """
+        Expects 403 forbidden for guest users.
+        """
         app.dependency_overrides[get_current_user] = override_dependency_guest
 
         response = client.delete(
@@ -205,3 +217,60 @@ class TestRoles(TestCase):
 
         assert response.status_code == 403
 
+    def test_delete_role_in_world_user_forbidden(self):
+        """
+        Expects 403 forbidden given a user with no permissions.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+
+        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+            mock_access.return_value = None, "error"
+
+            response = client.delete(
+                "/worlds/1/roles/1",
+            )
+
+            assert response.status_code == 403
+            assert mock_access.call_count == 1
+            assert response.json()['detail'] == "error"
+
+    def test_delete_role_in_world_invalid_role(self):
+        """
+        Expects 400 bad request given a invalid role.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+
+        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+            with patch("app.crud.crud_roles.CRUDRole.remove") as mock_rem:
+                mock_access.return_value = User(user_id=1), ""
+                mock_rem.return_value = None, "error"
+
+                response = client.delete(
+                    "/worlds/1/roles/1",
+                )
+
+                assert response.status_code == 400
+                assert mock_rem.call_count == 1
+                assert mock_access.call_count == 1
+                assert response.json()['detail'] == "error"
+
+    def test_delete_role_in_world_success(self):
+        """
+        Expects 200 Ok if a given user with access deletes a valid role.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+
+        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+            with patch("app.crud.crud_roles.CRUDRole.remove") as mock_rem:
+                mock_access.return_value = User(user_id=1), ""
+                mock_rem.return_value = Role(world_id=1, role_id=1), ""
+
+                response = client.delete(
+                    "/worlds/1/roles/1",
+                )
+
+                assert response.status_code == 200
+                assert mock_rem.call_count == 1
+                assert mock_access.call_count == 1
+                assert response.json()['world_id'] == 1
+                assert response.json()['role_id'] == 1
