@@ -13,7 +13,7 @@ class WorldService {
 
         let url = 'worlds/';
         let query = [];
-        
+    
         if(search !== "")
             query.push('search='+search);
         
@@ -29,8 +29,6 @@ class WorldService {
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
 
-        
-        console.log(AuthenticationService.getToken())
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',

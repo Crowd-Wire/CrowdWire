@@ -60,12 +60,12 @@ class SearchAllMaps extends Component {
 
 
 	search_handler = () => {
-
 		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
-			.then((res) => { return res.json() })
-      .then((res) => { 
-		this.setState({ maps: res }) });
+			.then((res) => { console.log(res);console.log(res.json());return res.json() })
+      		.then((res) => { this.setState({ maps: res }) })
+			.catch((err) => { console.log(err) });
 	}
+
 	changePage = async (event, page) => {
 		await this.setState({page: page});
 		this.search_handler(this.state.prevSearch, this.state.prevTags);

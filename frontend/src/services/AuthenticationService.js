@@ -41,29 +41,19 @@ class AuthenticationService {
             useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
         }
         else if(type==="AUTH"){
-            console.log(auth)
             useAuthStore.getState().login(auth.access_token, auth.expire_date);
         }
         console.log(useAuthStore.getState());
-
-        localStorage.setItem("auth",JSON.stringify(
-            {"token":auth.access_token,
-            "expire_date":auth.expire_date}
-            )
-        );
     }
 
     logout(){
         const st = useAuthStore.getState();
         if(st.guestUser){
-            console.log("GUEST")
             useAuthStore.getState().leaveGuest()
         }
         else if(st.registeredUser){
-            console.log("REGISTERED USER")
             useAuthStore.getState().leaveRegistered()
         }
-        console.log(st.registeredUser);
     }
 
     joinAsGuest(){

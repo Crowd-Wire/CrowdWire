@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from "react";
+import AppContext from 'AppContext.js';
 
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -36,6 +37,7 @@ import { useNavigate } from 'react-router-dom';
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
+
 const routes = (isAuth, changeAuth) => [
 	{
 		path: "/",
@@ -53,8 +55,8 @@ const routes = (isAuth, changeAuth) => [
 		path: "/",
 		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Navigate to="/dashboard/search"/> : <Outlet/>,
 		children: [
-            { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
-			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
+            { path: "/login", element: <LoginPage/> },
+			{ path: "/register", element: <RegisterPage/> },
 		],
 	},
 	{
@@ -69,8 +71,8 @@ const routes = (isAuth, changeAuth) => [
 		path: "/dashboard", 
 		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
-			{path:"/search", element: <DashSearch isAuth={isAuth} changeAuth={changeAuth}/>}
+			{path: "/:id", element: <DashWorldDetails/>},
+			{path:"/search", element: <DashSearch isAuth={isAuth}/>}
 		]
 	},
     {

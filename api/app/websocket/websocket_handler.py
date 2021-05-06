@@ -94,6 +94,13 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     await send_groups_snapshot(world_id, user_id)
 
 
+async def disconnect_user(world_id: str, user_id: str):
+    group_ids = set()
+    group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
+    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': group_ids}})
+    await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids))
+
+
 async def handle_actions(actions: dict):
     logger.info(actions)
 
@@ -111,6 +118,13 @@ async def handle_actions(actions: dict):
         rem_action = actions['rem-user-from-groups']
         logger.info(rem_action)
         await remove_user(rem_action['worldId'], rem_action['groupIds'], rem_action['peerId'])
+
+
+async def remove_user(word_id: str, room_ids: list, user_id: str):
+    payload = {'topic': "remove-user-from-groups",
+               'd': {'roomIds': list(room_ids), 'peerId': user_id}}
+
+    await rabbit_handler.publish(json.dumps(payload))
 
 
 async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
@@ -133,13 +147,6 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
 async def destroy_room(word_id: str, room_id: str):
     payload = {'topic': "destroy-room",
                'd': {'roomId': room_id}}
-
-    await rabbit_handler.publish(json.dumps(payload))
-
-
-async def remove_user(word_id: str, room_ids: list, user_id: str):
-    payload = {'topic': "remove-user-from-groups",
-               'd': {'roomIds': list(room_ids), 'peerId': user_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 

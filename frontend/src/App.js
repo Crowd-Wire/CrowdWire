@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from 'react';
+import AppContext from 'AppContext.js';
 
 // import { createBrowserHistory } from "history";
 // var hist = createBrowserHistory(); (not sure if we need this anymore)
@@ -8,9 +9,6 @@ import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import useAuthStore from 'stores/useAuthStore.ts';
 export default () => {
-  const changeAuth = (auth) => {
-    setAuth(auth);
-  }
   const startAuth = () => {
     const st = useAuthStore.getState();
     if(st.registeredUser && st.registeredUser.token)
@@ -19,8 +17,21 @@ export default () => {
       return "GUEST"
     return null;
   }
+  
   const [isAuth, setAuth] = React.useState(startAuth());
+  
+  const changeAuth = (auth) => {
+    setAuth(auth);
+  }
+  
+
+  const settings = {
+    isAuth: isAuth,
+  }
+
   const routing = useRoutes(routes(isAuth, changeAuth));
   
-  return routing;
+  return (<AppContext.Provider value={settings}>
+    {routing}
+    </AppContext.Provider>); 
 }

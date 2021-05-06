@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useContext } from 'react';
+import AppContext from 'AppContext.js';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -68,6 +69,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function DashDrawer(props){
+  const myContext = useContext(AppContext);
   const navigation = useNavigate();
   const location = useLocation();
   const classes = useStyles();
@@ -75,6 +77,7 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing.unit*2+100;
   const definitions = theme.spacing.unit*2+50;
+  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -93,9 +96,8 @@ export default function DashDrawer(props){
   }
 
   const logout = () => {
-    localStorage.clear(); 
-    props.changeAuth(false);
     AuthenticationService.logout();
+    props.changeAuth(false);
   }
 
   const onClickCreateWorld = () => {
@@ -165,7 +167,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          { props.isAuth==="GUEST" ?
+          { myContext.isAuth==="GUEST" ?
             <></>
             :
             <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
