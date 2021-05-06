@@ -1,14 +1,27 @@
 import { useRoomStore } from "../stores/useRoomStore";
 import { useMediaStore } from "../stores/useMediaStore";
+import { Transport } from "mediasoup-client/lib/Transport";
 
-export const sendMedia = async () => {
+export const sendMedia = async (roomId:string = null) => {
   let { set, media, mediaStream } = useMediaStore.getState();
-  const { sendTransport, roomId } = useRoomStore.getState();
-  
-  if (!roomId)
-    return;
+  const { rooms } = useRoomStore.getState();
 
-  if (!sendTransport) {
+  
+  if (roomId && !(roomId in rooms))
+    return;
+  
+  const sendTransports: Transport[] = [];
+
+  if (roomId)
+    sendTransports.push(rooms[roomId].sendTransport)
+  else {
+    for (let value of Object.values(rooms))
+      sendTransports.push(value.sendTransport)
+  }
+
+  console.log(sendTransports)
+
+  if (sendTransports.length <= 0) {
     console.log("no sendTransport in sendVoice");
     return;
   }
@@ -30,10 +43,14 @@ export const sendMedia = async () => {
   if (media) {
     try {
       console.log("creating producer...");
-      sendTransport.produce({
-        track: media,
-        appData: { mediaTag: "media" },
-      }).then((producer) => {set({mediaProducer: producer})})
+      sendTransports.forEach(function (sendTransport) {
+        sendTransport.produce({
+          track: media,
+          appData: { mediaTag: "media" },
+        })
+        .then((producer) => {set({mediaProducer: producer})})
+        .catch((err) => console.log(err))
+      });
       media.onended = function(event) {
         useMediaStore.getState().mediaProducer.close();
         set({media: null, mediaStream: null, mediaProducer: null})

@@ -174,8 +174,12 @@ class RedisConnector:
         await self.sadd(f"world:{world_id}:user:{user_id}:users", *found_users_id)
 
     async def add_users_to_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
-        """Add one or more users to a groups"""
+        """
+        Add one or more users to a groups
+        Returns a dictionary with actions made to groups and users
+        """
 
+        actions = {"add-users-to-room": [], "close-room": []}
         users_id = [user_id, *users_id]
         all_users_id = set(users_id) | set(await self.get_group_users(world_id, group_id))
 
@@ -215,22 +219,29 @@ class RedisConnector:
         mergeable_groups_id.remove(lowest_group_id)
 
         for mgid in mergeable_groups_id:
+            actions['close-room'].append({'worldId': world_id, 'roomId': group_id})
+
             if mgid == group_id:
                 mem_users_id = all_users_id
             else:
                 mem_users_id = mem_group_users_id[mgid][0]
+
             await self.rem_group(world_id, mgid)
 
             # add users to lowest group id
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
+                actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
                 await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
 
         """Add users to the normalized group"""
-        # TODO: maybe doing twice? but no problem
-        await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
-        for uid in users_id:
-            await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+        if not mergeable_groups_id:
+            await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
+            for uid in users_id:
+                actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
+                await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+
+        return actions
 
     async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Add one or more groups to a user"""
@@ -251,6 +262,9 @@ class RedisConnector:
 
     async def rem_users_from_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """Remove one or more users from a group"""
+        """Returns a dictionary with actions made to groups and users"""
+
+        actions = []
 
         """Remove users"""
         users_id = [user_id, *users_id]
@@ -260,6 +274,7 @@ class RedisConnector:
 
         """Normalize groups after remove"""
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
+            actions.append({'worldId': world_id, 'roomId': group_id})
             # remove group when one or none inner users
             await self.rem_group(world_id, group_id)
         else:
@@ -273,14 +288,20 @@ class RedisConnector:
             for igid in inter_groups_id:
                 if set(await self.get_group_users(world_id, igid)).issuperset(set(left_users)):
                     # remove redundant group
+                    actions.append({'worldId': world_id, 'roomId': group_id})
                     await self.rem_group(world_id, group_id)
                     break
 
+        return actions
+
     async def rem_groups_from_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
-        """Remove one or more groups from a user"""
+        """Remove one or more groups from a user
+        Returns a dictionary with actions made to groups and users"""
+        actions = {}
         groups_id = [group_id, *groups_id]
         for gid in groups_id:
-            await self.rem_users_from_group(world_id, gid, user_id)
+            actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
+        return actions
 
 
 redis_connector = RedisConnector()

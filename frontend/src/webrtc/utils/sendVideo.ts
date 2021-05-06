@@ -2,17 +2,27 @@ import storeDevice from "../../redux/commStore.js";
 import { useRoomStore } from "../stores/useRoomStore";
 import { useVideoStore } from "../stores/useVideoStore";
 import { useMuteStore } from "../stores/useMuteStore";
+import { Transport } from "mediasoup-client/lib/Transport";
 
-export const sendVideo = async () => {
+export const sendVideo = async (roomId:string = null) => {
   const { camId } = storeDevice.getState().camId;
   let { set, cam, camStream } = useVideoStore.getState();
-  const { sendTransport, roomId } = useRoomStore.getState();
+  const { rooms } = useRoomStore.getState();
   const { videoMuted } = useMuteStore.getState();
   
-  if (!roomId || videoMuted)
+  if ( (roomId && !(roomId in rooms)) || videoMuted)
     return;
+  
+  const sendTransports: Transport[] = [];
 
-  if (!sendTransport) {
+  if (roomId)
+    sendTransports.push(rooms[roomId].sendTransport)
+  else {
+    for (let value of Object.values(rooms))
+      sendTransports.push(value.sendTransport)
+  }
+
+  if (sendTransports.length <= 0) {
     console.log("no sendTransport in sendVoice");
     return;
   }
@@ -35,9 +45,20 @@ export const sendVideo = async () => {
 
   if (cam) {
     console.log("creating producer...");
-    sendTransport.produce({
-      track: cam,
-      appData: { mediaTag: "video" },
-    }).then((producer) => {set({camProducer: producer})})
+    sendTransports.forEach(function (sendTransport) {
+      sendTransport.produce({
+        track: cam,
+        appData: { mediaTag: "video" },
+      })
+      .then((producer) => {set({camProducer: producer})})
+      .catch((err) => {
+        console.log(err)
+        cam.onended = function(event) {
+          useVideoStore.getState().camProducer.close();
+          set({cam: null, camStream: null, camProducer: null})
+        }
+      })
+    });
+
   }
 };

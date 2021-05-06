@@ -10,6 +10,7 @@ import gameUITypes from "consts/gameUITypes";
 import Phaser from "./Sections/Phaser";
 import MapUI from "./Sections/MapUI";
 import MapEditorUI from "./Sections/MapEditorUI";
+import RoomCall from "../../components/Communications/RoomCall";
 // MapManager
 // Settings
 
@@ -52,6 +53,8 @@ class GamePage extends React.Component {
           )}
         </div>
 
+        <RoomCall/>
+        
         {/* Game */}
         <Phaser />
       </>

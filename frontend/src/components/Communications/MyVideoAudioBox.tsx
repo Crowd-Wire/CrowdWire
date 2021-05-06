@@ -3,7 +3,7 @@ import { Card } from '@material-ui/core';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
-import SettingsIcon from '@material-ui/icons/Settings';
+import SettingsIcon from '@material-ui/icons/SettingsApplicationsTwoTone';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
@@ -37,6 +37,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [mediaOffState, setMediaOffState] = useState(true)
   const [showModal, setShowModal] = useState(false)
 
+  
   function toggleModal() {
     setShowModal(!showModal)
   }
@@ -46,7 +47,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setVideoPauseState(!videoPauseState)
     useMuteStore.getState().setVideoMute(videoPauseState);
     let { camProducer } = useVideoStore.getState();
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
 
@@ -55,14 +56,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         camProducer.pause();
       else
         camProducer.resume();
-      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'video', pause: videoPauseState } })
+      for (let roomId in rooms)
+        wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
     }
   }
   const toggleAudio = () => {
     setAudioPauseState(!audioPauseState)
     useMuteStore.getState().setAudioMute(audioPauseState)
     let { micProducer } = useVoiceStore.getState();
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
     
@@ -72,7 +74,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       else {
         micProducer.resume();
       }
-      wsend({ topic: "toggle-producer", d: { roomId: roomId, kind: 'audio', pause: audioPauseState } });
+      for (let roomId in rooms)
+        wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
     }
   }
 
@@ -91,10 +94,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   useEffect(() => {
-    let { roomId } = useRoomStore.getState();
+    let { rooms } = useRoomStore.getState();
 
     setMediaOffState(useMediaStore.getState().media ? false : true)
-    wsend({ topic: "close-media", d: { roomId: roomId } })
+    for (let roomId in rooms)
+      wsend({ topic: "close-media" })
     console.log("sending close media")
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useMediaStore.getState().media])
@@ -119,8 +123,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div>
-      <div style={{height:'100%', maxWidth:400, width: '100%', overflow: 'auto', display: 'inline-block'}}>
+    <div style={{
+      height:'100%',
+      maxWidth:400,
+      width: '100%',
+      overflow: 'auto',
+    }}>
         <Card style={{padding: 3,
         background: 'rgba(65, 90, 90, 0.5)',
         overflow: 'hidden',
@@ -130,51 +138,74 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         backdropFilter: 'blur(3px)',
         height: '100%'
       }}>
-            <div style={{padding: 2, textAlign: 'center', fontSize: 18, color: '#fff', fontWeight: 500}}>
-              <span>{username}</span>
-              <SettingsIcon style={{'cursor': 'pointer', float: 'right'}}
-                onClick={() => toggleModal()}/>
-            </div>
-            <div id={id+"border_div"}>
+            <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
                 { videoTrack ? (
-                  <video autoPlay id={id+"_video"} ref={myRef}
-                  style={{display: videoPauseState ? 'block' : 'none'}}/>
+                    <video autoPlay id={id+"_video"} ref={myRef}
+                      style={{display: videoPauseState ? 'block' : 'none'}}/>
                   ) : audioTrack ? (
-                    <audio autoPlay id={id+"_audio"} ref={myRef}/>
-                    ) : ''}
+                    <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
+                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
+                      <audio autoPlay id={id+"_audio"} ref={myRef}/>
+                    </div>
+                  ) : ''
+                }
+                { !videoTrack || !videoPauseState ?
+                  (
+                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
+                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+                  </div>
+                  )
+                : ''}
             </div>
 
-            <div style={{position: 'relative', bottom: 0, width:'100%'}}>
+            
+
+            <div style={{
+              position: 'absolute',
+              top: 2,
+              paddingRight: 2,
+              textAlign: 'center',
+              fontSize: '1.2em',
+              color: '#fff',
+              fontWeight: 500,
+              width: '98%',
+              WebkitTextStroke: '0.5px white',
+              backgroundColor: 'rgba(0,0,0, 0.3)',
+            }}>
+              <span>{username}</span>
+              <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
+                onClick={() => toggleModal()}/>
+            </div>
+            <div style={{position: 'relative', width:'96%', bottom:0, fontSize: '1em'}}>
               <Row>
                 <Col sm={6}>
                   { videoTrack ?
                       videoPauseState ? 
-                      (<VideocamIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleVideo()}/>)
+                      (<VideocamIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleVideo()}/>)
                       : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
                       : (<VideocamOffIcon color={'action'}/>)
                     }
                   { audioTrack ?
                       audioPauseState ? 
-                      (<MicIcon style={{'cursor': 'pointer', color :'white'}} onClick={() => toggleAudio()}/>)
+                      (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon color={'action'}/>)
                     }
                 </Col>
 
                 <Col style={{textAlign: 'right'}} sm={6}>
-                  { mediaOffState ? 
-                    <ScreenShareIcon style={{'cursor': 'pointer', color :'white'}} onClick={() => toggleMedia()}/>
-                    :
-                    <StopScreenShareIcon style={{'cursor': 'pointer'}} color={'primary'} onClick={() => toggleMedia()}/>
-                  }
+                    { mediaOffState ? 
+                      <ScreenShareIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleMedia()}/>
+                      :
+                      <StopScreenShareIcon style={{'cursor': 'pointer'}} color="secondary" onClick={() => toggleMedia()}/>
+                    }
                 </Col>
               </Row>
             </div>
         </Card>
-      </div>
-    { showModal ? 
-      <DeviceSettings closeModal={toggleModal}/>
-    : ''}
+      { showModal ? 
+        <DeviceSettings closeModal={toggleModal}/>
+      : ''}
     </div>
   );
 };
