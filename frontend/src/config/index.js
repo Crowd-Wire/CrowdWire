@@ -7,8 +7,8 @@ if (window.REACT_APP_RUNNING_MODE != null && window.REACT_APP_RUNNING_MODE == 'p
     let HOST = window.REACT_APP_API_IP
     console.log("host" + HOST)
     WS_BASE = `ws://${HOST}/api/v1`
-    API_BASE = `http://${HOST}/api/v1`
-    URL_BASE = `http://${HOST}`
+    API_BASE = `http://${HOST}/api/v1/`
+    URL_BASE = `http://${HOST}/`
 }
 else {
     WS_BASE = "ws://localhost:8000";
