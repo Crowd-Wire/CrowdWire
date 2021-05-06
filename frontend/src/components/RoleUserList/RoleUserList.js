@@ -20,7 +20,6 @@ export default function RoleUserList(props){
 
     const moveCard = useCallback((dragArray, hoverArray) => {
         const dragCard = value.users[dragArray[1]];
-        console.log(dragCard, dragArray, hoverArray);
         setUsers(dragArray, hoverArray, dragCard);
     });
     return(

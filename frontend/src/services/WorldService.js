@@ -29,8 +29,6 @@ class WorldService {
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
 
-        
-
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
