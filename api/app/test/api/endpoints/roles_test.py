@@ -13,6 +13,7 @@ client = TestClient(app)
 async def override_dependency_user(token: str = None):
     return User()
 
+
 async def override_dependency_guest():
     return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6")
 
