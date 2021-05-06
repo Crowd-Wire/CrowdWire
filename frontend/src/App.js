@@ -6,13 +6,14 @@ import React from "react";
 import { useRoutes } from 'react-router-dom';
 import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import useAuthStore from 'stores/useAuthStore.ts';
 export default () => {
   const changeAuth = (auth) => {
     setAuth(auth);
   }
   const startAuth = () => {
-    if(localStorage.getItem("auth") && localStorage.getItem("auth")["token"]!==null)
+    const st = useAuthStore.getState();
+    if((st.registeredUser && st.registeredUser.token) || (st.guestUser && st.guestUser.token))
       return true;
     return false;
   }

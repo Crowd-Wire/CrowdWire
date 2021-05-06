@@ -27,16 +27,19 @@ class AuthenticationService {
         })
     }
     getToken() {
-        if(localStorage.getItem("auth")!==null)
-            return JSON.parse(localStorage.getItem("auth"))["token"];
+        const st = useAuthStore.getState()
+        if(st.registeredUser && st.registeredUser.token)
+            return useAuthStore.getState().registeredUser.token;
         return null;
     }
 
     setToken(auth, type) {
+        console.log(useAuthStore.getState());
         if(type==="GUEST"){
-            useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.guest_uuid);
+            useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
         }
         else if(type==="AUTH"){
+            console.log(auth)
             useAuthStore.getState().login(auth.access_token, auth.expire_date);
         }
         console.log(useAuthStore.getState());

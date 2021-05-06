@@ -33,12 +33,12 @@ const useAuthStore = create(
             leaveGuest: () => {
                 return set(() => {
                     return {guestUser: null};
-                }, true)
+                })
             },
             leaveRegistered: () => {
                 return set(() => {
                     return {registeredUser: null};
-                }, true)
+                })
             },
         })
     ),
