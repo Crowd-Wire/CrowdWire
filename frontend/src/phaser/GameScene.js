@@ -157,9 +157,7 @@ class GameScene extends Phaser.Scene {
                         if (left) {
                             GameScene.inRangePlayers.delete(id);
                             // close media connections to this user
-                            console.log(useConsumerStore.getState())
                             useConsumerStore.getState().closePeer(id);
-                            console.log(useConsumerStore.getState())
                         };
                         return left;
                     })

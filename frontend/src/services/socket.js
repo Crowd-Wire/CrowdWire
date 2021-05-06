@@ -144,6 +144,7 @@ export const getSocket = (worldId) => {
             playerStore.getState().connectPlayer(data.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
+            useConsumerStore.getState().closePeer(data.user_id);
             playerStore.getState().disconnectPlayer(data.user_id);
             break;
         case "PLAYER_MOVEMENT":
