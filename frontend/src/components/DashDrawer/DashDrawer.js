@@ -11,6 +11,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import { useLocation, useNavigate } from "react-router-dom";
 
 
@@ -71,33 +72,30 @@ export default function DashDrawer(props){
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const addWorld = theme.spacing.unit*2+50;
+  const addWorld = theme.spacing.unit*2+100;
+  const definitions = theme.spacing.unit*2+50;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard")
-      navigation("/dashboard");
+    if(location.pathname!=="/dashboard/search")
+      navigation("/dashboard/search");
     props.handler(false);
   }
 
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard")
-      navigation("/dashboard");
+    if(location.pathname!=="/dashboard/search")
+      navigation("/dashboard/search");
     props.handler(true);
   }
 
 
   const onClickCreateWorld = () => {
-    navigation("../create-world");
+    navigation("/create-world");
   }
 
-  // const onClickDefinitions = () => {
-  //   console.log(navigation.toString());
-
-  // }
 
   const handleDrawerClose = () => {
     setOpen(false);
@@ -161,7 +159,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create WOrld" style={{position: "fixed", bottom: addWorld}}
+          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
           onClick={onClickCreateWorld}>
             <ListItemIcon>
                 <AddCircleOutlined className={classes.iconDrawer}/>
@@ -172,9 +170,19 @@ export default function DashDrawer(props){
                 })}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Settings" style={{position: "fixed", bottom: theme.spacing.unit * 2}}>
+            button key="Settings" style={{position: "fixed", bottom: definitions}}>
           <ListItemIcon>
               <Settings className={classes.iconDrawer}/>
+          </ListItemIcon>
+          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+          </ListItem>
+          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+            button key="Settings" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
+            onClick={() => {localStorage.clear(); props.changeAuth(false)}}
+          >
+          <ListItemIcon>
+              <MeetingRoomIcon className={classes.iconDrawer}/>
           </ListItemIcon>
           <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>

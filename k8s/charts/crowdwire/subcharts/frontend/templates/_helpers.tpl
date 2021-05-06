@@ -61,6 +61,11 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "frontend.apiservicename" -}}
+{{- $serv_name:= include "frontend.fullname" (dict "Values" $.Values.api "Chart" (dict "Name" "api") "Release" $.Release) }}
+{{- printf "%s" $serv_name }}
+{{- end }}
+
 
 {/* NAME OF THE SERVICE MANIFEST */}}
 {{- define "frontend.servicename" -}}

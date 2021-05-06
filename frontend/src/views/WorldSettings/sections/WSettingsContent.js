@@ -33,7 +33,6 @@ class WSettingsContent extends Component {
 	
 	setUsers = (item, rName) => {
 		this.setState(state => {
-			console.log(item, 1)
 
 			const roles = state.roles;
 			let flag = false;
@@ -49,9 +48,7 @@ class WSettingsContent extends Component {
 				}
 				if (flag) break;
 			}
-			console.log(item, 2)
 			roles[rName].users.splice(0, 0, item);
-			console.log(roles)
 
 			return { roles };
 		})

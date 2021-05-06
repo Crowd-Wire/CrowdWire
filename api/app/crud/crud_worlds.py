@@ -138,7 +138,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                 else:
                     return None, strings.INVALID_TAG
             update_data['tags'] = lst
-        print(update_data)
         # clear cache of the queries related to the object
         await clear_cache_by_model("World", world_id=db_obj.world_id)
         obj = super().update(db, db_obj=db_obj, obj_in=update_data)
@@ -179,6 +178,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if not user_id:
             return None, strings.USER_NOT_PASSED
         # Check first if the world Exists
+        # For Statistics Purposes we do not really delete the worlds, since
+        # we would lose all the data
         obj, msg = self.is_editable_to_user(db=db, world_id=world_id, user_id=user_id)
         if not obj:
             return obj, msg

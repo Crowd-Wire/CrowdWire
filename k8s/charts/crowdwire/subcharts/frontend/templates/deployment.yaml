@@ -28,16 +28,32 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - containerPort: 80
-              protocol: TCP
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+      - env:
+        - name: RUNNING_MODE
+          value: {{ .Values.running_mode }}
+        {{- if .Values.api.enabled }}
+        - name: API_SERVICE_NAME
+          value: {{ include "frontend.apiservicename" . }}
+        {{- end}}
+        name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+          - containerPort: 80
+            protocol: TCP
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+                - name:  {{ include "frontend.fullname" . }}-config-volume
+                  mountPath: /usr/share/nginx/html/env-config.js
+                  subPath: env-config.js
+                  readOnly: true
+      volumes:
+        - name: {{ include "frontend.fullname" . }}-config-volume
+          configMap:
+            name: {{ include "frontend.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional, Tuple
 
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -33,6 +34,29 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         Verify if user has already joined this world
         """
         return db.query(World_User).filter(World_User.user_id == user_id, World_User.world_id == world_id).first()
+
+    def update_user_role(self, db: Session, world_id: int, user_id: int, role_id: int) \
+            -> Tuple[Optional[World_User], str]:
+        world_user = self.get_user_joined(db=db, world_id=world_id, user_id=user_id)
+        if world_user:
+            world_user.role_id = role_id
+            db.add(world_user)
+            db.commit()
+            db.refresh(world_user)
+            return world_user, strings.ROLE_CHANGED_SUCCESS
+        return None, strings.USER_NOT_IN_WORLD
+
+    def change_roles(self, db: Session, world_id: int, role_to_change_id: int, role_changed_id: int):
+        """
+        it changes the role of all users with this role
+        """
+        updated_objs = db.query(World_User) \
+            .filter(world_id == world_id,
+                    World_User.role_id == role_changed_id)\
+            .update({World_User.role_id: role_to_change_id})
+
+        db.commit()
+        return updated_objs, ""
 
     async def join_world(self, db: Session, _world: World, _user: User) -> World_User:
         """

@@ -1,6 +1,41 @@
 ## API 
 
 
+### Code Coverage
+
+In order to test code coverage use:
+```
+poetry run coverage run --source=app -m pytest 
+```
+
+This will run pytest and checks every file inside *app* directory.
+Then creates a *.coverage* file that stores the informations for the report.
+
+To get the results use:
+```
+poetry run coverage report -m
+```
+
+To get the report in html format use:
+```
+poetry run coverage html
+```
+
+It creates a folder with multiple html files.
+
+### Google Authentication
+
+For the Google Authentication feature to work it is required to have .env file in the same directory of 
+the app, in this directory for our case.
+
+The .env file should contain 2 variables and should look something like this:
+CLIENT_ID="googleapi.com"
+CLIENT_SECRET="randomsecret"
+
+For these to work, the application needs to be registered in the google api platform.
+Do not forget to change the address that has access to the api when going into production.
+
+
 ### Alembic
 
 Create alembic folder:

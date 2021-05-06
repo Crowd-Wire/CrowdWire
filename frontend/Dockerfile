@@ -18,5 +18,16 @@ COPY --from=build /usr/src/app/build /usr/share/nginx/html
 # Specify port
 EXPOSE 80
 
+# Copy .env file and shell script to container
+WORKDIR /usr/share/nginx/html
+COPY ./env.sh .
+COPY .env .
+
+# Add bash
+#RUN apk add --no-cache bash
+
+# Make our shell script executable
+#RUN chmod +x env.sh
 # start app
-CMD ["nginx", "-g", "daemon off;"]
+#"/bin/bash", "-c", "./env.sh &&
+CMD [ "nginx", "-g", "daemon off;"]

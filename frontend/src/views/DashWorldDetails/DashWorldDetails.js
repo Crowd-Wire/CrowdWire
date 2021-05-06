@@ -31,7 +31,6 @@ export default function DashWorldDetails(){
     });
   }, [])
   const handler = () => {
-      console.log("cenas");
       history.back();
   }
   const [joined,setJoined] = React.useState(false);
@@ -42,7 +41,7 @@ export default function DashWorldDetails(){
 return(
     <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer handler={sidebar_handler}/>
+        <DashDrawer handler={sidebar_handler} changeAuth={this.props.changeAuth}/>
         <DashboardContent handler = {handler} worldInfo={worldInfo} />
     </div>
     );
