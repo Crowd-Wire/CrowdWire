@@ -22,4 +22,4 @@ HEALTHCHECK --interval=21s --timeout=3s --start-period=10s CMD curl --fail http:
 
 #run poetry and fastapi server
 #poetry run alembic upgrade head
-CMD poetry run uvicorn --host=0.0.0.0 app.main:app
+CMD poetry run uvicorn --host=0.0.0.0 app.main:app	

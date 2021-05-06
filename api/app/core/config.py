@@ -30,19 +30,19 @@ class Settings(BaseSettings):
         f":{POSTGRES_PASSWORD}@{POSTGRES_SERVICE_NAME}" \
         f":5432/{POSTGRES_DB}"
 
-    RABBITMQ_USER: str = os.getenv('RABBITMQ_USER', 'user')
+    RABBITMQ_USERNAME: str = os.getenv('RABBITMQ_USERNAME', 'user')
     RABBITMQ_PASSWORD: str = "bitnami"
-    RABBITMQ_SERVICE_HOST: str = os.getenv('RABBITMQ_SERVICE_HOST', "localhost")
+    RABBITMQ_SERVICE_NAME: str = os.getenv('RABBITMQ_SERVICE_NAME', "localhost")
     RABBITMQ_URI: str = f"amqp://" \
-                        f"{RABBITMQ_USER}:{RABBITMQ_PASSWORD}" \
-                        f"@{RABBITMQ_SERVICE_HOST}:5672/"
+                        f"{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}" \
+                        f"@{RABBITMQ_SERVICE_NAME}:5672/"
 
     RABBITMQ_SENDING_QUEUE: str = "media_server_queue"
     RABBITMQ_RECEIVING_QUEUE: str = "rest_api_queue"
     REDIS_SENTINEL_HOST: str = os.getenv('REDIS_SENTINEL_HOST', 'localhost')
     REDIS_SENTINEL_PORT: int = 26379
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
-    REDIS_MASTER: str = os.getenv('REDIS_MASTER', 'mymaster')
+    REDIS_MASTER: str = 'mymaster'
 
     CLIENT_ID: str = ""
     CLIENT_SECRET: str = ""
