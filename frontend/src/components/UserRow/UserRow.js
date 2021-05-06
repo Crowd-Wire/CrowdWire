@@ -23,12 +23,8 @@ export default function UserRow(props){
             const dropResult = monitor.getDropResult();
             if (!dropResult)
                 return;
-            console.log(allRoles);
             allRoles.forEach(rName => {
-                console.log(rName);
-                console.log("dropRes"+dropResult.name);
                 if (dropResult && dropResult.name === rName){
-                    console.log("role name is "+rName);
                     changeItemColumn(item, rName);
                 }
             });
