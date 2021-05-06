@@ -24,6 +24,10 @@ async def world_websocket(
     # overwrites user_id given by token TODO: remove after tests
     user_id = manager.get_next_user_id()
     await manager.connect(world_id, websocket, user_id)
+    # default room id when joining world
+    # maybe on the function disconnect_room()
+    # check which room he is on instead of this
+    room_id = 0
 
     try:
         while True:
@@ -36,6 +40,7 @@ async def world_websocket(
                 )
 
             if topic == protocol.JOIN_PLAYER:
+                room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
                 await wh.send_groups_snapshot(world_id, user_id)
 
@@ -71,4 +76,5 @@ async def world_websocket(
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
         manager.disconnect(world_id, user_id)
-        # TODO: disconnect from room
+        await manager.disconnect_room(world_id, room_id, user_id)
+        await wh.disconnect_user(world_id, user_id)
