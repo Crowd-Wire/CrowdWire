@@ -1,9 +1,11 @@
+import pickle
 from typing import Optional, List, Union
 
 import aioredis
 from app.core.config import settings
+from app.schemas import RoleInDB
 from app.utils import generate_guest_username, choose_avatar
-from app import schemas
+from app import schemas, models
 from uuid import uuid4
 from loguru import logger
 
@@ -51,10 +53,11 @@ class RedisConnector:
             all_keys.extend(keys)
         return all_keys
 
-    async def hget(self, key: str, field: str):
-        return await self.master.execute('hget', key, field, encoding='utf-8')
+    async def hget(self, key: str, field: any):
+        # TODO: CHECK ENCODINGS!
+        return await self.master.execute('hget', key, field)
 
-    async def hset(self, key: str, field: str, value: str):
+    async def hset(self, key: str, field: str, value: any):
         return await self.master.execute('hset', key, field, value)
 
     async def sadd(self, key: str, member: str, *members):
@@ -84,10 +87,10 @@ class RedisConnector:
         be a string of the uuid for guests
         """
         for k, v in data.items():
-            await self.hset(f"world:{str(world_id)}:{str(user_id)}",
-                            k, v)
+            await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
-    async def join_new_guest_user(self, world_id: int, user_id: uuid4) -> schemas.World_UserInDB:
+    async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) \
+            -> schemas.World_UserWithRoleInDB:
         """
         Generates a username for guests and the user the @method save_world_user_data
         to store the user data
@@ -99,35 +102,43 @@ class RedisConnector:
         await self.save_world_user_data(
             world_id=world_id,
             user_id=user_id,
-            data={'username': username, 'avatar': avatar}
+            data={'username': username, 'avatar': avatar, 'role': role}
         )
-        return schemas.World_UserInDB(
+        return schemas.World_UserWithRoleInDB(
             world_id=world_id,
             user_id=user_id,
             username=username,
-            avatar=avatar
+            avatar=avatar,
+            role=RoleInDB(**role.__dict__)
         )
 
-    async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) -> Optional[schemas.World_UserInDB]:
+    async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[schemas.World_UserWithRoleInDB]:
         """
         Checks World_User Data, if present, to be returned to REST API
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
         # TODO: maybe check encoding instead of converting to string
-        data = {
-            'username': await self.hget(
-                f"world:{str(world_id)}:{str(user_id)}", 'username'
-            ),
-            'avatar': await self.hget(
-                f"world:{str(world_id)}:{str(user_id)}", 'avatar'
-            )
-        }
-        if data.get('avatar') and data.get('username'):
-            return schemas.World_UserInDB(
+        username = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'username')
+        avatar = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'avatar')
+        role = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'role'
+        )
+
+        if username and avatar and role:
+            data = {
+                'username': pickle.loads(username),
+                'avatar': pickle.loads(avatar),
+                'role': pickle.loads(role).__dict__
+            }
+            return schemas.World_UserWithRoleInDB(
                 world_id=world_id,
                 user_id=user_id,
                 avatar=data['avatar'],
-                username=data['username']
+                username=data['username'],
+                role=schemas.RoleInDB(**data['role'])
             )
 
         return None
