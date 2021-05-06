@@ -146,11 +146,11 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 export const startRabbit = async (handler: HandlerMap) => {
   console.log(
     "trying to connect to: ",
-    process.env.RABBITMQ_URL || "amqp://user:bitnami@localhost"
+    process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672"
   );
   let conn: Connection;
   try {
-    conn = await amqp.connect(process.env.RABBITMQ_URL || "amqp://user:bitnami@localhost");
+    conn = await amqp.connect(process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672");
   } catch (err) {
     console.error("Unable to connect to RabbitMQ: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
