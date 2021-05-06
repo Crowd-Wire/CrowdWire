@@ -142,7 +142,7 @@ export default function WorldDetails(props){
                                 <TextField
                                     {...params}
                                     variant="standard"
-                                    label="Labels"
+                                    label="Tags"
                                 />
                                 )}
                             />
@@ -154,7 +154,7 @@ export default function WorldDetails(props){
                                 helperText={maxUsersHelper}
                                 style={{marginRight:"30px"}}
                                 id="standard-number"
-                                label="Max Online Users"
+                                label="Max Online Users*"
                                 type="number"
                                 InputLabelProps={{
                                     shrink: true,
