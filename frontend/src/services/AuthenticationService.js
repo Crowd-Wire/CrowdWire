@@ -1,7 +1,8 @@
 import { API_BASE } from "config";
 
-class AuthenticationService {
+import useAuthStore from "stores/useAuthStore.ts";
 
+class AuthenticationService {
     login(email, password) {
         return fetch(API_BASE + 'login', {
             method: 'POST',
@@ -31,12 +32,33 @@ class AuthenticationService {
         return null;
     }
 
-    setToken(auth) {
+    setToken(auth, type) {
+        if(type==="GUEST"){
+            useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.guest_uuid);
+        }
+        else if(type==="AUTH"){
+            useAuthStore.getState().login(auth.access_token, auth.expire_date);
+        }
+        console.log(useAuthStore.getState());
+
         localStorage.setItem("auth",JSON.stringify(
             {"token":auth.access_token,
             "expire_date":auth.expire_date}
             )
         );
+    }
+
+    logout(){
+        const st = useAuthStore.getState();
+        if(st.guestUser){
+            console.log("GUEST")
+            useAuthStore.getState().leaveGuest()
+        }
+        else if(st.registeredUser){
+            console.log("REGISTERED USER")
+            useAuthStore.getState().leaveRegistered()
+        }
+        console.log(st.registeredUser);
     }
 
     joinAsGuest(){

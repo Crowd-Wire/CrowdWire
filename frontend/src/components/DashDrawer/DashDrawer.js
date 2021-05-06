@@ -13,6 +13,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import { useLocation, useNavigate } from "react-router-dom";
+import AuthenticationService from "services/AuthenticationService.js";
 
 
 const drawerWidth = 240;
@@ -91,6 +92,11 @@ export default function DashDrawer(props){
     props.handler(true);
   }
 
+  const logout = () => {
+    localStorage.clear(); 
+    props.changeAuth(false);
+    AuthenticationService.logout();
+  }
 
   const onClickCreateWorld = () => {
     navigation("/create-world");
@@ -178,13 +184,13 @@ export default function DashDrawer(props){
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Settings" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
-            onClick={() => {localStorage.clear(); props.changeAuth(false)}}
+            button key="Leave" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
+            onClick={() => logout()}
           >
           <ListItemIcon>
               <MeetingRoomIcon className={classes.iconDrawer}/>
           </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+          <ListItemText style={{ color: '#FFFFFF' }} primary="LOGOUT"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
         </List>

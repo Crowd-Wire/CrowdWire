@@ -79,7 +79,7 @@ class LoginPage extends React.Component {
         console.log(res)
         if(res.access_token!==undefined){
           this.notify("Auth");
-          AuthenticationService.setToken(res);
+          AuthenticationService.setToken(res,"AUTH");
           this.setState({loggedIn:true})
           this.props.changeAuth(true);
         }
@@ -101,7 +101,7 @@ class LoginPage extends React.Component {
       .then((res) => {
         if(res.access_token!==undefined){
           this.notify("Guest");
-          AuthenticationService.setToken(res);
+          AuthenticationService.setToken(res, "GUEST");
           this.setState({loggedIn:true}); 
           this.props.changeAuth(true);
         }
