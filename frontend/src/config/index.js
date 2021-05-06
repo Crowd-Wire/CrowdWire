@@ -6,7 +6,7 @@ console.log(window.REACT_APP_API_IP);
 if (window.REACT_APP_RUNNING_MODE != null && window.REACT_APP_RUNNING_MODE == 'production'){
     let HOST = window.REACT_APP_API_IP
     console.log("host" + HOST)
-    WS_BASE = `ws://${HOST}`
+    WS_BASE = `ws://${HOST}/api/v1`
     API_BASE = `http://${HOST}/api/v1`
     URL_BASE = `http://${HOST}`
 }
