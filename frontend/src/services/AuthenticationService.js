@@ -36,23 +36,21 @@ class AuthenticationService {
     }
 
     setToken(auth, type) {
-        console.log(useAuthStore.getState());
         if(type==="GUEST"){
             useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
         }
         else if(type==="AUTH"){
             useAuthStore.getState().login(auth.access_token, auth.expire_date);
         }
-        console.log(useAuthStore.getState());
     }
 
     logout(){
         const st = useAuthStore.getState();
         if(st.guestUser){
-            useAuthStore.getState().leaveGuest()
+            useAuthStore.getState().leaveGuest();
         }
         else if(st.registeredUser){
-            useAuthStore.getState().leaveRegistered()
+            useAuthStore.getState().leaveRegistered();
         }
     }
 

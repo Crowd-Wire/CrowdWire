@@ -97,7 +97,7 @@ export default function DashDrawer(props){
 
   const logout = () => {
     AuthenticationService.logout();
-    props.changeAuth(false);
+    myContext.changeAuth(false);
   }
 
   const onClickCreateWorld = () => {

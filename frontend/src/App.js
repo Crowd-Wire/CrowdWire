@@ -27,6 +27,7 @@ export default () => {
 
   const settings = {
     isAuth: isAuth,
+    changeAuth: changeAuth
   }
 
   const routing = useRoutes(routes(isAuth, changeAuth));

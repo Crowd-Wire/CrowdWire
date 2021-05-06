@@ -26,10 +26,11 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
+import AppContext from 'AppContext';
 
 class LoginPage extends React.Component {
 
+  static contextType = AppContext;
   constructor(props) {
     super(props);
     this.state = { 
@@ -80,8 +81,7 @@ class LoginPage extends React.Component {
         if(res.access_token!==undefined){
           this.notify("Auth");
           AuthenticationService.setToken(res,"AUTH");
-          this.setState({loggedIn:true})
-          this.props.changeAuth("REGISTERED");
+          this.context.changeAuth("REGISTERED");
         }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
@@ -102,8 +102,7 @@ class LoginPage extends React.Component {
         if(res.access_token!==undefined){
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
-          this.setState({loggedIn:true}); 
-          this.props.changeAuth("GUEST");
+          this.context.changeAuth("GUEST");
         }
       })
 
@@ -111,10 +110,6 @@ class LoginPage extends React.Component {
 
 
   render() {
-    if (this.state.loggedIn) {
-      return <Navigate to="../dashboard/search" />
-    }
-
     return (
       <div>
         <div

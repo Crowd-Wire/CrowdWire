@@ -26,11 +26,14 @@ import AuthenticationService from "services/AuthenticationService";
 import { useNavigate, Navigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
+import AppContext from 'AppContext.js';
 
 const useStyles = makeStyles(styles);
 
 
 class RegisterPage extends React.Component {
+
+  static contextType = AppContext;
 
   constructor(props) {
     super(props);
@@ -73,11 +76,11 @@ class RegisterPage extends React.Component {
     )
     .then(
       (res) => {
-        AuthenticationService.setToken(res);
         if(res.access_token!==undefined){
           this.notify();
-          this.setState({loggedIn:true})
-          this.props.changeAuth(true);
+          AuthenticationService.setToken(res,"AUTH");
+          this.context.changeAuth("REGISTERED");
+
         }
       }
     ) 
@@ -159,9 +162,6 @@ class RegisterPage extends React.Component {
   }
 
   render() {
-    if (this.state.loggedIn) {
-      return <Navigate to="/dashboard/search" />
-    }
     return (
       <div>
         <div
