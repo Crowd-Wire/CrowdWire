@@ -75,7 +75,12 @@ async def join_world(
         world_user = await redis_connector.get_world_user_data(world_id, user.user_id)
         if not world_user:
             # Otherwise, goes to PostgreSQL database
-            world_user = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+
+            world_user, default_role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+            # pydantic schema is waiting for a role object not a role id, so let's delete the attr
+            delattr(world_user, 'role_id')
+            setattr(world_user, 'role', default_role)
+
             return world_user
     else:
         # There are some differences for guests..
@@ -85,7 +90,9 @@ async def join_world(
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
             logger.debug('not cached:/')
-            world_user = await redis_connector.join_new_guest_user(world_id=world_id, user_id=user.user_id)
+            world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
+            world_user = await redis_connector.join_new_guest_user(world_id=world_id,
+                                                                   user_id=user.user_id, role=world_default_role)
     return world_user
 
 

@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, validator, UUID4
 from typing import Optional, Union
 from app.core.consts import AVATARS_LIST
+from app.schemas import RoleInDB
 
 
 class World_UserBase(BaseModel):
@@ -39,6 +40,7 @@ class World_UserInDBBase(BaseModel):
     # user_id is an UUID1 for Guest Users
     user_id: Optional[Union[int, UUID4]]
     world_id: int
+    role: RoleInDB
 
     class Config:
         orm_mode = True
