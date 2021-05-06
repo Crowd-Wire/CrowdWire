@@ -6,7 +6,6 @@ import secrets
 class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
-    INVITE_SECRET_TOKEN: str = secrets.token_urlsafe(32)
     PROJECT_NAME: str = "CrowdWire"
 
     # TODO: Change this
@@ -33,7 +32,7 @@ class Settings(BaseSettings):
                         f"@{RABBITMQ_HOST}:5672/"
 
     REDIS_SENTINEL_HOST: str = 'localhost'
-    REDIS_SENTINEL_PORT: int = 26379
+    REDIS_SENTINEL_PORT: int = 6379
     REDIS_SENTINEL_PASSWORD: str = 'password'
     REDIS_MASTER: str = 'mymaster'
 

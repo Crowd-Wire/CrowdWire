@@ -52,9 +52,9 @@ class GamePage extends React.Component {
             {style: gameUIStyle}
           )}
         </div>
-        <div style={{position: 'absolute', zIndex: 99, height: '25%', width:'100%'}}>
-          <RoomCall/>
-        </div>
+
+        <RoomCall/>
+        
         {/* Game */}
         <Phaser />
       </>

@@ -123,7 +123,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-      <div className="video_div_card">
+    <div style={{
+      height:'100%',
+      maxWidth:400,
+      width: '100%',
+      overflow: 'auto',
+    }}>
         <Card style={{padding: 3,
         background: 'rgba(65, 90, 90, 0.5)',
         overflow: 'hidden',
@@ -135,22 +140,19 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       }}>
             <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
                 { videoTrack ? (
-                  <video autoPlay id={id+"_video"} ref={myRef}
-                  style={{display: videoPauseState ? 'block' : 'none'}}/>
+                    <video autoPlay id={id+"_video"} ref={myRef}
+                      style={{display: videoPauseState ? 'block' : 'none'}}/>
                   ) : audioTrack ? (
                     <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
                       <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
                       <audio autoPlay id={id+"_audio"} ref={myRef}/>
                     </div>
-                    ) : (
-                      <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                        <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
-                      </div>
-                    )}
-                { !videoPauseState ?
+                  ) : ''
+                }
+                { !videoTrack || !videoPauseState ?
                   (
-                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
+                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
+                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
                   </div>
                   )
                 : ''}

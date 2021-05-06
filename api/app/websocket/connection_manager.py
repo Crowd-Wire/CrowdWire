@@ -96,9 +96,10 @@ class ConnectionManager:
 
     async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:
-            for user_id in self.connections[world_id][room_id]:
-                if user_id != sender_id:
-                    await self.users_ws[user_id].send_json(payload)
+            if room_id in self.connections[world_id]:
+                for user_id in self.connections[world_id][room_id]:
+                    if user_id != sender_id:
+                        await self.send_personal_message(payload, user_id)
             # logger.info(
             #     f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
             #     f"{payload}"

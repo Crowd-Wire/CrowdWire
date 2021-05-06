@@ -52,11 +52,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     for uid in users_id:
         if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
             # check if user already claimed proximity
-            logger.info("dentro do if")
             add_users.add(uid)
-        else:
-            logger.info("fora do if")
-            
 
     actions = {}
     # create new group and let it normalize
