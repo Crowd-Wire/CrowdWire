@@ -37,10 +37,6 @@ class Settings(BaseSettings):
                         f"{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}" \
                         f"@{RABBITMQ_SERVICE_NAME}:5672/"
 
-    REDIS_SENTINEL_HOST: str = 'localhost'
-    REDIS_SENTINEL_PORT: int = 6379
-    REDIS_SENTINEL_PASSWORD: str = 'password'
-    REDIS_MASTER: str = 'mymaster'
     RABBITMQ_SENDING_QUEUE: str = "media_server_queue"
     RABBITMQ_RECEIVING_QUEUE: str = "rest_api_queue"
     REDIS_SENTINEL_HOST: str = os.getenv('REDIS_SENTINEL_HOST', 'localhost')
