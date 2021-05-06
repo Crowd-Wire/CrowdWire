@@ -13,9 +13,11 @@ export default () => {
   }
   const startAuth = () => {
     const st = useAuthStore.getState();
-    if((st.registeredUser && st.registeredUser.token) || (st.guestUser && st.guestUser.token))
-      return true;
-    return false;
+    if(st.registeredUser && st.registeredUser.token)
+      return "REGISTERED";
+    else if(st.guestUser && st.guestUser.token)
+      return "GUEST"
+    return null;
   }
   const [isAuth, setAuth] = React.useState(startAuth());
   const routing = useRoutes(routes(isAuth, changeAuth));

@@ -30,7 +30,7 @@ class WorldService {
             url = url.concat('?'+query.join('&'));
 
         
-
+        console.log(AuthenticationService.getToken())
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',

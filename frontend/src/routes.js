@@ -51,7 +51,7 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{
 		path: "/",
-		element: isAuth ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Navigate to="/dashboard/search"/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
 			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
@@ -59,7 +59,7 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{
 		path:"/",
-		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
+		element: isAuth==="REGISTERED"  ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
 			{ path: "/join", element: <InviteJoinPage/>},
@@ -67,7 +67,7 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{ 
 		path: "/dashboard", 
-		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
+		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
 			{path:"/search", element: <DashSearch changeAuth={changeAuth}/>}
@@ -75,15 +75,15 @@ const routes = (isAuth, changeAuth) => [
 	},
     {
 		path: "/user",
-		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
+		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet /> : <Navigate to="/login" />,
 		children: [
-            { path: "/profile", element: <ProfilePage /> },
+            { path: "/profile", element: isAuth==="GUEST"? <ProfilePage /> : <Navigate to="/login"/> },
             { path: "/settings", element: <UserSettings /> },
 		],
 	},
     {
 		path: "/world",
-		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
+		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },

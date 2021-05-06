@@ -81,7 +81,7 @@ class LoginPage extends React.Component {
           this.notify("Auth");
           AuthenticationService.setToken(res,"AUTH");
           this.setState({loggedIn:true})
-          this.props.changeAuth(true);
+          this.props.changeAuth("REGISTERED");
         }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
@@ -103,7 +103,7 @@ class LoginPage extends React.Component {
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
           this.setState({loggedIn:true}); 
-          this.props.changeAuth(true);
+          this.props.changeAuth("GUEST");
         }
       })
 

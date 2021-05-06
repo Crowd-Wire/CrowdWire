@@ -30,6 +30,8 @@ class AuthenticationService {
         const st = useAuthStore.getState()
         if(st.registeredUser && st.registeredUser.token)
             return useAuthStore.getState().registeredUser.token;
+        if(st.guestUser && st.guestUser.token)
+            return useAuthStore.getState().guestUser.token;
         return null;
     }
 
