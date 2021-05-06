@@ -146,7 +146,7 @@ class TestAuth(TestCase):
         )
         assert response.status_code == 422
 
-    def test_generate_invite_link_success_user(self):
+    def test_generate_invite_link_user_success(self):
         """
         Expects 200 Ok given a user with the right access
         """

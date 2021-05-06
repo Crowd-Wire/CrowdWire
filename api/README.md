@@ -1,6 +1,27 @@
 ## API 
 
 
+### Code Coverage
+
+In order to test code coverage use:
+```
+poetry run coverage run --source=app -m pytest 
+```
+
+This will run pytest and checks every file inside *app* directory.
+Then creates a *.coverage* file that stores the informations for the report.
+
+To get the results use:
+```
+poetry run coverage report -m
+```
+
+To get the report in html format use:
+```
+poetry run coverage html
+```
+
+It creates a folder with multiple html files.
 
 ### Google Authentication
 
