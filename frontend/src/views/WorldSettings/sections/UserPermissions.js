@@ -83,7 +83,7 @@ export default function UserPermissions() {
             />
           </Row>
         </Col>
-        <Col Col xs={6} sm={6} md={6}>
+        <Col xs={6} sm={6} md={6}>
           <Row>
             <FormControlLabel
               control={
