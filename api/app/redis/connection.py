@@ -89,7 +89,8 @@ class RedisConnector:
         for k, v in data.items():
             await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
-    async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) -> schemas.World_UserInDB:
+    async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) \
+            -> schemas.World_UserWithRoleInDB:
         """
         Generates a username for guests and the user the @method save_world_user_data
         to store the user data
@@ -103,7 +104,7 @@ class RedisConnector:
             user_id=user_id,
             data={'username': username, 'avatar': avatar, 'role': role}
         )
-        return schemas.World_UserInDB(
+        return schemas.World_UserWithRoleInDB(
             world_id=world_id,
             user_id=user_id,
             username=username,
@@ -111,7 +112,8 @@ class RedisConnector:
             role=RoleInDB(**role.__dict__)
         )
 
-    async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) -> Optional[schemas.World_UserInDB]:
+    async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[schemas.World_UserWithRoleInDB]:
         """
         Checks World_User Data, if present, to be returned to REST API
         @return: a schema of a World User taking into consideration Redis Stored Values
@@ -132,7 +134,7 @@ class RedisConnector:
                 'avatar': pickle.loads(avatar),
                 'role': pickle.loads(role).__dict__
             }
-            return schemas.World_UserInDB(
+            return schemas.World_UserWithRoleInDB(
                 world_id=world_id,
                 user_id=user_id,
                 avatar=data['avatar'],

@@ -56,7 +56,7 @@ async def join_world_by_link(
     return world_user
 
 
-@router.get("/{world_id}/users", response_model=schemas.World_UserInDB)
+@router.get("/{world_id}/users", response_model=schemas.World_UserWithRoleInDB)
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -125,7 +125,8 @@ async def update_world(
     return world_obj_updated
 
 
-@router.put("/{world_id}/users", response_model=schemas.World_UserInDB)
+@router.put("/{world_id}/users",
+            response_model=Union[schemas.World_UserInDB, schemas.World_UserWithRoleInDB])
 async def update_world_user_info(
         world_id: int,
         user_data: schemas.World_UserUpdate,
@@ -135,12 +136,14 @@ async def update_world_user_info(
     """
     Update User info for a given world: username and avatar name usually
     """
-
+    # registered user
     if not is_guest_user(user):
         world_user_obj = crud.crud_world_user.get_user_joined(db, world_id, user.user_id)
         if not world_user_obj:
             raise HTTPException(status_code=400, detail=strings.USER_NOT_IN_WORLD)
-        # registered user
+
+        # no need to return error, override user_id
+        user_data.user_id = user.user_id
         world_user = crud.crud_world_user.update(
             db=db,
             db_obj=world_user_obj,

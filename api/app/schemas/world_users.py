@@ -40,7 +40,6 @@ class World_UserInDBBase(BaseModel):
     # user_id is an UUID1 for Guest Users
     user_id: Optional[Union[int, UUID4]]
     world_id: int
-    role: RoleInDB
 
     class Config:
         orm_mode = True
@@ -50,6 +49,16 @@ class World_UserInDBBase(BaseModel):
 class World_UserInDB(World_UserInDBBase):
     avatar: Optional[str]
     username: Optional[str]
+    role_id: int
+
+
+# Used to Return The Details Of A role
+# instead of only the id, useful to avoid more
+# requests to the API
+class World_UserWithRoleInDB(World_UserInDBBase):
+    avatar: Optional[str]
+    username: Optional[str]
+    role: RoleInDB
 
 
 # Return Data for Statistics
