@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import uvicorn
 from app.db.session import SessionLocal
 from app.db.init_db import init_db
 from app.api.api_v1.api import api_router

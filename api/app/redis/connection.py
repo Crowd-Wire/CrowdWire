@@ -1,11 +1,9 @@
-import pickle
 from typing import Optional, List, Union
 
 import aioredis
 from app.core.config import settings
-from app.schemas import RoleInDB
 from app.utils import generate_guest_username, choose_avatar
-from app import schemas, models
+from app import schemas
 from uuid import uuid4
 from loguru import logger
 
@@ -24,7 +22,6 @@ class RedisConnector:
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
         # await self.master.execute('flushall')
-
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
