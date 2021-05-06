@@ -52,7 +52,7 @@ spec:
               key: postgresql-db
               name: {{ include "api.postgresservicename" . }}
         - name: RABBITMQ_SERVICE_NAME
-          value: {{ include "api.postgresservicename" . }}
+          value: {{ include "api.rabbitmqservicename" . }}
         - name: RABBITMQ_USERNAME
           valueFrom:
             secretKeyRef:
@@ -79,12 +79,12 @@ spec:
         ports:
           - containerPort: 8000
             protocol: TCP
-        readinessProbe:
-          httpGet:
-            path: /docs
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 30 
+        #readinessProbe:
+        #  httpGet:
+        #    path: /docs
+        #    port: 8000
+        #  initialDelaySeconds: 5
+        #  periodSeconds: 30 
 
         resources:
           {{- toYaml .Values.resources | nindent 12 }}

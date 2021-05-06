@@ -17,11 +17,11 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        self.sentinel_pool = await aioredis.sentinel.create_sentinel_pool(
+        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
             [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-            password=settings.REDIS_SENTINEL_PASSWORD)
-
-        self.master = self.sentinel_pool.master_for(settings.REDIS_MASTER)
+            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
         # await self.master.execute('flushall')
 
