@@ -2,6 +2,7 @@ import create from "zustand";
 import { combine } from "zustand/middleware";
 import { Device } from "mediasoup-client";
 import { detectDevice, Transport } from "mediasoup-client/lib/types";
+import { useConsumerStore } from "./useConsumerStore";
 
 export const getDevice = () => {
   try {
@@ -21,17 +22,64 @@ export const getDevice = () => {
 export const useRoomStore = create(
   combine(
     {
-      roomId: null as string | null,
-      recvTransport: null as Transport | null,
-      sendTransport: null as Transport | null,
+      rooms: {} as Record<
+        string,
+        { 
+          recvTransport: Transport | null,
+          sendTransport: Transport | null,
+        }
+      >,
       device: getDevice(),
     },
     (set) => ({
-      nullify: () =>
-        set({
-          roomId: null,
-          recvTransport: null,
-          sendTransport: null,
+      addRoom: (roomId: string) =>
+        set((s) => {
+          return {
+            rooms : {
+              ...s.rooms,
+              [roomId]: {
+                recvTransport: null,
+                sendTransport: null
+              }
+            },
+            device: s.device,
+          }
+        }),
+      removeRoom: (roomId: string) =>
+        set((s) => {
+          if (s.rooms[roomId]) delete s.rooms[roomId];
+          return {
+            rooms: {
+              ...s.rooms
+            },
+            device: s.device,
+          }
+        }),
+      addTransport: (direction: string, transport: Transport, roomId: string) =>
+        set((s) => {
+          if (direction === "recv") {
+            return {
+              rooms: {
+                ...s.rooms,
+                [roomId]: {
+                  recvTransport: transport,
+                  sendTransport: s.rooms[roomId].sendTransport,
+                }
+              },
+              device: s.device
+            }
+          } else {
+            return {
+              rooms: {
+                ...s.rooms,
+                [roomId]: {
+                  recvTransport: s.rooms[roomId].recvTransport,
+                  sendTransport: transport,
+                }
+              },
+              device: s.device
+            }
+          }
         }),
       set,
     })

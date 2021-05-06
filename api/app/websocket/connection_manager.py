@@ -90,14 +90,16 @@ class ConnectionManager:
             user_id
         )
 
-    async def send_personal_message(self, message: Any, websocket: WebSocket):
-        await websocket.send_json(message)
+    async def send_personal_message(self, message: Any, user_id):
+        if user_id in self.users_ws:
+            await self.users_ws[user_id].send_json(message)
 
     async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:
-            for user_id in self.connections[world_id][room_id]:
-                if user_id != sender_id:
-                    await self.users_ws[user_id].send_json(payload)
+            if room_id in self.connections[world_id]:
+                for user_id in self.connections[world_id][room_id]:
+                    if user_id != sender_id:
+                        await self.send_personal_message(payload, user_id)
             # logger.info(
             #     f"Broadcasted to" f" World {world_id}, Room {room_id} the message: "
             #     f"{payload}"
@@ -105,6 +107,20 @@ class ConnectionManager:
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, Room {room_id}"
+            )
+
+    async def broadcast_to_user_rooms(self, world_id: str, payload: Any, sender_id: str):
+        try:
+            group_ids = await redis_connector.get_user_groups(world_id, sender_id)
+
+            for room_id in group_ids:
+                user_ids = await redis_connector.get_group_users(world_id, room_id)
+                for user_id in user_ids:
+                    if user_id != sender_id:
+                        await self.send_personal_message(payload, user_id)
+        except KeyError:
+            logger.error(
+                f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
             )
 
 
