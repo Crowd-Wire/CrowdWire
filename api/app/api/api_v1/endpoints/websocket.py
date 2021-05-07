@@ -6,7 +6,6 @@ from app.api import dependencies as deps
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
-import asyncio
 
 """
 Class used to Manage the WebSocket Connections, to each World
@@ -40,7 +39,7 @@ async def world_websocket(
                     f"Received message with topic {topic} from user {user_id}"
                 )
 
-            if  topic == protocol.PING:
+            if topic == protocol.PING:
                 await websocket.send_text(protocol.PONG)
 
             elif topic == protocol.JOIN_PLAYER:
