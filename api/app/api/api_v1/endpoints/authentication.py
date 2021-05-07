@@ -130,6 +130,7 @@ def test_token(
     """
     return current_user
 
+
 @router.post("/reset-token")
 def reset_token(
     current_user: Union[models.User, schemas.GuestUser] = Depends(dependencies.get_expired_token_user)
@@ -147,7 +148,7 @@ def reset_token(
             "expire_date": str(expires),
             "guest_uuid": current_user.user_id
         }
-    
+
     access_token, expires = security.create_access_token(current_user.user_id)
 
     return {
@@ -155,9 +156,6 @@ def reset_token(
         "token_type": "bearer",
         "expire_date": str(expires),
     }
-
-
-
 
 
 # Google Login
