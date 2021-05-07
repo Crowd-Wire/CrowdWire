@@ -124,9 +124,8 @@ export const getSocket = (worldId) => {
 
       socket.onopen = async (event) => {
           console.info("[open] Connection established");
-          await socket.send(JSON.stringify({token: '', room_id: '1'}));
           const heartbeat = setInterval(() => {
-              if (socket && socket.readyState !== socket.CLOSED) {
+              if (socket && socket.readyState === socket.OPEN) {
                 socket.send(JSON.stringify({'topic': 'PING'}));
               } else {
                 // reopen web socket maybe?
@@ -134,6 +133,7 @@ export const getSocket = (worldId) => {
                 clearInterval(heartbeat);
               }
           }, 5000);
+          await socket.send(JSON.stringify({token: '', room_id: '1'}));
       };
 
     socket.onmessage = (event) => {
