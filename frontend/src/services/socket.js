@@ -125,16 +125,23 @@ export const getSocket = (worldId) => {
       socket.onopen = async (event) => {
           console.info("[open] Connection established");
           await socket.send(JSON.stringify({token: '', room_id: '1'}));
-          // const id = setInterval(() => {
-          //     if (socket && socket.readyState !== socket.CLOSED) {
-          //         socket.send("ping");
-          //     } else {
-          //         clearInterval(id);
-          //     }
-          // }, 8000);
+          const heartbeat = setInterval(() => {
+              if (socket && socket.readyState !== socket.CLOSED) {
+                socket.send(JSON.stringify({'topic': 'PING'}));
+              } else {
+                // reopen web socket maybe?
+                // or ask for new tokens if thats the case
+                clearInterval(heartbeat);
+              }
+          }, 5000);
       };
 
     socket.onmessage = (event) => {
+      if (event.data == "PONG") {
+        console.log(event.data)
+        return
+      }
+
       var data = JSON.parse(event.data);
 
       console.info(`[message] Data received for topic ${data.topic}`);
@@ -247,3 +254,10 @@ export const wsend = async (d) => {
     await socket.send(JSON.stringify(d));
   }
 };
+
+function heartbeat() {
+  if (socket && socket.readyState === socket.OPEN) {
+    socket.send("heartbeat");
+  }
+  setTimeout(heartbeat, 500);
+}
