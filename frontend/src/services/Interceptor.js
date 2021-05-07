@@ -1,6 +1,6 @@
 import AuthenticationService from './AuthenticationService.js';
 import fetchIntercept from 'fetch-intercept';
-
+import useAuthService from 'stores/useAuthStore.ts';
 const originalRequest = {}
 export const interceptor = fetchIntercept.register({    
     request: function (url, config) {
@@ -26,6 +26,7 @@ export const interceptor = fetchIntercept.register({
             {
                 // this makes so that there is no infinite loop
                 interceptor()
+                AuthenticationService.logout();
                 return Promise.reject("Session expired");
             }
             else
@@ -34,7 +35,12 @@ export const interceptor = fetchIntercept.register({
                         .then((data) => {
                             return data.json();
                         }).then( (data) => {
-                            AuthenticationService.setToken(data);
+                            console.log("data");
+                            console.log(data);
+                            if(useAuthService.getState().registeredUser)
+                                AuthenticationService.setToken(data,"AUTH");
+                            else if(useAuthService.getState().guestUser)
+                                AuthenticationService.setToken(data, "GUEST");
                             config['headers']['Authorization'] = 'Bearer '+ data.access_token
                             return fetch(url, config)
                         })
