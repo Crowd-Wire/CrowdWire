@@ -21,25 +21,32 @@ const useAuthStore = create(
         },
         (set) => ({
             login: (token: string, expire_date: string) => {
+                console.log("login")
                 return set(() => {
                     return { registeredUser: {token: token, expire_date: expire_date} };
                 })
             },
             joinGuest: (token: string, expire_date: string, guest_uuid: string) => {
+                console.log("loginGuest")
                 return set(() => {
                     return { guestUser: {token: token, expire_date: expire_date, guest_uuid: guest_uuid} };
                 })
             },
-            leaveGuest: () => {
+            leave: () => {
+                console.log("leave")
                 return set(() => {
-                    return {guestUser: null};
+                    return {guestUser: null, registeredUser: null};
                 })
             },
-            leaveRegistered: () => {
-                return set(() => {
-                    return {registeredUser: null};
+            updateToken: (token: string, expire_date: string) => {
+                console.log("update")
+                return set((s) => {
+                    if(s.registeredUser!== null){
+                        return { ...s, registerdUser: {token: token, expire_date: expire_date}};
+                    }
+                    return {...s, guestUser: {token: token, expire_date: expire_date, guest_uuid:s.guestUser.guest_uuid}};
                 })
-            },
+            }
         })
     ),
 )

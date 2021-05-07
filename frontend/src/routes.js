@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import AppContext from 'AppContext.js';
 
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -25,7 +24,6 @@ import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
-import { useNavigate } from 'react-router-dom';
 
 /**
  * @author Leandro Silva
@@ -37,8 +35,8 @@ import { useNavigate } from 'react-router-dom';
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-
-const routes = (isAuth, changeAuth) => [
+ 
+const routes = (guestUser, registeredUser) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -53,7 +51,7 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{
 		path: "/",
-		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: guestUser || registeredUser ? <Navigate to="/dashboard/search"/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },
@@ -61,7 +59,7 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{
 		path:"/",
-		element: isAuth==="REGISTERED"  ? <Outlet/> : <Navigate to="/login"/>,
+		element:  registeredUser ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
 			{ path: "/join", element: <InviteJoinPage/>},
@@ -69,23 +67,23 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{ 
 		path: "/dashboard", 
-		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet/> : <Navigate to="/login"/>,
+		element: registeredUser || guestUser  ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch isAuth={isAuth}/>}
+			{path:"/search", element: <DashSearch/>}
 		]
 	},
     {
 		path: "/user",
-		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet /> : <Navigate to="/login" />,
+		element: registeredUser || guestUser ? <Outlet /> : <Navigate to="/login" />,
 		children: [
-            { path: "/profile", element: isAuth==="GUEST"? <ProfilePage /> : <Navigate to="/login"/> },
+            { path: "/profile", element: registeredUser ? <ProfilePage /> : <Navigate to="/login"/> },
             { path: "/settings", element: <UserSettings /> },
 		],
 	},
     {
 		path: "/world",
-		element: isAuth==="GUEST" || isAuth==="REGISTERED" ? <Outlet /> : <Navigate to="/login" />,
+		element: registeredUser || registeredUser  ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },

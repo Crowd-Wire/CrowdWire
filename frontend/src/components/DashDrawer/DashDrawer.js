@@ -1,5 +1,4 @@
-import React, { useContext } from 'react';
-import AppContext from 'AppContext.js';
+import React from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -15,6 +14,7 @@ import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthenticationService from "services/AuthenticationService.js";
+import useAuthStore from "stores/useAuthStore.ts";
 
 
 const drawerWidth = 240;
@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function DashDrawer(props){
-  const myContext = useContext(AppContext);
+  const st = useAuthStore.getState();
   const navigation = useNavigate();
   const location = useLocation();
   const classes = useStyles();
@@ -97,7 +97,6 @@ export default function DashDrawer(props){
 
   const logout = () => {
     AuthenticationService.logout();
-    myContext.changeAuth(false);
   }
 
   const onClickCreateWorld = () => {
@@ -167,7 +166,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          { myContext.isAuth==="GUEST" ?
+          { st.guestUser ?
             <></>
             :
             <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}

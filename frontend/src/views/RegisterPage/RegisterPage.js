@@ -23,17 +23,14 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
-import { useNavigate, Navigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
-import AppContext from 'AppContext.js';
+import useAuthStore from "stores/useAuthStore";
 
 const useStyles = makeStyles(styles);
 
-
 class RegisterPage extends React.Component {
 
-  static contextType = AppContext;
 
   constructor(props) {
     super(props);
@@ -79,8 +76,6 @@ class RegisterPage extends React.Component {
         if(res.access_token!==undefined){
           this.notify();
           AuthenticationService.setToken(res,"AUTH");
-          this.context.changeAuth("REGISTERED");
-
         }
       }
     ) 

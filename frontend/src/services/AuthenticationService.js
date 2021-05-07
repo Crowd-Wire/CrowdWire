@@ -42,15 +42,16 @@ class AuthenticationService {
         else if(type==="AUTH"){
             useAuthStore.getState().login(auth.access_token, auth.expire_date);
         }
+        console.log(useAuthStore.getState())
     }
 
     logout(){
         const st = useAuthStore.getState();
         if(st.guestUser){
-            useAuthStore.getState().leaveGuest();
+            useAuthStore.getState().leave();
         }
         else if(st.registeredUser){
-            useAuthStore.getState().leaveRegistered();
+            useAuthStore.getState().leave();
         }
     }
 
