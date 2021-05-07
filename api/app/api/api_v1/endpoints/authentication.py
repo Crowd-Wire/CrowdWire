@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -129,6 +129,33 @@ def test_token(
     Test access token
     """
     return current_user
+
+
+@router.post("/reset-token")
+def reset_token(
+    current_user: Union[models.User, schemas.GuestUser] = Depends(dependencies.get_expired_token_user)
+) -> Any:
+
+    if is_guest_user(current_user):
+        access_token, expires = security.create_access_token(
+            subject=current_user.user_id,
+            is_guest_user=True,
+            expires_delta=timedelta(hours=settings.ACCESS_GUEST_TOKEN_EXPIRE_HOURS)
+        )
+        return {
+            "access_token": access_token,
+            "token_type": 'bearer',
+            "expire_date": str(expires),
+            "guest_uuid": current_user.user_id
+        }
+
+    access_token, expires = security.create_access_token(current_user.user_id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires),
+    }
 
 
 # Google Login

@@ -6,6 +6,7 @@ import React from "react";
 import { useRoutes } from 'react-router-dom';
 import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import interceptor from './services/Interceptor';
 
 export default () => {
   const changeAuth = (auth) => {
