@@ -32,7 +32,7 @@ async def world_websocket(
 
             if topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
-                await wh.send_groups_snapshot(world_id, user_id)
+                await wh.send_groups_snapshot(world_id, user_id) # TODO: remove after tests
 
             elif topic == protocol.PLAYER_MOVEMENT:
                 await wh.send_player_movement(world_id, user_id, payload)
@@ -49,8 +49,9 @@ async def world_websocket(
                 await wh.join_as_new_peer_or_speaker(world_id, user_id, payload)
 
             elif topic in (
-                    protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
-                    protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK):
+                protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
+                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
+            ):
                 await wh.handle_transport_or_track(user_id, payload)
 
             elif topic == protocol.CLOSE_MEDIA:

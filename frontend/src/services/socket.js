@@ -12,13 +12,13 @@ import AuthenticationService from "services/AuthenticationService";
 
 import playerStore from "stores/usePlayerStore.ts";
 
-let commSocket;
+// let commSocket;
 
-export const getCommSocket = () => {
-  if (!commSocket)
-    commSocket = new WebSocket(`${WS_BASE}/?`);
-  return commSocket;
-}
+// export const getCommSocket = () => {
+//   if (!commSocket)
+//     commSocket = new WebSocket(`${WS_BASE}/?`);
+//   return commSocket;
+// }
 
 async function flushConsumerQueue(_roomId) {
   try {

@@ -25,11 +25,10 @@ const gameConfig = {
       // autoCenter: Phaser.DOM.CENTER_BOTH,
 
       //mode: Phaser.Scale.FIT,
-
       mode: Phaser.Scale.RESIZE,
 
       //mode: Phaser.DOM.FIT,
-      //autoCenter: Phaser.Scale.CENTER_BOTH,
+      // autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 
       width: '100%',
       height: '100%',

@@ -24,8 +24,6 @@ import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
 
-import { useNavigate } from 'react-router-dom';
-
 /**
  * @author Leandro Silva
  * 

@@ -13,6 +13,8 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     await manager.connect_room(world_id, room_id, user_id, position)
     # store position on redis
     await redis_connector.set_user_position(world_id, room_id, user_id, position)
+    # store room on redis
+    
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
