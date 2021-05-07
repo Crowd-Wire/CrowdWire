@@ -90,8 +90,8 @@ export const config = {
     webRtcTransport: {
       listenIps: [
         {
-          ip: process.env.WEBRTC_LISTEN_IP || "20.74.40.44",
-          announcedIp: process.env.A_IP || undefined,
+          ip: process.env.WEBRTC_LISTEN_IP || "0.0.0.0",
+          announcedIp: process.env.A_IP || "crowdwire.duckdns.org",
         },
         // { ip: "192.168.42.68", announcedIp: null },
         // { ip: '10.10.23.101', announcedIp: null },

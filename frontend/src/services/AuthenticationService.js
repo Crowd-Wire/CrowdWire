@@ -55,6 +55,16 @@ class AuthenticationService {
         }
     }
 
+    refreshToken(){
+        return fetch(API_BASE + 'reset-token', {
+            method: 'POST',
+            mode: 'cors',
+            headers:{
+                "Authorization" : "Bearer "+ this.getToken() 
+            }
+        });
+    }
+
     joinAsGuest(){
         return fetch(API_BASE + 'join-guest/', {
             method: 'POST',

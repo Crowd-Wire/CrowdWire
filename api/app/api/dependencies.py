@@ -6,11 +6,14 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from loguru import logger
+from datetime import datetime, timedelta
 
 from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
+
+from app.crud import crud_user
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 reusable_oauth2_optional = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
@@ -52,7 +55,7 @@ def get_current_user(
     except (jwt.JWTError, ValidationError) as e:
         logger.debug(e)
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
     if not token_data.is_guest_user:
@@ -125,3 +128,31 @@ def get_current_active_superuser(
             status_code=400, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+def get_expired_token_user(token: str = Depends(reusable_oauth2_optional), db: Session = Depends(get_db)):
+
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM], options={'verify_exp': False}
+        )
+        logger.debug(payload)
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError) as e:
+        logger.debug(e)
+        if str(e) != "Signature has expired.":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+            )
+
+    # after hour of inactivity the users session expire and they have to login again
+    if token_data.exp + timedelta(hours=1) >= datetime.now(token_data.exp.tzinfo):
+        if not token_data.is_guest_user:
+            return crud_user.get(db, id=token_data.sub)
+        return schemas.GuestUser(is_guest_user=True, user_id=token_data.sub)
+
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Session Expired",
+    )

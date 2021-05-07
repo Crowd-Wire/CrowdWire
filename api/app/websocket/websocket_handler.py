@@ -97,8 +97,9 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
 async def disconnect_user(world_id: str, user_id: str):
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
-    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': group_ids}})
-    await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids))
+    if group_ids:
+        await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': group_ids}})
+        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids))
 
 
 async def handle_actions(actions: dict):
