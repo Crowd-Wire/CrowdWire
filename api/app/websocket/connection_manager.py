@@ -73,12 +73,13 @@ class ConnectionManager:
 
     async def disconnect_room(self, world_id: str, room_id: str, user_id: str):
         try:
-            self.connections[world_id][room_id].remove(user_id)
-            if not self.connections[world_id][room_id]:
-                self.connections[world_id].pop(room_id)
-                if not self.connections[world_id]:
-                    self.connections.pop(world_id)
-            logger.info(f"Removed connection from World {world_id}, Room {room_id}")
+            if room_id in self.connections[world_id]:
+                self.connections[world_id][room_id].remove(user_id)
+                if not self.connections[world_id][room_id]:
+                    self.connections[world_id].pop(room_id)
+                    if not self.connections[world_id]:
+                        self.connections.pop(world_id)
+                logger.info(f"Removed connection from World {world_id}, Room {room_id}")
         except KeyError:
             logger.error(
                 f"Error when trying to remove connection from World {world_id}, "
@@ -88,6 +89,9 @@ class ConnectionManager:
             world_id, room_id,
             {'topic': protocol.LEAVE_PLAYER, 'user_id': user_id},
             user_id
+        )
+        logger.info(
+            f"Disconnected User {user_id} from World {world_id} and room {room_id}"
         )
 
     async def send_personal_message(self, message: Any, user_id):

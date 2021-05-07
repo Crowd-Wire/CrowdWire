@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
     },  
 }));
 
-export default function DashWorldDetails(){
+export default function DashWorldDetails(props){
   const classes = useStyles();
   const history = createBrowserHistory();
   const loc = useLocation();
@@ -41,7 +41,7 @@ export default function DashWorldDetails(){
 return(
     <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer handler={sidebar_handler} changeAuth={this.props.changeAuth}/>
+        <DashDrawer handler={sidebar_handler} changeAuth={props.changeAuth}/>
         <DashboardContent handler = {handler} worldInfo={worldInfo} />
     </div>
     );

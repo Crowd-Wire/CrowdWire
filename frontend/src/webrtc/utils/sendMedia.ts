@@ -19,8 +19,6 @@ export const sendMedia = async (roomId:string = null) => {
       sendTransports.push(value.sendTransport)
   }
 
-  console.log(sendTransports)
-
   if (sendTransports.length <= 0) {
     console.log("no sendTransport in sendVoice");
     return;

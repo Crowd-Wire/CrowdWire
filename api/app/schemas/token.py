@@ -1,5 +1,5 @@
 from typing import Optional, Union
-
+from datetime import datetime
 from pydantic import BaseModel, UUID4
 
 
@@ -19,6 +19,7 @@ class TokenPayload(BaseModel):
     # Guest Users ID is not an integer
     sub: Union[int, UUID4] = None
     is_guest_user: Optional[bool] = False
+    exp: Optional[datetime] = None
 
 
 class InviteTokenPayload(BaseModel):

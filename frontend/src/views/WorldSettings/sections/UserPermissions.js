@@ -8,7 +8,10 @@ import Row from 'react-bootstrap/Row';
 
 
 export default function UserPermissions() {
-  const [state, setState] = React.useState({checkedG: true});
+  const [state, setState] = React.useState(
+    {obj_int: false, walk: false, talk: false, inv_users: false,
+      write: false, conf_manage: false, talk_conf: false, role_manage:false}
+  );
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -22,9 +25,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.obj_int}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="obj_int"
                   color="primary"
                   />
                 }
@@ -37,9 +40,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.walk}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="walk"
                   color="primary"
                   />
                 }
@@ -53,9 +56,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.talk}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="talk"
                   color="primary"
                   />
                 }
@@ -68,9 +71,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.inv_users}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="inv_users"
                   color="primary"
                   />
                 }
@@ -80,14 +83,14 @@ export default function UserPermissions() {
             />
           </Row>
         </Col>
-        <Col Col xs={6} sm={6} md={6}>
+        <Col xs={6} sm={6} md={6}>
           <Row>
             <FormControlLabel
               control={
                 <Checkbox
-                checked={state.checkedB}
+                checked={state.talk_conf}
                 onChange={handleChange}
-                name="checkedB"
+                name="talk_conf"
                 color="primary"
                 />
               }
@@ -100,9 +103,9 @@ export default function UserPermissions() {
           <FormControlLabel
             control={
               <Checkbox
-              checked={state.checkedB}
+              checked={state.conf_manage}
               onChange={handleChange}
-                name="checkedB"
+                name="conf_manage"
                 color="primary"
               />
               }
@@ -115,9 +118,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.role_manage}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="role_manage"
                   color="primary"
                 />
               }
@@ -130,9 +133,9 @@ export default function UserPermissions() {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={state.checkedB}
+                  checked={state.write}
                   onChange={handleChange}
-                  name="checkedB"
+                  name="write"
                   color="primary"
                 />
               }

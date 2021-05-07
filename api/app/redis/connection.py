@@ -122,8 +122,7 @@ class RedisConnector:
         username = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'username')
         avatar = await self.hget(
-                f"world:{str(world_id)}:{str(user_id)}", 'avatar'
-            )
+            f"world:{str(world_id)}:{str(user_id)}", 'avatar')
         role = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'role'
         )
