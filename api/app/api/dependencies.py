@@ -145,6 +145,9 @@ def get_expired_token_user(token: str = Depends(reusable_oauth2_optional), db: S
                 detail="Could not validate credentials",
             )
 
+    # TODO: verify if the expire time for the token is at max 1 hour ago
+    # so the users have to login instead of permanently refreshing the token
     if not token_data.is_guest_user:
-        return crud_user.get(db, int(token_data.sub))
-    return None
+        return crud_user.get(db, id=token_data.sub)
+    return schemas.GuestUser(is_guest_user=True, user_id=token_data.sub)
+

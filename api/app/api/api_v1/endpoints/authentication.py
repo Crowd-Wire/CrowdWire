@@ -134,10 +134,10 @@ def test_token(
 def reset_token(
     current_user: Union[models.User, schemas.GuestUser] = Depends(dependencies.get_expired_token_user)
 ) -> Any:
-    print(current_user)
+
     if is_guest_user(current_user):
         access_token, expires = security.create_access_token(
-            subject=current_user.uuid,
+            subject=current_user.user_id,
             is_guest_user=True,
             expires_delta=timedelta(hours=settings.ACCESS_GUEST_TOKEN_EXPIRE_HOURS)
         )
@@ -145,11 +145,11 @@ def reset_token(
             "access_token": access_token,
             "token_type": 'bearer',
             "expire_date": str(expires),
-            "guest_uuid": current_user.uuid
+            "guest_uuid": current_user.user_id
         }
     
     access_token, expires = security.create_access_token(current_user.user_id)
-    print(access_token)
+
     return {
         "access_token": access_token,
         "token_type": "bearer",
