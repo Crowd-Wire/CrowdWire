@@ -161,8 +161,7 @@ export const getSocket = (worldId) => {
 
       switch (data.topic) {
         case "SEND_MESSAGE":
-            console.log('RECV_MSG', data.text);
-            useMessageStore.getState().addMessage({text: data.text, date: data.date});
+            useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
             break;
         case "JOIN_PLAYER":
             usePlayerStore.getState().connectPlayer(data.user_id, data.position);

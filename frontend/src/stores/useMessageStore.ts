@@ -3,6 +3,7 @@ import { combine } from "zustand/middleware";
 
 
 interface Message {
+    from: string;
     text: string;
     date: string;
 }

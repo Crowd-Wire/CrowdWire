@@ -240,7 +240,7 @@ class GameScene extends Phaser.Scene {
  * @param {number} y - The start vertical position in the scene.
  */
 class Player extends Phaser.GameObjects.Container {
-    speed = 500;  // 900 is the upperbound ig
+    speed = 300;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
     ws = getSocket('1');

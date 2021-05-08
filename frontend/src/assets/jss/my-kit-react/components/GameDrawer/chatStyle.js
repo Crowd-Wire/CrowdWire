@@ -29,7 +29,6 @@ const chatStyle = {
         color: "white",
         borderRadius: '5px',
         padding: "0.5rem 0.2rem",
-        display: 'flex',
         margin: '5px',
     },
 }

@@ -31,7 +31,7 @@ async def world_websocket(
     # check which room he is on instead of this
     room_id = 0
 
-    # TODO: maybe refactor to Chain of Responsibility pattern
+    # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
         while True:
             payload = await websocket.receive_json()
@@ -47,6 +47,7 @@ async def world_websocket(
 
             elif topic == protocol.SEND_MESSAGE:
                 payload['date'] = datetime.now().strftime('%H:%M')
+                payload['from'] = f"User{user_id}"
                 await manager.broadcast(world_id, '1', payload, None)
 
             elif topic == protocol.JOIN_PLAYER:

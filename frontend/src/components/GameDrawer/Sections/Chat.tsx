@@ -31,8 +31,13 @@ const Chat = (props) => {
                     {
                         messages.map((m) => (
                             <div className={classes.message}>
-                                <span style={{marginRight: '1rem'}}>{m.text}</span>
-                                <span style={{marginLeft: 'auto', fontWeight: 'bold'}}>{m.date}</span>
+                                <p style={{margin: '0 0.5rem', fontWeight: 'bold'}}>
+                                    <span>{m.from}</span>
+                                    <span style={{float: 'right'}}>{m.date}</span>
+                                </p>
+                                <p style={{margin: '0 0.5rem'}}>
+                                    {m.text}
+                                </p>
                             </div>
                         ))
                     }
