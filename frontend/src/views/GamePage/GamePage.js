@@ -6,7 +6,7 @@ import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 
 import Phaser from "./Sections/Phaser.js";
 
-import DashDrawer from 'components/DashDrawer/DashDrawer.js';
+import GameDrawer from 'components/GameDrawer/GameDrawer.js';
 
 class GamePage extends React.Component {
 
@@ -20,7 +20,7 @@ class GamePage extends React.Component {
     return (
       <>
         <div className={classes.wrapper}>
-            <DashDrawer></DashDrawer>
+            <GameDrawer />
           <div  className={classes.gameWindow}>
             {/* Game */}
             <Phaser />
