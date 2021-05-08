@@ -7,6 +7,8 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 
+from datetime import datetime
+
 """
 Class used to Manage the WebSocket Connections, to each World
 """
@@ -25,12 +27,17 @@ async def world_websocket(
     user_id = manager.get_next_user_id()
     await manager.connect(world_id, websocket, user_id)
 
+    # TODO: maybe refactor to Chain of Responsibility pattern
     try:
         while True:
             payload = await websocket.receive_json()
             topic = payload['topic']
 
-            if topic == protocol.JOIN_PLAYER:
+            if topic == protocol.SEND_MESSAGE:
+                payload['date'] = datetime.now().strftime('%H:%M')
+                await manager.broadcast(world_id, '1', payload, None)
+
+            elif topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
                 await wh.send_groups_snapshot(world_id, user_id) # TODO: remove after tests
 

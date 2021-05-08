@@ -14,7 +14,7 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     # store position on redis
     await redis_connector.set_user_position(world_id, room_id, user_id, position)
     # store room on redis
-    
+
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
@@ -52,9 +52,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     add_users = set()
     for uid in users_id:
-        # if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
-        # check if user already claimed proximity
-        add_users.add(uid)
+        if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
+            # check if user already claimed proximity
+            add_users.add(uid)
 
     # create new group and let it normalize
     if add_users:

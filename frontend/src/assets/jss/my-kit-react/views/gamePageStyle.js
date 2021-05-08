@@ -11,6 +11,7 @@ const mapEditorStyle = {
         width: 'calc(100vh - 300px)',
         height: '100vh',
         flexGrow: 1,
+        backgroundColor: "#0b1117",
     },
 } 
 

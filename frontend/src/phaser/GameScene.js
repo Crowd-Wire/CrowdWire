@@ -80,6 +80,11 @@ class GameScene extends Phaser.Scene {
         this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
         this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
 
+        window.lixo = (x, y) => {
+            this.localPlayers['-3'].body.reset(x, y);
+            console.log(this.localPlayers['-3'])
+        }
+
         // main player
         this.player = new Player(this, 50, 50);
 
@@ -157,11 +162,11 @@ class GameScene extends Phaser.Scene {
         const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
         // Draw tiles (only within the groundLayer)
-        if (this.input.manager.activePointer.isDown) {
-            const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
-            if (tile)
-                tile.setCollision(true);
-        }
+        // if (this.input.manager.activePointer.isDown) {
+        //     const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
+        //     if (tile)
+        //         tile.setCollision(true);
+        // }
                 
         if (!globalVar)
             return;
@@ -321,14 +326,20 @@ class Player extends Phaser.GameObjects.Container {
         this.body.setVelocityY(direction.y * this.speed);
         this.body.velocity.normalize().scale(this.speed);
 
-        if (this.step == 1 && !this.body.speed) {
-            this.ws.sendMovement('1', this.body.center, this.body.velocity);
-            this.step = 0;
-        } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-            this.ws.sendMovement('1', this.body.center.subtract(this.body.newVelocity), this.body.velocity);
+        if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
+            this.ws.sendMovement('1', this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
-            this.step = 1;
         }
+
+        // if (this.step == 1 && !this.body.speed) {
+        //     this.ws.sendMovement('1', this.body.position, this.body.velocity);
+        //     this.step = 0;
+        //     console.log(this)
+        // } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
+        //     this.ws.sendMovement('1', this.body.position.subtract(this.body.newVelocity), this.body.velocity);
+        //     this.lastVelocity = this.body.velocity.clone();
+        //     this.step = 1;
+        // }
     }
 
     updateAnimation(velocity) {

@@ -10,7 +10,8 @@ import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import { useWsHandlerStore } from "../webrtc/stores/useWsHandlerStore";
 import AuthenticationService from "services/AuthenticationService";
 
-import playerStore from "stores/usePlayerStore.ts";
+import usePlayerStore from "stores/usePlayerStore.ts";
+import useMessageStore from "stores/useMessageStore.ts";
 
 // let commSocket;
 
@@ -70,16 +71,17 @@ export const getSocket = (worldId) => {
   }
 
   const sendMovement = async (roomId, position, velocity) => {
-      const payload = {
-          topic: "PLAYER_MOVEMENT",
-          room_id: roomId,
-          position,
-          velocity,
-      }
-      if (socket.readyState === WebSocket.OPEN)
-          await socket.send(JSON.stringify(payload));
-      else
-          console.error(`[error] socket closed before sendMovement`);
+    console.log('\nSEND',position,velocity)
+    const payload = {
+        topic: "PLAYER_MOVEMENT",
+        room_id: roomId,
+        position,
+        velocity,
+    }
+    if (socket.readyState === WebSocket.OPEN)
+        await socket.send(JSON.stringify(payload));
+    else
+        console.error(`[error] socket closed before sendMovement`);
   }
 
   const wirePlayer = async (roomId, usersId) => {
@@ -104,6 +106,19 @@ export const getSocket = (worldId) => {
       await socket.send(JSON.stringify(payload));
     else
       console.error(`[error] socket closed before unwirePlayer`);
+  }
+
+  const sendMessage = async (message, to) => {
+    console.log(message, to);
+    const payload = {
+      topic: "SEND_MESSAGE",
+      text: message,
+      to,
+    }
+    if (socket.readyState === WebSocket.OPEN)
+      await socket.send(JSON.stringify(payload));
+    else
+      console.error(`[error] socket closed before sendMessage`);
   }
 
   const sendComms = async (topic="", worldId="", userId="") => {
@@ -137,20 +152,25 @@ export const getSocket = (worldId) => {
       console.info(`[message] Data received for topic ${data.topic}`);
 
       switch (data.topic) {
+        case "SEND_MESSAGE":
+            console.log('RECV_MSG', data.text);
+            useMessageStore.getState().addMessage({text: data.text, date: data.date});
+            break;
         case "JOIN_PLAYER":
-            playerStore.getState().connectPlayer(data.user_id, data.position);
+            usePlayerStore.getState().connectPlayer(data.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
-            playerStore.getState().disconnectPlayer(data.user_id);
+            usePlayerStore.getState().disconnectPlayer(data.user_id);
             break;
         case "PLAYER_MOVEMENT":
-            playerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
+            console.log('\nRECV',data.position, data.velocity)
+            usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
-            playerStore.getState().connectPlayers(data.snapshot);
+            usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
         case "GROUPS_SNAPSHOT":
-            playerStore.getState().setGroups(data.groups);
+            usePlayerStore.getState().setGroups(data.groups);
             break;
         case "you-joined-as-peer":
           console.log(data)
@@ -229,7 +249,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, sendComms, joinRoom, wirePlayer, unwirePlayer};
+  return {socket, sendMovement, sendComms, joinRoom, wirePlayer, unwirePlayer, sendMessage};
 }
 
 export const wsend = async (d) => {
