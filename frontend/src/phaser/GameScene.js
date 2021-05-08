@@ -68,12 +68,21 @@ class GameScene extends Phaser.Scene {
         this.physics.world.bounds.height = this.map.heightInPixels;
 
         // listen to the arrow keys
-        this.cursors = this.input.keyboard.addKeys({
-            up:Phaser.Input.Keyboard.KeyCodes.W,
-            down:Phaser.Input.Keyboard.KeyCodes.S,
-            left:Phaser.Input.Keyboard.KeyCodes.A,
-            right:Phaser.Input.Keyboard.KeyCodes.D
-        });
+        // this.cursors = this.input.keyboard.addKeys({
+        //     up:Phaser.Input.Keyboard.KeyCodes.W,
+        //     down:Phaser.Input.Keyboard.KeyCodes.S,
+        //     left:Phaser.Input.Keyboard.KeyCodes.A,
+        //     right:Phaser.Input.Keyboard.KeyCodes.D
+        // }, false);
+        this.cursors = this.input.keyboard.createCursorKeys();
+
+        // this.cursors.onDown.add(function() {
+        //     this.processKeyboardEvent(function() {
+        //        // do something
+        //     });
+        // });
+
+
 
         // static players for range test
         this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
@@ -111,6 +120,7 @@ class GameScene extends Phaser.Scene {
 
         this.physics.add.collider(Object.values(this.remotePlayers), this.collisionLayer);
     }
+
 
     // TODO: remove after tests
     // allows devs to see in frontend the groups assigned to the users
@@ -158,15 +168,19 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         this.player.update();
 
+        if (!globalVar)
+            console.log(this.game);
+
         // Convert the mouse position to world position within the camera
         const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
         // Draw tiles (only within the groundLayer)
-        // if (this.input.manager.activePointer.isDown) {
-        //     const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
-        //     if (tile)
-        //         tile.setCollision(true);
-        // }
+        if (this.input.manager.activePointer.isDown) {
+            console.log('draw?')
+            const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
+            if (tile)
+                tile.setCollision(true);
+        }
                 
         if (!globalVar)
             return;

@@ -4,7 +4,7 @@ import { combine } from "zustand/middleware";
 
 interface Message {
     text: string;
-    data: string;
+    date: string;
 }
 
 const useMessageStore = create(
