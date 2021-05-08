@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict, Optional, Union, Tuple
 
 from sqlalchemy.orm import Session
@@ -5,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
-from app.schemas.users import UserCreate, UserUpdate
+from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
 from app.core import strings
 
 
@@ -43,7 +44,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             hashed_password=get_password_hash(user_data.hashed_password),
             name=user_data.name,
             birth=user_data.birth,
-            register_date=user_data.register_date,
+            register_date=datetime.datetime.now(),
             status=0,
             is_superuser=False
         )
@@ -51,6 +52,52 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db.commit()
         db.refresh(db_user)
         return db_user, strings.USER_REGISTERED_SUCCESS
+
+    def create_google(self, db: Session, user: UserCreateGoogle) -> Tuple[Optional[User], str]:
+
+        if self.get_sub(db=db, sub=user.sub):
+            return None, strings.GOOGLE_USER_ALREADY_REGISTERED
+
+        db_user = User(
+            email=user.email,
+            name=user.name,
+            status=0,
+            register_date=datetime.datetime.now(),
+            is_superuser=False,
+            birth=user.birth,
+            sub=user.sub
+        )
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return db_user, strings.USER_REGISTERED_SUCCESS
+
+    def get_sub(self, db: Session, sub: int) -> Optional[User]:
+
+        return db.query(User).filter(User.sub == sub).first()
+
+    def google_auth(self, db: Session, user) -> Tuple[Optional[User], str]:
+        """
+        Verifies if the google user already exists and returns it else creates user.
+        A User cannot be normally registered in the application and then try to login with google.
+        """
+
+        user_db = self.get_sub(db=db, sub=user.sub)
+
+        if user_db and self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
+            # If there is already an account with that google email that is not linked to google
+            return None, strings.GOOGLE_EMAIL_ALREADY_REGISTERED
+
+        if not user_db:
+            # User is not registered
+            # Create an account
+            user_create = UserCreateGoogle(
+                email=user.email, name=user.name, sub=user.sub
+            )
+            return crud_user.create_google(db=db, user=user_create)
+
+        return user_db, strings.AUTHENTICATION_SUCCESS
 
     def update(
             self, db: Session, db_obj: User,

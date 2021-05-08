@@ -22,7 +22,7 @@ const chatStyle = {
         border: '2px solid #f50057',
         borderRadius: '5px',
         width: '100%',
-        margin: '15px'
+        margin: '15px',
     },
     message: {
         backgroundColor: '#1f344d',

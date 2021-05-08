@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, validator, UUID4
 from typing import Optional, Union
 from app.core.consts import AVATARS_LIST
+from app.schemas import RoleInDB
 
 
 class World_UserBase(BaseModel):
@@ -48,6 +49,16 @@ class World_UserInDBBase(BaseModel):
 class World_UserInDB(World_UserInDBBase):
     avatar: Optional[str]
     username: Optional[str]
+    role_id: int
+
+
+# Used to Return The Details Of A role
+# instead of only the id, useful to avoid more
+# requests to the API
+class World_UserWithRoleInDB(World_UserInDBBase):
+    avatar: Optional[str]
+    username: Optional[str]
+    role: RoleInDB
 
 
 # Return Data for Statistics

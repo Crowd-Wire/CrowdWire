@@ -10,7 +10,7 @@ export async function createTransport(
   transportOptions: TransportOptions
 ) {
   console.log(`create ${direction} transport`);
-  const { device, set } = useRoomStore.getState();
+  const { device, addTransport } = useRoomStore.getState();
   var socket = getSocket(1).socket;
 
   // ask the server to create a server-side transport object and send
@@ -99,9 +99,5 @@ export async function createTransport(
     );
   });
 
-  if (direction === "recv") {
-    set({ recvTransport: transport });
-  } else {
-    set({ sendTransport: transport });
-  }
+  addTransport(direction, transport, _roomId);
 }

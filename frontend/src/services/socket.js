@@ -2,7 +2,7 @@ import { WS_BASE } from "config";
 import { createTransport } from "../webrtc/utils/createTransport";
 import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
-import { joinRoom } from "../webrtc/utils/joinRoom";
+import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
@@ -12,6 +12,7 @@ import AuthenticationService from "services/AuthenticationService";
 
 import usePlayerStore from "stores/usePlayerStore.ts";
 import useMessageStore from "stores/useMessageStore.ts";
+import GameScene from "phaser/GameScene";
 
 // let commSocket;
 
@@ -28,7 +29,7 @@ async function flushConsumerQueue(_roomId) {
       d: { peerId, consumerParameters },
     } of consumerQueue) {
       if (_roomId === roomId) {
-        await consumeStream(consumerParameters, peerId, consumerParameters.kind)
+        await consumeStream(consumerParameters, roomId, peerId, consumerParameters.kind,)
       }
     }
   } catch (err) {
@@ -40,8 +41,9 @@ async function flushConsumerQueue(_roomId) {
 
 async function consumeAll(consumerParametersArr) {
   try {
+    console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, consumer.peerId, kind))) {
+      if (!(await consumeStream(consumer.consumerParameters, consumer.roomId, consumer.peerId, kind))) {
         break;
       }
     }
@@ -60,23 +62,22 @@ export const getSocket = (worldId) => {
 
   const joinRoom = async (roomId, position) => {
     const payload = {
-        topic: "JOIN_PLAYER",
-        room_id: roomId,
-        position
+      topic: "JOIN_PLAYER",
+      room_id: roomId,
+      position
     }
     if (socket.readyState === WebSocket.OPEN)
-        await socket.send(JSON.stringify(payload));
+      await socket.send(JSON.stringify(payload));
     else
-        console.error(`[error] socket closed before joinRoom`);
+      console.error(`[error] socket closed before joinRoom`);
   }
 
   const sendMovement = async (roomId, position, velocity) => {
-    console.log('\nSEND',position,velocity)
     const payload = {
-        topic: "PLAYER_MOVEMENT",
-        room_id: roomId,
-        position,
-        velocity,
+      topic: "PLAYER_MOVEMENT",
+      room_id: roomId,
+      position,
+      velocity,
     }
     if (socket.readyState === WebSocket.OPEN)
         await socket.send(JSON.stringify(payload));
@@ -136,17 +137,24 @@ export const getSocket = (worldId) => {
 
       socket.onopen = async (event) => {
           console.info("[open] Connection established");
+          const heartbeat = setInterval(() => {
+              if (socket && socket.readyState === socket.OPEN) {
+                socket.send(JSON.stringify({'topic': 'PING'}));
+              } else {
+                // reopen web socket maybe?
+                // or ask for new tokens if thats the case
+                clearInterval(heartbeat);
+              }
+          }, 5000);
           await socket.send(JSON.stringify({token: '', room_id: '1'}));
-          // const id = setInterval(() => {
-          //     if (socket && socket.readyState !== socket.CLOSED) {
-          //         socket.send("ping");
-          //     } else {
-          //         clearInterval(id);
-          //     }
-          // }, 8000);
       };
 
     socket.onmessage = (event) => {
+      if (event.data == "PONG") {
+        console.log(event.data)
+        return
+      }
+
       var data = JSON.parse(event.data);
 
       console.info(`[message] Data received for topic ${data.topic}`);
@@ -160,6 +168,7 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().connectPlayer(data.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
+            useConsumerStore.getState().closePeer(data.user_id);
             usePlayerStore.getState().disconnectPlayer(data.user_id);
             break;
         case "PLAYER_MOVEMENT":
@@ -174,24 +183,24 @@ export const getSocket = (worldId) => {
             break;
         case "you-joined-as-peer":
           console.log(data)
-          joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVideo();
+                sendVideo(data.d.roomId);
               });
           })
           break;
         case "you-joined-as-speaker":
           console.log(data)
-          joinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVoice();
-                sendVideo();
+                sendVoice(data.d.roomId);
+                sendVideo(data.d.roomId);
               });
           })
           break;
@@ -201,27 +210,33 @@ export const getSocket = (worldId) => {
           break;
         case "new-peer-producer":
           console.log(data)
-          if (useRoomStore.getState().recvTransport && useRoomStore.getState().roomId === data.d.roomId) {
-            consumeStream(data.d.consumerParameters, data.d.peerId, data.d.kind );
-          } else {
-            consumerQueue = [...consumerQueue, { roomId: data.d.roomId, d: data.d }];
+          // check if tile im currently on is a conference type or not
+          // else check if player is in range
+          console.log(GameScene.inRangePlayers.has(data.d.peerId))
+          if (GameScene.inRangePlayers.has(data.d.peerId)) {
+            const roomId = data.d.roomId;
+            if (useRoomStore.getState().rooms[roomId].recvTransport) {
+              consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
+            } else {
+              consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
+            }
           }
           break;
-        case "active_speaker":
+        case "active-speaker":
           console.log(data)
           if (data.value)
             useConsumerStore.getState().addActiveSpeaker(data.peerId)
           else
             useConsumerStore.getState().removeActiveSpeaker(data.peerId)
           break;
-        case "toggle_peer_producer":
+        case "toggle-peer-producer":
           console.log(data)
           if (data.kind === 'audio')
             useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
           else
             useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
           break;
-        case "close_media":
+        case "close-media":
           console.log(data)
           useConsumerStore.getState().closeMedia(data.peerId)
           break;
@@ -257,3 +272,10 @@ export const wsend = async (d) => {
     await socket.send(JSON.stringify(d));
   }
 };
+
+function heartbeat() {
+  if (socket && socket.readyState === socket.OPEN) {
+    socket.send("heartbeat");
+  }
+  setTimeout(heartbeat, 500);
+}

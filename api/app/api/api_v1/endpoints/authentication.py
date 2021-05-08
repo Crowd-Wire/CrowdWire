@@ -1,10 +1,12 @@
 from datetime import timedelta
-from typing import Any
+from typing import Any, Union
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-
+from authlib.integrations.starlette_client import OAuth, OAuthError
+from starlette.config import Config
+from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
@@ -16,6 +18,7 @@ from app.core import security, strings
 # verify_password_reset_token,
 # )
 from app.core.config import settings
+from app.utils import is_guest_user
 
 router = APIRouter()
 
@@ -52,6 +55,9 @@ def generate_invite_link(
     """
     Generate an invitation link( a token )
     """
+
+    if is_guest_user(current_user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
     world_user_obj, msg = crud.crud_world_user.can_generate_link(
         db=db,
         world_id=world_id,
@@ -109,7 +115,7 @@ def join_as_guest():
     )
     return {
         "access_token": access_token,
-        "token_type": 'Bearer',
+        "token_type": 'bearer',
         "expire_date": str(expires),
         "guest_uuid": _uuid
     }
@@ -124,6 +130,88 @@ def test_token(
     """
     return current_user
 
+
+@router.post("/reset-token")
+def reset_token(
+    current_user: Union[models.User, schemas.GuestUser] = Depends(dependencies.get_expired_token_user)
+) -> Any:
+
+    if is_guest_user(current_user):
+        access_token, expires = security.create_access_token(
+            subject=current_user.user_id,
+            is_guest_user=True,
+            expires_delta=timedelta(hours=settings.ACCESS_GUEST_TOKEN_EXPIRE_HOURS)
+        )
+        return {
+            "access_token": access_token,
+            "token_type": 'bearer',
+            "expire_date": str(expires),
+            "guest_uuid": current_user.user_id
+        }
+
+    access_token, expires = security.create_access_token(current_user.user_id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires),
+    }
+
+
+# Google Login
+
+# TODO: change this to get the secrets from the environment variables
+config = Config('.env')
+oauth = OAuth(config)
+
+CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
+
+oauth.register(
+    name='google',
+    client_id=settings.CLIENT_ID,
+    client_secret=settings.CLIENT_SECRET,
+    server_metadata_url=CONF_URL,
+    client_kwargs={
+        'scope': 'openid email profile'
+    }
+)
+
+
+@router.route('/login/google')
+async def google_login(request: Request):
+    """
+    The request will be redirected to google and the result will be sent to /auth/google endpoint
+    """
+    redirect_uri = request.url_for('auth')
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
+@router.get('/auth/google')
+async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
+    """
+    Receives the information from the google operation and returns the application token.
+    """
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError:
+        return {"error": "Invalid Authentication"}
+
+    user = await oauth.google.parse_id_token(request, token)
+
+    user_db, msg = crud.crud_user.google_auth(db=db, user=user)
+
+    if not user_db:
+        raise HTTPException(status_code=400, detail=msg)
+
+    access_token, expires = security.create_access_token(user_db.user_id)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "expire_date": str(expires)
+    }
+
+    return "token"
 
 """
 @router.post("/password-recovery/{email}", response_model=schemas.Msg)

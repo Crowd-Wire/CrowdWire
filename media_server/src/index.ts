@@ -58,6 +58,28 @@ async function main() {
         // peer?.sendTransport?.close();
       }
     },
+    ['remove-user-from-groups']: ({ roomIds, peerId }) => {
+      for (let i = 0; i < roomIds.length; i++) {
+        let roomId = roomIds[i];
+        if (roomId in rooms) {
+          if (peerId in rooms[roomId].state) {
+            closePeer(rooms[roomId].state[peerId]);
+            delete rooms[roomId].state[peerId];
+          }
+          if (Object.keys(rooms[roomId].state).length === 0) {
+            deleteRoom(roomId, rooms);
+          }
+        }
+      }
+    },
+    ["destroy-room"]: ({ roomId }) => {
+      if (roomId in rooms) {
+        for (const peer of Object.values(rooms[roomId].state)) {
+          closePeer(peer);
+        }
+        deleteRoom(roomId, rooms);
+      }
+    },
     ['toggle-producer']: ({ roomId, peerId, kind, pause }) => {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
@@ -71,14 +93,6 @@ async function main() {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
         peer?.producer?.get('media')?.close();
-      }
-    },
-    ["destroy-room"]: ({ roomId }) => {
-      if (roomId in rooms) {
-        for (const peer of Object.values(rooms[roomId].state)) {
-          closePeer(peer);
-        }
-        deleteRoom(roomId, rooms);
       }
     },
     ["close-peer"]: async ({ roomId, peerId, kicked }, uid, send) => {
@@ -249,11 +263,11 @@ async function main() {
             peerId: myPeerId,
           },
         });
-        send({
-          topic: "error",
-          d: "error connecting to voice server | " + e.message,
-          uid,
-        });
+        // send({
+        //   topic: "error",
+        //   d: "error connecting to voice server | " + e.message,
+        //   uid,
+        // });
         return;
       }
     },
@@ -289,12 +303,6 @@ async function main() {
           uid,
           d: { error: e.message, roomId },
         });
-        send({
-          topic: "error",
-          d: "error connecting to voice server | " + e.message,
-          uid,
-        });
-        return;
       }
       send({
         topic: `@connect-transport-${direction}-done` as const,

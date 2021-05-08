@@ -84,7 +84,12 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div style={{height:'100%', maxWidth:400, width: '100%', overflow: 'auto', display: 'inline-block'}}>
+    <div style={{
+      height:'100%',
+      maxWidth:400,
+      width: '100%',
+      overflow: 'auto',
+    }}>
       <Card style={{padding: 3,
         background: 'rgba(65, 90, 90, 0.5)',
         overflow: 'hidden',
@@ -94,37 +99,65 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
         backdropFilter: 'blur(3px)',
         height: '100%'
       }}>
-          <div style={{textAlign: 'center', fontSize: 18, color: '#fff', fontWeight: 500}}>
-            <span>{username}</span>
-          </div>
+          
           <div id={id+"border_div"}>
             { videoTrack ? (
               <video autoPlay id={id+"_video"} ref={videoRef}
-                style={{display: videoState ? 'block' : 'none'}}/>
+                style={{display: videoState ? 'block' : 'none', height: '100%'}}/>
               ) : audioTrack ? (
                 <audio autoPlay id={id+"_audio"} ref={videoRef}/>
                 ) : ''}
+            { !videoTrack || !videoState ?
+              (
+              <div style={{display: 'block', textAlign: 'center', width: '100%', height: '100%', paddingTop: '15%', paddingBottom: '15%'}}>
+                <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+              </div>
+              )
+            : '' }
+          </div>
+
+          <div style={{
+              position: 'absolute',
+              top: 2,
+              padding: 2,
+              textAlign: 'center',
+              fontSize: '1.2em',
+              color: 'white',
+              width: '98%',
+              fontWeight: 500,
+              backgroundColor: 'rgba(0,0,0, 0.2)',
+            }}>
+            <span>{username}</span>
           </div>
           
-          <div className="row col-sm-12" style={{position: 'absolute', bottom: 0}}>
+          <div style={{
+            position: 'absolute',
+            fontSize: '1em',
+            bottom: 2,
+            width: '96%',
+            paddingLeft: '2px',
+            fontWeight: 500,
+            backgroundColor: 'rgba(0,0,0, 0.2)'}}>
+            <Row>
               <Col sm={5}>
                 { videoTrack && !videoToggle ?
                     videoState ? 
                       (<VideocamIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleVideo()}/>)
                     : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-                  : (<VideocamOffIcon color={'action'}/>)
+                  : (<VideocamOffIcon style={{'color': 'grey'}}/>)
                 }
                 { audioTrack && !audioToggle ?
                     audioState ? 
                       (<MicIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleAudio()}/>)
                     : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-                  : (<MicOffIcon color={'action'}/>)
+                  : (<MicOffIcon style={{'color': 'grey'}} />)
                 }
               </Col>
 
-              <Col sm={7} style={{textAlign: 'center', paddingRight: 2}}>
+              <Col sm={7} style={{textAlign: 'center', maxHeight: 30}}>
                 <UserVolumeSlider volColor={'white'} userId={id} />
               </Col>
+            </Row>
           </div>
       </Card>
     </div>

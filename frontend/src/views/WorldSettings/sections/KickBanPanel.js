@@ -15,7 +15,7 @@ export default function KickBanPanel(props){
 	for(let i=0; i<users.length; i++){
 		rows.push(
 			<Row 
-				style={{height:"40px", border:"solid #54B5B4 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%"}}
+				key={"user_"+i} style={{height:"40px", border:"solid #54B5B4 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%"}}
 			>
 				<Typography variant="h6" style={{marginLeft:"30px", marginTop:"auto", marginBottom:"auto"}}>
 					{users[i]}
@@ -25,7 +25,7 @@ export default function KickBanPanel(props){
 	}
 	for(let i=0; i<reports.length; i++){
 		reportBoxes.push(
-			<Row style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
+			<Row key={"report_box_"+i} style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
 				<Typography style={{marginTop:"auto"}} variant="h5">{reports[i]['Reporter']}</Typography>
 				<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
 					<Typography variant="body1" style={{color:"white"}}>{reports[i]['Message']}</Typography>

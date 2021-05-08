@@ -24,8 +24,9 @@ export function getVideoAudioStream(video=true, audio=true, camId=storeDevice.ge
             frameRate: quality ? quality : 12,
             noiseSuppression: true,
             deviceId: camId,
-            width: {min: 640, ideal: 1280, max: 1920},
-            height: {min: 480, ideal: 720, max: 1080}
+            width: {min: 320, max: 1280},
+            height: {min: 180, max: 720},
+            facingMode: 'user'
         } : false,
         audio: audio ? {deviceId: micId} : false,
     })

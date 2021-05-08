@@ -14,9 +14,9 @@ interface DeviceSettingsProps {
 }
 
 export const DeviceSettings: React.FC<DeviceSettingsProps> = ({closeModal, volColor='rgb(63, 81, 181)'}) => {
-  const [setMicId] = useState(storeDevice.getState().micId);
-	const [setCamId] = useState(storeDevice.getState().camId);
-	const [setGlobalVolume] = useState(storeVolume.getState().globalVolume);
+  const [micId, setMicId] = useState(storeDevice.getState().micId);
+	const [camId, setCamId] = useState(storeDevice.getState().camId);
+	const [globalVolume, setGlobalVolume] = useState(storeVolume.getState().globalVolume);
 
   const [optionsMic, setOptionsMic] = useState<
     Array<{ id: string; label: string } | null>

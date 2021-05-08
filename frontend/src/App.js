@@ -6,10 +6,19 @@ import React from "react";
 import { useRoutes } from 'react-router-dom';
 import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import interceptor from './services/Interceptor';
 
 export default () => {
-  const isAuth = true;
-  const routing = useRoutes(routes(isAuth));
+  const changeAuth = (auth) => {
+    setAuth(auth);
+  }
+  const startAuth = () => {
+    if(localStorage.getItem("auth") && localStorage.getItem("auth")["token"]!==null)
+      return true;
+    return false;
+  }
+  const [isAuth, setAuth] = React.useState(startAuth());
+  const routing = useRoutes(routes(isAuth, changeAuth));
   
   return routing;
 }

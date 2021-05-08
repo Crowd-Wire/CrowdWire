@@ -25,7 +25,6 @@ export default function WorldDetails(props){
         TagService.getAll()
                 .then((res) => {return res.json()})
                 .then((res) => {
-            console.log(res);
             let arr = [];
             res.forEach(tag => arr.push(tag.name)); 
             setTags(arr);
@@ -64,13 +63,11 @@ export default function WorldDetails(props){
         else
             setDescHelper("");
         if(send){
-            console.log("sending");
             createWorld(wName, accessibility, guests, maxUsers, tag_array, desc);
         }
     }
 
     const onChangeValue = (event) => {
-        console.log(typeof event.target.value)
         setAccessibility(event.target.value);
     }
 
@@ -145,7 +142,7 @@ export default function WorldDetails(props){
                                 <TextField
                                     {...params}
                                     variant="standard"
-                                    label="Labels"
+                                    label="Tags"
                                 />
                                 )}
                             />
@@ -157,7 +154,7 @@ export default function WorldDetails(props){
                                 helperText={maxUsersHelper}
                                 style={{marginRight:"30px"}}
                                 id="standard-number"
-                                label="Max Online Users"
+                                label="Max Online Users*"
                                 type="number"
                                 InputLabelProps={{
                                     shrink: true,

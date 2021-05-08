@@ -12,26 +12,28 @@ export const ActiveSpeakerListener: React.FC<ActiveSpeakerListenerProps> = ({}) 
   
   useEffect(() => {
     let { micStream } = useVoiceStore();
-    let { roomId } = useRoomStore();
+    let { rooms } = useRoomStore();
 
-    if (!roomId || !micStream || isSafari) {
+    if (Object.keys(rooms).length <= 0 || !micStream || isSafari) {
       return;
     }
 
     const harker = hark(micStream, { threshold: -65, interval: 75 });
 
     harker.on("speaking", () => {
+      for (let roomId in rooms)
         wsend({ topic: "speaking_change", d: { roomId: roomId, value: true } });
     });
 
     harker.on("stopped_speaking", () => {
+      for (let roomId in rooms)
         wsend({ topic: "speaking_change", d: { roomId: roomId, value: false } });
     });
 
     return () => {
       harker.stop();
     };
-  }, [useVoiceStore.getState().micStream, useRoomStore.getState().roomId]);
+  }, [useVoiceStore.getState().micStream, useRoomStore.getState().rooms]);
 
   return null;
 };

@@ -11,6 +11,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
+
+running_mode: 'production'
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -54,6 +57,10 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+configValues: |
+  window.REACT_APP_RUNNING_MODE = 'production'
+  window.REACT_APP_API_IP = '20.74.40.44'
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

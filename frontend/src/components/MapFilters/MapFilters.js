@@ -76,7 +76,6 @@ export default function MapFilters(props) {
   const handleChange = (prop) => (event) => {
     setValues({ ...values, [prop]: event.target.value });
     props.changeSearch(event.target.value);
-    console.log(props.search);
   };
 
   const [values, setValues] = React.useState({

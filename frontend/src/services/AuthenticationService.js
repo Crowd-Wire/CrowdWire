@@ -26,7 +26,9 @@ class AuthenticationService {
         })
     }
     getToken() {
-        return JSON.parse(localStorage.getItem("auth"))["token"];
+        if(localStorage.getItem("auth")!==null)
+            return JSON.parse(localStorage.getItem("auth"))["token"];
+        return null;
     }
 
     setToken(auth) {
@@ -35,6 +37,16 @@ class AuthenticationService {
             "expire_date":auth.expire_date}
             )
         );
+    }
+
+    refreshToken(){
+        return fetch(API_BASE + 'reset-token', {
+            method: 'POST',
+            mode: 'cors',
+            headers:{
+                "Authorization" : "Bearer "+ this.getToken() 
+            }
+        });
     }
 
     joinAsGuest(){
