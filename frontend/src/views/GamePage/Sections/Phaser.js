@@ -1,6 +1,7 @@
 import React from "react";
 
 import * as Game from "phaser/Game";
+import RoomCall from "./../../../components/Communications/RoomCall";
 
 
 class Phaser extends React.Component {
@@ -29,7 +30,9 @@ class Phaser extends React.Component {
   render() {
     return (
       <div id="game-container" style={{
-       }}>{/*style={{pointerEvents: "none", display: "none"}}>*/}</div>
+       }}>{/*style={{pointerEvents: "none", display: "none"}}>*/}
+                   <RoomCall />
+</div>
     );
   }
 }

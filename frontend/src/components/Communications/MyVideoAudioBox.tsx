@@ -21,6 +21,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -39,10 +40,19 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [mediaOffState, setMediaOffState] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const handle = useFullScreenHandle();
-
+  const [fullscreen, setFullscreen] = useState(false)
   
   function toggleModal() {
     setShowModal(!showModal)
+  }
+
+  const handleFullscreen = () => {
+    if (!fullscreen) {
+      handle.enter()
+    } else {
+      handle.exit()
+    }
+    setFullscreen(!fullscreen);
   }
   
 
@@ -134,7 +144,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         width: '100%',
         overflow: 'auto',
       }}>
-      <FullscreenIcon onClick={handle.enter} style={{color:'white'}}></FullscreenIcon>
       <FullScreen handle={handle}>
         <Card style={{padding: 4,
           background: 'rgba(65, 90, 90, 0.5)',
@@ -144,25 +153,25 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           backdropFilter: 'blur(3px)',
           height: '100%'
         }}>
-              <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
-                  { videoTrack ? (
-                      <video autoPlay id={id+"_video"} ref={myRef}
-                        style={{display: videoPauseState ? 'block' : 'none'}}/>
-                    ) : audioTrack ? (
-                      <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                        <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
-                        <audio autoPlay id={id+"_audio"} ref={myRef}/>
-                      </div>
-                    ) : ''
-                  }
-                  { !videoTrack || !videoPauseState ?
-                    (
-                    <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
-                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+            <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
+                { videoTrack ? (
+                    <video autoPlay id={id+"_video"} ref={myRef}
+                      style={{display: videoPauseState ? 'block' : 'none'}}/>
+                  ) : audioTrack ? (
+                    <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
+                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
+                      <audio autoPlay id={id+"_audio"} ref={myRef}/>
                     </div>
-                    )
-                  : ''}
-              </div>
+                  ) : ''
+                }
+                { !videoTrack || !videoPauseState ?
+                  (
+                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
+                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+                  </div>
+                  )
+                : ''}
+            </div>
 
               <div style={{
                 position: 'absolute',
@@ -177,11 +186,23 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 paddingRight: 10
               }}>
                 <span>{username}</span>
+                {fullscreen ? 
+                  <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+                : 
+                  <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+                }
                 <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
                   onClick={() => toggleModal()}/>
               </div>
 
-              <div style={{position: 'absolute', width:'100%', bottom:3, fontSize: '1em', paddingRight: 10}}>
+              <div style={{
+                position: 'absolute',
+                fontSize: '1em',
+                bottom: 2,
+                width: '96%',
+                paddingLeft: '2px',
+                fontWeight: 500,
+                backgroundColor: 'rgba(0,0,0, 0.2)'}}>
                 <Row>
                   <Col sm={6}>
                     { videoTrack ?
