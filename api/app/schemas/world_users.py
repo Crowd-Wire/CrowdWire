@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, validator, UUID4
 from typing import Optional, Union
 from app.core.consts import AVATARS_LIST
-from app.schemas import RoleInDB, WorldMapInDB
+from app.schemas import RoleInDB
 
 
 class World_UserBase(BaseModel):
@@ -59,6 +59,7 @@ class World_UserWithRoleInDB(World_UserInDBBase):
     avatar: Optional[str]
     username: Optional[str]
     role: RoleInDB
+
 
 class World_UserWithRoleAndMap(World_UserWithRoleInDB):
     map: bytes

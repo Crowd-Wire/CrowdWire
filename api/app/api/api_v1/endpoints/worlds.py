@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Query
-from typing import Optional, Any, List, Union, Tuple
+from typing import Optional, Any, List, Union
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
