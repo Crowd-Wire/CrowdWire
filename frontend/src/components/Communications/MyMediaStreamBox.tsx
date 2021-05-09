@@ -5,6 +5,9 @@ import { useMediaStore } from "../../webrtc/stores/useMediaStore";
 import { makeStyles } from '@material-ui/core/styles';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 interface MyMediaStreamBoxProps {
   username?: string;
@@ -16,6 +19,17 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
   username="anonymous", id, mediaTrack
 }) => {
   const myRef = useRef<any>(null);
+  const handle = useFullScreenHandle();
+  const [fullscreen, setFullscreen] = useState(false)
+
+  const handleFullscreen = () => {
+    if (!fullscreen) {
+      handle.enter()
+    } else {
+      handle.exit()
+    }
+    setFullscreen(!fullscreen);
+  }
   
   const useStyles = makeStyles((theme) => ({
     margin: {
@@ -48,6 +62,7 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
       overflow: 'auto',
       display: 'inline-block',
     }}>
+      <FullScreen handle={handle}>
       <Card style={{padding: 3,
         background: 'rgba(215, 240, 240, 0.5)',
         overflow: 'hidden',
@@ -73,6 +88,11 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
           backgroundColor: 'rgba(0,0,0, 0.3)',
         }}>
           <span>{username}'s Screen</span>
+            {fullscreen ? 
+              <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+            : 
+              <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+            }
         </div>
         <div style={{position: 'relative', width:'96%', bottom:2, fontSize: '1em'}}>
           <Row>
@@ -85,6 +105,7 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
           </Row>
         </div>
       </Card>
+      </FullScreen>
     </div>
   );
 };

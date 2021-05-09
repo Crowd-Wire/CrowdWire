@@ -16,6 +16,7 @@ AVATARS_LIST = [AVATAR_1, AVATAR_2, AVATAR_3]
 
 
 class WebsocketProtocol:
+    SEND_MESSAGE = 'SEND_MESSAGE'
     PING = 'PING'
     PONG = 'PONG'
     JOIN_PLAYER = 'JOIN_PLAYER'

@@ -25,9 +25,7 @@ import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
 
 interface State {
-  chatToggle: boolean;
   displayStream: boolean;
-  messages: Array<string>;
   consumerMap: any;
   cam: any;
   mic: any;
@@ -38,9 +36,7 @@ export default class RoomCall extends React.Component<{}, State> {
   constructor(props) {
     super(props);
     this.state = {
-      chatToggle: false,
       displayStream: false,
-      messages: [],
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam,
       mic: useVoiceStore.getState().mic,
@@ -70,10 +66,6 @@ export default class RoomCall extends React.Component<{}, State> {
   accessVideo: boolean = false;
   socket = getSocket(1).socket;
   myVideoRef = createRef<any>();
-
-  chatHandle = (bool:boolean=false) => {
-    this.setState({chatToggle:bool});
-  }
   
   setNavigatorToStream = () => {
     console.log(this.accessMic)
@@ -187,7 +179,7 @@ export default class RoomCall extends React.Component<{}, State> {
     }
     return (
       <div style={{
-        position: 'absolute',
+        position: 'fixed',
         zIndex: 99,
         height: '25%',
         width:'100%',
@@ -195,6 +187,7 @@ export default class RoomCall extends React.Component<{}, State> {
         justifyContent: 'center',
         alignItems: 'center'
       }}>
+        
         {/* <ActiveSpeakerListener/> */}
 
         {numberUsers > 0 ? 
@@ -260,13 +253,6 @@ export default class RoomCall extends React.Component<{}, State> {
             videoTrack={this.state.cam}
           />
         </div>
-        <ChatBox 
-          chatToggle={this.state.chatToggle} 
-          closeDrawer={() => this.chatHandle(false)} 
-          // socketInstance={this.socketInstance.current} 
-          // myDetails={userDetails} 
-          messages={this.state.messages}>
-        </ChatBox>
       </div>
     );
   }

@@ -26,8 +26,6 @@ import DashSearch from "views/DashSearch/DashSearch.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 
 /**
- * @author Leandro Silva
- * 
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
  * 

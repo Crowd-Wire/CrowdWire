@@ -16,9 +16,14 @@ class BootScene extends Phaser.Scene {
 
     preload() {
         // map tiles
-        this.load.image('tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wall-tiles.png`)
+        this.load.image('wall-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wall-tiles.png`);
+        this.load.image('util-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/util-tiles.png`);
+        this.load.image('table-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-tiles.png`);
+        this.load.image('table-V',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-V.png`);
+        this.load.image('table-H',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-H.png`);
+
         // map in json format
-        this.load.tilemapTiledJSON('map', `${process.env.PUBLIC_URL}/assets/tilemaps/maps/staticmap.json`);
+        this.load.tilemapTiledJSON('map', `${process.env.PUBLIC_URL}/assets/tilemaps/maps/defaultmap.json`);
         // our two characters???
         this.load.spritesheet('player', `${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
 

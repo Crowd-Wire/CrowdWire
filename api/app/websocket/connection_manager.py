@@ -16,7 +16,7 @@ class ConnectionManager:
         Dictionary with the World_id as key and the List of Active Connections as
         value
         """
-        self.connections: Dict[str, Dict[str, List[WebSocket]]] = {}
+        self.connections: Dict[str, Dict[str, List[str]]] = {}
 
         self.users_ws: Dict[str, WebSocket] = {}
 
