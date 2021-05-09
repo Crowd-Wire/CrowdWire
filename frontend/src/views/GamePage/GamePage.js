@@ -1,24 +1,10 @@
 import React from "react";
+import { withStyles } from "@material-ui/core";
 
-import classNames from 'classnames';
+import GameDrawer from 'components/GameDrawer/GameDrawer';
+import Phaser from "./Sections/Phaser.js";
 
-import { connect } from "react-redux";
-
-import gameUITypes from "consts/gameUITypes";
-// import { toggleGameUI } from "redux/store";
-
-import Phaser from "./Sections/Phaser";
-import MapUI from "./Sections/MapUI";
-import MapEditorUI from "./Sections/MapEditorUI";
-import RoomCall from "../../components/Communications/RoomCall";
-// MapManager
-// Settings
-
-
-const gameUIStyle = {
-  position: "absolute",
-  zIndex: 2,
-}
+import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 
 
 class GamePage extends React.Component {
@@ -29,47 +15,19 @@ class GamePage extends React.Component {
 
   render() {
     const { classes } = this.props;
-    let componentUI = <MapUI />;
-
-    if (this.props) {
-      switch (this.props.activeUI) {
-        case gameUITypes.MAP:
-          componentUI = <MapUI />;
-          break;
-        case gameUITypes.MAP_EDITOR:
-          componentUI = <MapEditorUI />;
-          break;
-      }
-    }
-
-
+    
     return (
       <>
-        {/* Game UI */}
-        <div id="uiRoot">
-          {React.cloneElement(
-            componentUI,
-            {style: gameUIStyle}
-          )}
+        <div className={classes.wrapper}>
+          <GameDrawer />
+          <div  className={classes.gameWindow}>
+            {/* Game */}
+            <Phaser />
+          </div>
         </div>
-
-        <RoomCall/>
-        
-        {/* Game */}
-        <Phaser />
       </>
     );
   }
 }
 
-
-const mapStateToProps = (state) => ({
-  ...state
-});
-
-// const mapDispatchToProps = (dispatch) => ({
-//   toggleGameUI: () => dispatch(toggleGameUI),
-// });
-
-export default connect(mapStateToProps)(GamePage);
-
+export default withStyles(styles)(GamePage);

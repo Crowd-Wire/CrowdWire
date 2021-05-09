@@ -24,11 +24,8 @@ import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
 import DashSearch from "views/DashSearch/DashSearch.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
-import { useNavigate } from 'react-router-dom';
 
 /**
- * @author Leandro Silva
- * 
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
  * 
