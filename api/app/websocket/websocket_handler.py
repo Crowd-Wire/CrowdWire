@@ -16,7 +16,6 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     # store room on redis
 
 
-
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
     room_id = payload['room_id']
     velocity = payload['velocity']

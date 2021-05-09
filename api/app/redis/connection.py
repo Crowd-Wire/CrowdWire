@@ -242,7 +242,6 @@ class RedisConnector:
 
         return actions
 
-    
     async def add_groups_to_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Add one or more groups to a user"""
         groups_id = [group_id, *groups_id]

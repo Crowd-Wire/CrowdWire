@@ -53,7 +53,7 @@ async def world_websocket(
             elif topic == protocol.JOIN_PLAYER:
                 room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
-                await wh.send_groups_snapshot(world_id, user_id) # TODO: remove after tests
+                await wh.send_groups_snapshot(world_id, user_id)  # TODO: remove after tests
 
             elif topic == protocol.PLAYER_MOVEMENT:
                 await wh.send_player_movement(world_id, user_id, payload)
