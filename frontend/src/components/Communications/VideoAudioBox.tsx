@@ -8,6 +8,9 @@ import VideocamIcon from '@material-ui/icons/Videocam';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 interface VideoAudioBoxProps {
   username?: string;
@@ -30,9 +33,20 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
 
   const [videoState, setVideoState] = useState(videoToggle)
   const [audioState, setAudioState] = useState(audioToggle)
+  const handle = useFullScreenHandle();
+  const [fullscreen, setFullscreen] = useState(false)
 
   const toggleVideo = () => {
     setVideoState(!videoState)
+  }
+
+  const handleFullscreen = () => {
+    if (!fullscreen) {
+      handle.enter()
+    } else {
+      handle.exit()
+    }
+    setFullscreen(!fullscreen);
   }
 
   const toggleAudio = () => {
@@ -90,16 +104,15 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
       width: '100%',
       overflow: 'auto',
     }}>
-      <Card style={{padding: 3,
-        background: 'rgba(65, 90, 90, 0.5)',
-        overflow: 'hidden',
-        boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
-        borderTop: '1px solid rgba(255,255,255,0.5)',
-        borderLeft: '1px solid rgba(255,255,255,0.5)',
-        backdropFilter: 'blur(3px)',
-        height: '100%'
-      }}>
-          
+      <FullScreen handle={handle}>
+        <Card style={{padding: 4,
+          background: 'rgba(65, 90, 90, 0.5)',
+          overflow: 'hidden',
+          boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(255,255,255,0.5)',
+          backdropFilter: 'blur(3px)',
+          height: '100%'
+        }}>
           <div id={id+"border_div"}>
             { videoTrack ? (
               <video autoPlay id={id+"_video"} ref={videoRef}
@@ -117,17 +130,23 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
           </div>
 
           <div style={{
-              position: 'absolute',
-              top: 2,
-              padding: 2,
-              textAlign: 'center',
-              fontSize: '1.2em',
-              color: 'white',
-              width: '98%',
-              fontWeight: 500,
-              backgroundColor: 'rgba(0,0,0, 0.2)',
-            }}>
+            position: 'absolute',
+            top: 2,
+            textAlign: 'center',
+            fontSize: '1.2em',
+            color: '#fff',
+            fontWeight: 500,
+            width: '100%',
+            WebkitTextStroke: '0.5px white',
+            backgroundColor: 'rgba(0,0,0, 0.3)',
+            paddingRight: 10
+          }}>
             <span>{username}</span>
+            {fullscreen ? 
+              <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+            : 
+              <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+            }
           </div>
           
           <div style={{
@@ -154,12 +173,13 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                 }
               </Col>
 
-              <Col sm={7} style={{textAlign: 'center', maxHeight: 30}}>
+              <Col sm={7} style={{textAlign: 'right', maxHeight: 30}}>
                 <UserVolumeSlider volColor={'white'} userId={id} />
               </Col>
             </Row>
           </div>
-      </Card>
+        </Card>
+      </FullScreen>
     </div>
   );
 };

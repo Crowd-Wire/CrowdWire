@@ -22,6 +22,7 @@ class RedisConnector:
             [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
             password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
         await self.master.execute('flushall')
 

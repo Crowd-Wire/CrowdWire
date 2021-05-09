@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Card } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 interface MediaStreamBoxProps {
   username?: string;
@@ -12,6 +15,17 @@ export const MediaStreamBox: React.FC<MediaStreamBoxProps> = ({
   username="anonymous", id, mediaTrack
 }) => {
   const myRef = useRef<any>(null);
+  const handle = useFullScreenHandle();
+  const [fullscreen, setFullscreen] = useState(false)
+  
+  const handleFullscreen = () => {
+    if (!fullscreen) {
+      handle.enter()
+    } else {
+      handle.exit()
+    }
+    setFullscreen(!fullscreen);
+  }
   
   const useStyles = makeStyles((theme) => ({
     margin: {
@@ -41,6 +55,7 @@ export const MediaStreamBox: React.FC<MediaStreamBoxProps> = ({
       justifyContent: 'center',
       alignItems: 'center'
     }}>
+      <FullScreen handle={handle}>
       <Card style={{padding: 3,
         background: 'rgba(215, 240, 240, 0.5)',
         overflow: 'hidden',
@@ -65,8 +80,14 @@ export const MediaStreamBox: React.FC<MediaStreamBoxProps> = ({
           backgroundColor: 'rgba(0,0,0, 0.3)',
         }}>
           <span>{username}'s Screen</span>
+            {fullscreen ? 
+              <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+            : 
+              <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+            }
         </div>
       </Card>
+      </FullScreen>
     </div>
   );
 };
