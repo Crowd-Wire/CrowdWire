@@ -1,5 +1,5 @@
-import React, { useState, Component } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import React, { Component } from "react";
+import { withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import MapCard from 'components/MapCard/MapCard.js';
 import Row from 'react-bootstrap/Row';
@@ -8,6 +8,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
 import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
+import useAuthStore from "stores/useAuthStore";
 
 
 const useStyles = theme => ({
@@ -63,7 +64,7 @@ class SearchAllMaps extends Component {
 		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
 			.then((res) => { console.log(res);console.log(res.json());return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
-			.catch((err) => { console.log(err) });
+			.catch((err) => { useAuthStore.getState().leave() });
 	}
 
 	changePage = async (event, page) => {
@@ -88,7 +89,7 @@ class SearchAllMaps extends Component {
 			.then((res) => {
 				if(res)
 					this.setState({ maps: res }) 
-			});
+			}).catch((error) => {useAuthStore.getState().leave()});
 	}
 	async componentDidUpdate(){
 		if(this.joined!=this.props.joined){
@@ -103,7 +104,7 @@ class SearchAllMaps extends Component {
 					if(res)
 						this.setState({ maps: res }) 
 					this.setState({search:"", tags: []});
-				});
+				}).catch((error) => {useAuthStore.getState().leave()});
 		}
 	}
 

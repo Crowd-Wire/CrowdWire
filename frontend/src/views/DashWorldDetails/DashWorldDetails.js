@@ -6,6 +6,8 @@ import WorldService from 'services/WorldService.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { useLocation, useNavigate } from 'react-router-dom'
 import { createBrowserHistory } from 'history';
+import useAuthStore from "stores/useAuthStore";
+
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
@@ -28,7 +30,7 @@ export default function DashWorldDetails(props){
     .then((res) => {
       if(res)
         setWorldInfo(res)
-    });
+    }).catch((error)=>{useAuthStore.getState().leave()});
   }, [])
   const handler = () => {
       history.back();

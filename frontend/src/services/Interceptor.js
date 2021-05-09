@@ -1,6 +1,6 @@
 import AuthenticationService from './AuthenticationService.js';
 import fetchIntercept from 'fetch-intercept';
-import useAuthService from 'stores/useAuthStore.ts';
+import useAuthStore from 'stores/useAuthStore.ts';
 const originalRequest = {}
 export const interceptor = fetchIntercept.register({    
     request: function (url, config) {
@@ -35,14 +35,16 @@ export const interceptor = fetchIntercept.register({
                         .then((data) => {
                             return data.json();
                         }).then( (data) => {
-                            console.log("data");
-                            console.log(data);
-                            if(useAuthService.getState().registeredUser)
-                                AuthenticationService.setToken(data,"AUTH");
-                            else if(useAuthService.getState().guestUser)
-                                AuthenticationService.setToken(data, "GUEST");
-                            config['headers']['Authorization'] = 'Bearer '+ data.access_token
-                            return fetch(url, config)
+                            if(data){
+                                console.log("data");
+                                console.log(data);
+                                if(!useAuthStore.getState().guest_uuid)
+                                    AuthenticationService.setToken(data,"AUTH");
+                                else
+                                    AuthenticationService.setToken(data, "GUEST");
+                                config['headers']['Authorization'] = 'Bearer '+ data.access_token
+                                return fetch(url, config)
+                            }
                         })
                         .catch((error) => {
                             return Promise.reject(error)

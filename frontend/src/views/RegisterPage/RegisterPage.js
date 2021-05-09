@@ -25,7 +25,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
 import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
-import useAuthStore from "stores/useAuthStore";
 
 const useStyles = makeStyles(styles);
 
