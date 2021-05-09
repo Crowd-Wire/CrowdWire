@@ -7,6 +7,8 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 
+from datetime import datetime
+
 """
 Class used to Manage the WebSocket Connections, to each World
 """
@@ -29,6 +31,7 @@ async def world_websocket(
     # check which room he is on instead of this
     room_id = 0
 
+    # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
         while True:
             payload = await websocket.receive_json()
@@ -42,10 +45,15 @@ async def world_websocket(
             if topic == protocol.PING:
                 await websocket.send_text(protocol.PONG)
 
+            elif topic == protocol.SEND_MESSAGE:
+                payload['date'] = datetime.now().strftime('%H:%M')
+                payload['from'] = f"User{user_id}"
+                await manager.broadcast(world_id, '1', payload, None)
+
             elif topic == protocol.JOIN_PLAYER:
                 room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
-                await wh.send_groups_snapshot(world_id, user_id)
+                await wh.send_groups_snapshot(world_id, user_id)  # TODO: remove after tests
 
             elif topic == protocol.PLAYER_MOVEMENT:
                 await wh.send_player_movement(world_id, user_id, payload)
@@ -62,8 +70,9 @@ async def world_websocket(
                 await wh.join_as_new_peer_or_speaker(world_id, user_id, payload)
 
             elif topic in (
-                    protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
-                    protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK):
+                protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
+                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
+            ):
                 await wh.handle_transport_or_track(user_id, payload)
 
             elif topic == protocol.CLOSE_MEDIA:
