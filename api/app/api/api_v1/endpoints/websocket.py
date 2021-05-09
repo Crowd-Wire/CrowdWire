@@ -19,7 +19,7 @@ router = APIRouter()
     "/{world_id}",
 )
 async def world_websocket(
-        websocket: WebSocket, world_id: str,
+        websocket: WebSocket, world_id: int,
         token: Optional[str] = Query(None),
         user_id: str = Depends(deps.get_websockets_user)
 ) -> Any:

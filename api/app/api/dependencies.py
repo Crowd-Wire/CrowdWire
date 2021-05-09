@@ -13,7 +13,7 @@ from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
 
-from app.crud import crud_user
+from app.crud import crud_user, crud_world
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 reusable_oauth2_optional = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
@@ -96,6 +96,8 @@ async def get_websockets_user(
         websocket: WebSocket,
         *,
         token: str,
+        world_id: int,
+        db: Session = Depends(get_db)
 ) -> str:
     try:
         payload = jwt.decode(
@@ -105,6 +107,18 @@ async def get_websockets_user(
         token_data = schemas.TokenPayload(**payload)
     except (jwt.JWTError, ValidationError) as e:
         logger.debug(e)
+        raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+
+    # checks if the user has access to that world
+    # he might try to connect to the websocket directly
+    if token_data.is_guest_user:
+        world_obj, msg = await crud_world.get_available_for_guests(db=db, world_id=world_id)
+    else:
+        world_obj, msg = await crud_world.get_available(db=db, world_id=world_id, user_id=token_data.sub)
+
+    logger.debug(token_data.sub)
+    logger.debug(world_obj)
+    if not world_obj:
         raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
     return str(token_data.sub)

@@ -63,42 +63,59 @@ async def join_world(
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     """
-    Registers a User in a World and returns the Information as a world_user object
+    Checks if the world is available for that type of user.
+    If the user is registered it will try to get its information for that world from cache.
+    If it is not there, check the database.
+    For guests checks if that user was in this world by checking redis. If it is not in redis a new entry will be
+    created.
+    Returns the Information as a world_user object and also the role and map of the world.
     """
+
     if not is_guest_user(user):
+
         # checks if the world is available for him
         world_obj, msg = await crud.crud_world.get_available(db=db, world_id=world_id, user_id=user.user_id)
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
+
         # verify if the user is already in redis cache
         # If it's not the first time the user has joined the world, get it from redis(cache)
         world_user = await redis_connector.get_world_user_data(world_id, user.user_id)
         if not world_user:
-            # Otherwise, goes to PostgreSQL database
 
+            # Otherwise, goes to PostgreSQL database
+            logger.debug("no cache")
             world_user, default_role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+
             # pydantic schema is waiting for a role object not a role id
             delattr(world_user, 'role_id')
             setattr(world_user, 'role', default_role)
+            setattr(world_user, 'map', world_obj.world_map)
+
+        else:
+
+            # adds the world map to the data from the world_user
+            world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
 
     else:
-        # There are some differences for guests..
+
+        # guests cannot join worlds that dont allow guests
         world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id)
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
+
+        # This allows the same guest to join the same world without losing its data
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
-            logger.debug('not cached:/')
+
+            # gives the guest the default role for that world
             world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
             world_user = await redis_connector.join_new_guest_user(world_id=world_id,
                                                                    user_id=user.user_id, role=world_default_role)
 
-    world, msg = await crud.crud_world.get(db=db, world_id=world_id)
-    if not world:
-        # it should never reach this but for some reason it does it does not return something wrong
-        raise HTTPException(status_code=400, detail=msg)
+        # adds the world map to the data from the world_user
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
 
-    setattr(world_user, 'map', world.world_map)
     return world_user
 
 
