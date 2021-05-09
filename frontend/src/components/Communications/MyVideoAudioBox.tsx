@@ -19,6 +19,8 @@ import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -36,6 +38,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [audioPauseState, setAudioPauseState] = useState(true)
   const [mediaOffState, setMediaOffState] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const handle = useFullScreenHandle();
 
   
   function toggleModal() {
@@ -123,89 +126,92 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [videoTrack, audioTrack])
   return (
-    <div style={{
-      height:'100%',
-      maxWidth:400,
-      width: '100%',
-      overflow: 'auto',
-    }}>
-        <Card style={{padding: 3,
-        background: 'rgba(65, 90, 90, 0.5)',
-        overflow: 'hidden',
-        boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
-        borderTop: '1px solid rgba(255,255,255,0.5)',
-        borderLeft: '1px solid rgba(255,255,255,0.5)',
-        backdropFilter: 'blur(3px)',
-        height: '100%'
+    
+    <div
+      style={{
+        height:'100%',
+        maxWidth:400,
+        width: '100%',
+        overflow: 'auto',
       }}>
-            <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
-                { videoTrack ? (
-                    <video autoPlay id={id+"_video"} ref={myRef}
-                      style={{display: videoPauseState ? 'block' : 'none'}}/>
-                  ) : audioTrack ? (
-                    <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
-                      <audio autoPlay id={id+"_audio"} ref={myRef}/>
+      <FullscreenIcon onClick={handle.enter} style={{color:'white'}}></FullscreenIcon>
+      <FullScreen handle={handle}>
+        <Card style={{padding: 4,
+          background: 'rgba(65, 90, 90, 0.5)',
+          overflow: 'hidden',
+          boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(255,255,255,0.5)',
+          backdropFilter: 'blur(3px)',
+          height: '100%'
+        }}>
+              <div id={id+"border_div"} style={{height:"100%", width: "100%"}}>
+                  { videoTrack ? (
+                      <video autoPlay id={id+"_video"} ref={myRef}
+                        style={{display: videoPauseState ? 'block' : 'none'}}/>
+                    ) : audioTrack ? (
+                      <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
+                        <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
+                        <audio autoPlay id={id+"_audio"} ref={myRef}/>
+                      </div>
+                    ) : ''
+                  }
+                  { !videoTrack || !videoPauseState ?
+                    (
+                    <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
+                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
                     </div>
-                  ) : ''
-                }
-                { !videoTrack || !videoPauseState ?
-                  (
-                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
-                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
-                  </div>
-                  )
-                : ''}
-            </div>
+                    )
+                  : ''}
+              </div>
 
-            
+              <div style={{
+                position: 'absolute',
+                top: 2,
+                textAlign: 'center',
+                fontSize: '1.2em',
+                color: '#fff',
+                fontWeight: 500,
+                width: '100%',
+                WebkitTextStroke: '0.5px white',
+                backgroundColor: 'rgba(0,0,0, 0.3)',
+                paddingRight: 10
+              }}>
+                <span>{username}</span>
+                <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
+                  onClick={() => toggleModal()}/>
+              </div>
 
-            <div style={{
-              position: 'absolute',
-              top: 2,
-              paddingRight: 2,
-              textAlign: 'center',
-              fontSize: '1.2em',
-              color: '#fff',
-              fontWeight: 500,
-              width: '98%',
-              WebkitTextStroke: '0.5px white',
-              backgroundColor: 'rgba(0,0,0, 0.3)',
-            }}>
-              <span>{username}</span>
-              <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
-                onClick={() => toggleModal()}/>
-            </div>
-            <div style={{position: 'relative', width:'96%', bottom:0, fontSize: '1em'}}>
-              <Row>
-                <Col sm={6}>
-                  { videoTrack ?
-                      videoPauseState ? 
-                      (<VideocamIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleVideo()}/>)
-                      : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
-                      : (<VideocamOffIcon color={'action'}/>)
-                    }
-                  { audioTrack ?
-                      audioPauseState ? 
-                      (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
-                      : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-                      : (<MicOffIcon color={'action'}/>)
-                    }
-                </Col>
+              <div style={{position: 'absolute', width:'100%', bottom:3, fontSize: '1em', paddingRight: 10}}>
+                <Row>
+                  <Col sm={6}>
+                    { videoTrack ?
+                        videoPauseState ? 
+                        (<VideocamIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleVideo()}/>)
+                        : (<VideocamOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleVideo()}/>)
+                        : (<VideocamOffIcon color={'action'}/>)
+                      }
+                    { audioTrack ?
+                        audioPauseState ? 
+                        (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
+                        : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
+                        : (<MicOffIcon color={'action'}/>)
+                      }
+                  </Col>
 
-                <Col style={{textAlign: 'right'}} sm={6}>
-                    { mediaOffState ? 
-                      <ScreenShareIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleMedia()}/>
-                      :
-                      <StopScreenShareIcon style={{'cursor': 'pointer'}} color="secondary" onClick={() => toggleMedia()}/>
-                    }
-                </Col>
-              </Row>
-            </div>
-        </Card>
-      { showModal ? 
-        <DeviceSettings closeModal={toggleModal}/>
-      : ''}
+                  <Col style={{textAlign: 'right'}} sm={6}>
+                      { mediaOffState ? 
+                        <ScreenShareIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleMedia()}/>
+                        :
+                        <StopScreenShareIcon style={{'cursor': 'pointer'}} color="secondary" onClick={() => toggleMedia()}/>
+                      }
+                  </Col>
+                </Row>
+              </div>
+          </Card>
+        { showModal ? 
+          <DeviceSettings closeModal={toggleModal}/>
+        : ''}
+      </FullScreen>
     </div>
   );
 };
