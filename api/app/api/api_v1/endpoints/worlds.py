@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Query
-from typing import Optional, Any, List, Union
+from typing import Optional, Any, List, Union, Tuple
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app import schemas, crud, models
@@ -56,7 +56,7 @@ async def join_world_by_link(
     return world_user
 
 
-@router.get("/{world_id}/users", response_model=schemas.World_UserWithRoleInDB)
+@router.get("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -77,11 +77,10 @@ async def join_world(
             # Otherwise, goes to PostgreSQL database
 
             world_user, default_role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
-            # pydantic schema is waiting for a role object not a role id, so let's delete the attr
+            # pydantic schema is waiting for a role object not a role id
             delattr(world_user, 'role_id')
             setattr(world_user, 'role', default_role)
 
-            return world_user
     else:
         # There are some differences for guests..
         world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id)
@@ -93,6 +92,13 @@ async def join_world(
             world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
             world_user = await redis_connector.join_new_guest_user(world_id=world_id,
                                                                    user_id=user.user_id, role=world_default_role)
+
+    world, msg = await crud.crud_world.get(db=db, world_id=world_id)
+    if not world:
+        # it should never reach this but for some reason it does it does not return something wrong
+        raise HTTPException(status_code=400, detail=msg)
+
+    setattr(world_user, 'map', world.world_map)
     return world_user
 
 
