@@ -37,7 +37,7 @@ async def world_websocket(
             payload = await websocket.receive_json()
             topic = payload['topic']
 
-            if topic != protocol.PLAYER_MOVEMENT:
+            if topic != protocol.PLAYER_MOVEMENT and topic != protocol.PING:
                 logger.info(
                     f"Received message with topic {topic} from user {user_id}"
                 )
@@ -73,7 +73,7 @@ async def world_websocket(
                 protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
                 protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
             ):
-                await wh.handle_transport_or_track(user_id, payload)
+                await wh.handle_transport_or_track(world_id, user_id, payload)
 
             elif topic == protocol.CLOSE_MEDIA:
                 await wh.close_media(world_id, user_id, payload)
@@ -92,7 +92,7 @@ async def world_websocket(
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)
     except BaseException:
-        logger.info("base exc")
+        logger.info("base exception, python error in code")
         manager.disconnect(world_id, user_id)
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)

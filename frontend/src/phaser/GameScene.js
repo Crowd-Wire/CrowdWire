@@ -152,7 +152,7 @@ class GameScene extends Phaser.Scene {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    this.remotePlayers[id].destroy();
+                    this.remotePlayers[id].disconnect();
                     delete this.remotePlayers[id];
                 }
             }
@@ -170,7 +170,6 @@ class GameScene extends Phaser.Scene {
 
         // Draw tiles (only within the groundLayer)
         if (this.input.manager.activePointer.isDown) {
-            console.log('draw?')
             const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
             if (tile)
                 tile.setCollision(true);
@@ -424,7 +423,7 @@ class RemotePlayer extends Player {
     /**
      * Destroys the object cleanly.
      */
-    destroy() {
+    disconnect() {
         this.unsubscribe();
         this.destroy();
     }

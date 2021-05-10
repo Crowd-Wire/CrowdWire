@@ -210,7 +210,6 @@ export const useConsumerStore = create(
             delete s.consumerMap[userId];
             useConsumerStore.getState().checkRoomToClose(user.roomId);
           }
-          console.log(s.consumerMap)
           return {
             consumerMap: {
               ...s.consumerMap

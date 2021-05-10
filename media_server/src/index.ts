@@ -10,7 +10,7 @@ import { deleteRoom } from "./utils/deleteRoom";
 import { startMediasoup } from "./utils/startMediasoup";
 import { HandlerMap, startRabbit } from "./utils/startRabbit";
 
-const log = debugModule("crowdwire:index");
+// const log = debugModule("crowdwire:index");
 const errLog = debugModule("crowdwire:ERROR");
 
 const rooms: MyRooms = {};
@@ -154,6 +154,7 @@ async function main() {
           continue;
         }
       }
+
       send({
         topic: "@get-recv-tracks-done",
         uid,
@@ -194,7 +195,7 @@ async function main() {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
             if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontends to get update, but this can be removed
+              // @todo give some time for frontend to get update, but this can be removed
               send({
                 rid: roomId,
                 topic: "close_consumer",
@@ -292,7 +293,7 @@ async function main() {
         return;
       }
 
-      log("connect-transport", peerId, transport.appData);
+      console.log("connect-transport", peerId, transport.appData);
 
       try {
         await transport.connect({ dtlsParameters });
@@ -321,7 +322,7 @@ async function main() {
         errBack();
         return;
       }
-      log("add-speaker", peerId);
+      console.log("add-speaker", peerId);
 
       const { router } = rooms[roomId];
       const sendTransport = await createTransport("send", router, peerId);
@@ -342,24 +343,27 @@ async function main() {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
-      log("join-as-new-speaker", peerId);
 
+      console.log("join-as-new-speaker", peerId);
+      
       const { state, router } = rooms[roomId];
+
+      if (state[peerId]) {
+        closePeer(state[peerId]);
+      }
+
       const [recvTransport, sendTransport] = await Promise.all([
         createTransport("recv", router, peerId),
         createTransport("send", router, peerId),
       ]);
       
-      if (state[peerId]) {
-        closePeer(state[peerId]);
-      }
       rooms[roomId].state[peerId] = {
         recvTransport: recvTransport,
         sendTransport: sendTransport,
         consumers: [],
         producer: null,
       };
-
+      
       send({
         topic: "you-joined-as-speaker",
         d: {
@@ -376,7 +380,7 @@ async function main() {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
-      log("join-as-new-peer", peerId);
+      console.log("join-as-new-peer", peerId);
       const { state, router } = rooms[roomId];
       const [recvTransport, sendTransport] = await Promise.all([
         createTransport("recv", router, peerId),

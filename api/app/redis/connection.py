@@ -24,7 +24,7 @@ class RedisConnector:
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
-        await self.master.execute('flushall')
+        # await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -80,6 +80,10 @@ class RedisConnector:
     async def srem(self, key: str, member: str, *members):
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
+
+    async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
+        """Determine if a given user is a member of a group"""
+        return await self.sismember(f"world:{str(world_id)}:user:{str(user_id)}:groups", group_id)
 
     async def save_world_user_data(self, world_id: int, user_id: Union[int, uuid4], data: dict):
         """
@@ -219,11 +223,11 @@ class RedisConnector:
         mergeable_groups_id.remove(lowest_group_id)
 
         for mgid in mergeable_groups_id:
-            actions['close-room'].append({'worldId': world_id, 'roomId': group_id})
 
             if mgid == group_id:
                 mem_users_id = all_users_id
             else:
+                actions['close-room'].append({'worldId': world_id, 'roomId': mgid})
                 mem_users_id = mem_group_users_id[mgid][0]
 
             await self.rem_group(world_id, mgid)
@@ -231,15 +235,17 @@ class RedisConnector:
             # add users to lowest group id
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
-                actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
-                await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
+                if not (await self.user_in_group(world_id, muid, lowest_group_id)):
+                    actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
+                    await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
 
         """Add users to the normalized group"""
         if not mergeable_groups_id:
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
             for uid in users_id:
-                actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
-                await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+                if not (await self.user_in_group(world_id, uid, lowest_group_id)):
+                    actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
+                    await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
 
         return actions
 
