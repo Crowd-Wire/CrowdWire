@@ -59,7 +59,6 @@ class GameScene extends Phaser.Scene {
         //     // Add new objects to our sprite group, change the start y position to meet the platform
         //     const object = this.objects.create(obj.x, obj.y + 200 - obj.height, 'table-H').setOrigin(0, 0);
         // });
-  
 
         // -1 makes all tiles on this layer collidable
         this.collisionLayer.setCollisionByExclusion([-1]);
