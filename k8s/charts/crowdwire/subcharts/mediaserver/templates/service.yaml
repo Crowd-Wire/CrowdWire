@@ -5,10 +5,14 @@ metadata:
   labels:
     {{- include "mediaserver.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: LoadBalancer
+  loadBalancerIP: 20.74.42.138
   ports:
-    - port: {{ .Values.service.port }}
+    - name : tcp
+      port: {{ .Values.service.port }}
       targetPort: 3001
       protocol: TCP
+
   selector:
     {{- include "mediaserver.selectorLabels" . | nindent 4 }}
+    
