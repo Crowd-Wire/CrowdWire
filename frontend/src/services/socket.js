@@ -56,7 +56,7 @@ export const getSocket = (worldId) => {
       room_id: roomId,
       position
     }
-    if (socket.readyState === WebSocket.OPEN)
+    if (socket && socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else
       console.error(`[error] socket closed before joinRoom`);
@@ -69,7 +69,7 @@ export const getSocket = (worldId) => {
       position,
       velocity,
     }
-    if (socket.readyState === WebSocket.OPEN)
+    if (socket && socket.readyState === WebSocket.OPEN)
         await socket.send(JSON.stringify(payload));
     else
         console.error(`[error] socket closed before sendMovement`);
@@ -81,7 +81,7 @@ export const getSocket = (worldId) => {
       // room_id: roomId,
       users_id: usersId,
     }
-    if (socket.readyState === WebSocket.OPEN)
+    if (socket && socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else
       console.error(`[error] socket closed before wirePlayer`);
@@ -93,7 +93,7 @@ export const getSocket = (worldId) => {
       // room_id: roomId,
       users_id: usersId,
     }
-    if (socket.readyState === WebSocket.OPEN)
+    if (socket && socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else
       console.error(`[error] socket closed before unwirePlayer`);
@@ -106,7 +106,7 @@ export const getSocket = (worldId) => {
       text: message,
       to,
     }
-    if (socket.readyState === WebSocket.OPEN)
+    if (socket && socket.readyState === WebSocket.OPEN)
       await socket.send(JSON.stringify(payload));
     else
       console.error(`[error] socket closed before sendMessage`);
