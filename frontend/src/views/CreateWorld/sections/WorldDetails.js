@@ -12,7 +12,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FormLabel from '@material-ui/core/FormLabel';
 import TagService from 'services/TagService';
-
+import useAuthStore from 'stores/useAuthStore.ts';
 let wName = "";
 let maxUsers = -1;
 let tag_array = [];
@@ -28,7 +28,7 @@ export default function WorldDetails(props){
             let arr = [];
             res.forEach(tag => arr.push(tag.name)); 
             setTags(arr);
-          })
+          }).catch((error) => {useAuthStore.getState().leave()})
       }, [])
 
     const [accessibility, setAccessibility] = React.useState("false");

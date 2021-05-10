@@ -47,7 +47,7 @@ export const sendMedia = async (roomId:string = null) => {
           appData: { mediaTag: "media" },
         })
         .then((producer) => {set({mediaProducer: producer})})
-        .catch((err) => console.log(err))
+        .catch((err) => {console.log(err)})
       });
       media.onended = function(event) {
         useMediaStore.getState().mediaProducer.close();

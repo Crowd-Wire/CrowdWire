@@ -26,7 +26,6 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
-import { ToastContainer } from 'react-toastify';
 
 class LoginPage extends React.Component {
 
@@ -79,9 +78,7 @@ class LoginPage extends React.Component {
         console.log(res)
         if(res.access_token!==undefined){
           this.notify("Auth");
-          AuthenticationService.setToken(res);
-          this.setState({loggedIn:true})
-          this.props.changeAuth(true);
+          AuthenticationService.setToken(res,"AUTH");
         }
         else if(res.detail==="Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
@@ -101,9 +98,7 @@ class LoginPage extends React.Component {
       .then((res) => {
         if(res.access_token!==undefined){
           this.notify("Guest");
-          AuthenticationService.setToken(res);
-          this.setState({loggedIn:true}); 
-          this.props.changeAuth(true);
+          AuthenticationService.setToken(res, "GUEST");
         }
       })
 
@@ -111,10 +106,6 @@ class LoginPage extends React.Component {
 
 
   render() {
-    if (this.state.loggedIn) {
-      return <Navigate to="../dashboard/search" />
-    }
-
     return (
       <div>
         <div

@@ -13,7 +13,7 @@ class WorldService {
 
         let url = 'worlds/';
         let query = [];
-        
+    
         if(search !== "")
             query.push('search='+search);
         

@@ -35,7 +35,7 @@ class DashboardContent extends Component{
 		if(this.props.worldInfo.tags===undefined)
 			return;
 		if(this.props.worldInfo.tags.length===0)
-			labels.push(<Typography style={{color:"white"}}>No labels available for this world.</Typography>);
+			labels.push(<Typography style={{color:"white"}}>No tags available for this world.</Typography>);
 		for(let i = 0; i < this.props.worldInfo.tags.length;i++){
 			labels.push(<span style={this.spanStyle}>{this.props.worldInfo.tags[i].name}</span>);
 		}
