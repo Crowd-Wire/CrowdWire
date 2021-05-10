@@ -92,7 +92,7 @@ async def world_websocket(
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)
     except BaseException:
-        logger.info("base exc")
+        logger.info("base exception, python error in code")
         manager.disconnect(world_id, user_id)
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)

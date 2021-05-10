@@ -43,7 +43,8 @@ class ConnectionManager:
         return user_id
 
     def disconnect(self, world_id: str, user_id: str):
-        del self.users_ws[user_id]
+        if user_id in self.users_ws:
+            del self.users_ws[user_id]
         logger.info(
             f"Disconnected User {user_id} from World {world_id}"
         )
