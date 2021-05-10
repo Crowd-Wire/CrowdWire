@@ -20,6 +20,8 @@ ROLE_DEFAULT_ALREADY_EXISTS = "There is a default role for this World"
 ROLE_DEFAULT_DELETE_FORBIDDEN = "Cannot delete the default role of a role"
 GOOGLE_USER_ALREADY_REGISTERED = "This google account is already registered."
 GOOGLE_EMAIL_ALREADY_REGISTERED = "There is already an account with this email."
+REPORT_NOT_FOUND_FOR_WORLD_BY_USER = "The given user did not report this world."
+WORLD_ALREADY_REPORTED_BY_USER = "This world has already been reported by the user."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."

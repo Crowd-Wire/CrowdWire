@@ -27,5 +27,38 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
         return reports
 
+    async def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
+        """
+        Checks if a user has reported a given world.
+        """
+        report = db.query(Report_World)\
+            .filter(Report_World.reported == world_id, Report_World.reporter == user_id).first()
+
+        if not report:
+            return None, strings.REPORT_NOT_FOUND_FOR_WORLD_BY_USER
+        return report, ""
+
+    async def create(
+            self, db: Session, obj_in: ReportWorldCreate, *args, **kwargs
+    ) -> Tuple[Optional[Report_World], str]:
+        """
+        Checks if the world was already reported by user and if not creates the report.
+        """
+
+        request_user = kwargs.get('request_user')
+        if not request_user or (request_user and not isinstance(request_user, User)):
+            return None, strings.USER_NOT_PASSED
+
+        report, _ = self.get_world_report_for_user(db=db, world_id=obj_in.reporter, user_id=request_user.user_id)
+        if report:
+            return None, strings.WORLD_ALREADY_REPORTED_BY_USER
+
+        obj_in.reporter = request_user.user_id
+
+        report = super().create(db=db, obj_in=obj_in)
+        return report, ""
+
+
+
 
 crud_report_world = CRUDReport_World(Report_World)

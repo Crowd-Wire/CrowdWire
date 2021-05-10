@@ -7,6 +7,7 @@ from app.api import dependencies as deps
 from app.core import strings
 from app.utils import is_guest_user
 from app.crud import crud_role, crud_report_world
+from app.schemas import ReportWorldCreate
 
 router = APIRouter()
 
@@ -28,3 +29,19 @@ async def get_all_world_reports(
 
     reports, msg = await crud_report_world(db=db, world_id=1, page=page, limit=limit)
     return roles
+
+router.post("/")
+async def create_world_report(
+        report: ReportWorldCreate,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+) -> Any:
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    report, msg = crud_report_world.create(db=db, obj_in=report, request_user=user)
+    if not report:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return report

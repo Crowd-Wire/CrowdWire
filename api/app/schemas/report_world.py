@@ -8,8 +8,9 @@ class ReportWorldBase(BaseModel):
     timestamp: Optional[datetime]
     comment: Optional[str]
 
-class ReportWorldCreate(BaseModel):
-    reporter: int
+
+# does not need the id of the reporter because it is necessary a token
+class ReportWorldCreate(ReportWorldBase):
     reported: int
     timestamp: datetime
     comment: str
