@@ -68,12 +68,10 @@ export default function WorldDetails(props){
     }
 
     const onChangeValue = (event) => {
-        console.log(event.target.value)
         setAccessibility(event.target.value);
     }
 
     const onChangeGuests = (event) => {
-        console.log(event.target.value)
         setGuests(event.target.value);
     }
 
