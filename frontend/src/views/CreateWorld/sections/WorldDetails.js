@@ -68,10 +68,12 @@ export default function WorldDetails(props){
     }
 
     const onChangeValue = (event) => {
+        console.log(event.target.value)
         setAccessibility(event.target.value);
     }
 
     const onChangeGuests = (event) => {
+        console.log(event.target.value)
         setGuests(event.target.value);
     }
 
@@ -122,8 +124,8 @@ export default function WorldDetails(props){
                             <div style={{width:"100%", marginRight:"auto"}}>
                             <FormLabel component="legend">Allow guests</FormLabel>
                                 <RadioGroup row name="guests" onChange={onChangeGuests}>
-                                <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Allow" />
-                                <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Deny" />
+                                <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Deny" />
+                                <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Allow" />
                             </RadioGroup>
                             </div>
                         </Col>
