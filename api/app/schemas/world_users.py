@@ -61,6 +61,10 @@ class World_UserWithRoleInDB(World_UserInDBBase):
     role: RoleInDB
 
 
+class World_UserWithRoleAndMap(World_UserWithRoleInDB):
+    map: bytes
+
+
 # Return Data for Statistics
 class World_UserInDBStats(World_UserInDBBase):
     n_joins: int
