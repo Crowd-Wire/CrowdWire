@@ -53,6 +53,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     for uid in users_id:
         if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
             # check if user already claimed proximity
+            logger.info("yes he confirmed")
             add_users.add(uid)
 
     actions = {}
@@ -70,17 +71,28 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
-
+    logger.info('unwire ' + str(user_id) + 'from ' + str(users_id))
     # remove faraway users from confirm struc
     await redis_connector.rem_users_from_user(world_id, user_id, *users_id)
 
     rem_groups_id = set()
     add_users_id = set()
+
     for uid in users_id:
-        rem_groups_id.update(await redis_connector.get_user_groups(world_id, user_id))
+        rem_groups_id.update(await redis_connector.get_user_groups(world_id, uid))
+
     for rgid in rem_groups_id:
         add_users_id.update(await redis_connector.get_group_users(world_id, rgid))
-    add_users_id ^= set(users_id) ^ {user_id}
+
+    add_users_id = add_users_id - set(users_id) - {user_id}
+
+    users_in_my_group = set()
+    my_groups = await redis_connector.get_user_groups(world_id, user_id)
+    for guid in my_groups:
+        users_in_my_group.update(await redis_connector.get_group_users(world_id, guid))
+
+    logger.info(users_in_my_group)
+    add_users_id &= users_in_my_group
 
     if rem_groups_id:
         # remove user from groups where the faraway users are
@@ -89,7 +101,9 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id}})
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
+        logger.info(add_users_id)
         # add user to a new group with the still nearby users
+        #if not add_users_id in my_groups:
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
     await send_groups_snapshot(world_id, user_id)
@@ -108,13 +122,14 @@ async def handle_actions(actions: dict):
 
     if 'add-users-to-room' in actions:
         add_users = actions['add-users-to-room']
+        
         for add_action in add_users:
+            logger.info('adding users' + str(add_action['peerId']) + ' to room ' + str(add_action['roomId']))
             await join_as_new_peer_or_speaker(add_action['worldId'], add_action['roomId'], add_action['peerId'])
     if 'close-room' in actions:
         close_rooms = actions['close-room']
-        logger.info(close_rooms)
         for close_action in close_rooms:
-            logger.info(close_action)
+            logger.info('closing room ' + str(close_action['roomId']))
             await destroy_room(close_action['worldId'], close_action['roomId'])
     if 'rem-user-from-groups' in actions:
         rem_action = actions['rem-user-from-groups']
@@ -142,7 +157,7 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
     """
     payload = {'topic': "join-as-speaker",
                'd': {'roomId': room_id, 'peerId': user_id}}
-
+    logger.info(payload)
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -153,9 +168,12 @@ async def destroy_room(word_id: str, room_id: str):
     await rabbit_handler.publish(json.dumps(payload))
 
 
-async def handle_transport_or_track(user_id: str, payload: dict):
+async def handle_transport_or_track(world_id: str, user_id: str, payload: dict):
     payload['d']['peerId'] = user_id
-    await rabbit_handler.publish(json.dumps(payload))
+    room_id = payload['d']['roomId']
+    logger.info(await redis_connector.user_in_group(world_id, user_id, room_id))
+    if (await redis_connector.user_in_group(world_id, user_id, room_id)):
+        await rabbit_handler.publish(json.dumps(payload))
 
 
 async def close_media(world_id: str, user_id: str, payload: dict):
