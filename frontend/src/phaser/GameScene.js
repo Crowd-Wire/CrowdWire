@@ -170,7 +170,6 @@ class GameScene extends Phaser.Scene {
 
         // Draw tiles (only within the groundLayer)
         if (this.input.manager.activePointer.isDown) {
-            console.log('draw?')
             const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
             if (tile)
                 tile.setCollision(true);

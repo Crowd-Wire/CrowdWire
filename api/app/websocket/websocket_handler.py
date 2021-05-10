@@ -71,8 +71,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
-    logger.info('unwire ' + str(user_id) + 'from ' + str(users_id))
-    # remove faraway users from confirm struc
+    # remove faraway users from confirm structure
     await redis_connector.rem_users_from_user(world_id, user_id, *users_id)
 
     rem_groups_id = set()
@@ -91,7 +90,6 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     for guid in my_groups:
         users_in_my_group.update(await redis_connector.get_group_users(world_id, guid))
 
-    logger.info(users_in_my_group)
     add_users_id &= users_in_my_group
 
     if rem_groups_id:
@@ -101,9 +99,8 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id}})
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
-        logger.info(add_users_id)
         # add user to a new group with the still nearby users
-        #if not add_users_id in my_groups:
+        # if not add_users_id in my_groups:
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
     await send_groups_snapshot(world_id, user_id)
@@ -119,21 +116,16 @@ async def disconnect_user(world_id: str, user_id: str):
 
 async def handle_actions(actions: dict):
     logger.info(actions)
-
     if 'add-users-to-room' in actions:
         add_users = actions['add-users-to-room']
-        
         for add_action in add_users:
-            logger.info('adding users' + str(add_action['peerId']) + ' to room ' + str(add_action['roomId']))
             await join_as_new_peer_or_speaker(add_action['worldId'], add_action['roomId'], add_action['peerId'])
     if 'close-room' in actions:
         close_rooms = actions['close-room']
         for close_action in close_rooms:
-            logger.info('closing room ' + str(close_action['roomId']))
             await destroy_room(close_action['worldId'], close_action['roomId'])
     if 'rem-user-from-groups' in actions:
         rem_action = actions['rem-user-from-groups']
-        logger.info(rem_action)
         await remove_user(rem_action['worldId'], rem_action['groupIds'], rem_action['peerId'])
 
 
@@ -180,7 +172,6 @@ async def close_media(world_id: str, user_id: str, payload: dict):
     payload['d'] = {'peerId': user_id}
 
     groupIds = await redis_connector.get_user_groups(world_id, user_id)
-    logger.info(groupIds)
 
     for roomId in groupIds:
         payload['d']['roomId'] = roomId
@@ -201,7 +192,6 @@ async def toggle_producer(world_id: str, user_id: str, payload: dict):
     payload['d']['peerId'] = user_id
 
     groupIds = await redis_connector.get_user_groups(world_id, user_id)
-    logger.info(groupIds)
 
     for roomId in groupIds:
         payload['d']['roomId'] = roomId

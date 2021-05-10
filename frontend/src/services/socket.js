@@ -14,14 +14,6 @@ import usePlayerStore from "stores/usePlayerStore.ts";
 import useMessageStore from "stores/useMessageStore.ts";
 import GameScene from "phaser/GameScene";
 
-// let commSocket;
-
-// export const getCommSocket = () => {
-//   if (!commSocket)
-//     commSocket = new WebSocket(`${WS_BASE}/?`);
-//   return commSocket;
-// }
-
 async function flushConsumerQueue(_roomId) {
   try {
     for (const {
@@ -122,32 +114,21 @@ export const getSocket = (worldId) => {
       console.error(`[error] socket closed before sendMessage`);
   }
 
-  const sendComms = async (topic="", worldId="", userId="") => {
-    const payload = {
-      topic: topic,
-      worldId: worldId,
-      userId:userId,
-    }
-    await socket.send(JSON.stringify(payload));
-  }
-
   if (!socket) {
-      const token = AuthenticationService.getToken();
-      socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
+    const token = AuthenticationService.getToken();
+    socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
 
-      socket.onopen = async (event) => {
-          console.info("[open] Connection established");
-          const heartbeat = setInterval(() => {
-              if (socket && socket.readyState === socket.OPEN) {
-                socket.send(JSON.stringify({'topic': 'PING'}));
-              } else {
-                // reopen web socket maybe?
-                // or ask for new tokens if thats the case
-                clearInterval(heartbeat);
-              }
-          }, 5000);
-          await socket.send(JSON.stringify({token: '', room_id: '1'}));
-      };
+    socket.onopen = async (event) => {
+        console.info("[open] Connection established");
+        const heartbeat = setInterval(() => {
+            if (socket && socket.readyState === socket.OPEN) {
+              socket.send(JSON.stringify({'topic': 'PING'}));
+            } else {
+              clearInterval(heartbeat);
+            }
+        }, 5000);
+        await socket.send(JSON.stringify({token: '', room_id: '1'}));
+    };
 
     socket.onmessage = (event) => {
       if (event.data == "PONG") {
@@ -171,7 +152,7 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().disconnectPlayer(data.user_id);
             break;
         case "PLAYER_MOVEMENT":
-            console.log('\nRECV',data.position, data.velocity)
+            // console.log('\nRECV',data.position, data.velocity)
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
@@ -252,10 +233,18 @@ export const getSocket = (worldId) => {
       if (event.wasClean) {
         console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
       } else {
-        // e.g. server process killed or network down
         // event.code is usually 1006 in this case
         console.info('[close] Connection died');
       }
+      socket = null;
+
+      const reconnect = setInterval(() => {
+        if (!socket || socket.readyState != socket.OPEN) {
+          getSocket(worldId);
+        } else {
+          clearInterval(reconnect);
+        }
+      }, 5000);
     };
 
     socket.onerror = (error) => {
@@ -263,7 +252,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, sendComms, joinRoom, wirePlayer, unwirePlayer, sendMessage};
+  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage};
 }
 
 export const wsend = async (d) => {
@@ -271,10 +260,3 @@ export const wsend = async (d) => {
     await socket.send(JSON.stringify(d));
   }
 };
-
-function heartbeat() {
-  if (socket && socket.readyState === socket.OPEN) {
-    socket.send("heartbeat");
-  }
-  setTimeout(heartbeat, 500);
-}
