@@ -180,8 +180,6 @@ export const useConsumerStore = create(
         }),
       checkRoomToClose: (roomId) =>
         set((s) => {
-          console.log('LSADLDASLDLASLDASLDAS')
-          console.log('closing room ' + roomId)
           let to_close = true;
           for (const [key, value] of Object.entries(s.consumerMap)) {
             if (value.roomId == roomId) {
@@ -198,8 +196,6 @@ export const useConsumerStore = create(
         }),
       closePeer: (userId) =>
         set((s) => {
-          console.log('closing peer ' + userId)
-          console.log('LSADLDASLDLASLDASLDAS')
           let user = s.consumerMap[userId]
           if (user) {
             if (user.consumerAudio && !user.consumerAudio.closed) {
@@ -214,7 +210,6 @@ export const useConsumerStore = create(
             delete s.consumerMap[userId];
             useConsumerStore.getState().checkRoomToClose(user.roomId);
           }
-          console.log(s.consumerMap)
           return {
             consumerMap: {
               ...s.consumerMap

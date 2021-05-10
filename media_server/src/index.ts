@@ -136,10 +136,6 @@ async function main() {
           continue;
         }
         try {
-          console.log("get recev tracks from ")
-          console.log(myPeerId)
-          console.log(' to ')
-          console.log(theirPeerId)
           const { producer } = peerState;
           for (let [key, value] of producer.entries()) {
             consumerParametersArr.push(
@@ -367,15 +363,6 @@ async function main() {
         consumers: [],
         producer: null,
       };
-      
-      // for (const [key, value] of Object.entries(rooms)) {
-      //   console.log('room ' + key)
-      //   for (const [peer, state] of Object.entries(value.state)) {
-      //     console.log(peer);
-      //     if (state.recvTransport) console.log('has recevT')
-      //     if (state.sendTransport) console.log('has sendT')
-      //   }
-      // }
       
       send({
         topic: "you-joined-as-speaker",
