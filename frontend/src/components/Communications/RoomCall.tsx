@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 // Icons imports
 import { Button } from '@material-ui/core';
 
-import ChatBox from "./ChatBox";
 import Carousel from "react-grid-carousel";
 import { useCheckMediaAccess, getVideoAudioStream } from "../../utils/checkMediaAccess.js";
 import storeDevice from "../../redux/commStore.js";
@@ -23,9 +22,12 @@ import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 interface State {
   displayStream: boolean;
+  fullscreen: boolean;
   consumerMap: any;
   cam: any;
   mic: any;
@@ -37,6 +39,7 @@ export default class RoomCall extends React.Component<{}, State> {
     super(props);
     this.state = {
       displayStream: false,
+      fullscreen: false,
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam,
       mic: useVoiceStore.getState().mic,
@@ -66,7 +69,8 @@ export default class RoomCall extends React.Component<{}, State> {
   accessVideo: boolean = false;
   socket = getSocket(1).socket;
   myVideoRef = createRef<any>();
-  
+  comp_height = '25%';
+
   setNavigatorToStream = () => {
     console.log(this.accessMic)
     console.log(this.accessVideo)
@@ -76,6 +80,10 @@ export default class RoomCall extends React.Component<{}, State> {
         useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
       }
     })
+  }
+
+  handleFullscreen = () => {
+    this.setState({fullscreen: !this.state.fullscreen});
   }
   
   reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
@@ -88,16 +96,6 @@ export default class RoomCall extends React.Component<{}, State> {
             resolve(true);
           });
         });
-  }
-  
-  removeVideo = (id:string) => {
-      //delete this.state.users[id];
-      const video = document.getElementById(id);
-      if (video) video.remove();
-  }
-  
-  getMyVideo = (id:string=this.myId) => {
-    return document.getElementById(id);
   }
 
   componentDidMount() {
@@ -156,23 +154,29 @@ export default class RoomCall extends React.Component<{}, State> {
     };
     // if (this.state.media)
     //   numberUsers += 1;
+    let numberCols = numberUsers > 6 ? 6 : numberUsers;
+    let numberRows = this.state.fullscreen ? numberUsers > 12 ? 3 : numberUsers > 6 ? 2 : 1 : 1;
+    let hasNextPage = numberUsers > (numberCols * numberRows) ? true : false;
+    let smallNumberCols = numberUsers > 4 ? 4 : numberUsers;
+    let smallNumberRows = this.state.fullscreen ? 2 : 1;
+    let smallHasNextPage = numberUsers > (smallNumberCols * smallNumberRows) ? true : false;
     const gridSettings = {
-      cols: numberUsers > 6 ? 6 : numberUsers,
-      rows: 1,
+      cols: numberCols,
+      rows: numberRows,
       gap: 10,
       loop: true,
-      hideArrow: numberUsers > 12 ? false : true,
-      showDots: numberUsers > 12 ? true : false,
+      hideArrow: !hasNextPage,
+      showDots: hasNextPage,
       responsiveLayout: [
         {
           breakpoint: 1200,
-          cols: numberUsers > 4 ? 4 : numberUsers,
-          rows: 1,
+          cols: smallNumberCols,
+          rows: smallNumberRows,
           gap: 5,
           loop: true,
           autoplay: 0,
-          hideArrow: numberUsers > 6 ? false : true,
-          showDots: numberUsers > 8 ? true : false,
+          hideArrow: !smallHasNextPage,
+          showDots: smallHasNextPage,
         }
       ],
       mobileBreakpoint: 600
@@ -180,19 +184,30 @@ export default class RoomCall extends React.Component<{}, State> {
     return (
       <div style={{
         position: 'fixed',
+        paddingRight: 80,
         zIndex: 99,
-        height: '25%',
+        height: this.state.fullscreen ? '100%' : '25%',
         width:'100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center'
       }}>
         
+        
         {/* <ActiveSpeakerListener/> */}
 
         {numberUsers > 0 ? 
         
-        (<div  style={{height: '100%', padding: 2, width: numberUsers < 6 ? `${18*numberUsers}%` : '100%'}}>
+        (
+          <div  style={{height: '100%', padding: 2, width: numberUsers < 6 ? `${18*numberUsers}%` : '100%'}}>
+            <div style={{position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100}}>
+              {this.state.fullscreen ?
+                  (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Expand View<FullscreenExitIcon/></Button>)
+                : numberUsers > 6 ?
+                    (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenIcon/></Button>)
+                  : ''
+              }
+            </div>
           <Carousel {...gridSettings}>
 
             { Object.keys(this.state.consumerMap).length > 0 
