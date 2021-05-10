@@ -13,7 +13,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
     @cache(model="Role")
     async def can_acess_world_roles(self, db: Session, world_id: int, user_id: int):
         """
-        Checks if a user can access the roles a world
+        Checks if a user can access the roles of a world
         """
         role = db.query(Role).join(World_User).filter(
             World_User.role_id == Role.role_id,
@@ -23,6 +23,24 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if not role:
             return None, strings.ROLES_NOT_FOUND
         return role, ""
+
+    @cache(model="Role")
+    async def can_access_world_reports(self, db: Session, world_id: int, user_id: int):
+        """
+        Checks if a user can access the reports of a world
+        """
+
+        role = db.query(Role).join(World_User).filter(
+            World_User.role_id == Role.role_id,
+            World_User.user_id == user_id,
+            Role.world_id == world_id,
+            Role.ban.is_(True)
+        ).first()
+
+        if not role:
+            return None, strings.ROLES_NOT_FOUND
+        return role, ""
+
 
     @cache(model="Role")
     async def get_by_role_id_and_world_id(self, db: Session, role_id: int, world_id: int) -> Tuple[Optional[Role], str]:
