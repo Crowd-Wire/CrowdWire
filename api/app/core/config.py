@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     PRODUCTION = RUNNING_MODE is not None and RUNNING_MODE.lower() == 'production'
     DEBUG = not PRODUCTION
     API_V1_STR: str = "/api/v1"
-    #SECRET_KEY: str = secrets.token_urlsafe(32)
-    #INVITE_SECRET_TOKEN: str = secrets.token_urlsafe(32)
-    SECRET_KEY: str = 'tadR9vKVol_AIP_ve899H7iztvinsaVnlKqS3vdbGnY'
-    INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    INVITE_SECRET_TOKEN: str = secrets.token_urlsafe(32)
+    # SECRET_KEY: str = 'tadR9vKVol_AIP_ve899H7iztvinsaVnlKqS3vdbGnY'
+    # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
     # TODO: Change this

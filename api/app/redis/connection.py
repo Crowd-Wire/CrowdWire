@@ -17,14 +17,14 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        self.master = await aioredis.create_connection('redis://localhost/0')
+        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
-        await self.master.execute('flushall')
+        # await self.master.execute('flushall')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -80,8 +80,8 @@ class RedisConnector:
     async def srem(self, key: str, member: str, *members):
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
-    
-    async def user_in_group(self, world_id:str, user_id: str, group_id: str) -> int:
+
+    async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
         """Determine if a given user is a member of a group"""
         return await self.sismember(f"world:{str(world_id)}:user:{str(user_id)}:groups", group_id)
 
