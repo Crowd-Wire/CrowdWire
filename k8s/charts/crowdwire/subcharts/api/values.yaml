@@ -15,7 +15,7 @@ rabbitmq:
 replicaCount: 1
 
 image:
-  repository: dagomes/teste
+  repository: dagomes/api
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
