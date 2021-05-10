@@ -199,7 +199,7 @@ async function main() {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
             if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontends to get update, but this can be removed
+              // @todo give some time for frontend to get update, but this can be removed
               send({
                 rid: roomId,
                 topic: "close_consumer",

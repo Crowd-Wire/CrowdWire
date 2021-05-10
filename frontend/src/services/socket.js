@@ -31,18 +31,16 @@ async function flushConsumerQueue(_roomId) {
   }
 }
 
-async function consumeAll(consumerParametersArr) {
+async function consumeAll(consumerParametersArr, roomId) {
   try {
     console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, consumer.roomId, consumer.peerId, kind))) {
+      if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
         break;
       }
     }
   } catch (err) {
     console.log(err);
-  } finally {
-    flushConsumerQueue();
   }
 }
 
@@ -186,7 +184,7 @@ export const getSocket = (worldId) => {
           break;
         case "@get-recv-tracks-done":
           console.log(data)
-          consumeAll(data.d.consumerParametersArr);
+          consumeAll(data.d.consumerParametersArr, data.d.roomId);
           break;
         case "new-peer-producer":
           console.log(data)

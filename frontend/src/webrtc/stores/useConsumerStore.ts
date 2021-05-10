@@ -197,7 +197,7 @@ export const useConsumerStore = create(
           }
         }),
       closePeer: (userId) =>
-      set((s) => {
+        set((s) => {
           console.log('closing peer ' + userId)
           console.log('LSADLDASLDLASLDASLDAS')
           let user = s.consumerMap[userId]
