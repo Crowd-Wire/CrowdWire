@@ -1,0 +1,12 @@
+dependencies:
+- name: postgresql
+  repository: file://../postgresql
+  version: 10.3.11
+- name: redis
+  repository: file://../redis
+  version: 12.9.0
+- name: rabbitmq
+  repository: file://../rabbitmq
+  version: 8.11.3
+digest: sha256:1f97b859346f5908dc60447c7971d59d96a73ca9d2514da1c3211c5f3fbd35e2
+generated: "2021-04-09T11:28:44.710389236+01:00"

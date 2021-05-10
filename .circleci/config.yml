@@ -1,0 +1,10 @@
+version: 2.1
+
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run: docker build -t ubuntu-test:latest api/
+      - run: docker build -t ubuntu-test:latest frontend/
+      - run: docker build -t ubuntu-test:latest media_server/
