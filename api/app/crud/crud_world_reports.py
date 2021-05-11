@@ -26,8 +26,11 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
             Report_World.timestamp,
             World.name.label("world_name"),
             User.email.label("reporter_email")
-        ).filter(Report_World.reported == world_id, World.world_id == world_id)\
-        .offset(page_size * (page-1)).limit(page_size).all()
+        ).filter(
+            Report_World.reported == world_id,
+            World.world_id == world_id,
+            Report_World.reporter == User.user_id
+        ).offset(page_size * (page-1)).limit(page_size).all()
 
         # the results are not inside a dict so it is hard to conver to json
         return [r._asdict() for r in reports], ""

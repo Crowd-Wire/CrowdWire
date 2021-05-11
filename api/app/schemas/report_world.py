@@ -14,9 +14,9 @@ class ReportWorldCreate(ReportWorldBase):
     reported: int
     timestamp: datetime
     comment: str
-
-    class config:
-        orm_mode = True
+    
+    class Config:
+	    orm_mode=True
 
 class ReportWorldInDBWithEmail(ReportWorldBase):
     reporter_email: str
