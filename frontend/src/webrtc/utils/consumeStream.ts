@@ -19,7 +19,7 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
   }
 
   if (!GameScene.inRangePlayers.has(peerId)) {
-    console.log("skipping consumeStream because player not in range");
+    console.log("skipping consumeStream because player was not in range");
     return false;
   }
   
