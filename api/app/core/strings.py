@@ -24,6 +24,7 @@ REPORT_NOT_FOUND_FOR_WORLD_BY_USER = "The given user did not report this world."
 WORLD_ALREADY_REPORTED_BY_USER = "This world has already been reported by the user."
 WORLD_REPORT_ACCESS_FORBIDDEN = "You do not have permissions to access the reports of the world."
 WORLD_NOT_REPORTED_BY_USER = "This world was not reported by the user."
+USER_CANNOT_REPORT_WORLD = "You must join the world in order to report it."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."

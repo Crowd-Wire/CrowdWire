@@ -16,10 +16,17 @@ class ReportWorldCreate(ReportWorldBase):
     timestamp: datetime
     comment: str
 
+
+class ReportWorldInDB(ReportWorldBase):
+    reported: int
+    reporter: int
+    timestamp: datetime
+    comment: str
+
     class Config:
         orm_mode = True
 
 
-class ReportWorldInDBWithEmail(ReportWorldBase):
+class ReportWorldInDBWithEmail(ReportWorldInDB):
     reporter_email: str
     world_name: str

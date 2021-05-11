@@ -5,11 +5,12 @@ from .base import CRUDBase
 from app.models import World, User, Report_World
 from app.core import strings
 from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail
+from .crud_world_users import crud_world_user
 
 
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
-    async def get_all_world_reports(
+    def get_all_world_reports(
             self, db: Session, world_id: int, page: int, limit: int
     ) -> List[ReportWorldInDBWithEmail]:
         """
@@ -35,7 +36,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         # the results are not inside a dict so it is hard to conver to json
         return [r._asdict() for r in reports], ""
 
-    async def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
+    def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
         """
         Checks if a user has reported a given world.
         """
@@ -46,7 +47,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
             return None, strings.REPORT_NOT_FOUND_FOR_WORLD_BY_USER
         return report, ""
 
-    async def create(
+    def create(
             self, db: Session, obj_in: ReportWorldCreate, *args, **kwargs
     ) -> Tuple[Optional[Report_World], str]:
         """
@@ -57,10 +58,12 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         if not request_user or (request_user and not isinstance(request_user, User)):
             return None, strings.USER_NOT_PASSED
 
-        # TODO: see if the user has joined the world that he wants to report
+        world_user = crud_world_user.get_user_joined(db=db, user_id=request_user.user_id, world_id=obj_in.reported)
+        if not world_user:
+            return None, strings.USER_CANNOT_REPORT_WORLD
 
         # checks if the user has already reported this world
-        report, _ = await self.get_world_report_for_user(db=db, world_id=obj_in.reported, user_id=request_user.user_id)
+        report, _ = self.get_world_report_for_user(db=db, world_id=obj_in.reported, user_id=request_user.user_id)
         if report:
             return None, strings.WORLD_ALREADY_REPORTED_BY_USER
 
@@ -69,11 +72,11 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         report = super().create(db=db, obj_in=obj_in)
         return report, ""
 
-    async def remove(self, db: Session, world_id: int, user_id: int) -> Tuple[Optional[Report_World], str]:
+    def remove(self, db: Session, world_id: int, user_id: int) -> Tuple[Optional[Report_World], str]:
         """
         Deletes the report made by a user to a world.
         """
-        report, _ = await self.get_world_report_for_user(db=db, world_id=world_id, user_id=user_id)
+        report, _ = self.get_world_report_for_user(db=db, world_id=world_id, user_id=user_id)
         if not report:
             return None, strings.WORLD_NOT_REPORTED_BY_USER
 
