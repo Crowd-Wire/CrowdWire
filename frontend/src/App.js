@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import { PersistGate } from 'zustand-persist'
 
 // import { createBrowserHistory } from "history";
 // var hist = createBrowserHistory(); (not sure if we need this anymore)
@@ -6,19 +7,21 @@ import React from "react";
 import { useRoutes } from 'react-router-dom';
 import routes from './routes';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import useAuthStore from 'stores/useAuthStore.ts';
 import interceptor from './services/Interceptor';
 
-export default () => {
-  const changeAuth = (auth) => {
-    setAuth(auth);
-  }
-  const startAuth = () => {
-    if(localStorage.getItem("auth") && localStorage.getItem("auth")["token"]!==null)
-      return true;
-    return false;
-  }
-  const [isAuth, setAuth] = React.useState(startAuth());
-  const routing = useRoutes(routes(isAuth, changeAuth));
+export default function App(){
+  useAuthStore();
+  const token = useAuthStore(state => state.token);
+  const expire_date = useAuthStore(state => state.expire_date);
+  const guest_uuid = useAuthStore(state => state.guest_uuid);
+  useEffect(() => {
+  }, [token,expire_date, guest_uuid]);
   
-  return routing;
+  return <PersistGate
+  onBeforeLift={() => {
+        console.log('onBeforeLift')
+      }}>
+    {useRoutes(routes(token,expire_date, guest_uuid))}
+  </PersistGate>; 
 }

@@ -156,6 +156,43 @@
          "spacing":0,
          "tilecount":6,
          "tileheight":32,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"string",
+                         "value":"C1"
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"string",
+                         "value":"C2"
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"string",
+                         "value":"C3"
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "properties":[
+                        {
+                         "name":"id",
+                         "type":"string",
+                         "value":"C4"
+                        }]
+                }],
          "tilewidth":32
         }, 
         {

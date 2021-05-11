@@ -42,13 +42,11 @@ class DashboardStats extends Component{
     };
     
     hideModal = () => {
-        console.log("false now");
         this.setState({show: false});        
     }
 
     hideModalandDelete = () => {
         WorldService.deleteWorld(this.props.details.world_id);
-        console.log("false now");
         this.setState({show: false});
         let hist = createBrowserHistory();
         hist.back();
@@ -60,7 +58,6 @@ class DashboardStats extends Component{
 
 
     hideDialog = () => {
-        console.log("false now");
         this.setState({dialog: false});        
     }
 
@@ -69,7 +66,6 @@ class DashboardStats extends Component{
     }
     
     render(){
-        console.log(this.props.details);
         return(
             <>    
                 <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>

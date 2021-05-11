@@ -7,8 +7,6 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 
-from datetime import datetime
-
 """
 Class used to Manage the WebSocket Connections, to each World
 """
@@ -19,7 +17,7 @@ router = APIRouter()
     "/{world_id}",
 )
 async def world_websocket(
-        websocket: WebSocket, world_id: str,
+        websocket: WebSocket, world_id: int,
         token: Optional[str] = Query(None),
         user_id: str = Depends(deps.get_websockets_user)
 ) -> Any:
@@ -46,20 +44,20 @@ async def world_websocket(
                 await websocket.send_text(protocol.PONG)
 
             elif topic == protocol.SEND_MESSAGE:
-                payload['date'] = datetime.now().strftime('%H:%M')
-                payload['from'] = f"User{user_id}"
-                await manager.broadcast(world_id, '1', payload, None)
+                await wh.send_message(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_PLAYER:
-                room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
-                await wh.send_groups_snapshot(world_id, user_id)  # TODO: remove after tests
 
             elif topic == protocol.PLAYER_MOVEMENT:
                 await wh.send_player_movement(world_id, user_id, payload)
 
-            elif topic == protocol.CHANGE_ROOM:
-                pass
+            elif topic == protocol.JOIN_CONFERENCE:
+                await wh.join_conference(world_id, user_id, payload)
+
+            elif topic == protocol.LEAVE_CONFERENCE:
+                await wh.leave_conference(world_id, user_id)
+
             elif topic == protocol.WIRE_PLAYER:
                 await wh.wire_players(world_id, user_id, payload)
 
@@ -92,7 +90,7 @@ async def world_websocket(
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)
     except BaseException:
-        logger.info("base exception, python error in code")
+        logger.info("base exc")
         manager.disconnect(world_id, user_id)
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)

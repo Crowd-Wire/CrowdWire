@@ -4,6 +4,7 @@ from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
 from app.websocket.connection_manager import manager
+from datetime import datetime
 from loguru import logger
 
 
@@ -14,6 +15,8 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     # store position on redis
     await redis_connector.set_user_position(world_id, room_id, user_id, position)
     # store room on redis
+
+    await send_groups_snapshot(world_id)  # TODO: remove after tests
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
@@ -30,8 +33,14 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
     )
 
 
+async def send_message(world_id: str, user_id: str, payload: dict):
+    payload['date'] = datetime.now().strftime('%H:%M')
+    payload['from'] = f"User{user_id}"
+    await manager.broadcast(world_id, '1', payload, None)
+
+
 # TODO: remove after tests
-async def send_groups_snapshot(world_id: str, user_id: str):
+async def send_groups_snapshot(world_id: str):
     """Send a group snapshot to all users from a world
 
     Allows devs to see in frontend the groups assigned to the users
@@ -65,7 +74,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     # actions made to groups
     await handle_actions(actions)
 
-    await send_groups_snapshot(world_id, user_id)
+    await send_groups_snapshot(world_id)
 
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
@@ -101,7 +110,26 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         # add user to a new group with the still nearby users
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
-    await send_groups_snapshot(world_id, user_id)
+    await send_groups_snapshot(world_id)
+
+
+async def join_conference(world_id: str, user_id: str, payload: dict):
+    conference_id = payload['conference_id']
+    groups_id = await redis_connector.get_user_groups(world_id, user_id)
+    if groups_id:
+        await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id)
+    await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
+    await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
+
+    await send_groups_snapshot(world_id)
+
+
+async def leave_conference(world_id: str, user_id: str):
+    groups_id = await redis_connector.get_user_groups(world_id, user_id)
+    if groups_id:
+        await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id)
+
+    await send_groups_snapshot(world_id)
 
 
 async def disconnect_user(world_id: str, user_id: str):

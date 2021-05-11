@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { Navigate, Outlet } from 'react-router-dom';
 
@@ -33,7 +33,8 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-const routes = (isAuth, changeAuth) => [
+ 
+const routes = (guestUser, registeredUser) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -48,15 +49,15 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{
 		path: "/",
-		element: isAuth ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: guestUser || registeredUser ? <Navigate to="/dashboard/search"/> : <Outlet/>,
 		children: [
-            { path: "/login", element: <LoginPage changeAuth={changeAuth}/> },
-			{ path: "/register", element: <RegisterPage changeAuth={changeAuth}/> },
+            { path: "/login", element: <LoginPage/> },
+			{ path: "/register", element: <RegisterPage/> },
 		],
 	},
 	{
 		path:"/",
-		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
+		element:  registeredUser ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{ path: "/create-world", element: <CreateWorld /> },
 			{ path: "/join", element: <InviteJoinPage/>},
@@ -64,23 +65,23 @@ const routes = (isAuth, changeAuth) => [
 	},
 	{ 
 		path: "/dashboard", 
-		element: isAuth ? <Outlet/> : <Navigate to="/login"/>,
+		element: registeredUser || guestUser  ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails changeAuth={changeAuth}/>},
-			{path:"/search", element: <DashSearch changeAuth={changeAuth}/>}
+			{path: "/:id", element: <DashWorldDetails/>},
+			{path:"/search", element: <DashSearch/>}
 		]
 	},
     {
 		path: "/user",
-		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
+		element: registeredUser || guestUser ? <Outlet /> : <Navigate to="/login" />,
 		children: [
-            { path: "/profile", element: <ProfilePage /> },
+            { path: "/profile", element: registeredUser ? <ProfilePage /> : <Navigate to="/login"/> },
             { path: "/settings", element: <UserSettings /> },
 		],
 	},
     {
 		path: "/world",
-		element: isAuth ? <Outlet /> : <Navigate to="/login" />,
+		element: registeredUser || registeredUser  ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },

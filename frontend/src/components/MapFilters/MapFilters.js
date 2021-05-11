@@ -86,7 +86,7 @@ export default function MapFilters(props) {
 					<Row style={{alignContent:"center", marginBottom:"30px"}}>
 						<Col xs={12} sm={12} md={6}>
 							<FormControl fullWidth className={classes.margin} variant="outlined" >
-								<InputLabel htmlFor="outlined-margin-normal">Search Map</InputLabel>
+								<InputLabel htmlFor="outlined-margin-normal">Search Worlds</InputLabel>
 									<OutlinedInput
 										id="outlined-adornment-amount"
 										value={props.search}
@@ -123,7 +123,7 @@ export default function MapFilters(props) {
 											<TextField
 												{...params}
 												variant="standard"
-												label="Labels"
+												label="Tags"
 											/>
 											)}
 										/>
