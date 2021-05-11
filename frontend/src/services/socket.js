@@ -58,10 +58,7 @@ export const getSocket = (worldId) => {
       room_id: roomId,
       position
     }
-    if (socket && socket.readyState === socket.OPEN)
-      await socket.send(JSON.stringify(payload));
-    else
-      console.error(`[error] socket closed before joinRoom`);
+    await wsend(payload);
   }
 
   const sendMovement = async (roomId, position, velocity) => {
@@ -71,10 +68,22 @@ export const getSocket = (worldId) => {
       position,
       velocity,
     }
-    if (socket && socket.readyState === socket.OPEN)
-        await socket.send(JSON.stringify(payload));
-    else
-        console.error(`[error] socket closed before sendMovement`);
+    await wsend(payload);
+  }
+
+  const joinConference = async (conferenceId) => {
+    const payload = {
+      topic: "JOIN_CONFERENCE",
+      conference_id: conferenceId,
+    }
+    await wsend(payload);
+  }
+
+  const leaveConference = async () => {
+    const payload = {
+      topic: "LEAVE_CONFERENCE",
+    }
+    await wsend(payload);
   }
 
   const wirePlayer = async (roomId, usersId) => {
@@ -83,10 +92,7 @@ export const getSocket = (worldId) => {
       // room_id: roomId,
       users_id: usersId,
     }
-    if (socket && socket.readyState === socket.OPEN)
-      await socket.send(JSON.stringify(payload));
-    else
-      console.error(`[error] socket closed before wirePlayer`);
+    await wsend(payload);
   }
 
   const unwirePlayer = async (roomId, usersId) => {
@@ -95,10 +101,7 @@ export const getSocket = (worldId) => {
       // room_id: roomId,
       users_id: usersId,
     }
-    if (socket && socket.readyState === socket.OPEN)
-      await socket.send(JSON.stringify(payload));
-    else
-      console.error(`[error] socket closed before unwirePlayer`);
+    await wsend(payload);
   }
 
   const sendMessage = async (message, to) => {
@@ -108,10 +111,7 @@ export const getSocket = (worldId) => {
       text: message,
       to,
     }
-    if (socket && socket.readyState === socket.OPEN)
-      await socket.send(JSON.stringify(payload));
-    else
-      console.error(`[error] socket closed before sendMessage`);
+    await wsend(payload);
   }
 
   if (!socket) {
@@ -252,7 +252,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage};
+  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
 }
 
 export const wsend = async (d) => {
