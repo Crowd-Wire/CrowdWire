@@ -17,11 +17,11 @@ var globalVar = true;
 
 
 class GameScene extends Phaser.Scene {
+    static inRangePlayers = new Set();
+    static inConference = null;
+
     remotePlayers = {};
     localPlayers = {};
-    static inRangePlayers = new Set();
-    count = 0;
-    floatTile;
     ws = getSocket('1');
 
     constructor() {
@@ -59,7 +59,6 @@ class GameScene extends Phaser.Scene {
         //     // Add new objects to our sprite group, change the start y position to meet the platform
         //     const object = this.objects.create(obj.x, obj.y + 200 - obj.height, 'table-H').setOrigin(0, 0);
         // });
-  
 
         // -1 makes all tiles on this layer collidable
         this.collisionLayer.setCollisionByExclusion([-1]);
@@ -132,6 +131,9 @@ class GameScene extends Phaser.Scene {
                 this.teste_player_id = id;
                 let text = this.player.getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
+                // hack to recall join conference when no one is in conference
+                if (!grps.includes(GameScene.inConference))
+                    GameScene.inConference = null;
             }
         }
     }
@@ -159,64 +161,82 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    updateConferences = () => {
+        const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
+        
+        if (tile) {
+            const conferenceId = tile.properties.id;
+            if (GameScene.inConference != conferenceId) {
+                GameScene.inConference = conferenceId;
+                GameScene.inRangePlayers = new Set();
+                this.ws.joinConference(conferenceId);
+            }
+        }
+        else {
+            if (GameScene.inConference != null) {
+                GameScene.inConference = null;
+                this.ws.leaveConference();
+            }
+        }
+    }
+
+    updateRangePlayers = () => {
+        if (GameScene.inConference == null) {
+            // detect surrounding players
+            var bodies = this.physics.overlapCirc(
+                this.player.body.center.x, this.player.body.center.y, 150, true, true)
+            if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
+                const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
+                    .map((b) => b.gameObject.id);
+                if (rangePlayers.length > GameScene.inRangePlayers.size) {
+                    // wire players
+                    this.ws.wirePlayer('1', 
+                        rangePlayers.filter((id) => {
+                            const entered = !GameScene.inRangePlayers.has(id);
+                            if (entered) GameScene.inRangePlayers.add(id);
+                            return entered;
+                        })
+                    );
+                } else {
+                    // unwire players
+                    this.ws.unwirePlayer('1', 
+                        [...GameScene.inRangePlayers].filter((id) => {
+                            const left = !rangePlayers.includes(id);
+                            if (left) {
+                                GameScene.inRangePlayers.delete(id);
+                                // close media connections to this user
+                                useConsumerStore.getState().closePeer(id);
+                            };
+                            return left;
+                        })
+                    );
+                }
+            } else if (bodies.length > 1) {
+                this.player.body.debugBodyColor = 0x0099ff; // blue
+            } else {
+                this.player.body.debugBodyColor = 0xff9900; // orange
+            }
+        }   
+    }
+
     update(time, delta) {
         this.player.update();
 
-        if (!globalVar)
-            console.log(this.game);
+        // // Convert the mouse position to world position within the camera
+        // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
-        // Convert the mouse position to world position within the camera
-        const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-        // Draw tiles (only within the groundLayer)
-        if (this.input.manager.activePointer.isDown) {
-            const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
-            if (tile)
-                tile.setCollision(true);
-        }
+        // // Draw tiles (only within the groundLayer)
+        // if (this.input.manager.activePointer.isDown) {
+        //     const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
+        //     if (tile)
+        //         tile.setCollision(true);
+        // }
                 
         if (!globalVar)
             return;
         
-        const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
-        
-        if (tile)
-            console.log(tile.properties.type, tile.properties.id);
-        
-        // detect surrounding players
-        var bodies = this.physics.overlapCirc(
-            this.player.body.center.x, this.player.body.center.y, 150, true, true)
-        if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
-            const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
-                .map((b) => b.gameObject.id);
-            if (rangePlayers.length > GameScene.inRangePlayers.size) {
-                // wire players
-                this.ws.wirePlayer('1', 
-                    rangePlayers.filter((id) => {
-                        const entered = !GameScene.inRangePlayers.has(id);
-                        if (entered) GameScene.inRangePlayers.add(id);
-                        return entered;
-                    })
-                );
-            } else {
-                // unwire players
-                this.ws.unwirePlayer('1', 
-                    [...GameScene.inRangePlayers].filter((id) => {
-                        const left = !rangePlayers.includes(id);
-                        if (left) {
-                            GameScene.inRangePlayers.delete(id);
-                            // close media connections to this user
-                            useConsumerStore.getState().closePeer(id);
-                        };
-                        return left;
-                    })
-                );
-            }
-        } else if (bodies.length > 1) {
-            this.player.body.debugBodyColor = 0x0099ff; // blue
-        } else {
-            this.player.body.debugBodyColor = 0xff9900; // orange
-        }
+        this.updateConferences();
+        this.updateRangePlayers();
     }
 }
 

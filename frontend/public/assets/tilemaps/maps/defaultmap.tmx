@@ -8,6 +8,26 @@
  </tileset>
  <tileset firstgid="241" name="util-tiles" tilewidth="32" tileheight="32" tilecount="6" columns="3">
   <image source="../tiles/util-tiles.png" width="96" height="64"/>
+  <tile id="0">
+   <properties>
+    <property name="id" value="C1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="id" value="C2"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="id" value="C3"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="id" value="C4"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="247" name="objects" tilewidth="96" tileheight="96" tilecount="3" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
