@@ -4,6 +4,7 @@ from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
 from app.websocket.connection_manager import manager
+from datetime import datetime
 from loguru import logger
 
 
@@ -32,7 +33,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
     )
 
 
-async def send_message(word_id: str, user_id: str, payload: dict):
+async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
     payload['from'] = f"User{user_id}"
     await manager.broadcast(world_id, '1', payload, None)

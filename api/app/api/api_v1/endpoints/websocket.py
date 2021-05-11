@@ -7,8 +7,6 @@ from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 
-from datetime import datetime
-
 """
 Class used to Manage the WebSocket Connections, to each World
 """
