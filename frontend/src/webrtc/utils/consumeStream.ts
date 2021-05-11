@@ -5,9 +5,9 @@ import { useRoomStore } from "../stores/useRoomStore";
 
 export const consumeStream = async (consumerParameters: any, roomId: string, peerId: string, kind: string) => {
   const { rooms } = useRoomStore.getState();
-  
+
   if (!(roomId in rooms)) {
-    console.log("skipping consumeStream because room doesnt exist");
+    console.log("skipping consumeStream because room doesn't exist");
     return false;
   }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,6 +13,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { AddCircleOutlined, Explore, Public, Settings } from '@material-ui/icons';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import { useLocation, useNavigate } from "react-router-dom";
+import AuthenticationService from "services/AuthenticationService.js";
+import useAuthStore from "stores/useAuthStore.ts";
 
 
 const drawerWidth = 240;
@@ -67,6 +69,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function DashDrawer(props){
+  const st = useAuthStore.getState();
   const navigation = useNavigate();
   const location = useLocation();
   const classes = useStyles();
@@ -74,6 +77,7 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing.unit*2+100;
   const definitions = theme.spacing.unit*2+50;
+  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -91,6 +95,9 @@ export default function DashDrawer(props){
     props.handler(true);
   }
 
+  const logout = () => {
+    AuthenticationService.logout();
+  }
 
   const onClickCreateWorld = () => {
     navigation("/create-world");
@@ -159,16 +166,20 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
-          onClick={onClickCreateWorld}>
-            <ListItemIcon>
-                <AddCircleOutlined className={classes.iconDrawer}/>
-            </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
-                className={clsx(classes.menuButton, {
-                    [classes.hide]: !open,
-                })}/>
-          </ListItem>
+          { st.guest_uuid ?
+            <></>
+            :
+            <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
+            onClick={onClickCreateWorld}>
+              <ListItemIcon>
+                  <AddCircleOutlined className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
+                  className={clsx(classes.menuButton, {
+                      [classes.hide]: !open,
+                  })}/>
+            </ListItem>
+          }
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Settings" style={{position: "fixed", bottom: definitions}}>
           <ListItemIcon>
@@ -178,13 +189,13 @@ export default function DashDrawer(props){
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Settings" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
-            onClick={() => {localStorage.clear(); props.changeAuth(false)}}
+            button key="Leave" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
+            onClick={() => logout()}
           >
           <ListItemIcon>
               <MeetingRoomIcon className={classes.iconDrawer}/>
           </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+          <ListItemText style={{ color: '#FFFFFF' }} primary="LOGOUT"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
         </List>

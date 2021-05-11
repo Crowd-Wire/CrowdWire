@@ -62,7 +62,6 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     for uid in users_id:
         if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
             # check if user already claimed proximity
-            logger.info("yes he confirmed")
             add_users.add(uid)
 
     actions = {}
@@ -109,7 +108,6 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
         # add user to a new group with the still nearby users
-        # if not add_users_id in my_groups:
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
     await send_groups_snapshot(world_id)
@@ -177,7 +175,6 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
     """
     payload = {'topic': "join-as-speaker",
                'd': {'roomId': room_id, 'peerId': user_id}}
-    logger.info(payload)
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -191,7 +188,6 @@ async def destroy_room(word_id: str, room_id: str):
 async def handle_transport_or_track(world_id: str, user_id: str, payload: dict):
     payload['d']['peerId'] = user_id
     room_id = payload['d']['roomId']
-    logger.info(await redis_connector.user_in_group(world_id, user_id, room_id))
     if (await redis_connector.user_in_group(world_id, user_id, room_id)):
         await rabbit_handler.publish(json.dumps(payload))
 

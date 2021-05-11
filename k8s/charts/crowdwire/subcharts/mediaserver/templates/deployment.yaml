@@ -66,8 +66,318 @@ spec:
                 name: {{ include "mediaserver.rabbitmqservicename" . }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: 80
-              protocol: TCP
+              - name: tcp
+                containerPort: 3001
+                protocol: TCP
+              - name: udp0
+                containerPort: 40000
+                protocol: UDP
+              - name: udp1
+                containerPort: 40001
+                protocol: UDP
+              - name: udp2
+                containerPort: 40002
+                protocol: UDP
+              - name: udp3
+                containerPort: 40003
+                protocol: UDP
+              - name: udp4
+                containerPort: 40004
+                protocol: UDP
+              - name: udp5
+                containerPort: 40005
+                protocol: UDP
+              - name: udp6
+                containerPort: 40006
+                protocol: UDP
+              - name: udp7
+                containerPort: 40007
+                protocol: UDP
+              - name: udp8
+                containerPort: 40008
+                protocol: UDP
+              - name: udp9
+                containerPort: 40009
+                protocol: UDP
+              - name: udp10
+                containerPort: 40010
+                protocol: UDP
+              - name: udp11
+                containerPort: 40011
+                protocol: UDP
+              - name: udp12
+                containerPort: 40012
+                protocol: UDP
+              - name: udp13
+                containerPort: 40013
+                protocol: UDP
+              - name: udp14
+                containerPort: 40014
+                protocol: UDP
+              - name: udp15
+                containerPort: 40015
+                protocol: UDP
+              - name: udp16
+                containerPort: 40016
+                protocol: UDP
+              - name: udp17
+                containerPort: 40017
+                protocol: UDP
+              - name: udp18
+                containerPort: 40018
+                protocol: UDP
+              - name: udp19
+                containerPort: 40019
+                protocol: UDP
+              - name: udp20
+                containerPort: 40020
+                protocol: UDP
+              - name: udp21
+                containerPort: 40021
+                protocol: UDP
+              - name: udp22
+                containerPort: 40022
+                protocol: UDP
+              - name: udp23
+                containerPort: 40023
+                protocol: UDP
+              - name: udp24
+                containerPort: 40024
+                protocol: UDP
+              - name: udp25
+                containerPort: 40025
+                protocol: UDP
+              - name: udp26
+                containerPort: 40026
+                protocol: UDP
+              - name: udp27
+                containerPort: 40027
+                protocol: UDP
+              - name: udp28
+                containerPort: 40028
+                protocol: UDP
+              - name: udp29
+                containerPort: 40029
+                protocol: UDP
+              - name: udp30
+                containerPort: 40030
+                protocol: UDP
+              - name: udp31
+                containerPort: 40031
+                protocol: UDP
+              - name: udp32
+                containerPort: 40032
+                protocol: UDP
+              - name: udp33
+                containerPort: 40033
+                protocol: UDP
+              - name: udp34
+                containerPort: 40034
+                protocol: UDP
+              - name: udp35
+                containerPort: 40035
+                protocol: UDP
+              - name: udp36
+                containerPort: 40036
+                protocol: UDP
+              - name: udp37
+                containerPort: 40037
+                protocol: UDP
+              - name: udp38
+                containerPort: 40038
+                protocol: UDP
+              - name: udp39
+                containerPort: 40039
+                protocol: UDP
+              - name: udp40
+                containerPort: 40040
+                protocol: UDP
+              - name: udp41
+                containerPort: 40041
+                protocol: UDP
+              - name: udp42
+                containerPort: 40042
+                protocol: UDP
+              - name: udp43
+                containerPort: 40043
+                protocol: UDP
+              - name: udp44
+                containerPort: 40044
+                protocol: UDP
+              - name: udp45
+                containerPort: 40045
+                protocol: UDP
+              - name: udp46
+                containerPort: 40046
+                protocol: UDP
+              - name: udp47
+                containerPort: 40047
+                protocol: UDP
+              - name: udp48
+                containerPort: 40048
+                protocol: UDP
+              - name: udp49
+                containerPort: 40049
+                protocol: UDP
+              - name: udp50
+                containerPort: 40050
+                protocol: UDP
+              - name: udp51
+                containerPort: 40051
+                protocol: UDP
+              - name: udp52
+                containerPort: 40052
+                protocol: UDP
+              - name: udp53
+                containerPort: 40053
+                protocol: UDP
+              - name: udp54
+                containerPort: 40054
+                protocol: UDP
+              - name: udp55
+                containerPort: 40055
+                protocol: UDP
+              - name: udp56
+                containerPort: 40056
+                protocol: UDP
+              - name: udp57
+                containerPort: 40057
+                protocol: UDP
+              - name: udp58
+                containerPort: 40058
+                protocol: UDP
+              - name: udp59
+                containerPort: 40059
+                protocol: UDP
+              - name: udp60
+                containerPort: 40060
+                protocol: UDP
+              - name: udp61
+                containerPort: 40061
+                protocol: UDP
+              - name: udp62
+                containerPort: 40062
+                protocol: UDP
+              - name: udp63
+                containerPort: 40063
+                protocol: UDP
+              - name: udp64
+                containerPort: 40064
+                protocol: UDP
+              - name: udp65
+                containerPort: 40065
+                protocol: UDP
+              - name: udp66
+                containerPort: 40066
+                protocol: UDP
+              - name: udp67
+                containerPort: 40067
+                protocol: UDP
+              - name: udp68
+                containerPort: 40068
+                protocol: UDP
+              - name: udp69
+                containerPort: 40069
+                protocol: UDP
+              - name: udp70
+                containerPort: 40070
+                protocol: UDP
+              - name: udp71
+                containerPort: 40071
+                protocol: UDP
+              - name: udp72
+                containerPort: 40072
+                protocol: UDP
+              - name: udp73
+                containerPort: 40073
+                protocol: UDP
+              - name: udp74
+                containerPort: 40074
+                protocol: UDP
+              - name: udp75
+                containerPort: 40075
+                protocol: UDP
+              - name: udp76
+                containerPort: 40076
+                protocol: UDP
+              - name: udp77
+                containerPort: 40077
+                protocol: UDP
+              - name: udp78
+                containerPort: 40078
+                protocol: UDP
+              - name: udp79
+                containerPort: 40079
+                protocol: UDP
+              - name: udp80
+                containerPort: 40080
+                protocol: UDP
+              - name: udp81
+                containerPort: 40081
+                protocol: UDP
+              - name: udp82
+                containerPort: 40082
+                protocol: UDP
+              - name: udp83
+                containerPort: 40083
+                protocol: UDP
+              - name: udp84
+                containerPort: 40084
+                protocol: UDP
+              - name: udp85
+                containerPort: 40085
+                protocol: UDP
+              - name: udp86
+                containerPort: 40086
+                protocol: UDP
+              - name: udp87
+                containerPort: 40087
+                protocol: UDP
+              - name: udp88
+                containerPort: 40088
+                protocol: UDP
+              - name: udp89
+                containerPort: 40089
+                protocol: UDP
+              - name: udp90
+                containerPort: 40090
+                protocol: UDP
+              - name: udp91
+                containerPort: 40091
+                protocol: UDP
+              - name: udp92
+                containerPort: 40092
+                protocol: UDP
+              - name: udp93
+                containerPort: 40093
+                protocol: UDP
+              - name: udp94
+                containerPort: 40094
+                protocol: UDP
+              - name: udp95
+                containerPort: 40095
+                protocol: UDP
+              - name: udp96
+                containerPort: 40096
+                protocol: UDP
+              - name: udp97
+                containerPort: 40097
+                protocol: UDP
+              - name: udp98
+                containerPort: 40098
+                protocol: UDP
+              - name: udp99
+                containerPort: 40099
+                protocol: UDP
+              - name: udp100
+                containerPort: 40100
+                protocol: UDP
+              - name: udp101
+                containerPort: 40101
+                protocol: UDP
+              - name: udp102
+                containerPort: 40102
+                protocol: UDP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

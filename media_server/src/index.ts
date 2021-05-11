@@ -136,10 +136,6 @@ async function main() {
           continue;
         }
         try {
-          console.log("get recev tracks from ")
-          console.log(myPeerId)
-          console.log(' to ')
-          console.log(theirPeerId)
           const { producer } = peerState;
           for (let [key, value] of producer.entries()) {
             consumerParametersArr.push(
@@ -199,7 +195,7 @@ async function main() {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
             if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontends to get update, but this can be removed
+              // @todo give some time for frontend to get update, but this can be removed
               send({
                 rid: roomId,
                 topic: "close_consumer",
@@ -367,15 +363,6 @@ async function main() {
         consumers: [],
         producer: null,
       };
-      
-      // for (const [key, value] of Object.entries(rooms)) {
-      //   console.log('room ' + key)
-      //   for (const [peer, state] of Object.entries(value.state)) {
-      //     console.log(peer);
-      //     if (state.recvTransport) console.log('has recevT')
-      //     if (state.sendTransport) console.log('has sendT')
-      //   }
-      // }
       
       send({
         topic: "you-joined-as-speaker",

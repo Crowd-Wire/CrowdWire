@@ -27,18 +27,6 @@ class CreateWorld extends Component {
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
-    if(accessibility){
-      accessibility = true;
-    }
-    else{
-      accessibility = false;
-    }    
-    if(guests){
-      guests = true;
-    }
-    else{
-      guests = false;
-    }
     WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
       page: "edit"

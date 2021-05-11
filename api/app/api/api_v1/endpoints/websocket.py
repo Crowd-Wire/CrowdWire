@@ -17,7 +17,7 @@ router = APIRouter()
     "/{world_id}",
 )
 async def world_websocket(
-        websocket: WebSocket, world_id: str,
+        websocket: WebSocket, world_id: int,
         token: Optional[str] = Query(None),
         user_id: str = Depends(deps.get_websockets_user)
 ) -> Any:
@@ -89,8 +89,8 @@ async def world_websocket(
         manager.disconnect(world_id, user_id)
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)
-    # except BaseException:
-    #     logger.info("base exc")
-    #     manager.disconnect(world_id, user_id)
-    #     await manager.disconnect_room(world_id, room_id, user_id)
-    #     await wh.disconnect_user(world_id, user_id)
+    except BaseException:
+        logger.info("base exc")
+        manager.disconnect(world_id, user_id)
+        await manager.disconnect_room(world_id, room_id, user_id)
+        await wh.disconnect_user(world_id, user_id)

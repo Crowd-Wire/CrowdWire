@@ -13,7 +13,7 @@ class WorldService {
 
         let url = 'worlds/';
         let query = [];
-        
+    
         if(search !== "")
             query.push('search='+search);
         
@@ -106,6 +106,21 @@ class WorldService {
             }
         })
         
+    }
+
+
+    join_world(world_id){
+
+        return fetch(API_BASE + 'worlds/' + world_id + '/users',{
+
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer " + AuthenticationService.getToken()
+            }
+        })
+
+
     }
 
 

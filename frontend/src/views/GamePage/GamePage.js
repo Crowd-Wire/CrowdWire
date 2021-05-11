@@ -9,7 +9,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
-
+import WorldService from "../../services/WorldService";
 
 const GamePage = (props) => {
 
@@ -42,7 +42,7 @@ const GamePage = (props) => {
       handle.exit()
     }
   }
-
+  
   return (
     <>
       <FullScreen handle={handle}>

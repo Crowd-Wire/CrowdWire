@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import {
     BrowserRouter as Router,
-    Link,
     useLocation
   } from "react-router-dom";
 import {Col, Row, Card} from 'react-bootstrap';
 import Image from "assets/img/bg8.png";
+import useAuthStore from "stores/useAuthStore";
 
 
 export default function InviteJoinPage(props){
@@ -30,7 +30,7 @@ export default function InviteJoinPage(props){
                 .then((res) => {
                     if(res && res.world_id)
                         navigate("/world/"+res.world_id);
-                });
+                }).catch((error) => {useAuthStore.getState().leave()});
             }
         }else{
             navigate("/login");
