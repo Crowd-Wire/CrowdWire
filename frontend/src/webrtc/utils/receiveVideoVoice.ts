@@ -3,7 +3,6 @@ import { useRoomStore } from "../stores/useRoomStore";
 
 export const receiveVideoVoice = (roomId) => {
   var socket = getSocket(1).socket;
-
   socket.send(JSON.stringify({
     topic: "@get-recv-tracks",
     d: {

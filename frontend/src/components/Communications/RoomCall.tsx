@@ -72,30 +72,31 @@ export default class RoomCall extends React.Component<{}, State> {
   comp_height = '25%';
 
   setNavigatorToStream = () => {
-    console.log(this.accessMic)
-    console.log(this.accessVideo)
-    getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
-      if (stream) {
-        useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
-        useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
-      }
-    })
+    if (this.accessVideo || this.accessMic) {
+      getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
+        if (stream) {
+          useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
+          useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
+        }
+      })
+    }
   }
 
   handleFullscreen = () => {
     this.setState({fullscreen: !this.state.fullscreen});
   }
   
-  reInitializeStream = (video:boolean=this.accessVideo, audio:boolean=this.accessMic, type:string='userMedia') => {
-    // @ts-ignore
-    const media = type === 'userMedia' ? getVideoAudioStream(video, audio) : navigator.mediaDevices.getDisplayMedia();
-    return new Promise((resolve) => {
-      media.then((stream:MediaStream) => {
-            useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
-            useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
-            resolve(true);
+  reInitializeStream = () => {
+    if (this.accessMic || this.accessVideo) {
+      const media = getVideoAudioStream(this.accessMic, this.accessVideo);
+      return new Promise((resolve) => {
+        media.then((stream:MediaStream) => {
+              useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
+              useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
+              resolve(true);
+            });
           });
-        });
+    }
   }
 
   componentDidMount() {
