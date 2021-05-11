@@ -69,5 +69,17 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         report = super().create(db=db, obj_in=obj_in)
         return report, ""
 
+    async def remove(self, db: Session, world_id: int, user_id: int) -> Tuple[Optional[Report_World], str]:
+        """
+        Deletes the report made by a user to a world.
+        """
+        report, _ = await self.get_world_report_for_user(db=db, world_id=world_id, user_id=user_id)
+        if not report:
+            return None, strings.WORLD_NOT_REPORTED_BY_USER
+
+        db.delete(report)
+        db.commit()
+        return report, ""
+
 
 crud_report_world = CRUDReport_World(Report_World)

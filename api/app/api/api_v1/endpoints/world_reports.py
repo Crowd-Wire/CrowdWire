@@ -46,3 +46,19 @@ async def create_world_report(
         raise HTTPException(status_code=400, detail=msg)
 
     return report
+
+
+@router.delete("/", response_model=ReportWorldCreate)
+async def delete_world_report(
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+) -> Any:
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    report, msg = await crud_report_world.remove(db=db, world_id=world_id, user_id=user.user_id)
+    if not report:
+        raise HTTPException(status_code=400, detail=msg)
+    return report
