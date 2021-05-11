@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Navigate } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { withStyles } from '@material-ui/core/styles';
 import Col from 'react-bootstrap/Col';
@@ -20,7 +20,7 @@ const useStyles = theme => ({
   },
 });
 class CreateWorld extends Component {
-  state={page:"details"};
+  state={page:true};
   constructor(props){
     super(props);
   }
@@ -29,9 +29,10 @@ class CreateWorld extends Component {
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
     WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
     this.setState({
-      page: "edit"
+      page: false
     });
   }
+
   goBack(){
     const history = createBrowserHistory();
     history.back();
@@ -39,7 +40,7 @@ class CreateWorld extends Component {
   
   render() {
     const { classes } = this.props;
-    if(this.state.page==="details"){
+    if(this.state.page){
       return(
         <div className={classes.root}>
           <CssBaseline />
@@ -61,13 +62,10 @@ class CreateWorld extends Component {
         </div>
       );
     }
-    else if(this.state.page==="edit"){
-      return(<>Wrong2</>);
-    }
     else{
-      return(<>Wrong</>);
+      return(<Navigate to="/dashboard/search"></Navigate>);
     }
-  };
+  }
 }
 
 export default withStyles(useStyles)(CreateWorld);

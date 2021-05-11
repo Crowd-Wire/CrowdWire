@@ -34,7 +34,7 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
  * @param       isAuth       a boolean to check if the user is authorized
  */
  
-const routes = (guestUser, registeredUser) => [
+const routes = (token, guest_uuid) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -49,7 +49,7 @@ const routes = (guestUser, registeredUser) => [
 	},
 	{
 		path: "/",
-		element: guestUser || registeredUser ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: !token ? <Navigate to="/dashboard/search"/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },
@@ -57,31 +57,31 @@ const routes = (guestUser, registeredUser) => [
 	},
 	{
 		path:"/",
-		element:  registeredUser ? <Outlet/> : <Navigate to="/login"/>,
+		element:  token ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/create-world", element: <CreateWorld/> },
 			{ path: "/join", element: <InviteJoinPage/>},
 		],
 	},
 	{ 
 		path: "/dashboard", 
-		element: registeredUser || guestUser  ? <Outlet/> : <Navigate to="/login"/>,
+		element: token  ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch/>}
+			{path:"/search", element: <DashSearch token={token}/>}
 		]
 	},
     {
 		path: "/user",
-		element: registeredUser || guestUser ? <Outlet /> : <Navigate to="/login" />,
+		element: token ? <Outlet /> : <Navigate to="/login" />,
 		children: [
-            { path: "/profile", element: registeredUser ? <ProfilePage /> : <Navigate to="/login"/> },
+            { path: "/profile", element: !guest_uuid ? <ProfilePage /> : <Navigate to="/login"/> },
             { path: "/settings", element: <UserSettings /> },
 		],
 	},
     {
 		path: "/world",
-		element: registeredUser || registeredUser  ? <Outlet /> : <Navigate to="/login" />,
+		element: token && !guest_uuid  ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
