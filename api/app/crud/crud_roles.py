@@ -1,7 +1,8 @@
 from typing import Union, Optional, List, Tuple, Any, Dict
 
 from sqlalchemy.orm import Session
-from app.models import Role, World_User, User
+from sqlalchemy import or_
+from app.models import Role, World_User, User, World
 from .base import CRUDBase
 from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings
@@ -20,23 +21,6 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             World_User.user_id == user_id,
             Role.world_id == world_id,
             Role.role_manage.is_(True)).first()
-        if not role:
-            return None, strings.ROLES_NOT_FOUND
-        return role, ""
-
-    @cache(model="Role")
-    async def can_access_world_reports(self, db: Session, world_id: int, user_id: int):
-        """
-        Checks if a user can access the reports of a world
-        """
-
-        role = db.query(Role).join(World_User).filter(
-            World_User.role_id == Role.role_id,
-            World_User.user_id == user_id,
-            Role.world_id == world_id,
-            Role.ban.is_(True)
-        ).first()
-
         if not role:
             return None, strings.ROLES_NOT_FOUND
         return role, ""

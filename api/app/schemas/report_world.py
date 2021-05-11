@@ -15,6 +15,9 @@ class ReportWorldCreate(ReportWorldBase):
     timestamp: datetime
     comment: str
 
-class ReportWorldInDBWithUsername(ReportWorldBase):
-    reporter_username: str
-    reported_username: str
+    class config:
+        orm_mode = True
+
+class ReportWorldInDBWithEmail(ReportWorldBase):
+    reporter_email: str
+    world_name: str

@@ -7,25 +7,30 @@ from .base import CRUDBase
 from app.redis.connection import redis_connector
 from app.models import World_User, World, User, Role, Report_World
 from app.core import strings
-from app.schemas import ReportWorldBase, ReportWorldCreate, ReportWorldInDBWithUsername
+from app.schemas import ReportWorldBase, ReportWorldCreate, ReportWorldInDBWithEmail
 
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
     async def get_all_world_reports(
             self, db: Session, world_id: int, page: int, limit: int
-    ) -> List[ReportWorldInDBWithUsername]:
+    ) -> List[ReportWorldInDBWithEmail]:
         """
         Returns every report for that world.
         """
+        # TODO: change this value later
+        page_size = 10
 
-        reports = db.query(Report_World, World, World_User)\
-            .join(Report_World.reported == World.world_id)\
-            .join(Report_World.reporter == World_User.user_id)\
-            .filter(Report_World.reported == world_id).all()
+        # this query gets all reports for a world and gets the email and name the of the world
+        reports = db.query(
+            Report_World.comment,
+            Report_World.timestamp,
+            World.name.label("world_name"),
+            User.email.label("reporter_email")
+        ).filter(Report_World.reported == world_id, World.world_id == world_id)\
+        .offset(page_size * (page-1)).limit(page_size).all()
 
-        logger.debug(reports.__dict__)
-
-        return reports
+        # the results are not inside a dict so it is hard to conver to json
+        return [r._asdict() for r in reports], ""
 
     async def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
         """
@@ -49,7 +54,10 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         if not request_user or (request_user and not isinstance(request_user, User)):
             return None, strings.USER_NOT_PASSED
 
-        report, _ = self.get_world_report_for_user(db=db, world_id=obj_in.reporter, user_id=request_user.user_id)
+        # TODO: see if the user has joined the world that he wants to report
+
+        # checks if the user has already reported this world
+        report, _ = await self.get_world_report_for_user(db=db, world_id=obj_in.reported, user_id=request_user.user_id)
         if report:
             return None, strings.WORLD_ALREADY_REPORTED_BY_USER
 

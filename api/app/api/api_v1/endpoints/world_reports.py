@@ -12,8 +12,8 @@ from app.schemas import ReportWorldCreate
 router = APIRouter()
 
 
-router.get("/")
-async def get_all_world_reports(
+@router.get("/")
+async def get_all_reports_from_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
@@ -23,14 +23,14 @@ async def get_all_world_reports(
 
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
-    role, msg = await crud_role.can_access_world_reports(db=db, world_id=world_id, user_id=user.user_id)
-    if not role:
-        raise HTTPException(status_code=403, detail=msg)
 
-    reports, msg = await crud_report_world(db=db, world_id=1, page=page, limit=limit)
-    return roles
+    if not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.WORLD_REPORT_ACCESS_FORBIDDEN)
 
-router.post("/")
+    reports, msg = await crud_report_world.get_all_world_reports(db=db, world_id=1, page=page, limit=limit)
+    return reports
+
+@router.post("/", response_model=ReportWorldCreate)
 async def create_world_report(
         report: ReportWorldCreate,
         db: Session = Depends(deps.get_db),
@@ -40,7 +40,7 @@ async def create_world_report(
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    report, msg = crud_report_world.create(db=db, obj_in=report, request_user=user)
+    report, msg = await crud_report_world.create(db=db, obj_in=report, request_user=user)
     if not report:
         raise HTTPException(status_code=400, detail=msg)
 
