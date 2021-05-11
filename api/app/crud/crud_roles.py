@@ -16,15 +16,14 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         """
         Checks if a user can access the roles of a world
         """
-        role = db.query(Role).join(World_User).filter(
+        role = db.query(Role).join(World_User).join(World).filter(
             World_User.role_id == Role.role_id,
             World_User.user_id == user_id,
             Role.world_id == world_id,
-            Role.role_manage.is_(True)).first()
+            or_(Role.role_manage.is_(True), World.creator == user_id)).first()
         if not role:
             return None, strings.ROLES_NOT_FOUND
         return role, ""
-
 
     @cache(model="Role")
     async def get_by_role_id_and_world_id(self, db: Session, role_id: int, world_id: int) -> Tuple[Optional[Role], str]:

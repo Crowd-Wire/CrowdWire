@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
+
 class ReportWorldBase(BaseModel):
     reporter: Optional[int]
     reported: Optional[int]
@@ -14,9 +15,10 @@ class ReportWorldCreate(ReportWorldBase):
     reported: int
     timestamp: datetime
     comment: str
-    
+
     class Config:
-	    orm_mode=True
+        orm_mode = True
+
 
 class ReportWorldInDBWithEmail(ReportWorldBase):
     reporter_email: str

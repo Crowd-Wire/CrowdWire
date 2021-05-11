@@ -1,13 +1,11 @@
 from typing import Optional, Tuple, List
 
 from sqlalchemy.orm import Session
-from loguru import logger
-from .crud_roles import crud_role
 from .base import CRUDBase
-from app.redis.connection import redis_connector
-from app.models import World_User, World, User, Role, Report_World
+from app.models import World, User, Report_World
 from app.core import strings
-from app.schemas import ReportWorldBase, ReportWorldCreate, ReportWorldInDBWithEmail
+from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail
+
 
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
@@ -22,6 +20,8 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
         # this query gets all reports for a world and gets the email and name the of the world
         reports = db.query(
+            Report_World.reported,
+            Report_World.reporter,
             Report_World.comment,
             Report_World.timestamp,
             World.name.label("world_name"),
@@ -30,7 +30,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
             Report_World.reported == world_id,
             World.world_id == world_id,
             Report_World.reporter == User.user_id
-        ).offset(page_size * (page-1)).limit(page_size).all()
+        ).offset(page_size * (page - 1)).limit(page_size).all()
 
         # the results are not inside a dict so it is hard to conver to json
         return [r._asdict() for r in reports], ""
@@ -68,8 +68,6 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
         report = super().create(db=db, obj_in=obj_in)
         return report, ""
-
-
 
 
 crud_report_world = CRUDReport_World(Report_World)

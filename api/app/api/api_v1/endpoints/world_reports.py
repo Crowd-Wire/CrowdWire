@@ -6,13 +6,13 @@ from app import schemas, models
 from app.api import dependencies as deps
 from app.core import strings
 from app.utils import is_guest_user
-from app.crud import crud_role, crud_report_world
-from app.schemas import ReportWorldCreate
+from app.crud import crud_report_world
+from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail
 
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/", response_model=List[ReportWorldInDBWithEmail])
 async def get_all_reports_from_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -29,6 +29,7 @@ async def get_all_reports_from_world(
 
     reports, msg = await crud_report_world.get_all_world_reports(db=db, world_id=1, page=page, limit=limit)
     return reports
+
 
 @router.post("/", response_model=ReportWorldCreate)
 async def create_world_report(
