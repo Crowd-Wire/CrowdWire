@@ -22,7 +22,8 @@ export default function DashWorldDetails(props){
   const loc = useLocation();
   const [worldInfo, setWorldInfo] = React.useState("");
   useEffect (() => {
-    WorldService.getWorldDetails(loc.pathname)
+    const url = loc.pathname;
+    WorldService.getWorldDetails(url[url.length-1])
     .then((res) => {
       if(res.status == 200) 
         return res.json()

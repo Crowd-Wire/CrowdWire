@@ -17,6 +17,7 @@ export default function App(){
   const guest_uuid = useAuthStore(state => state.guest_uuid);
   
   useEffect(() => {
+    console.log(token);
   }, [token, guest_uuid]);
   
   return <PersistGate>
