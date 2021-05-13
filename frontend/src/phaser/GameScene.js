@@ -5,6 +5,7 @@ import { getSocket } from "services/socket";
 import usePlayerStore from "stores/usePlayerStore.ts";
 
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
+import useWorldUserStore from "../stores/useWorldUserStore";
 
 const sceneConfig = {
     active: false,
@@ -18,7 +19,6 @@ var globalVar = true;
 
 class GameScene extends Phaser.Scene {
     static inRangePlayers = new Set();
-    static inConference = null;
 
     remotePlayers = {};
     localPlayers = {};
@@ -132,8 +132,8 @@ class GameScene extends Phaser.Scene {
                 let text = this.player.getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
                 // hack to recall join conference when no one is in conference
-                if (!grps.includes(GameScene.inConference))
-                    GameScene.inConference = null;
+                if (!grps.includes(useWorldUserStore.getState().world_user.in_conference))
+                    useWorldUserStore.getState().updateConference(null);
             }
         }
     }
@@ -166,22 +166,22 @@ class GameScene extends Phaser.Scene {
         
         if (tile) {
             const conferenceId = tile.properties.id;
-            if (GameScene.inConference != conferenceId) {
-                GameScene.inConference = conferenceId;
+            if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
+                useWorldUserStore.getState().updateConference(conferenceId);
                 GameScene.inRangePlayers = new Set();
                 this.ws.joinConference(conferenceId);
             }
         }
         else {
-            if (GameScene.inConference != null) {
-                GameScene.inConference = null;
+            if (useWorldUserStore.getState().world_user.in_conference) {
+                useWorldUserStore.getState().updateConference(null);
                 this.ws.leaveConference();
             }
         }
     }
 
     updateRangePlayers = () => {
-        if (GameScene.inConference == null) {
+        if (useWorldUserStore.getState().world_user.in_conference == null) {
             // detect surrounding players
             var bodies = this.physics.overlapCirc(
                 this.player.body.center.x, this.player.body.center.y, 150, true, true)

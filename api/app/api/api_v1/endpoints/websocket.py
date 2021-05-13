@@ -47,6 +47,7 @@ async def world_websocket(
                 await wh.send_message(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_PLAYER:
+                room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
 
             elif topic == protocol.PLAYER_MOVEMENT:

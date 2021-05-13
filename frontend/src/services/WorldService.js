@@ -120,9 +120,7 @@ class WorldService {
             }
         })
 
-
     }
-
 
 }
 
