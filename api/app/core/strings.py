@@ -29,6 +29,7 @@ USER_SENT_REPORTS_ACCESS_FORBIDDEN = "You do not have permissions to access repo
 USER_RECEIVED_REPORTS_ACCESS_FORBIDDEN = "You do not have permissions to access reports received by that user"
 USERS_NOT_IN_SAME_WORLD = "One of the users has not joined this world."
 USER_ALREADY_REPORTED_IN_THIS_WORLD = "You have already reported this user in this world."
+USER_REPORT_NOT_FOUND = "This report does not exist."
 INVALID_PAGE_NUMBER = "Invalid page number."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."

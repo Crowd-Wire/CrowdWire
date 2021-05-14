@@ -4,6 +4,7 @@ from app.schemas import ReportUserCreate
 from app.models import Report_User, User
 from app.core import strings
 from .crud_world_users import crud_world_user
+from .crud_roles import crud_role
 
 class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
@@ -43,6 +44,27 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         return reports, ""
 
+    async def get_all_user_reports_received_in_world(
+            self, db: Session, user_id: int, request_user: User, world_id: int, page: int):
+        """
+        Checks if the request user is admin or has world ban permissions. Returns the received reports for
+        a user in a given world.
+        """
+
+        page_size = 10
+
+        # page cannot be lower than 1
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
+
+        role, msg = await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=request_user.user_id)
+        if not request_user.is_superuser and not role:
+            return None, strings.ACCESS_FORBIDDEN
+
+        reports = db.query(Report_User).filter(Report_User.reported == user_id, Report_User.world_id == world_id)\
+            .offset(page_size * (page - 1)).limit(page_size).all()
+
+        return reports, ""
 
     def get_user1_report_user2_world(self, db: Session, reported: int, reporter: int, world_id: int):
         """
@@ -79,6 +101,23 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         report = super().create(db=db, obj_in=report)
         return report, ""
 
+    async def remove(self, db: Session, reporter: int, reported: int, world_id: int, request_user: User):
+        """
+        Deletes the report made by a user to another in a given world. Can be accessed by world mods, admins and
+        the reporter
+        """
+        # The reporter itself,World mods and platform admins can delete a report made to someone in that world
+        role, msg = await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=request_user.user_id)
+        if reporter != request_user.user_id and not request_user.is_superuser and not role:
+            return None, strings.ACCESS_FORBIDDEN
+
+        report = self.get_user1_report_user2_world(db=db, reported=reported, reporter=reporter, world_id=world_id)
+        if report is None:
+            return None, strings.USER_REPORT_NOT_FOUND
+
+        db.delete(report)
+        db.commit()
+        return report, ""
 
 crud_report_user = CRUDReport_User(Report_User)
 

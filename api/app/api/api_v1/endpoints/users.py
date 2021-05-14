@@ -78,7 +78,7 @@ async def report_user(
 
     return report
 
-@router.get("/{id}/report-received")
+@router.get("/{id}/reports-received")
 async def get_all_user_reports_received(
         id: int,
         page: int = 1,
@@ -96,3 +96,44 @@ async def get_all_user_reports_received(
         raise HTTPException(status_code=400, detail=msg)
 
     return reports
+
+@router.get("/{id}/reports-received/{world}")
+async def get_all_user_report_received_in_world(
+        id: int,
+        world: int,
+        page: int = 1,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Gets all reports received by a user in a given world. Can be access by world mods and admins.
+    """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    reports, msg = await crud_report_user.get_all_user_reports_received_in_world(
+        db=db, user_id=id, request_user=user, page=page, world_id=world)
+
+    if reports is None:
+        raise HTTPException(status_code=400, detail=msg)
+    return reports
+
+@router.delete("/{reporter}/reports-sent/{world}/{reported}")
+async def delete_report_to_user_in_world(
+        reporter: int,
+        reported: int,
+        world: int,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    report, msg = await crud_report_user.remove(
+        db=db, request_user=user, reported=reported, reporter=reporter, world_id=world)
+
+    if report is None:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return report
