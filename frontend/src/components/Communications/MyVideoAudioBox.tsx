@@ -85,7 +85,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }, [talk_conference])
 
-  requestToSpeak = () => {
+  const requestToSpeak = () => {
     setHasRequested(true);
     wsend({ topic: "REQUEST_TO_SPEAK", 'conference_id': in_conference });
   }

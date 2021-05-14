@@ -35,13 +35,27 @@ async def world_websocket(
             payload = await websocket.receive_json()
             topic = payload['topic']
 
-            if topic != protocol.PLAYER_MOVEMENT and topic != protocol.PING:
-                logger.info(
-                    f"Received message with topic {topic} from user {user_id}"
-                )
-
             if topic == protocol.PING:
                 await websocket.send_text(protocol.PONG)
+                continue
+
+            if topic == protocol.PLAYER_MOVEMENT:
+                await wh.send_player_movement(world_id, user_id, payload)
+                continue
+
+            logger.info(f"Received message with topic {topic} from user {user_id}")
+
+            if topic in (
+                protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
+                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
+            ):
+                await wh.handle_transport_or_track(world_id, user_id, payload)
+
+            elif topic == protocol.WIRE_PLAYER:
+                await wh.wire_players(world_id, user_id, payload)
+
+            elif topic == protocol.UNWIRE_PLAYER:
+                await wh.unwire_players(world_id, user_id, payload)
 
             elif topic == protocol.SEND_MESSAGE:
                 await wh.send_message(world_id, user_id, payload)
@@ -50,35 +64,27 @@ async def world_websocket(
                 room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
 
-            elif topic == protocol.PLAYER_MOVEMENT:
-                await wh.send_player_movement(world_id, user_id, payload)
-
             elif topic == protocol.JOIN_CONFERENCE:
                 await wh.join_conference(world_id, user_id, payload)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id)
 
-            elif topic == protocol.WIRE_PLAYER:
-                await wh.wire_players(world_id, user_id, payload)
-
-            elif topic == protocol.UNWIRE_PLAYER:
-                await wh.unwire_players(world_id, user_id, payload)
-
-            elif topic in (protocol.JOIN_AS_NEW_PEER, protocol.JOIN_AS_SPEAKER):
-                await wh.join_as_new_peer_or_speaker(world_id, user_id, payload)
-
-            elif topic in (
-                protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
-                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
-            ):
-                await wh.handle_transport_or_track(world_id, user_id, payload)
-
             elif topic == protocol.CLOSE_MEDIA:
                 await wh.close_media(world_id, user_id, payload)
 
             elif topic == protocol.TOGGLE_PRODUCER:
                 await wh.toggle_producer(world_id, user_id, payload)
+
+            elif topic == protocol.REQUEST_TO_SPEAK:
+                # send to users who are in conference and have conference_managent permission
+                continue
+
+            elif topic == protocol.PERMISSION_TO_SPEAK:
+                # check if user who accepted has permission maybe
+                # also send to the user who has been accepted
+                # { 'topic': PERMISSION_TO_SPEAK, 'permission': true }
+                continue
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
