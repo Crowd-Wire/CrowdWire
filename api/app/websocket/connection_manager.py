@@ -6,7 +6,9 @@ from loguru import logger
 from app.core.consts import WebsocketProtocol as protocol
 from app.redis.connection import redis_connector
 from app.crud import crud_role
-
+from fastapi import Depends
+from app.api import dependencies
+from sqlalchemy.orm import Session
 class ConnectionManager:
     user_count = -1  # TODO: remove after tests
     group_count = -1
@@ -128,7 +130,7 @@ class ConnectionManager:
                 f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
             )
 
-    async def broadcast_to_conf_managers(self, world_id: str, payload: Any, conference: str):
+    async def broadcast_to_conf_managers(self, world_id: str, payload: Any, conference: str, db: Session=Depends(dependencies.get_db)):
         try:
             user_ids = await redis_connector.get_group_users(world_id, conference)
 

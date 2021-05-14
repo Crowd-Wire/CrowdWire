@@ -7,6 +7,9 @@ from app.websocket.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 from app.crud import crud_role
+from fastapi import Depends
+from app.api import dependencies
+from sqlalchemy.orm import Session
 
 async def join_player(world_id: str, user_id: str, payload: dict):
     room_id = payload['room_id']
