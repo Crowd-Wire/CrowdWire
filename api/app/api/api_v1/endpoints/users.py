@@ -39,30 +39,60 @@ async def edit_user(
 
 @router.get("/{id}/reports-sent", response_model=List[ReportUserInDB])
 async def get_all_user_reports_sent(
-        user_id: int,
+        id: int,
+        page: int = 1,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
-
+    """
+    Gets all the reports made by a user. Can be accessed by that user or by an admin.
+    """
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    reports, msg = crud_report_user.get_all_user_reports_sent(db=db, request_user=user, user_id=user_id)
+    reports, msg = crud_report_user.get_all_user_reports_sent(db=db, request_user=user, user_id=id, page=page)
+    if reports is None:
+        raise HTTPException(status_code=400, detail=msg)
 
     return reports
 
 @router.post("/{id}/reports-sent", response_model=ReportUserInDB)
 async def report_user(
+        id: int,
         report: ReportUserCreate,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
+    """
+    Creates a User Report.
+    """
+    if id != user.user_id:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    report, msg = crud_report_user.create(db=db, report=report, user_id=user.user_id)
+    report, msg = crud_report_user.create(db=db, report=report, user_id=id)
     if not report:
         raise HTTPException(status_code=400, detail=msg)
 
     return report
+
+@router.get("/{id}/report-received")
+async def get_all_user_reports_received(
+        id: int,
+        page: int = 1,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Gets all the reports received by a user. Can be accessed by an admin.
+    """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    reports, msg = crud_report_user.get_all_user_reports_received(db=db, user_id=id, request_user=user, page=page)
+    if reports is None:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return reports
