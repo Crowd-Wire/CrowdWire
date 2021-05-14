@@ -78,13 +78,13 @@ async def world_websocket(
 
             elif topic == protocol.REQUEST_TO_SPEAK:
                 # send to users who are in conference and have conference_managent permission
-                continue
+                await wh.send_to_conf_managers(world_id, user_id, payload)
 
             elif topic == protocol.PERMISSION_TO_SPEAK:
-                # check if user who accepted has permission maybe
-                # also send to the user who has been accepted
-                # { 'topic': PERMISSION_TO_SPEAK, 'permission': true }
-                continue
+                # check if user who accepted has permission
+                # warn the user who has been accepted or denied
+                # { 'topic': PERMISSION_TO_SPEAK, 'permission': true/false }
+                await wh.send_to_conf_listener(world_id, user_id, payload)
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)

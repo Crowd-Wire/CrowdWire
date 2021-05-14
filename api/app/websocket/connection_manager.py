@@ -5,7 +5,7 @@ from loguru import logger
 
 from app.core.consts import WebsocketProtocol as protocol
 from app.redis.connection import redis_connector
-
+from app.crud import crud_role
 
 class ConnectionManager:
     user_count = -1  # TODO: remove after tests
@@ -123,6 +123,18 @@ class ConnectionManager:
                 for user_id in user_ids:
                     if user_id != sender_id:
                         await self.send_personal_message(payload, user_id)
+        except KeyError:
+            logger.error(
+                f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
+            )
+
+    async def broadcast_to_conf_managers(self, world_id: str, payload: Any, conference: str):
+        try:
+            user_ids = await redis_connector.get_group_users(world_id, conference)
+
+            for user_id in user_ids:
+                if (await crud_role.can_manage_conference(world_id=world_id, user_id=user_id))[0]:
+                    await self.send_personal_message(payload, user_id)
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
