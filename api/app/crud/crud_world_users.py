@@ -100,7 +100,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
                 'role': role
             }
         )
-        print(role)
         db.commit()
         db.refresh(world_user)
         return world_user, role
