@@ -11,9 +11,12 @@ import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
+import UserList from './Sections/UserList';
+import WorldSettings from "views/WorldSettings/WorldSettings.js";
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -33,7 +36,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       width: sideBarWidth,
-      zIndex: 1201,
+      zIndex: 1202,
       backgroundColor: '#1f344d',
       height: '100%'
     },
@@ -72,15 +75,26 @@ const useStyles = makeStyles((theme: Theme) =>
 const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
   const [fullScreen, setFullScreen] = React.useState(false);
+  const [drawer, setDrawer] = React.useState(null);
+  const [page, setPage] = React.useState(null);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const handleDrawerOpen = (component) => {
+    setDrawer(component);
+    setPage(null);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setDrawer(null);
+  };
+
+  const handleOpen = (component) => {
+    setPage(component);
+    setDrawer(null);
+  };
+
+  const handleClose = () => {
+    setPage(null);
   };
 
   document.addEventListener('fullscreenchange', (event) => {
@@ -136,21 +150,21 @@ const GameDrawer = () => {
 
   const iconsStyle = {color: "#fff", fontSize: '2rem'};
 
-
   return (
+    <>
     <div className={classes.root}>
 
       <div className={clsx(classes.sideBar, "text-center")}>
         <div className={classes.sideTop}>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleDrawerOpen(<Chat />)}
           >
             <TextsmsIcon style={iconsStyle} />
           </IconButton>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleDrawerOpen(<UserList />)}
           >
             <PeopleAltIcon style={iconsStyle} />
           </IconButton>
@@ -158,18 +172,15 @@ const GameDrawer = () => {
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleOpen(<WorldSettings />)}
           >
             <SettingsIcon style={iconsStyle} />
           </IconButton>
-          <IconButton
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-          >
+          <IconButton onClick={handleFullscreen}>
           {
             fullScreen ?
-            <FullscreenExitIcon style={iconsStyle} onClick={handleFullscreen} />
-            : <FullscreenIcon style={iconsStyle} onClick={handleFullscreen} />
+            <FullscreenExitIcon style={iconsStyle} />
+            : <FullscreenIcon style={iconsStyle} />
           }
           </IconButton>
         </div>
@@ -178,7 +189,7 @@ const GameDrawer = () => {
         className={classes.drawer}
         variant="persistent"
         anchor="left"
-        open={open}
+        open={drawer != null}
         classes={{
           paper: classes.drawerPaper,
         }}
@@ -197,9 +208,21 @@ const GameDrawer = () => {
           </IconButton>
         </div>
         <Divider />
-        <Chat />
+        {
+          drawer
+        }
       </Drawer>
     </div>
+    { page ?
+      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201}}>
+        <CancelIcon 
+          style={{position: "absolute", top: "2rem", right: "2rem", fontSize: "2rem", cursor: "pointer", color: "white"}} 
+          onClick={handleClose} 
+        />
+        {page}
+      </div> : null
+    }
+    </>
   );
 }
 
