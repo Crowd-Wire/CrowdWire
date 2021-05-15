@@ -32,6 +32,9 @@ class Settings(BaseSettings):
         f":{POSTGRES_PASSWORD}@{POSTGRES_SERVICE_NAME}" \
         f":5432/{POSTGRES_DB}"
 
+    DB_ADMIN_EMAIL: str = "user@example.com"
+    DB_ADMIN_PASSWORD: str = "string"
+
     RABBITMQ_USERNAME: str = os.getenv('RABBITMQ_USERNAME', 'user')
     RABBITMQ_PASSWORD: str = "bitnami"
     RABBITMQ_SERVICE_NAME: str = os.getenv('RABBITMQ_SERVICE_NAME', "localhost")
