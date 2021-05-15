@@ -9,6 +9,7 @@ from app.crud import crud_role
 from fastapi import Depends
 from app.api import dependencies
 from sqlalchemy.orm import Session
+
 class ConnectionManager:
     user_count = -1  # TODO: remove after tests
     group_count = -1
