@@ -23,8 +23,6 @@ export default function GenerateInviteCard() {
             else
                 setLink("Invalid Token");
         } );
-        
-        
     }
 
     return (
@@ -47,6 +45,4 @@ export default function GenerateInviteCard() {
             </Card.Body>
         </Card>
     )
-
-
 }

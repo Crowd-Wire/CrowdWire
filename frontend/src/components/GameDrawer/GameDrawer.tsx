@@ -13,11 +13,15 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
 import UserList from './Sections/UserList';
-import WorldSettings from "views/WorldSettings/WorldSettings.js";
+import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import CancelIcon from '@material-ui/icons/Cancel';
+import LinkIcon from '@material-ui/icons/Link';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+
+import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -99,6 +103,11 @@ const GameDrawer = () => {
     setPage(null);
   };
 
+  const handleOpenInvite = () => {
+    setPage(<GenerateInviteCard/>);
+    setDrawer(null);
+  };
+
   document.addEventListener('fullscreenchange', (event) => {
     if (document.fullscreenElement) {
       // entered full-screen mode
@@ -178,9 +187,9 @@ const GameDrawer = () => {
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpen(<WorldSettings />)}
+            onClick={() => handleOpenInvite()}
           >
-            <SettingsIcon style={iconsStyle} />
+            <LinkIcon style={iconsStyle} />
           </IconButton>
           <IconButton onClick={handleFullscreen}>
           {
@@ -189,6 +198,20 @@ const GameDrawer = () => {
             : <FullscreenIcon style={iconsStyle} />
           }
           </IconButton>
+          <IconButton
+            aria-label="open drawer"
+            onClick={() => handleOpen(
+                <WSettingsContent />
+            )}
+          >
+            <SettingsIcon style={iconsStyle} />
+          </IconButton>
+          <IconButton
+            onClick={() => {}}
+          >
+            <MeetingRoomIcon style={iconsStyle} />
+          </IconButton>
+          
         </div>
       </div>
       <Drawer
@@ -212,7 +235,7 @@ const GameDrawer = () => {
       </Drawer>
     </div>
     { page ?
-      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201}}>
+      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201, paddingLeft: sideBarWidth, backgroundColor: "#32526a"}}>
         <CancelIcon 
           style={{position: "absolute", top: "2rem", right: "2rem", fontSize: "2rem", cursor: "pointer", color: "white"}} 
           onClick={handleClose} 
