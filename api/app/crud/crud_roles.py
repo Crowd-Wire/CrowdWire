@@ -25,6 +25,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             return None, strings.ROLES_NOT_FOUND
         return role, ""
 
+    @cache(model="Role")
     async def can_access_world_ban(self, db: Session, world_id: int, user_id: int):
         """
         Checks if a user can access bans of the world(see reports and ban users from world).
@@ -37,7 +38,6 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if not role:
             return None, strings.ACCESS_FORBIDDEN
         return role, ""
-
 
     @cache(model="Role")
     async def get_by_role_id_and_world_id(self, db: Session, role_id: int, world_id: int) -> Tuple[Optional[Role], str]:
@@ -155,7 +155,6 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                 role_changed_id=role_id)
             role_obj = super().remove(db=db, id=role_id)
             return role_obj, strings.ROLE_DELETED_SUCCESS
-        print("test")
         return None, ""
 
 

@@ -37,6 +37,7 @@ async def edit_user(
     updated_user_obj = crud_user.update(db=db, db_obj=user_obj, obj_in=update_user, request_user=user)
     return updated_user_obj
 
+
 @router.get("/{id}/reports-sent", response_model=List[ReportUserInDB])
 async def get_all_user_reports_sent(
         id: int,
@@ -55,6 +56,7 @@ async def get_all_user_reports_sent(
         raise HTTPException(status_code=400, detail=msg)
 
     return reports
+
 
 @router.post("/{id}/reports-sent", response_model=ReportUserInDB)
 async def report_user(
@@ -78,7 +80,8 @@ async def report_user(
 
     return report
 
-@router.get("/{id}/reports-received")
+
+@router.get("/{id}/reports-received", response_model=List[ReportUserInDB])
 async def get_all_user_reports_received(
         id: int,
         page: int = 1,
@@ -97,7 +100,8 @@ async def get_all_user_reports_received(
 
     return reports
 
-@router.get("/{id}/reports-received/{world}")
+
+@router.get("/{id}/reports-received/{world}", response_model=List[ReportUserInDB])
 async def get_all_user_report_received_in_world(
         id: int,
         world: int,
@@ -118,7 +122,8 @@ async def get_all_user_report_received_in_world(
         raise HTTPException(status_code=400, detail=msg)
     return reports
 
-@router.delete("/{reporter}/reports-sent/{world}/{reported}")
+
+@router.delete("/{reporter}/reports-sent/{world}/{reported}", response_model=ReportUserInDB)
 async def delete_report_to_user_in_world(
         reporter: int,
         reported: int,
@@ -126,10 +131,13 @@ async def delete_report_to_user_in_world(
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
-
+    """
+    Removes a report made to a user in a world.
+    """
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
+    # checks for permissions and deletes the report
     report, msg = await crud_report_user.remove(
         db=db, request_user=user, reported=reported, reporter=reporter, world_id=world)
 

@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
+
 class ReportUserBase(BaseModel):
     reporter: Optional[int]
     reported: Optional[int]
@@ -9,11 +10,13 @@ class ReportUserBase(BaseModel):
     comment: Optional[str]
     timestamp: Optional[datetime]
 
+
 class ReportUserCreate(ReportUserBase):
     reported: int
     world_id: int
     comment: Optional[str]
     timestamp: datetime
+
 
 class ReportUserInDB(ReportUserBase):
     reporter: int

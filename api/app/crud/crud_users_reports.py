@@ -5,10 +5,13 @@ from app.models import Report_User, User
 from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
+from typing import List, Optional, Tuple
+
 
 class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
-    def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int):
+    def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int)\
+            -> Tuple[List[Report_User], str]:
         """
         Gets all the reports made by a user.
         """
@@ -26,7 +29,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         return reports, ""
 
-    def get_all_user_reports_received(self, db: Session, user_id: int, request_user: User, page: int ):
+    def get_all_user_reports_received(self, db: Session, user_id: int, request_user: User, page: int)\
+            -> Tuple[List[Report_User], str]:
         """
         Gets all reports received by a user.
         """
@@ -45,7 +49,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         return reports, ""
 
     async def get_all_user_reports_received_in_world(
-            self, db: Session, user_id: int, request_user: User, world_id: int, page: int):
+            self, db: Session, user_id: int, request_user: User, world_id: int, page: int)\
+            -> Tuple[List[Report_User], str]:
         """
         Checks if the request user is admin or has world ban permissions. Returns the received reports for
         a user in a given world.
@@ -66,7 +71,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         return reports, ""
 
-    def get_user1_report_user2_world(self, db: Session, reported: int, reporter: int, world_id: int):
+    def get_user1_report_user2_world(self, db: Session, reported: int, reporter: int, world_id: int)\
+            -> Optional[Report_User]:
         """
         Checks if a user has reported another in a given world.
         """
@@ -79,7 +85,7 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         return report
 
-    def create(self, db: Session, user_id: int, report: ReportUserCreate):
+    def create(self, db: Session, user_id: int, report: ReportUserCreate) -> Tuple[Optional[Report_User], str]:
         """
         Creates a User Report.
         """
@@ -89,7 +95,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         # check if both users have been in this world
         if not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user_id) \
-            or not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=reported):
+                or not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=reported):
+
             return None, strings.USERS_NOT_IN_SAME_WORLD
 
         # check if the user has already reported the other in this world
@@ -101,7 +108,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         report = super().create(db=db, obj_in=report)
         return report, ""
 
-    async def remove(self, db: Session, reporter: int, reported: int, world_id: int, request_user: User):
+    async def remove(self, db: Session, reporter: int, reported: int, world_id: int, request_user: User)\
+            -> Tuple[Optional[Report_User], str]:
         """
         Deletes the report made by a user to another in a given world. Can be accessed by world mods, admins and
         the reporter
@@ -119,5 +127,5 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         db.commit()
         return report, ""
 
-crud_report_user = CRUDReport_User(Report_User)
 
+crud_report_user = CRUDReport_User(Report_User)
