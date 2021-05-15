@@ -20,7 +20,7 @@ const useStyles = theme => ({
   },
 });
 class CreateWorld extends Component {
-  state={page:true};
+  state={page:0};
   constructor(props){
     super(props);
   }
@@ -29,10 +29,16 @@ class CreateWorld extends Component {
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
     WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc).then((res) =>{
       if(res.status===200){
-        this.setState({
-          page: false
-        });
+        return res.json();
       }
+      return null;
+    })
+    .then((res)=>{
+      if(!res)
+        return;
+      this.setState({
+        page: res.world_id
+      });
     });
     
   }
@@ -44,7 +50,7 @@ class CreateWorld extends Component {
   
   render() {
     const { classes } = this.props;
-    if(this.state.page){
+    if(!this.state.page){
       return(
         <div className={classes.root}>
           <CssBaseline />
@@ -67,7 +73,7 @@ class CreateWorld extends Component {
       );
     }
     else{
-      return(<Navigate to="/dashboard/search"></Navigate>);
+      return(<Navigate to={"/dashboard/"+this.state.page}></Navigate>);
     }
   }
 }
