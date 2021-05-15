@@ -194,14 +194,23 @@ class LoginPage extends React.Component {
                         </Row>
                         <br />
                         <Row>
-                          <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
-                            <Button onClick={() => {}}  simple color="primary" size="md">
-                              Register
-                            </Button>
-                          </Link>
-                          <span>OR</span> 
-                          {/* Change this pls */}
-                          <Button onClick={this.handleGuestJoin} size="md" simple color="primary"> Join as Guest</Button>
+                          <span style={{marginLeft:"auto", marginRight:"auto"}}>OR</span> 
+                        </Row>
+                        <Row style={{marginLeft: "auto", marginRight: "auto"}}>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                <Button onClick={() => {}}  simple color="primary" size="sm" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                  Register
+                                </Button>
+                              </Link>
+                            </Row>
+                          </Col>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Button onClick={this.handleGuestJoin} style={{ margin: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
+                            </Row>
+                          </Col>
                         </Row>
                       </Col>
                     </CardFooter>
