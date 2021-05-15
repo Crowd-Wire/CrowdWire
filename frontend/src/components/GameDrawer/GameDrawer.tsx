@@ -12,6 +12,8 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
 
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -71,6 +73,7 @@ const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [fullScreen, setFullScreen] = React.useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -79,6 +82,59 @@ const GameDrawer = () => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  document.addEventListener('fullscreenchange', (event) => {
+    if (document.fullscreenElement) {
+      // entered full-screen mode
+      setFullScreen(true);
+    } else {
+      setFullScreen(false);
+    }
+  })
+
+  const handleFullscreen = () => {
+    if (!fullScreen) {
+      setFullScreen(true);
+      openFullscreen();
+    } else {
+      setFullScreen(false);
+      closeFullscreen();
+    }
+  }
+
+  const openFullscreen = () => {
+    /* View in fullscreen */
+    const elem = document.documentElement as HTMLElement & {
+      mozRequestFullScreen(): Promise<void>;
+      webkitRequestFullscreen(): Promise<void>;
+      msRequestFullscreen(): Promise<void>;
+    };
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+
+  const closeFullscreen = () => {
+    /* Close fullscreen */
+    const doc = document as Document & {
+      mozCancelFullScreen(): Promise<void>;
+      webkitExitFullscreen(): Promise<void>;
+      msExitFullscreen(): Promise<void>;
+    };
+    if (doc.exitFullscreen) {
+      doc.exitFullscreen();
+    } else if (doc.webkitExitFullscreen) { /* Safari */
+      doc.webkitExitFullscreen();
+    } else if (doc.msExitFullscreen) { /* IE11 */
+      doc.msExitFullscreen();
+    }
+  }
+
+  const iconsStyle = {color: "#fff", fontSize: '2rem'};
 
 
   return (
@@ -90,13 +146,13 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
           >
-            <TextsmsIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <TextsmsIcon style={iconsStyle} />
           </IconButton>
           <IconButton
             aria-label="open drawer"
             onClick={handleDrawerOpen}
           >
-            <PeopleAltIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <PeopleAltIcon style={iconsStyle} />
           </IconButton>
         </div>
         <div className={classes.sideBot}>
@@ -104,7 +160,17 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
           >
-            <SettingsIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <SettingsIcon style={iconsStyle} />
+          </IconButton>
+          <IconButton
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+          >
+          {
+            fullScreen ?
+            <FullscreenExitIcon style={iconsStyle} onClick={handleFullscreen} />
+            : <FullscreenIcon style={iconsStyle} onClick={handleFullscreen} />
+          }
           </IconButton>
         </div>
       </div>
