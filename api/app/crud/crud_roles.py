@@ -48,6 +48,19 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         return role, ""
 
     @cache(model="Role")
+    async def get_user_role_in_world(self, db: Session, world_id: int, user_id: int) -> Tuple[Optional[Role], str]:
+
+        role = db.query(Role).join(World_User).filter(
+            World_User.role_id == Role.role_id,
+            World_User.user_id == user_id,
+            World_User.world_id == world_id
+        ).first()
+
+        if not role:
+            return None, strings. ROLES_NOT_FOUND
+        return role, ""
+
+    @cache(model="Role")
     async def get_by_role_id(self, db: Session, role_id: int) -> Tuple[Optional[Role], str]:
         role = db.query(Role).filter(Role.role_id == role_id).first()
         if not role:
