@@ -85,11 +85,11 @@ async def join_world(
 
             # Otherwise, goes to PostgreSQL database
             logger.debug("no cache")
-            world_user, default_role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+            world_user, role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
 
             # pydantic schema is waiting for a role object not a role id
             delattr(world_user, 'role_id')
-            setattr(world_user, 'role', default_role)
+            setattr(world_user, 'role', role)
             setattr(world_user, 'map', world_obj.world_map)
 
         else:

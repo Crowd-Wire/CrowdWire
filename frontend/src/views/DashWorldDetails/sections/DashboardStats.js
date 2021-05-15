@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import { Navigate } from 'react-router-dom';
 import { Typography } from "@material-ui/core";
 import { createBrowserHistory } from 'history';
 import Row from 'react-bootstrap/Row';
@@ -21,7 +22,8 @@ class DashboardStats extends Component{
         super(props);
         this.state = {
             show: false,
-            dialog:false
+            dialog:false,
+            nav:false
         }
     }
     
@@ -65,18 +67,24 @@ class DashboardStats extends Component{
         this.setState({dialog: true});        
     }
     
+    showWorldManagement = () => {
+        this.setState({nav:true});
+    }
     render(){
+        if(this.state.nav){
+            return <Navigate to={"/world/"+this.props.details.world_id+"/settings"}></Navigate>
+        }
         return(
             <>    
                 <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
                     <br/>
-                    <Row style={{width:"100%",height:"90%"}}>
+                    <Row style={{width:"100%",height:"90%", marginLeft:"auto", marginRight:"auto"}}>
                         <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
                             <Row>
 
-                                    <Button variant="success" className={this.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
-                                    <Button variant="primary" className={this.actionButtons}>Edit Map</Button>
-                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showDialog()}}>Manage Map</Button>
+                                    <Button variant="success" className={this.actionButtons} style={{color:"black"}}>Enter Map</Button>
+                                    <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{marginLeft:"3%"}}>Edit Map</Button>
+                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{marginLeft:"3%"}}>Manage Map</Button>
 
                             </Row>
                             <Row style={{marginTop:"50px"}}>

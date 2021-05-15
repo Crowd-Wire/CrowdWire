@@ -100,6 +100,7 @@ export default function DashDrawer(props){
   }
 
   const onClickCreateWorld = () => {
+    console.log(st.guest_uuid+"and token "+st.token)
     navigation("/create-world");
   }
 

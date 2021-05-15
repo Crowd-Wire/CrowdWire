@@ -39,13 +39,12 @@ class WorldService {
     }
 
     getWorldDetails(path) {
-        let x = path.split("/");
         
         /*
             id:int
         */
 
-        let url = 'worlds/'+x[x.length-1];
+        let url = 'worlds/'+path;
         let query = [];
         return fetch(API_BASE + url, {
             method: 'GET',
@@ -120,9 +119,7 @@ class WorldService {
             }
         })
 
-
     }
-
 
 }
 
