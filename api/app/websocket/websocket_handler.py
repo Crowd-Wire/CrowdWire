@@ -7,8 +7,6 @@ from app.websocket.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 from app.crud import crud_role
-from fastapi import Depends
-from app.api import dependencies
 from sqlalchemy.orm import Session
 
 
@@ -247,19 +245,20 @@ async def speaking_change(world_id: str, user_id: str, payload: dict):
         user_id)
 
 
-async def send_to_conf_managers(world_id: str, user_id: str, payload: dict):
+async def send_to_conf_managers(world_id: str, user_id: str, payload: dict, db: Session):
     conference = payload['conference']
 
     await manager.broadcast_to_conf_managers(
-        world_id,
-        {'topic': protocol.REQUEST_TO_SPEAK,
-            'user_requested': user_id},
-        conference)
+        world_id=world_id,
+        payload={'topic': protocol.REQUEST_TO_SPEAK,
+            'd': {'user_requested': user_id}},
+        conference=conference, 
+        db=db)
 
 
-async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session = Depends(dependencies.get_db)):
+async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session):
     # check if user_id has permission to accept requests to speak here
-    if not (await crud_role.can_manage_conference(world_id=world_id, user_id=user_id))[0]:
+    if not (await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))[0]:
         return
 
     permission = payload['permission']

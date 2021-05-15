@@ -160,9 +160,6 @@ export const getSocket = (worldId) => {
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);
             break;
-        case "REQUEST_TO_SPEAK":
-          console.log(data)
-          break;
         case "PERMISSION_TO_SPEAK":
           useWorldUserStore.getState().permissionToSpeak(data.permission);
           break;

@@ -10,7 +10,6 @@ import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-import RequestSpeakIcon from '@material-ui/icons/PanTool';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
@@ -28,6 +27,9 @@ import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import useWorldUserStore from "../../stores/useWorldUserStore";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
+import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
+import Button from "@material-ui/core/Button";
+
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -50,6 +52,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const handle = useFullScreenHandle();
   const talk_conference = useWorldUserStore(state => state.world_user.role.talk_conference);
   const in_conference = useWorldUserStore(state => state.world_user.in_conference);
+  const initial_allowed_to_speak = useState(useWorldUserStore.getState().world_user.role.talk_conference);
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -62,15 +65,54 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     progress: undefined,
   }
 
-  useEffect(() =>{
-    if (in_conference && !talk_conference) {
-      toast.dark(
+  const toast_props_requests = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 60000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    draggable: true,
+    progress: undefined,
+  }
+
+  const requestToSpeak = () => {
+    setHasRequested(true);
+    wsend({ topic: "REQUEST_TO_SPEAK", 'conference': in_conference });
+  }
+
+  const handleRequestToSpeak = (user_id: any, permit: boolean) => {
+    wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_id': user_id});
+  }
+
+  useEffect(() => {
+    useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
+      console.log(d.user_requested)
+      toast.info(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          Press the ✋ Near Your Video Box to Request to Speak
+          The User {d.user_requested} Requested To Speak
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, true)}>Allow</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, false)}>Deny</Button>
         </span>
-        , toast_props);
-    }
+        , toast_props_requests
+      );
+    })
+  }, [])
+
+  useEffect(() => {
+    if (in_conference) {
+      if (!talk_conference) {
+        toast.dark(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Press the ✋ Near Your Video Box to Request to Speak
+          </span>
+          , toast_props
+        );
+      }
+    } else if (hasRequested) {
+      setHasRequested(false)
+      if (!initial_allowed_to_speak) { useWorldUserStore.getState().permissionToSpeak(false) }
+    };
   }, [in_conference])
 
   useEffect(() =>{
@@ -84,11 +126,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         , toast_props);
     }
   }, [talk_conference])
-
-  const requestToSpeak = () => {
-    setHasRequested(true);
-    wsend({ topic: "REQUEST_TO_SPEAK", 'conference_id': in_conference });
-  }
 
   function toggleModal() {
     setShowModal(!showModal)
@@ -266,8 +303,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                           in_conference ?
                             talk_conference ?
                               (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
-                            : hasRequested ? ''
-                              : <span onClick={() => requestToSpeak()}>✋</span>
+                              : hasRequested ?
+                                (<MicOffIcon color={'action'}/>)
+                                : <span onClick={() => requestToSpeak()}>✋</span>
                           : (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                         : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon color={'action'}/>)
