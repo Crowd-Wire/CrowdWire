@@ -1,7 +1,8 @@
 from typing import Union, Optional, List, Tuple, Any, Dict
 
 from sqlalchemy.orm import Session
-from app.models import Role, World_User, User
+from sqlalchemy import or_
+from app.models import Role, World_User, User, World
 from .base import CRUDBase
 from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings
@@ -13,15 +14,29 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
     @cache(model="Role")
     async def can_acess_world_roles(self, db: Session, world_id: int, user_id: int):
         """
-        Checks if a user can access the roles a world
+        Checks if a user can access the roles of a world
         """
-        role = db.query(Role).join(World_User).filter(
+        role = db.query(Role).join(World_User).join(World).filter(
             World_User.role_id == Role.role_id,
             World_User.user_id == user_id,
             Role.world_id == world_id,
-            Role.role_manage.is_(True)).first()
+            or_(Role.role_manage.is_(True), World.creator == user_id)).first()
         if not role:
             return None, strings.ROLES_NOT_FOUND
+        return role, ""
+
+    @cache(model="Role")
+    async def can_access_world_ban(self, db: Session, world_id: int, user_id: int):
+        """
+        Checks if a user can access bans of the world(see reports and ban users from world).
+        """
+        role = db.query(Role).join(World_User).join(World).filter(
+            World_User.role_id == Role.role_id,
+            World_User.user_id == user_id,
+            Role.world_id == world_id,
+            or_(Role.ban.is_(True), World.creator == user_id)).first()
+        if not role:
+            return None, strings.ACCESS_FORBIDDEN
         return role, ""
 
     @cache(model="Role")
@@ -140,7 +155,6 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                 role_changed_id=role_id)
             role_obj = super().remove(db=db, id=role_id)
             return role_obj, strings.ROLE_DELETED_SUCCESS
-        print("test")
         return None, ""
 
 

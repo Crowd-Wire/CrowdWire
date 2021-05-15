@@ -260,7 +260,7 @@ class RedisConnector:
         """Remove group from world"""
         for uid in await self.smembers(f"world:{world_id}:group:{group_id}"):
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
-        await self.master.execute('del', f"world:{world_id}:group:{group_id}")
+        await self.delete(f"world:{world_id}:group:{group_id}")
 
     async def rem_users_from_user(self, world_id: str, user_id: str, lost_user_id: str, *lost_users_id: List[str]):
         lost_users_id = [lost_user_id, *lost_users_id]
@@ -277,6 +277,10 @@ class RedisConnector:
         await self.srem(f"world:{world_id}:group:{group_id}", *users_id)
         for uid in users_id:
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
+
+        # hack to avoid removing conference groups
+        if group_id[0] == 'C':
+            return actions
 
         """Normalize groups after remove"""
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:

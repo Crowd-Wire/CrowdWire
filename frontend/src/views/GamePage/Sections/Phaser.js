@@ -19,8 +19,6 @@ class Phaser extends React.Component {
     // console.log(game.input.events._events.gameout.context.enabled)
     // console.log(game.input.events._events.gameover.context.enabled)
     // console.log(game.input.events._events.gameout.context.enabled)
-
-
   }
 
   shouldComponentUpdate() {
@@ -29,10 +27,9 @@ class Phaser extends React.Component {
 
   render() {
     return (
-      <div id="game-container" style={{
-       }}>{/*style={{pointerEvents: "none", display: "none"}}>*/}
-                   <RoomCall />
-</div>
+      <div id="game-container" style={{}}>{/*style={{pointerEvents: "none", display: "none"}}>*/}
+        <RoomCall />
+      </div>
     );
   }
 }

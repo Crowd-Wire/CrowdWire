@@ -5,8 +5,9 @@ metadata:
   labels:
     {{- include "mediaserver.labels" . | nindent 4 }}
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 20.74.42.138
+  type: NodePort
+  externalIPs:
+    - 193.136.92.151
   ports:
     - name : tcp
       port: {{ .Values.service.port }}
