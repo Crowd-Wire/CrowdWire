@@ -27,10 +27,15 @@ class CreateWorld extends Component {
 
 
   createWorld = (wName, accessibility, guests, maxUsers, tag_array, desc) => {
-    WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc)
-    this.setState({
-      page: false
+    WorldService.create(wName, accessibility, guests, maxUsers, tag_array, desc).then((res) =>{
+      console.log(res.json())
+      if(res.status===200){
+        this.setState({
+          page: false
+        });
+      }
     });
+    
   }
 
   goBack(){
