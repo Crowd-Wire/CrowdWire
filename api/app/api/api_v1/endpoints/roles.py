@@ -21,7 +21,7 @@ async def get_all_world_roles(
 ):
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
-    role, msg = await crud_role.can_acess_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
     roles, msg = await crud_role.get_world_roles(db=db, world_id=1, page=page, limit=limit)
@@ -55,7 +55,7 @@ async def edit_role_in_world(
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    role, msg = await crud_role.can_acess_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
     role, msg = await crud_role.get_by_role_id_and_world_id(db=db, role_id=role_id, world_id=world_id)
@@ -76,7 +76,7 @@ async def delete_role_in_world(
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    role, msg = await crud_role.can_acess_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
 

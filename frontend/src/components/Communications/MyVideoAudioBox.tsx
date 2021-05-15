@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+
 import { Card } from '@material-ui/core';
 import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
@@ -7,21 +8,28 @@ import SettingsIcon from '@material-ui/icons/SettingsApplicationsTwoTone';
 import ScreenShareIcon from '@material-ui/icons/ScreenShare';
 import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
-import { useVideoStore } from "../../webrtc/stores/useVideoStore";
-import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
-import { useMediaStore } from "../../webrtc/stores/useMediaStore";
-import { useRoomStore } from "../../webrtc/stores/useRoomStore";
-import { useMuteStore } from "../../webrtc/stores/useMuteStore";
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
+
 import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import { useVideoStore } from "../../webrtc/stores/useVideoStore";
+import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
+import { useMediaStore } from "../../webrtc/stores/useMediaStore";
+import { useRoomStore } from "../../webrtc/stores/useRoomStore";
+import { useMuteStore } from "../../webrtc/stores/useMuteStore";
+import useWorldUserStore from "../../stores/useWorldUserStore";
+import { toast } from 'react-toastify';
+import logo from '../../assets/crowdwire_white_logo.png';
+import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
+import Button from "@material-ui/core/Button";
+
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -35,13 +43,90 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   audioTrack=null, videoTrack=null
 }) => {
   const myRef = useRef<any>(null);
-  const [videoPauseState, setVideoPauseState] = useState(true)
-  const [audioPauseState, setAudioPauseState] = useState(true)
-  const [mediaOffState, setMediaOffState] = useState(true)
-  const [showModal, setShowModal] = useState(false)
+  const [videoPauseState, setVideoPauseState] = useState(true);
+  const [audioPauseState, setAudioPauseState] = useState(true);
+  const [mediaOffState, setMediaOffState] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
-  const [fullscreen, setFullscreen] = useState(false)
-  
+  const talk_conference = useWorldUserStore(state => state.world_user.role.talk_conference);
+  const in_conference = useWorldUserStore(state => state.world_user.in_conference);
+  const initial_allowed_to_speak = useState(useWorldUserStore.getState().world_user.role.talk_conference);
+
+  const toast_props = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    draggable: true,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+    progress: undefined,
+  }
+
+  const toast_props_requests = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 60000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    draggable: true,
+    progress: undefined,
+  }
+
+  const requestToSpeak = () => {
+    setHasRequested(true);
+    wsend({ topic: "REQUEST_TO_SPEAK", 'conference': in_conference });
+  }
+
+  const handleRequestToSpeak = (user_id: any, permit: boolean) => {
+    wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_id': user_id});
+  }
+
+  useEffect(() => {
+    useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
+      console.log(d.user_requested)
+      toast.info(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          The User {d.user_requested} Requested To Speak
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, true)}>Allow</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, false)}>Deny</Button>
+        </span>
+        , toast_props_requests
+      );
+    })
+  }, [])
+
+  useEffect(() => {
+    if (in_conference) {
+      if (!talk_conference) {
+        toast.dark(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Press the ✋ Near Your Video Box to Request to Speak
+          </span>
+          , toast_props
+        );
+      }
+    } else if (hasRequested) {
+      setHasRequested(false)
+      if (!initial_allowed_to_speak) { useWorldUserStore.getState().permissionToSpeak(false) }
+    };
+  }, [in_conference])
+
+  useEffect(() =>{
+    setHasRequested(false);
+    if (in_conference && talk_conference) {
+      toast.dark(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          Press the ✋ Near Your Video Box to Request to Speak
+        </span>
+        , toast_props);
+    }
+  }, [talk_conference])
+
   function toggleModal() {
     setShowModal(!showModal)
   }
@@ -135,6 +220,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       myRef.current.muted = true
     }
   }, [videoTrack, audioTrack])
+
   return (
     
     <div
@@ -186,9 +272,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 paddingRight: 10
               }}>
                 <span>{username}</span>
-                {fullscreen ? 
+                { fullscreen ?
                   <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
-                : 
+                :
                   <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
                 }
                 <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
@@ -200,7 +286,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 fontSize: '1em',
                 bottom: 2,
                 width: '96%',
-                paddingLeft: '2px',
+                paddingLeft: 2,
+                paddingBottom: 2,
                 fontWeight: 500,
                 backgroundColor: 'rgba(0,0,0, 0.2)'}}>
                 <Row>
@@ -212,11 +299,17 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                         : (<VideocamOffIcon color={'action'}/>)
                       }
                     { audioTrack ?
-                        audioPauseState ? 
-                        (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
+                        audioPauseState ?
+                          in_conference ?
+                            talk_conference ?
+                              (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
+                              : hasRequested ?
+                                (<MicOffIcon color={'action'}/>)
+                                : <span onClick={() => requestToSpeak()}>✋</span>
+                          : (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                         : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
-                        : (<MicOffIcon color={'action'}/>)
-                      }
+                      : (<MicOffIcon color={'action'}/>)
+                    }
                   </Col>
 
                   <Col style={{textAlign: 'right'}} sm={6}>

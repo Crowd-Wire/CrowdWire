@@ -8,7 +8,7 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { 
+        {
           roomId: string;
           consumerAudio: Consumer;
           consumerVideo: Consumer;

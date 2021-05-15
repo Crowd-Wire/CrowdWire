@@ -6,6 +6,8 @@ from app.redis.connection import redis_connector
 from app.websocket.connection_manager import manager
 from datetime import datetime
 from loguru import logger
+from app.crud import crud_role
+from sqlalchemy.orm import Session
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
@@ -241,3 +243,28 @@ async def speaking_change(world_id: str, user_id: str, payload: dict):
             'peerId': user_id,
             'value': value},
         user_id)
+
+
+async def send_to_conf_managers(world_id: str, user_id: str, payload: dict, db: Session):
+    conference = payload['conference']
+
+    await manager.broadcast_to_conf_managers(
+        world_id=world_id,
+        payload={'topic': protocol.REQUEST_TO_SPEAK, 'd': {'user_requested': user_id}},
+        conference=conference,
+        db=db)
+
+
+async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session):
+    # check if user_id has permission to accept requests to speak here
+    if not (await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))[0]:
+        return
+
+    permission = payload['permission']
+    user_requested = payload['user_requested']
+
+    await manager.send_personal_message(
+        world_id,
+        {'topic': protocol.PERMISSION_TO_SPEAK,
+            'permission': permission},
+        user_requested)

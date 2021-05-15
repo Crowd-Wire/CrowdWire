@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { withStyles } from "@material-ui/core";
 
 import GameDrawer from 'components/GameDrawer/GameDrawer';
@@ -10,12 +10,16 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
 import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 import WorldService from "../../services/WorldService";
+import { toast } from 'react-toastify';
+import logo from '../../assets/crowdwire_white_logo.png';
+import useWorldUserStore from '../../stores/useWorldUserStore';
 
 const GamePage = (props) => {
 
   const { classes } = props;
   const handle = useFullScreenHandle();
   const [fullScreen, setFullscreen] = useState(false)
+  const [loading, setLoading] = useState(1)
 
   const style = {
     position: 'absolute',
@@ -24,6 +28,17 @@ const GamePage = (props) => {
     fontSize: '2.5rem',
     cursor: 'pointer',
     zIndex: 100
+  }
+
+  const toast_props = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    draggable: true,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+    progress: undefined,
   }
 
   document.addEventListener('fullscreenchange', (event) => {
@@ -42,23 +57,50 @@ const GamePage = (props) => {
       handle.exit()
     }
   }
+
+  useEffect(() => {
+    WorldService.join_world(1)
+    .then((res) => res.json())
+    .then(
+      (res) => {
+        console.log(res)
+        if(res.detail){
+          toast.dark(
+            <span>
+              <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+              {res.detail}
+            </span>
+          ,toast_props);
+        }
+        else {
+          useWorldUserStore.getState().joinWorld(res);
+          console.log(useWorldUserStore.getState());
+          setLoading(0);
+        }
+      }
+    )
+  }, [])
   
   return (
     <>
-      <FullScreen handle={handle}>
-        <div className={classes.wrapper}>
-          <GameDrawer />
-          <div className={classes.gameWindow}>
-            {/* Game */}
-            <Phaser />
+      {loading ? 
+        ''
+      : 
+        <FullScreen handle={handle}>
+          <div className={classes.wrapper}>
+            <GameDrawer />
+            <div className={classes.gameWindow}>
+              {/* Game */}
+              <Phaser />
+            </div>
+            {
+              fullScreen ?
+              <FullscreenExitIcon style={style} onClick={handleFullscreen} />
+              : <FullscreenIcon style={style} onClick={handleFullscreen} />
+            }
           </div>
-          {
-            fullScreen ?
-            <FullscreenExitIcon style={style} onClick={handleFullscreen} />
-            : <FullscreenIcon style={style} onClick={handleFullscreen} />
-          }
-        </div>
-      </FullScreen>
+        </FullScreen>
+      }
     </>
   );
 }

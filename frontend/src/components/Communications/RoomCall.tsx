@@ -35,6 +35,11 @@ interface State {
 }
 
 export default class RoomCall extends React.Component<{}, State> {
+  consumerStoreSub: () => void;
+  videoStoreSub: () => void;
+  voiceStoreSub: () => void;
+  mediaStoreSub: () => void;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -46,21 +51,21 @@ export default class RoomCall extends React.Component<{}, State> {
       media : useMediaStore.getState().media
     }
 
-    useConsumerStore.subscribe((consumerMap) => {
+    this.consumerStoreSub = useConsumerStore.subscribe((consumerMap) => {
       this.setState({consumerMap})
     }, (state) => state.consumerMap);
 
-    useVideoStore.subscribe((cam) => {
+    this.videoStoreSub = useVideoStore.subscribe((cam) => {
       this.setState({cam});
       sendVideo();
     }, (state) => state.cam);
 
-    useVoiceStore.subscribe((mic) => {
+    this.voiceStoreSub = useVoiceStore.subscribe((mic) => {
       this.setState({mic});
       sendVoice();
     }, (state) => state.mic);
 
-    useMediaStore.subscribe((media) => {
+    this.mediaStoreSub = useMediaStore.subscribe((media) => {
       this.setState({media});
     }, (state) => state.media);
   }
@@ -109,7 +114,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.accessVideo = data[0]
       this.accessMic = data[1]
       const toast_props = {
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.TOP_RIGHT,
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
@@ -141,6 +146,13 @@ export default class RoomCall extends React.Component<{}, State> {
     }).catch((err)=> {
       console.log(err)
     });
+  }
+
+  componentWillUnmount() {
+    this.consumerStoreSub();
+    this.videoStoreSub();
+    this.voiceStoreSub();
+    this.mediaStoreSub();
   }
 
   
@@ -203,9 +215,9 @@ export default class RoomCall extends React.Component<{}, State> {
           <div  style={{height: '100%', padding: 2, width: numberUsers < 6 ? `${18*numberUsers}%` : '100%'}}>
             <div style={{position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100}}>
               {this.state.fullscreen ?
-                  (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Expand View<FullscreenExitIcon/></Button>)
+                  (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenExitIcon/></Button>)
                 : numberUsers > 6 ?
-                    (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenIcon/></Button>)
+                    (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Expand View<FullscreenIcon/></Button>)
                   : ''
               }
             </div>
