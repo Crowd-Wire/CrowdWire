@@ -11,6 +11,7 @@ from fastapi import Depends
 from app.api import dependencies
 from sqlalchemy.orm import Session
 
+
 async def join_player(world_id: str, user_id: str, payload: dict):
     room_id = payload['room_id']
     position = payload['position']
@@ -256,12 +257,11 @@ async def send_to_conf_managers(world_id: str, user_id: str, payload: dict):
         conference)
 
 
-async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session=Depends(dependencies.get_db)):
+async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session = Depends(dependencies.get_db)):
     # check if user_id has permission to accept requests to speak here
     if not (await crud_role.can_manage_conference(world_id=world_id, user_id=user_id))[0]:
         return
 
-    conference = payload['conference']
     permission = payload['permission']
     user_requested = payload['user_requested']
 
