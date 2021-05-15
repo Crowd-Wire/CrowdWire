@@ -160,9 +160,6 @@ export const getSocket = (worldId) => {
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);
             break;
-        case "PERMISSION_TO_SPEAK":
-          useWorldUserStore.getState().permissionToSpeak(data.permission);
-          break;
         case "you-joined-as-peer":
           console.log(data)
           beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {

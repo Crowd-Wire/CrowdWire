@@ -264,7 +264,5 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: 
     user_requested = payload['user_requested']
 
     await manager.send_personal_message(
-        world_id,
-        {'topic': protocol.PERMISSION_TO_SPEAK,
-            'permission': permission},
+        {'topic': protocol.PERMISSION_TO_SPEAK, 'd': {'permission': permission}},
         user_requested)

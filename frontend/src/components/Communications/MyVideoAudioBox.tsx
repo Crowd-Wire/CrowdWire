@@ -50,9 +50,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
-  const talk_conference = useWorldUserStore(state => state.world_user.role.talk_conference);
   const in_conference = useWorldUserStore(state => state.world_user.in_conference);
-  const initial_allowed_to_speak = useState(useWorldUserStore.getState().world_user.role.talk_conference);
+  const [allowed_to_speak, setAllowedToSpeak] = useState(useWorldUserStore.getState().world_user.role.talk_conference);
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -80,27 +79,37 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   const handleRequestToSpeak = (user_id: any, permit: boolean) => {
-    wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_id': user_id});
+    wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_requested': user_id});
   }
 
   useEffect(() => {
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
-      console.log(d.user_requested)
       toast.info(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
           The User {d.user_requested} Requested To Speak
-          <Button onClick={() => handleRequestToSpeak(d.user_requested, true)}>Allow</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, true)}>Accept</Button>
           <Button onClick={() => handleRequestToSpeak(d.user_requested, false)}>Deny</Button>
         </span>
         , toast_props_requests
       );
     })
+
+    useWsHandlerStore.getState().addWsListener(`PERMISSION_TO_SPEAK`, (d) => {
+      toast.info(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          Permission to Speak {d.permission ? 'Granted' : 'Denied'}
+        </span>
+        , toast_props_requests
+      );
+      if (d.permission) setAllowedToSpeak(d.permission)
+    })
   }, [])
 
   useEffect(() => {
     if (in_conference) {
-      if (!talk_conference) {
+      if (!allowed_to_speak) {
         toast.dark(
           <span>
             <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -109,15 +118,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           , toast_props
         );
       }
-    } else if (hasRequested) {
+    } else {
       setHasRequested(false)
-      if (!initial_allowed_to_speak) { useWorldUserStore.getState().permissionToSpeak(false) }
     };
   }, [in_conference])
 
   useEffect(() =>{
-    setHasRequested(false);
-    if (in_conference && talk_conference) {
+    if (in_conference && !allowed_to_speak) {
       toast.dark(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -125,7 +132,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         </span>
         , toast_props);
     }
-  }, [talk_conference])
+  }, [allowed_to_speak])
 
   function toggleModal() {
     setShowModal(!showModal)
@@ -301,7 +308,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                     { audioTrack ?
                         audioPauseState ?
                           in_conference ?
-                            talk_conference ?
+                            allowed_to_speak ?
                               (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                               : hasRequested ?
                                 (<MicOffIcon color={'action'}/>)
