@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy import event
 from app.core.config import settings
-from .base import Base, Tag, User
+from .base import Base, Tag, User, Role, World, World_User
 from .session import engine
 from datetime import datetime
 from app.core.security import get_password_hash
@@ -18,10 +18,55 @@ def insert_tags(target, connection, **kwargs):
 
 @event.listens_for(User.__table__, "after_create")
 def insert_users(target, connection, **kwargs):
-    # TODO: change this to create the admin from the env variables
+
+    # USER CREATION
     connection.execute(target.insert().values(
-        name="Bruno", email=settings.DB_ADMIN_EMAIL, register_date=datetime.now(), status=0, is_superuser=True,
+        name="Admin", email=settings.DB_ADMIN_EMAIL, register_date=datetime.now(), status=0, is_superuser=True,
         hashed_password=get_password_hash(settings.DB_ADMIN_PASSWORD)
+    ))
+    connection.execute(target.insert().values(
+        name="User1", email="user1@example.com", register_date=datetime.now(), status=0, is_superuser=False,
+        hashed_password=get_password_hash("string")
+    ))
+    connection.execute(target.insert().values(
+        name="User2", email="speaker@example.com", register_date=datetime.now(), status=0, is_superuser=False,
+        hashed_password=get_password_hash("string")
+    ))
+
+@event.listens_for(World.__table__, "after_create")
+def insert_worlds(target, connection, **kwargs):
+    # WORLD CREATION
+    connection.execute(World.__table__.insert().values(
+        creator=1, name="Test", creation_date=datetime.now(), max_users=10, public=True, allow_guests=True,
+        world_map=bytes("aaa".encode()), status=0
+    ))
+
+@event.listens_for(Role.__table__, "after_create")
+def insert_users(target, connection, **kwargs):
+    # ROLE CREATION
+    connection.execute(Role.__table__.insert().values(
+        world_id=1, name="default", is_default=True, interact=False, walk=True, talk=True, talk_conference=False,
+        world_mute=False, role_manage=False, conference_manage=False, chat=True, invite=False, ban=False
+    ))
+    connection.execute(Role.__table__.insert().values(
+        world_id=1, name="conference", is_default=True, interact=False, walk=True, talk=True, talk_conference=True,
+        world_mute=False, role_manage=False, conference_manage=True, chat=True, invite=False, ban=False
+    ))
+
+@event.listens_for(World_User.__table__, "after_create")
+def insert_users(target, connection, **kwargs):
+    # WORLD_USER CREATION
+    connection.execute(World_User.__table__.insert().values(
+        user_id=1, world_id=1, role_id=1, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
+        status=0, username="ADMIN"
+    ))
+    connection.execute(World_User.__table__.insert().values(
+        user_id=2, world_id=1, role_id=1, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
+        status=0, username="NORMAL"
+    ))
+    connection.execute(World_User.__table__.insert().values(
+        user_id=3, world_id=1, role_id=2, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
+        status=0, username="SPEAKER"
     ))
 
 def init_db(db: Session) -> None:
