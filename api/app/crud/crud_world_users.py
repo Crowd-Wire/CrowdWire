@@ -10,20 +10,26 @@ from app.models import World_User, World, User, Role
 from app.schemas import World_UserCreate, World_UserUpdate
 from app.utils import choose_avatar
 from app.core import strings
+from sqlalchemy import or_
 
 
 class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
 
     def can_generate_link(self, db: Session, world_id: int, user_id: int):
-        # Check first if user is in world
-        world_user_obj = db.query(World_User).join(Role).filter(
+        # # Check first if user is in world
+        # world_user_obj = db.query(World_User).join(Role).filter(
+        #     World_User.user_id == user_id,
+        #     World_User.world_id == world_id
+        # )
+        # if not world_user_obj.first():
+        #     return None, strings.USER_NOT_IN_WORLD
+        # # Check if has permission to generate invitation links
+        # world_user_obj = world_user_obj.filter(or_(Role.invite.is_(True),)).first()
+        world_user_obj = db.query(World_User).join(Role).join(World).filter(
+            World_User.role_id == Role.role_id,
             World_User.user_id == user_id,
-            World_User.world_id == world_id
-        )
-        if not world_user_obj.first():
-            return None, strings.USER_NOT_IN_WORLD
-        # Check if has permission to generate invitation links
-        world_user_obj = world_user_obj.filter(Role.invite.is_(True)).first()
+            Role.world_id == world_id,
+            or_(Role.role_manage.is_(True), World.creator == user_id)).first()
         if not world_user_obj:
             return None, strings.INVITATION_FORBIDDEN
         logger.debug(world_user_obj)

@@ -38,7 +38,7 @@ class ConnectionManager:
         self.users_ws[user_id] = websocket
 
         logger.info(
-            f"New connection added to World {world_id}"
+            f"Connected User {user_id} to World {world_id}"
         )
         return user_id
 
