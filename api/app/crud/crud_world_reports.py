@@ -6,7 +6,7 @@ from app.models import World, User, Report_World
 from app.core import strings
 from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail
 from .crud_world_users import crud_world_user
-
+from datetime import datetime
 
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
 
@@ -68,6 +68,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
             return None, strings.WORLD_ALREADY_REPORTED_BY_USER
 
         obj_in.reporter = request_user.user_id
+        obj_in.timestamp = datetime.now()
 
         report = super().create(db=db, obj_in=obj_in)
         return report, ""

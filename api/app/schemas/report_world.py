@@ -13,7 +13,6 @@ class ReportWorldBase(BaseModel):
 # does not need the id of the reporter because it is necessary a token
 class ReportWorldCreate(ReportWorldBase):
     reported: int
-    timestamp: datetime
     comment: str
 
 
