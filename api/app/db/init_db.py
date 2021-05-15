@@ -10,11 +10,13 @@ from app.core.security import get_password_hash
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
 
+
 @event.listens_for(Tag.__table__, "after_create")
 def insert_tags(target, connection, **kwargs):
     connection.execute(target.insert().values(name="Science"))
     connection.execute(target.insert().values(name="Technology"))
     connection.execute(target.insert().values(name="Fun"))
+
 
 @event.listens_for(User.__table__, "after_create")
 def insert_users(target, connection, **kwargs):
@@ -33,6 +35,7 @@ def insert_users(target, connection, **kwargs):
         hashed_password=get_password_hash("string")
     ))
 
+
 @event.listens_for(World.__table__, "after_create")
 def insert_worlds(target, connection, **kwargs):
     # WORLD CREATION
@@ -41,8 +44,9 @@ def insert_worlds(target, connection, **kwargs):
         world_map=bytes("aaa".encode()), status=0
     ))
 
+
 @event.listens_for(Role.__table__, "after_create")
-def insert_users(target, connection, **kwargs):
+def insert_roles(target, connection, **kwargs):
     # ROLE CREATION
     connection.execute(Role.__table__.insert().values(
         world_id=1, name="default", is_default=True, interact=False, walk=True, talk=True, talk_conference=False,
@@ -53,8 +57,9 @@ def insert_users(target, connection, **kwargs):
         world_mute=False, role_manage=False, conference_manage=True, chat=True, invite=False, ban=False
     ))
 
+
 @event.listens_for(World_User.__table__, "after_create")
-def insert_users(target, connection, **kwargs):
+def insert_world_users(target, connection, **kwargs):
     # WORLD_USER CREATION
     connection.execute(World_User.__table__.insert().values(
         user_id=1, world_id=1, role_id=1, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
@@ -69,6 +74,7 @@ def insert_users(target, connection, **kwargs):
         status=0, username="SPEAKER"
     ))
 
+
 def init_db(db: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
@@ -81,5 +87,3 @@ def init_db(db: Session) -> None:
 
     Base.metadata.reflect(bind=engine, schema=settings.SCHEMA_NAME)
     Base.metadata.create_all(engine, checkfirst=True)
-
-
