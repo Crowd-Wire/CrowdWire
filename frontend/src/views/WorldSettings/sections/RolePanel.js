@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,7 +10,6 @@ import RoleUserList from 'components/RoleUserList/RoleUserList.js';
 export default function RolePanel(props){
 	const { children, users, roles, value, index, setUsers , ...other } = props;
 	let rolekeys = [];
-
 	Object.keys(roles).forEach(function(key, index) {
 		rolekeys.push(
 			<div id={roles[key] + index} key={roles[key] + index}>
@@ -18,6 +17,10 @@ export default function RolePanel(props){
 			</div>
 		);
 	});
+
+	useEffect(()=>{
+		const role_list = roles();
+	},[])
 	return(
 		<div
 			role="tabpanel"
