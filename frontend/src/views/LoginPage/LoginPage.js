@@ -92,10 +92,17 @@ class LoginPage extends React.Component {
     )    
   }
 
+  _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      this.handleSubmit()
+    }
+  }
+
   handleGuestJoin = () => {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
+        console.log(res)
         if(res.access_token!==undefined){
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
@@ -150,6 +157,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "email",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -166,6 +174,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "password",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -181,7 +190,7 @@ class LoginPage extends React.Component {
                     <CardFooter className={this.props.classes.cardFooter}>
                       <Col>
                         <Row>
-                          <Button 
+                          <Button
                             onClick={this.handleSubmit} 
                             style={{ 
                               backgroundColor: "#5BC0BE", marginLeft: "auto", 

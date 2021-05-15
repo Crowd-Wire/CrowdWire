@@ -26,7 +26,7 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    # user_id = manager.get_next_user_id()
+    user_id = manager.get_next_user_id()
     await manager.connect(world_id, websocket, user_id)
     # default room id when joining world
     # maybe on the function disconnect_room()

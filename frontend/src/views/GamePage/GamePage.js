@@ -9,11 +9,14 @@ import WorldService from "../../services/WorldService";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import useWorldUserStore from '../../stores/useWorldUserStore';
+import { useNavigate } from "react-router-dom";
+import { getSocket } from "../../services/socket.js";
 
 const GamePage = (props) => {
 
   const { classes } = props;
   const [loading, setLoading] = useState(1)
+  const navigation = useNavigate();
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -32,13 +35,14 @@ const GamePage = (props) => {
     .then(
       (res) => {
         console.log(res)
-        if(res.detail){
+        if (res.detail){
           toast.dark(
             <span>
               <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
               {res.detail}
             </span>
           ,toast_props);
+          navigation("/dashboard/search");
         }
         else {
           useWorldUserStore.getState().joinWorld(res);
@@ -47,6 +51,13 @@ const GamePage = (props) => {
         }
       }
     )
+  }, [])
+
+  useEffect(() => {
+      // close socket on component unmount
+      return () => {
+        getSocket(1).socket.close();
+      }
   }, [])
   
   return (

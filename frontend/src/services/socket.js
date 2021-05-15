@@ -233,16 +233,15 @@ export const getSocket = (worldId) => {
       } else {
         // event.code is usually 1006 in this case
         console.info('[close] Connection died');
+        // const reconnect = setInterval(() => {
+        //   if (!socket || socket.readyState != socket.OPEN) {
+        //     getSocket(worldId);
+        //   } else {
+        //     clearInterval(reconnect);
+        //   }
+        // }, 5000);
       }
       socket = null;
-
-      const reconnect = setInterval(() => {
-        if (!socket || socket.readyState != socket.OPEN) {
-          getSocket(worldId);
-        } else {
-          clearInterval(reconnect);
-        }
-      }, 5000);
     };
 
     socket.onerror = (error) => {
