@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { withStyles } from "@material-ui/core";
 
 import GameDrawer from 'components/GameDrawer/GameDrawer';
