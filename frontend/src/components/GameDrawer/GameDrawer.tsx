@@ -7,6 +7,7 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import Badge from '@material-ui/core/Badge';
 import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
@@ -78,6 +79,7 @@ const GameDrawer = () => {
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
+  const [notifications, setNotifications] = React.useState(2);
 
   const handleDrawerOpen = (component) => {
     setDrawer(component);
@@ -160,13 +162,17 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={() => handleDrawerOpen(<Chat />)}
           >
-            <TextsmsIcon style={iconsStyle} />
+            <Badge badgeContent={0} color="secondary">
+              <TextsmsIcon style={iconsStyle} />
+            </Badge>
           </IconButton>
           <IconButton
             aria-label="open drawer"
             onClick={() => handleDrawerOpen(<UserList />)}
           >
-            <PeopleAltIcon style={iconsStyle} />
+            <Badge badgeContent={1} color="secondary">
+              <PeopleAltIcon style={iconsStyle} />
+            </Badge>
           </IconButton>
         </div>
         <div className={classes.sideBot}>
@@ -193,14 +199,6 @@ const GameDrawer = () => {
         classes={{
           paper: classes.drawerPaper,
         }}
-        // style={ open ? {
-          
-        //   transform: 'none',
-        //   transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-        // } : {
-        //   transform: 'translateX(-240px)',
-        //   visibility: 'hidden'
-        // }}
       >
         <div className={classes.drawerHeader}>
           <IconButton onClick={handleDrawerClose}>

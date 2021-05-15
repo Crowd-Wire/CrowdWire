@@ -1,7 +1,17 @@
 import React from 'react';
+import { withStyles } from '@material-ui/core/styles';
+
+import style from "assets/jss/my-kit-react/components/GameDrawer/chatStyle.js";
+
 
 const UserList = (props) => {
-    return null;
+    const {classes} = props;
+
+    return (
+        <div>
+
+        </div>
+    );
 }
 
-export default UserList;
+export default withStyles(style)(UserList);
