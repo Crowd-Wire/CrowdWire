@@ -1,11 +1,11 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import FileList from './FileList';
+import { FileList } from './FileList';
 import FileSharingModerator from './FileSharingModerator';
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
+import { makeStyles } from "@material-ui/core/styles";
 
-const styles = (theme) =>
+const useStyles = makeStyles((theme) =>
 	({
 		root :
 		{
@@ -26,10 +26,13 @@ const styles = (theme) =>
 		{
 			display : 'flex'
 		}
-	});
+	})
+)
 
-const FileSharing = (props) =>
-{
+export const FileSharing: React.FC<{}> = ({
+}) => {
+  const classes = useStyles();
+
 	const intl = useIntl();
 
 	const handleFileChange = async (event) =>
@@ -117,48 +120,3 @@ const FileSharing = (props) =>
 		</Paper>
 	);
 };
-
-FileSharing.propTypes = {
-	roomClient    : PropTypes.any.isRequired,
-	browser       : PropTypes.object.isRequired,
-	canShareFiles : PropTypes.bool.isRequired,
-	tabOpen       : PropTypes.bool.isRequired,
-	canShare      : PropTypes.bool.isRequired,
-	classes       : PropTypes.object.isRequired
-};
-
-const makeMapStateToProps = () =>
-{
-	const hasPermission = makePermissionSelector(permissions.SHARE_FILE);
-
-	const mapStateToProps = (state) =>
-	{
-		return {
-			canShareFiles : state.me.canShareFiles,
-			browser       : state.me.browser,
-			tabOpen       : state.toolarea.currentToolTab === 'files',
-			canShare      : hasPermission(state)
-		};
-	};
-
-	return mapStateToProps;
-};
-
-export default withRoomContext(connect(
-	makeMapStateToProps,
-	null,
-	null,
-	{
-		areStatesEqual : (next, prev) =>
-		{
-			return (
-				prev.room === next.room &&
-				prev.me.browser === next.me.browser &&
-				prev.me.roles === next.me.roles &&
-				prev.me.canShareFiles === next.me.canShareFiles &&
-				prev.peers === next.peers &&
-				prev.toolarea.currentToolTab === next.toolarea.currentToolTab
-			);
-		}
-	}
-)(withStyles(styles)(FileSharing)));
