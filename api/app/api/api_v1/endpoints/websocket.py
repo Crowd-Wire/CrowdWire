@@ -8,7 +8,6 @@ from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
 from app.api import dependencies
 from sqlalchemy.orm import Session
-from fastapi import Depends
 
 
 """

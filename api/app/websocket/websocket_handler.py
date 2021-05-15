@@ -250,9 +250,8 @@ async def send_to_conf_managers(world_id: str, user_id: str, payload: dict, db: 
 
     await manager.broadcast_to_conf_managers(
         world_id=world_id,
-        payload={'topic': protocol.REQUEST_TO_SPEAK,
-            'd': {'user_requested': user_id}},
-        conference=conference, 
+        payload={'topic': protocol.REQUEST_TO_SPEAK, 'd': {'user_requested': user_id}},
+        conference=conference,
         db=db)
 
 
