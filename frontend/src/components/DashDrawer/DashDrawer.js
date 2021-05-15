@@ -152,7 +152,7 @@ export default function DashDrawer(props){
             <ListItemIcon>
               <Explore className={classes.iconDrawer}/>
             </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary='My Worlds' className={classes.toolbar}
+            <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
                   className={clsx(classes.menuButton, {
                       [classes.hide]: !open,
                   })}/>
