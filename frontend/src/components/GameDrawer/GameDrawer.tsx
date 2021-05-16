@@ -12,7 +12,7 @@ import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
-import UserList from './Sections/UserList';
+import UserList from './Sections/UserList.js';
 import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
@@ -80,18 +80,20 @@ const useStyles = makeStyles((theme: Theme) =>
 const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
   const [notifications, setNotifications] = React.useState(2);
 
   const handleDrawerOpen = (component) => {
+    setOpen(true);
     setDrawer(component);
     setPage(null);
   };
 
   const handleDrawerClose = () => {
-    setDrawer(null);
+    setOpen(false);
   };
 
   const handleOpen = (component) => {
@@ -218,7 +220,7 @@ const GameDrawer = () => {
         className={classes.drawer}
         variant="persistent"
         anchor="left"
-        open={drawer != null}
+        open={open}
         classes={{
           paper: classes.drawerPaper,
         }}
