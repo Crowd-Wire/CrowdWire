@@ -181,11 +181,9 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, 
         one for receiving and other for sending
     """
     if permission:
-        payload = {'topic': "join-as-speaker",
-                'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': "join-as-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
     else:
-        payload = {'topic': "join-as-new-peer",
-                'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': "join-as-new-peer", 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -195,14 +193,12 @@ async def add_speaker(word_id: str, room_id: str, user_id: str):
         allows an user that is already in a room call but only
         receiving data streams to start sending audio and video
     """
-    payload = {'topic': "add-speaker",
-            'd': {'roomId': room_id, 'peerId': user_id}}
+    payload = {'topic': "add-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
 async def destroy_room(word_id: str, room_id: str):
-    payload = {'topic': "destroy-room",
-               'd': {'roomId': room_id}}
+    payload = {'topic': "destroy-room", 'd': {'roomId': room_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 

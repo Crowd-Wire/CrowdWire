@@ -42,7 +42,7 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
     useConsumerStore.getState().addAudioToggle(peerId, consumerParameters.producerPaused)
   else if (kind === 'video')
     useConsumerStore.getState().addVideoToggle(peerId, consumerParameters.producerPaused);
-  
-  console.log(useConsumerStore.getState())
+
+    console.log(useConsumerStore.getState())
   return true;
 };
