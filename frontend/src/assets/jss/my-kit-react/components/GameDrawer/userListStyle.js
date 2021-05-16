@@ -17,8 +17,8 @@ const userListStyle = {
         // boxShadow: "0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%)",
     },
     avatar: {
-        width: "3rem",
-        height: "3rem",
+        width: "2.5rem",
+        height: "2.5rem",
         borderRadius: "50%",
         backgroundColor :"white"
     },
