@@ -21,6 +21,11 @@ class WorldService {
             query.push('tags='+tags.join('&tags='));
         
         // when joined searchs for the visited worlds
+        console.log(joined)
+        if(joined === "all")
+            joined = true
+        else
+            joined = false
         query.push('joined=' + joined);
 
         // pagination

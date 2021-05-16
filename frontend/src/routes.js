@@ -21,10 +21,10 @@ import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
-import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
-import DashSearch from "views/DashSearch/DashSearch.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
-
+import DrawerLayout from "layouts/DrawerLayout";
+import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
+import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 /**
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
@@ -65,10 +65,10 @@ const routes = (token, guest_uuid) => [
 	},
 	{ 
 		path: "/dashboard", 
-		element: token  ? <Outlet/> : <Navigate to="/login"/>,
+		element: token  ? <DrawerLayout/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch token={token}/>}
+			{path: "/:id", element: <DashboardContent/>},
+			{path:"/search/:type", element: <SearchAllMaps/>}		
 		]
 	},
     {

@@ -10,6 +10,22 @@ import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 import useAuthStore from "stores/useAuthStore";
 
+import { useParams } from "react-router-dom";
+
+export const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const params = useParams();
+    
+    return (
+      <Component
+	  	params={params}
+        {...props}
+        />
+    );
+  };
+  
+  return Wrapper;
+};
 
 const useStyles = theme => ({
 	root: {
@@ -44,24 +60,24 @@ class SearchAllMaps extends Component {
 
 	constructor(props){
 		super(props)
-	}
-	state = {
-		maps: [],
-		search: "",
-		tags: [],
-		page: 1
+		this.type = props.params.type;
+		console.log("----->", this.type, "<---------");
+		this.joined = this.props.joined;
+		this.state = {
+			maps: [],
+			search: "",
+			tags: [],
+			page: 1
+		}
+		console.log(props.type);
 	}
 
 	focusMap(id){
 		this.props.handler(id);
-		
 	}
 
-	joined = this.props.joined;
-
-
 	search_handler = () => {
-		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
+		WorldService.search(this.state.search, this.state.tags, this.type, this.state.page)
 			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
 			.catch((err) => { useAuthStore.getState().leave() });
@@ -92,10 +108,11 @@ class SearchAllMaps extends Component {
 			}).catch((error) => {useAuthStore.getState().leave()});
 	}
 	async componentDidUpdate(){
-		if(this.joined!=this.props.joined){
-			this.joined = this.props.joined;
+		if(this.type!=this.props.params.type){
+			this.type = this.props.params.type;
+			console.log(this.type);
 			await this.setState({prevSearch: "", prevTags: []});
-			WorldService.search("", [], this.props.joined, this.state.page)
+			WorldService.search("", [], this.type, this.state.page)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()
@@ -138,4 +155,4 @@ class SearchAllMaps extends Component {
 
 	}
 }
-export default withStyles(useStyles)(SearchAllMaps);
+export default withRouter(withStyles(useStyles)(SearchAllMaps));
