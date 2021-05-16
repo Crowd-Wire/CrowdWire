@@ -148,7 +148,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                search: str,
                tags: Optional[List[str]],
                is_guest: bool = False,
-               joined: bool = False,
+               visibility: str = "public",
                user_id: int = 0,
                page: int = 1
                ) -> List[World]:
@@ -157,10 +157,13 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             tags = []
 
         # check if world banned
-        if not joined:
+        if visibility == "public":
             query = db.query(World).filter(World.public)
-        else:
+        elif visibility == "joined":
             query = db.query(World).join(World.users).filter(User.user_id == user_id)
+        elif visibility == "owned":
+            query = db.query(World).filter(World.creator == user_id) 
+
 
         if is_guest:
             query = query.filter(World.allow_guests.is_(True))

@@ -49,7 +49,7 @@ const routes = (token, guest_uuid) => [
 	},
 	{
 		path: "/",
-		element: token ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: token ? <Navigate to="/dashboard/search/public"/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },

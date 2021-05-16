@@ -84,8 +84,8 @@ export default function DashDrawer(props){
 
   const onClickAllWorlds = () => {
     props.handler(false);
-    if(location.pathname!=="/dashboard/search/all")
-      navigation("/dashboard/search/all");
+    if(location.pathname!=="/dashboard/search/public")
+      navigation("/dashboard/search/public");
   }
 
 

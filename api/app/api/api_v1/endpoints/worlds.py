@@ -225,14 +225,18 @@ def create_world(
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
-        joined: Optional[bool] = False,
+        visibility: Optional[str] = "public",
         page: Optional[int] = 1,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
+
+    if visibility not in ["public", "owned", "joined"]:
+        raise HTTPException(status_code=400, detail=strings.INVALID_WORLD_VISIBILITY_FILTER)
+
     if not is_guest_user(user):
         list_world_objs = crud.crud_world.filter(
-            db=db, search=search, tags=tags, joined=joined, page=page, user_id=user.user_id
+            db=db, search=search, tags=tags, visibility=visibility, page=page, user_id=user.user_id
         )
     else:
         # guest cannot access visited worlds

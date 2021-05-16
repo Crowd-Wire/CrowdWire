@@ -97,7 +97,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
-		WorldService.search("", [], this.props.joined, 1)
+		WorldService.search("", [], this.type, 1)
 			.then((res) => {
 				if(res.status == 200) 
 					return res.json()

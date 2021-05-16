@@ -42,7 +42,7 @@ const GamePage = (props) => {
               {res.detail}
             </span>
           ,toast_props);
-          navigation("/dashboard/search");
+          navigation("/dashboard/search/public");
         }
         else {
           useWorldUserStore.getState().joinWorld(res);

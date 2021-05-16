@@ -3,7 +3,7 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, joined = false, page) {
+    search(search, tags, type = "all", page) {
         /*
             search: string,
             tags: List[string]
@@ -21,12 +21,7 @@ class WorldService {
             query.push('tags='+tags.join('&tags='));
         
         // when joined searchs for the visited worlds
-        console.log(joined)
-        if(joined === "all")
-            joined = true
-        else
-            joined = false
-        query.push('joined=' + joined);
+        query.push('visibility=' + type);
 
         // pagination
         query.push('page=' + page);
