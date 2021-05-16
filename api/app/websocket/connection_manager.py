@@ -134,8 +134,6 @@ class ConnectionManager:
         try:
             user_ids = await redis_connector.get_group_users(world_id, conference)
             for user_id in user_ids:
-                logger.info(user_id)
-                logger.info(await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))
                 if (await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))[0]:
                     await self.send_personal_message(payload, user_id)
         except KeyError:

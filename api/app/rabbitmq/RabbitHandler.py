@@ -14,12 +14,13 @@ async def on_message(message: IncomingMessage) -> None:
         topic = msg['topic']
         # logger.info(" [x] Received message for topic  %r" % topic)
 
-        if topic == 'you-joined-as-peer'\
-                or topic == 'you-joined-as-speaker'\
-                or topic == "@get-recv-tracks-done"\
+        if topic == "@get-recv-tracks-done"\
                 or topic == "@send-track-send-done"\
                 or topic == "@connect-transport-recv-done"\
-                or topic == "@connect-transport-send-done":
+                or topic == "@connect-transport-send-done"\
+                or topic == 'you-joined-as-peer'\
+                or topic == 'you-joined-as-speaker'\
+                or topic == 'you-are-now-a-speaker':
 
             if 'error' in msg['d']:
                 return

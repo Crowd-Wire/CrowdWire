@@ -2,6 +2,7 @@ import { Transport } from "mediasoup-client/lib/Transport";
 import GameScene from "phaser/GameScene";
 import { useConsumerStore } from "../stores/useConsumerStore";
 import { useRoomStore } from "../stores/useRoomStore";
+import useWorldUserStore from "../../stores/useWorldUserStore";
 
 export const consumeStream = async (consumerParameters: any, roomId: string, peerId: string, kind: string) => {
   const { rooms } = useRoomStore.getState();
@@ -18,7 +19,7 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
     return false;
   }
 
-  if (!GameScene.inRangePlayers.has(peerId)) {
+  if (!GameScene.inRangePlayers.has(peerId) && !useWorldUserStore.getState().world_user.in_conference) {
     console.log("skipping consumeStream because player was not in range");
     return false;
   }

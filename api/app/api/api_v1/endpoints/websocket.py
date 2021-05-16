@@ -26,7 +26,7 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    user_id = manager.get_next_user_id()
+    # user_id = manager.get_next_user_id()
     await manager.connect(world_id, websocket, user_id)
     # default room id when joining world
     # maybe on the function disconnect_room()
@@ -69,7 +69,7 @@ async def world_websocket(
                 await wh.join_player(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_CONFERENCE:
-                await wh.join_conference(world_id, user_id, payload)
+                await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload, db=db)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id)

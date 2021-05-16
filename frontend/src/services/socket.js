@@ -166,9 +166,9 @@ export const getSocket = (worldId) => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
-              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVideo(data.d.roomId);
-              });
+              // createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+              //   sendVideo(data.d.roomId);
+              // });
           })
           break;
         case "you-joined-as-speaker":
@@ -191,7 +191,7 @@ export const getSocket = (worldId) => {
           console.log(data)
           // check if tile im currently on is a conference type or not
           // else check if player is in range
-          if (GameScene.inRangePlayers.has(data.d.peerId)) {
+          if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
             const roomId = data.d.roomId;
             if (useRoomStore.getState().rooms[roomId].recvTransport) {
               consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );

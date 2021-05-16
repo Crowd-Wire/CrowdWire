@@ -15,6 +15,7 @@ import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import { wsend } from "../../services/socket.js";
+import { createTransport } from "../../webrtc/utils/createTransport";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
@@ -64,22 +65,14 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     progress: undefined,
   }
 
-  const toast_props_requests = {
-    position: toast.POSITION.TOP_RIGHT,
-    autoClose: 60000,
-    hideProgressBar: false,
-    closeOnClick: false,
-    draggable: true,
-    progress: undefined,
-  }
-
   const requestToSpeak = () => {
     setHasRequested(true);
     wsend({ topic: "REQUEST_TO_SPEAK", 'conference': in_conference });
   }
 
-  const handleRequestToSpeak = (user_id: any, permit: boolean) => {
+  const handleRequestToSpeak = (user_id: any, permit: boolean, toast_id: any) => {
     wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_requested': user_id});
+    toast.dismiss(toast_id);
   }
 
   useEffect(() => {
@@ -88,10 +81,18 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
           The User {d.user_requested} Requested To Speak
-          <Button onClick={() => handleRequestToSpeak(d.user_requested, true)}>Accept</Button>
-          <Button onClick={() => handleRequestToSpeak(d.user_requested, false)}>Deny</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, true, "customId"+d.user_requested)}>Accept</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, false, "customId"+d.user_requested)}>Deny</Button>
         </span>
-        , toast_props_requests
+        , {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 60000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          draggable: true,
+          progress: undefined,
+          toastId: "customId"+d.user_requested
+        }
       );
     })
 
@@ -101,8 +102,18 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
           Permission to Speak {d.permission ? 'Granted' : 'Denied'}
         </span>
-        , toast_props_requests
+        , {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+        }
       );
+      createTransport(d.roomId, "send", d.sendTransportOptions).then(() => {
+        sendVoice(d.roomId);
+        sendVideo(d.roomId);
+      });
       if (d.permission) setAllowedToSpeak(d.permission)
     })
   }, [])
