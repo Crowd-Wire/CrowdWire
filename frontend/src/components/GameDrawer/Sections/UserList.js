@@ -1,10 +1,11 @@
 import React, {useState} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 
-import Button from '@material-ui/core/Button';
+import Button from "components/CustomButtons/Button.js";
+import CloseIcon from '@material-ui/icons/Close';
+import DoneIcon from '@material-ui/icons/Done';
 
 import style from "assets/jss/my-kit-react/components/GameDrawer/userListStyle.js";
-import exampleStyle from 'assets/jss/material-kit-react/views/componentsSections/exampleStyle';
 
 
 const example = [
@@ -15,72 +16,45 @@ const example = [
   {name: "Tina", request: false},
 ]
 
-const UserList = (props) => {
-    const {classes} = props;
-    const [users, setUsers] = React.useState(example);
 
-    return (
-        <div className={classes.root}>
-        {
-          users.map((u) => (
-            <div className={classes.user}>
-                <div className={classes.avatar}></div>
-                <div className={classes.content}>
-                  <div className={classes.username}>{u.name}</div>
-                  { 
-                    u.request && 
-                      <div className={classes.request}>
-                        Requested to speak
-                        <div className={classes.requestButtons}>
-                          <Button color="primary" variant="contained" style={{height: "1.125rem", fontSize: "0.8rem", marginRight: "1rem"}}>
-                            Accept
-                          </Button>
-                          <Button color="secondary" variant="contained" style={{height: "1.125rem", fontSize: "0.8rem"}}>
-                            Reject
-                          </Button>
-                        </div>
-                      </div>
-                  }
-                </div>
+
+const UserList = (props) => {
+  const {classes} = props;
+  const [users, setUsers] = React.useState(example);
+
+  const buttonStyle = {
+    width: "0.5rem",
+    height: "0.5rem",
+    minWidth: 0,
+    marginLeft: "0.5rem"
+  }
+
+  return (
+    <div className={classes.root}>
+    {
+      users.map((u) => (
+        <div className={classes.user}>
+            <div className={classes.avatar}></div>
+            <div className={classes.content}>
+              <div className={classes.username}>{u.name}</div>
+              { 
+                u.request && 
+                  <div className={classes.request}>
+                    Request to speak
+                    <Button justIcon round color="primary" style={buttonStyle}>
+                      <DoneIcon />
+                    </Button>
+                    <Button justIcon round color="secondary" style={buttonStyle}>
+                      <CloseIcon />
+                    </Button>
+                  </div>
+              }
             </div>
-          ))
-        }
         </div>
-    );
+      ))
+    }
+    </div>
+  );
 }
 
 export default withStyles(style)(UserList);
-
-
-// import { withStyles } from "@material-ui/core/styles";
-// import Button from "@material-ui/core/Button";
-// import React from "react";
-// import ArrowBack from "@material-ui/icons/ArrowBack";
-
-// const styles = (theme) => ({
-//   button: {
-//     backgroundColor: "red",
-//     "&:hover": {
-//       backgroundColor: "blue"
-//     },
-//     position: "absolute",
-//     bottom: 20,
-//     right: 20
-//   }
-// });
-
-// class APIWidget extends React.Component {
-//   render() {
-//     return (
-//       <Button
-//         variant="contained"
-//         color="secondary"
-//         className={this.props.classes.button}
-//         startIcon={<ArrowBack />}
-//       >
-//         Back
-//       </Button>
-//     );
-//   }
-// }
-// export default withStyles(styles)(APIWidget);

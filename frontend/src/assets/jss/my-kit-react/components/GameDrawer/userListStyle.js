@@ -33,37 +33,11 @@ const userListStyle = {
         color: "white"
     },
     request: {
-        paddingLeft: "15px",
         color: "#ccc",
     },
     requestButtons: {
         display: "flex",
     }
-    // chatBox: {
-    //     display: 'flex',
-    //     flexGrow: 1,
-    // },
-    // chatInput: {
-    //     display: 'flex',
-    //     flexBasis: '3rem',
-    //     justifyContent: 'center',
-    //     margin: '15px'
-    // },
-    // chat: {
-    //     display: 'flex',
-    //     "flex-direction": 'column',
-    //     border: '2px solid #f50057',
-    //     borderRadius: '5px',
-    //     width: '100%',
-    //     margin: '15px',
-    // },
-    // message: {
-    //     backgroundColor: '#1f344d',
-    //     color: "white",
-    //     borderRadius: '5px',
-    //     padding: "0.5rem 0.2rem",
-    //     margin: '5px',
-    // },
 }
 
 export default userListStyle;
