@@ -61,7 +61,6 @@ class SearchAllMaps extends Component {
 	constructor(props){
 		super(props)
 		this.type = props.params.type;
-		console.log("----->", this.type, "<---------");
 		this.joined = this.props.joined;
 		this.state = {
 			maps: [],
@@ -110,7 +109,6 @@ class SearchAllMaps extends Component {
 	async componentDidUpdate(){
 		if(this.type!=this.props.params.type){
 			this.type = this.props.params.type;
-			console.log(this.type);
 			await this.setState({prevSearch: "", prevTags: []});
 			WorldService.search("", [], this.type, this.state.page)
 				.then((res) => {
