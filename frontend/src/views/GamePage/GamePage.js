@@ -4,31 +4,19 @@ import { withStyles } from "@material-ui/core";
 import GameDrawer from 'components/GameDrawer/GameDrawer';
 import Phaser from "./Sections/Phaser.js";
 
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-
 import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 import WorldService from "../../services/WorldService";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import useWorldUserStore from '../../stores/useWorldUserStore';
+import { useNavigate } from "react-router-dom";
+import { getSocket } from "../../services/socket.js";
 
 const GamePage = (props) => {
 
   const { classes } = props;
-  const handle = useFullScreenHandle();
-  const [fullScreen, setFullscreen] = useState(false)
   const [loading, setLoading] = useState(1)
-
-  const style = {
-    position: 'absolute',
-    top: 0, 
-    right: 0, 
-    fontSize: '2.5rem',
-    cursor: 'pointer',
-    zIndex: 100
-  }
+  const navigation = useNavigate();
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -41,36 +29,20 @@ const GamePage = (props) => {
     progress: undefined,
   }
 
-  document.addEventListener('fullscreenchange', (event) => {
-    if (document.fullscreenElement) {
-      // entered full-screen mode
-      setFullscreen(true);
-    } else {
-      setFullscreen(false);
-    }
-  })
-
-  const handleFullscreen = () => {
-    if (!fullScreen) {
-      handle.enter()
-    } else {
-      handle.exit()
-    }
-  }
-
   useEffect(() => {
     WorldService.join_world(1)
     .then((res) => res.json())
     .then(
       (res) => {
         console.log(res)
-        if(res.detail){
+        if (res.detail){
           toast.dark(
             <span>
               <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
               {res.detail}
             </span>
           ,toast_props);
+          navigation("/dashboard/search");
         }
         else {
           useWorldUserStore.getState().joinWorld(res);
@@ -80,26 +52,26 @@ const GamePage = (props) => {
       }
     )
   }, [])
+
+  useEffect(() => {
+      // close socket on component unmount
+      return () => {
+        getSocket(1).socket.close();
+      }
+  }, [])
   
   return (
     <>
       {loading ? 
         ''
       : 
-        <FullScreen handle={handle}>
-          <div className={classes.wrapper}>
-            <GameDrawer />
-            <div className={classes.gameWindow}>
-              {/* Game */}
-              <Phaser />
-            </div>
-            {
-              fullScreen ?
-              <FullscreenExitIcon style={style} onClick={handleFullscreen} />
-              : <FullscreenIcon style={style} onClick={handleFullscreen} />
-            }
+        <div className={classes.wrapper}>
+          <GameDrawer />
+          <div className={classes.gameWindow}>
+            {/* Game */}
+            <Phaser />
           </div>
-        </FullScreen>
+        </div>
       }
     </>
   );

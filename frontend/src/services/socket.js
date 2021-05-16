@@ -160,18 +160,15 @@ export const getSocket = (worldId) => {
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);
             break;
-        case "PERMISSION_TO_SPEAK":
-          useWorldUserStore.getState().permissionToSpeak(data.permission);
-          break;
         case "you-joined-as-peer":
           console.log(data)
           beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                 receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
               })
-              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVideo(data.d.roomId);
-              });
+              // createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+              //   sendVideo(data.d.roomId);
+              // });
           })
           break;
         case "you-joined-as-speaker":
@@ -194,7 +191,7 @@ export const getSocket = (worldId) => {
           console.log(data)
           // check if tile im currently on is a conference type or not
           // else check if player is in range
-          if (GameScene.inRangePlayers.has(data.d.peerId)) {
+          if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
             const roomId = data.d.roomId;
             if (useRoomStore.getState().rooms[roomId].recvTransport) {
               consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
@@ -236,16 +233,15 @@ export const getSocket = (worldId) => {
       } else {
         // event.code is usually 1006 in this case
         console.info('[close] Connection died');
+        // const reconnect = setInterval(() => {
+        //   if (!socket || socket.readyState != socket.OPEN) {
+        //     getSocket(worldId);
+        //   } else {
+        //     clearInterval(reconnect);
+        //   }
+        // }, 5000);
       }
       socket = null;
-
-      const reconnect = setInterval(() => {
-        if (!socket || socket.readyState != socket.OPEN) {
-          getSocket(worldId);
-        } else {
-          clearInterval(reconnect);
-        }
-      }, 5000);
     };
 
     socket.onerror = (error) => {

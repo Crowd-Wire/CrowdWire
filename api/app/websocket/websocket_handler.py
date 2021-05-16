@@ -115,13 +115,18 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     await send_groups_snapshot(world_id)
 
 
-async def join_conference(world_id: str, user_id: str, payload: dict):
+async def join_conference(world_id: str, user_id: str, payload: dict, db: Session):
     conference_id = payload['conference_id']
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
     if groups_id:
-        await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id)
+        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
     await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
     await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
+
+    if (await crud_role.can_talk_conference(db=db, world_id=world_id, user_id=user_id))[0]:
+        await join_as_new_peer_or_speaker(world_id, conference_id, user_id)
+    else:
+        await join_as_new_peer_or_speaker(world_id, conference_id, user_id, False)
 
     await send_groups_snapshot(world_id)
 
@@ -129,7 +134,7 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
 async def leave_conference(world_id: str, user_id: str):
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
     if groups_id:
-        await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id)
+        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
 
     await send_groups_snapshot(world_id)
 
@@ -164,7 +169,7 @@ async def remove_user(word_id: str, room_ids: list, user_id: str):
     await rabbit_handler.publish(json.dumps(payload))
 
 
-async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
+async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, permission: bool = True):
     """
     join-as-new-peer:
         create a room if it doesnt exit and add that user to that room
@@ -175,14 +180,25 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str):
         the user to speak, so, it returns two kinds of transport,
         one for receiving and other for sending
     """
-    payload = {'topic': "join-as-speaker",
-               'd': {'roomId': room_id, 'peerId': user_id}}
+    if permission:
+        payload = {'topic': "join-as-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
+    else:
+        payload = {'topic': "join-as-new-peer", 'd': {'roomId': room_id, 'peerId': user_id}}
+    await rabbit_handler.publish(json.dumps(payload))
+
+
+async def add_speaker(word_id: str, room_id: str, user_id: str):
+    """
+    add-speaker:
+        allows an user that is already in a room call but only
+        receiving data streams to start sending audio and video
+    """
+    payload = {'topic': "add-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
 async def destroy_room(word_id: str, room_id: str):
-    payload = {'topic': "destroy-room",
-               'd': {'roomId': room_id}}
+    payload = {'topic': "destroy-room", 'd': {'roomId': room_id}}
 
     await rabbit_handler.publish(json.dumps(payload))
 
@@ -260,11 +276,13 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: 
     if not (await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))[0]:
         return
 
+    conference = payload['conference']
     permission = payload['permission']
     user_requested = payload['user_requested']
 
+    if permission:
+        await add_speaker(world_id, conference, user_requested)
+
     await manager.send_personal_message(
-        world_id,
-        {'topic': protocol.PERMISSION_TO_SPEAK,
-            'permission': permission},
+        {'topic': protocol.PERMISSION_TO_SPEAK, 'd': {'permission': permission}},
         user_requested)

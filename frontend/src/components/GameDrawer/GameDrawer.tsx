@@ -7,11 +7,21 @@ import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import Badge from '@material-ui/core/Badge';
 import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
+import UserList from './Sections/UserList';
+import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
 
+import FullscreenIcon from '@material-ui/icons/Fullscreen';
+import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import CancelIcon from '@material-ui/icons/Cancel';
+import LinkIcon from '@material-ui/icons/Link';
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+
+import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -31,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
       display: 'flex',
       flexDirection: 'column',
       width: sideBarWidth,
-      zIndex: 1201,
+      zIndex: 1202,
       backgroundColor: '#1f344d',
       height: '100%'
     },
@@ -70,60 +80,148 @@ const useStyles = makeStyles((theme: Theme) =>
 const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [fullScreen, setFullScreen] = React.useState(false);
+  const [drawer, setDrawer] = React.useState(null);
+  const [page, setPage] = React.useState(null);
+  const [notifications, setNotifications] = React.useState(2);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  const handleDrawerOpen = (component) => {
+    setDrawer(component);
+    setPage(null);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setDrawer(null);
   };
 
+  const handleOpen = (component) => {
+    setPage(component);
+    setDrawer(null);
+  };
+
+  const handleClose = () => {
+    setPage(null);
+  };
+
+  const handleOpenInvite = () => {
+    setPage(<GenerateInviteCard/>);
+    setDrawer(null);
+  };
+
+  document.addEventListener('fullscreenchange', (event) => {
+    if (document.fullscreenElement) {
+      // entered full-screen mode
+      setFullScreen(true);
+    } else {
+      setFullScreen(false);
+    }
+  })
+
+  const handleFullscreen = () => {
+    if (!fullScreen) {
+      setFullScreen(true);
+      openFullscreen();
+    } else {
+      setFullScreen(false);
+      closeFullscreen();
+    }
+  }
+
+  const openFullscreen = () => {
+    /* View in fullscreen */
+    const elem = document.documentElement as HTMLElement & {
+      mozRequestFullScreen(): Promise<void>;
+      webkitRequestFullscreen(): Promise<void>;
+      msRequestFullscreen(): Promise<void>;
+    };
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+      elem.msRequestFullscreen();
+    }
+  }
+
+  const closeFullscreen = () => {
+    /* Close fullscreen */
+    const doc = document as Document & {
+      mozCancelFullScreen(): Promise<void>;
+      webkitExitFullscreen(): Promise<void>;
+      msExitFullscreen(): Promise<void>;
+    };
+    if (doc.exitFullscreen) {
+      doc.exitFullscreen();
+    } else if (doc.webkitExitFullscreen) { /* Safari */
+      doc.webkitExitFullscreen();
+    } else if (doc.msExitFullscreen) { /* IE11 */
+      doc.msExitFullscreen();
+    }
+  }
+
+  const iconsStyle = {color: "#fff", fontSize: '2rem'};
 
   return (
+    <>
     <div className={classes.root}>
 
       <div className={clsx(classes.sideBar, "text-center")}>
         <div className={classes.sideTop}>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleDrawerOpen(<Chat />)}
           >
-            <TextsmsIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <Badge badgeContent={0} color="secondary">
+              <TextsmsIcon style={iconsStyle} />
+            </Badge>
           </IconButton>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleDrawerOpen(<UserList />)}
           >
-            <PeopleAltIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <Badge badgeContent={1} color="secondary">
+              <PeopleAltIcon style={iconsStyle} />
+            </Badge>
           </IconButton>
         </div>
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={() => handleOpenInvite()}
           >
-            <SettingsIcon style={{color: "#fff", fontSize: '2rem'}} />
+            <LinkIcon style={iconsStyle} />
           </IconButton>
+          <IconButton onClick={handleFullscreen}>
+          {
+            fullScreen ?
+            <FullscreenExitIcon style={iconsStyle} />
+            : <FullscreenIcon style={iconsStyle} />
+          }
+          </IconButton>
+          <IconButton
+            aria-label="open drawer"
+            onClick={() => handleOpen(
+                <WSettingsContent />
+            )}
+          >
+            <SettingsIcon style={iconsStyle} />
+          </IconButton>
+          <IconButton
+            onClick={() => {}}
+          >
+            <MeetingRoomIcon style={iconsStyle} />
+          </IconButton>
+          
         </div>
       </div>
       <Drawer
         className={classes.drawer}
         variant="persistent"
         anchor="left"
-        open={open}
+        open={drawer != null}
         classes={{
           paper: classes.drawerPaper,
         }}
-        // style={ open ? {
-          
-        //   transform: 'none',
-        //   transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-        // } : {
-        //   transform: 'translateX(-240px)',
-        //   visibility: 'hidden'
-        // }}
       >
         <div className={classes.drawerHeader}>
           <IconButton onClick={handleDrawerClose}>
@@ -131,9 +229,21 @@ const GameDrawer = () => {
           </IconButton>
         </div>
         <Divider />
-        <Chat />
+        {
+          drawer
+        }
       </Drawer>
     </div>
+    { page ?
+      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201, paddingLeft: sideBarWidth, backgroundColor: "#32526a"}}>
+        <CancelIcon 
+          style={{position: "absolute", top: "2rem", right: "2rem", fontSize: "2rem", cursor: "pointer", color: "white"}} 
+          onClick={handleClose} 
+        />
+        {page}
+      </div> : null
+    }
+    </>
   );
 }
 

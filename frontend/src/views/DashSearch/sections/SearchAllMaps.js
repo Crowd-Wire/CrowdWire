@@ -62,7 +62,7 @@ class SearchAllMaps extends Component {
 
 	search_handler = () => {
 		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
-			.then((res) => { console.log(res);console.log(res.json());return res.json() })
+			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
 			.catch((err) => { useAuthStore.getState().leave() });
 	}

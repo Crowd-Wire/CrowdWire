@@ -81,7 +81,7 @@ const routes = (token, guest_uuid) => [
 	},
     {
 		path: "/world",
-		element: token && !guest_uuid  ? <Outlet /> : <Navigate to="/login" />,
+		element: token ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },

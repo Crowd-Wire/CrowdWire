@@ -36,12 +36,33 @@ class GameScene extends Phaser.Scene {
         const wallTileset = this.map.addTilesetImage('wall-tiles');
         const utilTileset = this.map.addTilesetImage('util-tiles');
         const tableTileset = this.map.addTilesetImage('table-tiles');
-        //const lixoTileset = this.map.addTilesetImage('table-V');
+        const jardimTileset = this.map.addTilesetImage('jardim');
+        const arrowTileset = this.map.addTilesetImage('arrow');
+        const boardTileset = this.map.addTilesetImage('board');
+        const plankTileset = this.map.addTilesetImage('wooden-plank');
+        const tableVTileset = this.map.addTilesetImage('table-V');
+        const tableHTileset = this.map.addTilesetImage('table-H');
+        const brickTileset = this.map.addTilesetImage('bricks');
+        const chairTileset = this.map.addTilesetImage('chair');
 
-        this.map.createDynamicLayer('Ground', wallTileset);
-        this.roomLayer = this.map.createDynamicLayer('Room', utilTileset);
-        this.collisionLayer = this.map.createDynamicLayer('Collision', [wallTileset, tableTileset, utilTileset]);//lixoTileset]);
-        this.floatLayer = this.map.createDynamicLayer('Float', wallTileset).setDepth(1000);
+        const allTiles = [
+            wallTileset,
+            utilTileset,
+            tableTileset,
+            jardimTileset,
+            arrowTileset,
+            boardTileset,
+            plankTileset,
+            tableVTileset,
+            tableHTileset,
+            brickTileset,
+            chairTileset
+        ]
+
+        this.map.createDynamicLayer('Ground', allTiles);
+        this.roomLayer = this.map.createDynamicLayer('Room', allTiles).setVisible(false);
+        this.collisionLayer = this.map.createDynamicLayer('Collision', allTiles);
+        this.floatLayer = this.map.createDynamicLayer('Float', allTiles).setDepth(1000);
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
@@ -83,9 +104,9 @@ class GameScene extends Phaser.Scene {
         // });
 
         // static players for range test
-        this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
-        this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
-        this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
+        // this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
+        // this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
+        // this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
 
         // main player
         this.player = new Player(this, 50, 50);
@@ -154,8 +175,10 @@ class GameScene extends Phaser.Scene {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    this.remotePlayers[id].disconnect();
-                    delete this.remotePlayers[id];
+                    if (this.remotePlayers[id]) {
+                        this.remotePlayers[id].disconnect();
+                        delete this.remotePlayers[id];
+                    }
                 }
             }
         }
@@ -274,13 +297,13 @@ class Player extends Phaser.GameObjects.Container {
                 "Me",
                 '',
             ]);
-        const circle = scene.add.circle(0, 0, 150)
-            .setOrigin(0.5)
-            .setStrokeStyle(1, 0x1a65ac);
+        // const circle = scene.add.circle(0, 0, 150)
+        //     .setOrigin(0.5)
+        //     .setStrokeStyle(1, 0x1a65ac);
 
         this.addSprite(sprite)
             .addText(text)
-            .add(circle);
+            // .add(circle);
 
         this.body.setSize(sprite.width * 2, sprite.height)
             .setOffset(-sprite.width/2 * 2, 0);
