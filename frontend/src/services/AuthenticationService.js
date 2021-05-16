@@ -56,6 +56,7 @@ class AuthenticationService {
     }
 
     joinAsGuest(){
+        console.log(API_BASE)
         return fetch(API_BASE + 'join-guest', {
             method: 'POST',
             mode: 'cors',

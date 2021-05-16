@@ -3,6 +3,8 @@ import React from 'react';
 import {useState} from 'react';
 import WorldService from 'services/WorldService';
 import {URL_BASE} from 'config';
+import useWorldUserStore from 'stores/useWorldUserStore';
+
 
 export default function GenerateInviteCard() {
 
@@ -15,7 +17,7 @@ export default function GenerateInviteCard() {
 
     const generateLink = () => {
         
-        WorldService.generateLink(1)
+        WorldService.generateLink(useWorldUserStore.getState().world_user.world_id)
         .then( (res) => {return res.json()})
         .then( (res) => {
             if(res.access_token)

@@ -18,6 +18,7 @@ import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
+import useWorldUserStore from "../../stores/useWorldUserStore";
 // import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
@@ -72,7 +73,7 @@ export default class RoomCall extends React.Component<{}, State> {
   myId: string = 'myUsernameId';
   accessMic: boolean = false;
   accessVideo: boolean = false;
-  socket = getSocket(1).socket;
+  socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
   myVideoRef = createRef<any>();
   comp_height = '25%';
 

@@ -22,7 +22,7 @@ class GameScene extends Phaser.Scene {
 
     remotePlayers = {};
     localPlayers = {};
-    ws = getSocket('1');
+    ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
     constructor() {
         super(sceneConfig);
@@ -277,7 +277,7 @@ class Player extends Phaser.GameObjects.Container {
     speed = 300;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
-    ws = getSocket('1');
+    ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
     constructor(scene, x, y) {
         super(scene, x, y);
