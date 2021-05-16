@@ -56,7 +56,8 @@ async def join_world_by_link(
     else:
         # Saves on Redis for Guest Users
         logger.debug('not cached:/')
-        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id)
+        world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_obj.world_id)
+        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id, role=world_default_role)
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
     return world_user
 
