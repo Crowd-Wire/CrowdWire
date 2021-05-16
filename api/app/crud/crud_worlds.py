@@ -162,8 +162,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         elif visibility == "joined":
             query = db.query(World).join(World.users).filter(User.user_id == user_id)
         elif visibility == "owned":
-            query = db.query(World).filter(World.creator == user_id) 
-
+            query = db.query(World).filter(World.creator == user_id)
 
         if is_guest:
             query = query.filter(World.allow_guests.is_(True))
