@@ -13,7 +13,7 @@ import { MyMediaStreamBox } from "./MyMediaStreamBox";
 import { MediaStreamBox } from "./MediaStreamBox";
 import logo from '../../assets/crowdwire_white_logo.png';
 
-import { getSocket, wsend } from "../../services/socket.js";
+import { getSocket } from "../../services/socket.js";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";

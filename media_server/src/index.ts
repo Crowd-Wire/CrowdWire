@@ -317,9 +317,8 @@ async function main() {
       }
       send({ topic: "room-created", d: { roomId }, uid });
     },
-    ["add-speaker"]: async ({ roomId, peerId }, uid, send, errBack) => {
+    ["add-speaker"]: async ({ roomId, peerId }, uid, send) => {
       if (!rooms[roomId]?.state[peerId]) {
-        errBack();
         return;
       }
       console.log("add-speaker", peerId);
@@ -384,16 +383,17 @@ async function main() {
       const { state, router } = rooms[roomId];
       const [recvTransport, sendTransport] = await Promise.all([
         createTransport("recv", router, peerId),
-        createTransport("send", router, peerId),
+        // createTransport("send", router, peerId),
       ]);
-      
+
       if (state[peerId]) {
         closePeer(state[peerId]);
       }
 
       rooms[roomId].state[peerId] = {
         recvTransport: recvTransport,
-        sendTransport: sendTransport,
+        // sendTransport: sendTransport,
+        sendTransport: null,
         consumers: [],
         producer: null,
       };
@@ -405,7 +405,7 @@ async function main() {
           peerId,
           routerRtpCapabilities: rooms[roomId].router.rtpCapabilities,
           recvTransportOptions: transportToOptions(recvTransport),
-          sendTransportOptions: transportToOptions(sendTransport),
+          // sendTransportOptions: transportToOptions(sendTransport),
         },
         uid,
       });

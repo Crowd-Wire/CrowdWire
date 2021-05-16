@@ -69,7 +69,7 @@ async def world_websocket(
                 await wh.join_player(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_CONFERENCE:
-                await wh.join_conference(world_id, user_id, payload)
+                await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload, db=db)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id)
