@@ -61,7 +61,8 @@ class AuthenticationService {
             method: 'POST',
             mode: 'cors',
             headers: {
-                'accept': 'application/json'
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
         })
     }

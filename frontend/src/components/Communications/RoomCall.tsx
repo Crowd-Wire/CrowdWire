@@ -18,6 +18,7 @@ import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
+import { useRoomStore } from '../../webrtc/stores/useRoomStore';
 import useWorldUserStore from "../../stores/useWorldUserStore";
 // import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
@@ -154,6 +155,13 @@ export default class RoomCall extends React.Component<{}, State> {
     this.videoStoreSub();
     this.voiceStoreSub();
     this.mediaStoreSub();
+    useVideoStore.getState().nullify();
+    useVoiceStore.getState().nullify();
+    useMediaStore.getState().nullify();
+    //@ts-ignore
+    for (var key of Object.keys(useRoomStore.getState().rooms)) {
+      useConsumerStore.getState().closeRoom(key);
+    }
   }
 
   
