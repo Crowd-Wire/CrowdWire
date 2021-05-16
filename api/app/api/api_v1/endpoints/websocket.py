@@ -87,7 +87,6 @@ async def world_websocket(
             elif topic == protocol.PERMISSION_TO_SPEAK:
                 # check if user who accepted has permission
                 # warn the user who has been accepted or denied
-                # { 'topic': PERMISSION_TO_SPEAK, 'permission': true/false }
                 await wh.send_to_conf_listener(world_id=world_id, user_id=user_id, payload=payload, db=db)
 
             elif topic == protocol.SPEAKING_CHANGE:

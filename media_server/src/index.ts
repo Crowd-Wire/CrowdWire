@@ -321,6 +321,7 @@ async function main() {
       if (!rooms[roomId]?.state[peerId]) {
         return;
       }
+      
       console.log("add-speaker", peerId);
 
       const { router } = rooms[roomId];
@@ -379,10 +380,12 @@ async function main() {
       if (!(roomId in rooms)) {
         rooms[roomId] = createRoom();
       }
+      
       console.log("join-as-new-peer", peerId);
+
       const { state, router } = rooms[roomId];
-      const [recvTransport, sendTransport] = await Promise.all([
-        createTransport("recv", router, peerId),
+      const [recvTransport] = await Promise.all([
+        createTransport("recv", router, peerId)
         // createTransport("send", router, peerId),
       ]);
 

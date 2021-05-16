@@ -22,7 +22,7 @@ interface WorldUser {
     avatar: string;
     role: Role;
     username: string;
-    in_conference: any;
+    in_conference: string;
 }
 
 const useWorldUserStore = create(
@@ -33,20 +33,20 @@ const useWorldUserStore = create(
         (set) => ({
             joinWorld: (world_user: WorldUser) => {
                 return set((s) => {
-                    world_user.in_conference = false;
+                    world_user.in_conference = null;
                     return { world_user };
                 });
             },
             updateConference: (inConference: any) => {
                 return set((s) => {
                     s.world_user.in_conference = inConference;
-                    return {...s};
+                    return {world_user: s.world_user};
                 })
             },
             permissionToSpeak: (permit: boolean) => {
                 return set((s) => {
                     s.world_user.role.talk_conference = permit;
-                    return {...s};
+                    return {world_user: s.world_user};
                 })
             }
         })

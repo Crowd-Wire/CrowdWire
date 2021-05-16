@@ -59,7 +59,7 @@ const GamePage = (props) => {
   useEffect(() => {
       // close socket on component unmount
       return () => {
-        if (useWorldUserStore.getState().world_user.world_id) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+        if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
       }
   }, [])
   

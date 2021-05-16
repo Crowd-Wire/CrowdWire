@@ -111,7 +111,7 @@ type OutgoingMessageDataMap = {
     peerId: string;
     routerRtpCapabilities: RtpCapabilities;
     recvTransportOptions: TransportOptions;
-    sendTransportOptions: TransportOptions;
+    //sendTransportOptions: TransportOptions;
   };
 } & {
   [Key in SendTrackDoneOperationName]: {

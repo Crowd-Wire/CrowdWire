@@ -160,6 +160,18 @@ export const getSocket = (worldId) => {
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);
             break;
+        case "you-joined-as-speaker":
+          console.log(data)
+          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+              createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
+                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+              })
+              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                sendVoice(data.d.roomId);
+                sendVideo(data.d.roomId);
+              });
+          })
+          break;
         case "you-joined-as-peer":
           console.log(data)
           beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
@@ -171,15 +183,12 @@ export const getSocket = (worldId) => {
               // });
           })
           break;
-        case "you-joined-as-speaker":
+        case "you-are-now-a-speaker":
           console.log(data)
           beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
-              createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
-                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
-              })
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVoice(data.d.roomId);
                 sendVideo(data.d.roomId);
+                sendVoice(data.d.roomId);
               });
           })
           break;

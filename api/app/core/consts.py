@@ -31,6 +31,7 @@ class WebsocketProtocol:
     PERMISSION_TO_SPEAK = 'PERMISSION_TO_SPEAK'
     UNWIRE_PLAYER = 'UNWIRE_PLAYER'
     JOIN_AS_NEW_PEER = 'join-as-new-peer'
+    ADD_SPEAKER = 'add-speaker'
     JOIN_AS_SPEAKER = 'join-as-speaker'
     ACTIVE_SPEAKER = 'active_speaker'
     CONNECT_TRANSPORT = '@connect-transport'

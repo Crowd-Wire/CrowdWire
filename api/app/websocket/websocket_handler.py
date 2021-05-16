@@ -181,9 +181,9 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, 
         one for receiving and other for sending
     """
     if permission:
-        payload = {'topic': "join-as-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': protocol.JOIN_AS_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
     else:
-        payload = {'topic': "join-as-new-peer", 'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': protocol.JOIN_AS_NEW_PEER, 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -193,7 +193,7 @@ async def add_speaker(word_id: str, room_id: str, user_id: str):
         allows an user that is already in a room call but only
         receiving data streams to start sending audio and video
     """
-    payload = {'topic': "add-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
+    payload = {'topic': protocol.ADD_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -279,6 +279,7 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: 
     conference = payload['conference']
     permission = payload['permission']
     user_requested = payload['user_requested']
+    logger.info(conference)
 
     if permission:
         await add_speaker(world_id, conference, user_requested)

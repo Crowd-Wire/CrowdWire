@@ -37,6 +37,7 @@
     "react-redux": "^7.2.0",
     "react-router": "^6.0.0-beta.0",
     "react-router-dom": "^6.0.0-beta.0",
+    "react-router-last-location": "^2.0.1",
     "react-scripts": "3.4.1",
     "react-slick": "^0.28.1",
     "react-swipeable-views": "0.13.9",
