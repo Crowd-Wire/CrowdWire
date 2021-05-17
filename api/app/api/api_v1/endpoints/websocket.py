@@ -23,7 +23,7 @@ router = APIRouter()
 async def world_websocket(
         websocket: WebSocket, world_id: int,
         token: Optional[str] = Query(None),
-        user: Union[models.User, schemas.GuestUser]= Depends(deps.get_websockets_user),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_websockets_user),
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
