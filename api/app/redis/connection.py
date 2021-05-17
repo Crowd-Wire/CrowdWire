@@ -148,6 +148,36 @@ class RedisConnector:
 
         return None
 
+    async def can_talk_conference(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> bool:
+        """
+        Checks World_User Data, if present, to be returned to REST API
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        role = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'role'
+        )
+
+        if role:
+            role = pickle.loads(role).__dict__
+            return role['talk_conference']
+        return False
+
+    async def can_manage_conferences(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> bool:
+        """
+        Checks World_User Data, if present, to be returned to REST API
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        role = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'role'
+        )
+
+        if role:
+            role = pickle.loads(role).__dict__
+            return role['conference_manage']
+        return False
+
     async def get_user_position(self, world_id: str, room_id: str, user_id: str) -> dict:
         """Get last user position received"""
         pairs = await self.master.execute('hgetall',

@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from app.websocket.connection_manager import manager
 from app.websocket import websocket_handler as wh
@@ -6,6 +6,10 @@ from app.api import dependencies as deps
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
+from app.api import dependencies
+from sqlalchemy.orm import Session
+from app import models, schemas
+
 
 """
 Class used to Manage the WebSocket Connections, to each World
@@ -19,16 +23,18 @@ router = APIRouter()
 async def world_websocket(
         websocket: WebSocket, world_id: int,
         token: Optional[str] = Query(None),
-        user_id: str = Depends(deps.get_websockets_user)
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_websockets_user),
+        db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    user_id = manager.get_next_user_id()
-    await manager.connect(world_id, websocket, user_id)
+    # user_id = manager.get_next_user_id()
+    user_id = str(user.user_id)
     # default room id when joining world
     # maybe on the function disconnect_room()
     # check which room he is on instead of this
     room_id = 0
 
+    await manager.connect(world_id, websocket, user_id)
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
         while True:
@@ -65,7 +71,7 @@ async def world_websocket(
                 await wh.join_player(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_CONFERENCE:
-                await wh.join_conference(world_id, user_id, payload)
+                await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id)
@@ -78,13 +84,12 @@ async def world_websocket(
 
             elif topic == protocol.REQUEST_TO_SPEAK:
                 # send to users who are in conference and have conference_managent permission
-                await wh.send_to_conf_managers(world_id, user_id, payload)
+                await wh.send_to_conf_managers(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.PERMISSION_TO_SPEAK:
                 # check if user who accepted has permission
                 # warn the user who has been accepted or denied
-                # { 'topic': PERMISSION_TO_SPEAK, 'permission': true/false }
-                await wh.send_to_conf_listener(world_id, user_id, payload)
+                await wh.send_to_conf_listener(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
@@ -96,8 +101,8 @@ async def world_websocket(
         manager.disconnect(world_id, user_id)
         await manager.disconnect_room(world_id, room_id, user_id)
         await wh.disconnect_user(world_id, user_id)
-    except BaseException:
-        logger.info("base exc")
-        manager.disconnect(world_id, user_id)
-        await manager.disconnect_room(world_id, room_id, user_id)
-        await wh.disconnect_user(world_id, user_id)
+    # except BaseException:
+    #     logger.info("base exc")
+    #     manager.disconnect(world_id, user_id)
+    #     await manager.disconnect_room(world_id, room_id, user_id)
+    #     await wh.disconnect_user(world_id, user_id)

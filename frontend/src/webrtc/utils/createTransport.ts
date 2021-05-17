@@ -2,7 +2,7 @@ import { TransportOptions } from "mediasoup-client/lib/types";
 import { getSocket } from "../../services/socket";
 import { useRoomStore } from "../stores/useRoomStore";
 import { useWsHandlerStore } from "../stores/useWsHandlerStore";
-
+import useWorldUserStore from "../../stores/useWorldUserStore";
 
 export async function createTransport(
   _roomId: string,
@@ -11,7 +11,7 @@ export async function createTransport(
 ) {
   console.log(`create ${direction} transport`);
   const { device, addTransport } = useRoomStore.getState();
-  var socket = getSocket(1).socket;
+  var socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
 
   // ask the server to create a server-side transport object and send
   // us back the info we need to create a client-side transport

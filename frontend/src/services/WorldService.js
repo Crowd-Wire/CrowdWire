@@ -3,7 +3,7 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, joined = false, page) {
+    search(search, tags, type = "all", page) {
         /*
             search: string,
             tags: List[string]
@@ -21,7 +21,7 @@ class WorldService {
             query.push('tags='+tags.join('&tags='));
         
         // when joined searchs for the visited worlds
-        query.push('joined=' + joined);
+        query.push('visibility=' + type);
 
         // pagination
         query.push('page=' + page);
@@ -39,13 +39,12 @@ class WorldService {
     }
 
     getWorldDetails(path) {
-        let x = path.split("/");
         
         /*
             id:int
         */
 
-        let url = 'worlds/'+x[x.length-1];
+        let url = 'worlds/'+path;
         let query = [];
         return fetch(API_BASE + url, {
             method: 'GET',

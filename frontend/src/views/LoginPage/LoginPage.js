@@ -92,10 +92,17 @@ class LoginPage extends React.Component {
     )    
   }
 
+  _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      this.handleSubmit()
+    }
+  }
+
   handleGuestJoin = () => {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
+        console.log(res)
         if(res.access_token!==undefined){
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
@@ -150,6 +157,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "email",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -166,6 +174,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "password",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -181,7 +190,7 @@ class LoginPage extends React.Component {
                     <CardFooter className={this.props.classes.cardFooter}>
                       <Col>
                         <Row>
-                          <Button 
+                          <Button
                             onClick={this.handleSubmit} 
                             style={{ 
                               backgroundColor: "#5BC0BE", marginLeft: "auto", 
@@ -194,14 +203,23 @@ class LoginPage extends React.Component {
                         </Row>
                         <br />
                         <Row>
-                          <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
-                            <Button onClick={() => {}}  simple color="primary" size="md">
-                              Register
-                            </Button>
-                          </Link>
-                          <span>OR</span> 
-                          {/* Change this pls */}
-                          <Button onClick={this.handleGuestJoin} size="md" simple color="primary"> Join as Guest</Button>
+                          <span style={{marginLeft:"auto", marginRight:"auto"}}>OR</span> 
+                        </Row>
+                        <Row style={{marginLeft: "auto", marginRight: "auto"}}>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                <Button onClick={() => {}}  simple color="primary" size="sm" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                  Register
+                                </Button>
+                              </Link>
+                            </Row>
+                          </Col>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Button onClick={this.handleGuestJoin} style={{ margin: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
+                            </Row>
+                          </Col>
                         </Row>
                       </Col>
                     </CardFooter>

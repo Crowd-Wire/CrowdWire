@@ -10,7 +10,6 @@ import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-import RequestSpeakIcon from '@material-ui/icons/PanTool';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
@@ -28,6 +27,9 @@ import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import useWorldUserStore from "../../stores/useWorldUserStore";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
+import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
+import Button from "@material-ui/core/Button";
+
 
 interface MyVideoAudioBoxProps {
   username?: string;
@@ -48,8 +50,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
-  const talk_conference = useWorldUserStore(state => state.world_user.role.talk_conference);
   const in_conference = useWorldUserStore(state => state.world_user.in_conference);
+  const [allowed_to_speak, setAllowedToSpeak] = useState(useWorldUserStore.getState().world_user.role.talk_conference);
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -62,20 +64,77 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     progress: undefined,
   }
 
-  useEffect(() =>{
-    if (in_conference && !talk_conference) {
-      toast.dark(
+  const requestToSpeak = () => {
+    setHasRequested(true);
+    if (useWorldUserStore.getState().world_user.in_conference) {
+      wsend({ topic: "REQUEST_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference });
+    }
+  }
+
+  const handleRequestToSpeak = (user_id: any, permit: boolean, toast_id: any) => {
+    if (useWorldUserStore.getState().world_user.in_conference) {
+      wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference, 'permission': permit, 'user_requested': user_id});
+    }
+    toast.dismiss(toast_id);
+  }
+
+  useEffect(() => {
+    useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
+      toast.info(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          Press the ✋ Near Your Video Box to Request to Speak
+          The User {d.user_requested} Requested To Speak
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, true, "customId"+d.user_requested)}>Accept</Button>
+          <Button onClick={() => handleRequestToSpeak(d.user_requested, false, "customId"+d.user_requested)}>Deny</Button>
         </span>
-        , toast_props);
-    }
+        , {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 60000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          draggable: true,
+          progress: undefined,
+          toastId: "customId"+d.user_requested
+        }
+      );
+    })
+
+    useWsHandlerStore.getState().addWsListener(`PERMISSION_TO_SPEAK`, (d) => {
+      toast.info(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          Permission to Speak {d.permission ? 'Granted' : 'Denied'}
+        </span>
+        , {
+          position: toast.POSITION.TOP_RIGHT,
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          draggable: true,
+        }
+      );
+      if (d.permission) setAllowedToSpeak(d.permission)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (in_conference) {
+      if (!allowed_to_speak) {
+        toast.dark(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Press the ✋ Near Your Video Box to Request to Speak
+          </span>
+          , toast_props
+        );
+      }
+    } else {
+      setHasRequested(false)
+    };
   }, [in_conference])
 
   useEffect(() =>{
-    setHasRequested(false);
-    if (in_conference && talk_conference) {
+    if (in_conference && !allowed_to_speak) {
       toast.dark(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -83,12 +142,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         </span>
         , toast_props);
     }
-  }, [talk_conference])
-
-  const requestToSpeak = () => {
-    setHasRequested(true);
-    wsend({ topic: "REQUEST_TO_SPEAK", 'conference_id': in_conference });
-  }
+  }, [allowed_to_speak])
 
   function toggleModal() {
     setShowModal(!showModal)
@@ -264,10 +318,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                     { audioTrack ?
                         audioPauseState ?
                           in_conference ?
-                            talk_conference ?
+                            allowed_to_speak ?
                               (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
-                            : hasRequested ? ''
-                              : <span onClick={() => requestToSpeak()}>✋</span>
+                              : hasRequested ?
+                                (<MicOffIcon color={'action'}/>)
+                                : <span onClick={() => requestToSpeak()}>✋</span>
                           : (<MicIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleAudio()}/>)
                         : (<MicOffIcon style={{'cursor': 'pointer'}} color={'secondary'} onClick={() => toggleAudio()}/>)
                       : (<MicOffIcon color={'action'}/>)

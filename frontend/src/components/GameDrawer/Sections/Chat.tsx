@@ -1,15 +1,16 @@
-import React, { KeyboardEventHandler } from 'react';
+import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import { withStyles } from '@material-ui/core/styles';
 
 import { getSocket } from 'services/socket';
 import useMessageStore from 'stores/useMessageStore';
 import style from "assets/jss/my-kit-react/components/GameDrawer/chatStyle.js";
+import useWorldUserStore from "stores/useWorldUserStore";
 
 const Chat = (props) => {
     const {classes} = props;
     const [text, setText] = React.useState("");
-    const ws = getSocket('1');
+    const ws = getSocket(useWorldUserStore.getState().world_user.world_id);
     const messages = useMessageStore(state => state.messages);
 
     const handleChange = (event) => {

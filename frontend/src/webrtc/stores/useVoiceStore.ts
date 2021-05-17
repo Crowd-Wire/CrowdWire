@@ -9,12 +9,16 @@ export const useVoiceStore = create(
       micProducer: null as any | null,
     },
     (set) => ({
-      nullify: () =>
-        set({
-          mic: null,
-          micStream: null,
-          micProducer: null,
-        }),
+      nullify: () => {
+        set((s) => {
+          if (s.mic) s.mic.stop()
+          return {
+            mic: null,
+            micStream: null,
+            micProducer: null,
+          }
+        })
+      },
       set,
     })
   )

@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
 import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
-
+import WorldService from 'services/WorldService.js'
 
 class WSettingsContent extends Component {
 
@@ -25,6 +25,8 @@ class WSettingsContent extends Component {
 				{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
 				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
 			],
+			path: window.location.pathname,
+			details: null
 		};
 		
 	constructor(props){
@@ -63,6 +65,16 @@ class WSettingsContent extends Component {
 			id: `simple-tab-${index}`,
 			'aria-controls': `simple-tabpanel-${index}`,
 		};
+	}
+
+	componentDidMount(){
+		const page_url = this.state.path.split("/");
+		const page = page_url[2];
+		const world_id=page;
+		this.setState({path:world_id});
+		WorldService.getWorldDetails(world_id).then((res) => {
+			console.log(res.json());
+		})
 	}
 
 

@@ -15,13 +15,8 @@ export default function App(){
   const token = useAuthStore(state => state.token);
   const expire_date = useAuthStore(state => state.expire_date);
   const guest_uuid = useAuthStore(state => state.guest_uuid);
-  useEffect(() => {
-  }, [token,expire_date, guest_uuid]);
   
-  return <PersistGate
-  onBeforeLift={() => {
-        console.log('onBeforeLift')
-      }}>
-    {useRoutes(routes(token,expire_date, guest_uuid))}
+  return <PersistGate>
+    {useRoutes(routes(token, guest_uuid))}
   </PersistGate>; 
 }

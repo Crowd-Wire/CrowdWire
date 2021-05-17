@@ -19,29 +19,52 @@ var globalVar = true;
 
 class GameScene extends Phaser.Scene {
     static inRangePlayers = new Set();
+    static map = null;
+    static roomLayer = null;
 
     remotePlayers = {};
     localPlayers = {};
-    ws = getSocket('1');
+    ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
     constructor() {
         super(sceneConfig);
     }
 
     create() {
-        this.map = this.add.tilemap('map');
+        GameScene.map = this.add.tilemap('map');
 
         // MapBuilder(this, 'map');
 
-        const wallTileset = this.map.addTilesetImage('wall-tiles');
-        const utilTileset = this.map.addTilesetImage('util-tiles');
-        const tableTileset = this.map.addTilesetImage('table-tiles');
-        //const lixoTileset = this.map.addTilesetImage('table-V');
+        const wallTileset = GameScene.map.addTilesetImage('wall-tiles');
+        const utilTileset = GameScene.map.addTilesetImage('util-tiles');
+        const tableTileset = GameScene.map.addTilesetImage('table-tiles');
+        const jardimTileset = GameScene.map.addTilesetImage('jardim');
+        const arrowTileset = GameScene.map.addTilesetImage('arrow');
+        const boardTileset = GameScene.map.addTilesetImage('board');
+        const plankTileset = GameScene.map.addTilesetImage('wooden-plank');
+        const tableVTileset = GameScene.map.addTilesetImage('table-V');
+        const tableHTileset = GameScene.map.addTilesetImage('table-H');
+        const brickTileset = GameScene.map.addTilesetImage('bricks');
+        const chairTileset = GameScene.map.addTilesetImage('chair');
 
-        this.map.createDynamicLayer('Ground', wallTileset);
-        this.roomLayer = this.map.createDynamicLayer('Room', utilTileset);
-        this.collisionLayer = this.map.createDynamicLayer('Collision', [wallTileset, tableTileset, utilTileset]);//lixoTileset]);
-        this.floatLayer = this.map.createDynamicLayer('Float', wallTileset).setDepth(1000);
+        const allTiles = [
+            wallTileset,
+            utilTileset,
+            tableTileset,
+            jardimTileset,
+            arrowTileset,
+            boardTileset,
+            plankTileset,
+            tableVTileset,
+            tableHTileset,
+            brickTileset,
+            chairTileset
+        ]
+
+        GameScene.map.createDynamicLayer('Ground', allTiles);
+        GameScene.roomLayer = GameScene.map.createDynamicLayer('Room', allTiles).setVisible(false);
+        this.collisionLayer = GameScene.map.createDynamicLayer('Collision', allTiles);
+        this.floatLayer = GameScene.map.createDynamicLayer('Float', allTiles).setDepth(1000);
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
@@ -51,7 +74,7 @@ class GameScene extends Phaser.Scene {
         // });
 
         // Let's get the object objects, these are NOT sprites
-        // const objectLayer = this.map.createFromObjects('Object', {key: 'table-V'});
+        // const objectLayer = GameScene.map.createFromObjects('Object', {key: 'table-V'});
 
         // Now we create objects in our sprite group for each object in our map
         // objectLayer['objects'].forEach(obj => {
@@ -64,8 +87,8 @@ class GameScene extends Phaser.Scene {
         this.collisionLayer.setCollisionByExclusion([-1]);
 
         // create the map borders
-        this.physics.world.bounds.width = this.map.widthInPixels;
-        this.physics.world.bounds.height = this.map.heightInPixels;
+        this.physics.world.bounds.width = GameScene.map.widthInPixels;
+        this.physics.world.bounds.height = GameScene.map.heightInPixels;
 
         // listen to the arrow keys
         // this.cursors = this.input.keyboard.addKeys({
@@ -83,9 +106,9 @@ class GameScene extends Phaser.Scene {
         // });
 
         // static players for range test
-        this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
-        this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
-        this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
+        // this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
+        // this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
+        // this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
 
         // main player
         this.player = new Player(this, 50, 50);
@@ -94,7 +117,7 @@ class GameScene extends Phaser.Scene {
         this.ws.joinRoom('1', {x: 50, y: 50});
 
         // make camera follow player
-        //this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+        //this.cameras.main.setBounds(0, 0, GameScene.map.widthInPixels, GameScene.map.heightInPixels);
         this.cameras.main.startFollow(this.player)
             .setBackgroundColor("#0C1117")//'#080C10');
             .setZoom(1.5);
@@ -131,9 +154,6 @@ class GameScene extends Phaser.Scene {
                 this.teste_player_id = id;
                 let text = this.player.getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
-                // hack to recall join conference when no one is in conference
-                if (!grps.includes(useWorldUserStore.getState().world_user.in_conference))
-                    useWorldUserStore.getState().updateConference(null);
             }
         }
     }
@@ -154,30 +174,36 @@ class GameScene extends Phaser.Scene {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    this.remotePlayers[id].disconnect();
-                    delete this.remotePlayers[id];
+                    if (this.remotePlayers[id]) {
+                        this.remotePlayers[id].disconnect();
+                        delete this.remotePlayers[id];
+                    }
                 }
             }
         }
     }
 
-    updateConferences = () => {
-        const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
+    static updateConferences = (player) => {
+        if (GameScene.roomLayer) {
+            const tile = GameScene.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
+
+            if (tile) {
+                const conferenceId = tile.properties.id;
+                if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
+                    useWorldUserStore.getState().updateConference(conferenceId);
+                    GameScene.inRangePlayers = new Set();
+                    player.ws.joinConference(conferenceId);
+                }
+            }
+            else {
+                if (useWorldUserStore.getState().world_user.in_conference) {
+                    useConsumerStore.getState().closeRoom(useWorldUserStore.getState().world_user.in_conference);
+                    useWorldUserStore.getState().updateConference(null);
+                    player.ws.leaveConference();
+                }
+            }
+        }
         
-        if (tile) {
-            const conferenceId = tile.properties.id;
-            if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
-                useWorldUserStore.getState().updateConference(conferenceId);
-                GameScene.inRangePlayers = new Set();
-                this.ws.joinConference(conferenceId);
-            }
-        }
-        else {
-            if (useWorldUserStore.getState().world_user.in_conference) {
-                useWorldUserStore.getState().updateConference(null);
-                this.ws.leaveConference();
-            }
-        }
     }
 
     updateRangePlayers = () => {
@@ -216,7 +242,7 @@ class GameScene extends Phaser.Scene {
             } else {
                 this.player.body.debugBodyColor = 0xff9900; // orange
             }
-        }   
+        }
     }
 
     update(time, delta) {
@@ -231,11 +257,10 @@ class GameScene extends Phaser.Scene {
         //     if (tile)
         //         tile.setCollision(true);
         // }
-                
+
         if (!globalVar)
             return;
-        
-        this.updateConferences();
+        // this.updateConferences();
         this.updateRangePlayers();
     }
 }
@@ -254,7 +279,7 @@ class Player extends Phaser.GameObjects.Container {
     speed = 300;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
-    ws = getSocket('1');
+    ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
     constructor(scene, x, y) {
         super(scene, x, y);
@@ -274,13 +299,13 @@ class Player extends Phaser.GameObjects.Container {
                 "Me",
                 '',
             ]);
-        const circle = scene.add.circle(0, 0, 150)
-            .setOrigin(0.5)
-            .setStrokeStyle(1, 0x1a65ac);
+        // const circle = scene.add.circle(0, 0, 150)
+        //     .setOrigin(0.5)
+        //     .setStrokeStyle(1, 0x1a65ac);
 
         this.addSprite(sprite)
             .addText(text)
-            .add(circle);
+            // .add(circle);
 
         this.body.setSize(sprite.width * 2, sprite.height)
             .setOffset(-sprite.width/2 * 2, 0);
@@ -360,6 +385,7 @@ class Player extends Phaser.GameObjects.Container {
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
             this.ws.sendMovement('1', this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
+            GameScene.updateConferences(this);
         }
 
         // if (this.step == 1 && !this.body.speed) {

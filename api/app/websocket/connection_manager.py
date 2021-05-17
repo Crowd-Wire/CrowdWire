@@ -5,10 +5,7 @@ from loguru import logger
 
 from app.core.consts import WebsocketProtocol as protocol
 from app.redis.connection import redis_connector
-from app.crud import crud_role
-from fastapi import Depends
-from app.api import dependencies
-from sqlalchemy.orm import Session
+
 
 class ConnectionManager:
     user_count = -1  # TODO: remove after tests
@@ -41,7 +38,7 @@ class ConnectionManager:
         self.users_ws[user_id] = websocket
 
         logger.info(
-            f"New connection added to World {world_id}"
+            f"Connected User {user_id} to World {world_id}"
         )
         return user_id
 
@@ -104,7 +101,7 @@ class ConnectionManager:
 
     async def broadcast(self, world_id: str, room_id: str, payload: Any, sender_id: str):
         try:
-            if room_id in self.connections[world_id]:
+            if world_id in self.connections and room_id in self.connections[world_id]:
                 for user_id in self.connections[world_id][room_id]:
                     if user_id != sender_id:
                         await self.send_personal_message(payload, user_id)
@@ -131,16 +128,15 @@ class ConnectionManager:
                 f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
             )
 
-    async def broadcast_to_conf_managers(self, world_id: str, payload: Any, conference: str, db: Session=Depends(dependencies.get_db)):
+    async def broadcast_to_conf_managers(self, world_id: str, payload: Any, conference: str):
         try:
             user_ids = await redis_connector.get_group_users(world_id, conference)
-
             for user_id in user_ids:
-                if (await crud_role.can_manage_conference(world_id=world_id, user_id=user_id))[0]:
+                if (await redis_connector.can_manage_conferences(world_id=world_id, user_id=user_id)):
                     await self.send_personal_message(payload, user_id)
         except KeyError:
             logger.error(
-                f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
+                f"Error when trying to broadcast conference managers of World {world_id}"
             )
 
 
