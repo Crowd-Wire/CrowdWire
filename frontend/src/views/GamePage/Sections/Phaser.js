@@ -6,6 +6,8 @@ import * as Game from "phaser/Game";
 class Phaser extends React.Component {
   mouseOver = false;
   keyDown = false;
+  enabled = false;
+  state = {opacity: 1}
   
   componentDidMount() {
     const game = Game.setupGame();
@@ -15,22 +17,26 @@ class Phaser extends React.Component {
     document.onkeydown = () => {this.keyDown = true };
     document.onkeyup = () => {this.keyDown = false };
 
+
+    // game.input.on("gameover", () => {
+    //   console.log("gameover")
+    // })
+
     document.onpointerup = () => {
-      if (!this.keyDown) {
-        if (this.mouseOver) {
-          game.input.enabled = true;
-          game.input.keyboard.enabled = true;
-        } else {
-          game.input.enabled = false;
-          game.input.keyboard.enabled = false;
-        }
+      console.log("mouseOver", this.mouseOver);
+      console.log("keyDown", this.keyDown);
+
+      if (this.mouseOver) {
+        this.setState({opacity: 1})
+        game.input.enabled = true;
+        game.input.keyboard.enabled = true;
+      } else if (!this.keyDown) {
+        this.setState({opacity: 0.6})
+        game.input.enabled = false;
+        game.input.keyboard.enabled = false;
       }
     }
 
-  }
-
-  shouldComponentUpdate() {
-    return false;
   }
 
   mouseLeave = () => {
@@ -38,14 +44,16 @@ class Phaser extends React.Component {
   }
 
   mouseEnter = () => {
-   this.mouseOver = true;
+    this.mouseOver = true;
   }
 
   render() {
     return (
-      <div id="game-container" 
-        onMouseLeave={this.mouseLeave} 
-        onMouseEnter={this.mouseEnter}>
+      <div id="game-container"
+        style={{opacity: this.state.opacity}}
+        onMouseOut={this.mouseLeave} 
+        onMouseOver={this.mouseEnter}>
+          {console.log("render")}
       </div>
     );
   }

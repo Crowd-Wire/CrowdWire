@@ -44,7 +44,7 @@ const UserList = (props) => {
                     <Button justIcon round color="primary" style={buttonStyle}>
                       <DoneIcon />
                     </Button>
-                    <Button justIcon round color="secondary" style={buttonStyle}>
+                    <Button justIcon round style={buttonStyle}>
                       <CloseIcon />
                     </Button>
                   </div>
