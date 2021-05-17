@@ -208,10 +208,10 @@ def create_world(
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
-    world_in.creator = user
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
+    world_in.creator = user
     obj, message = crud.crud_world.create(db=db, obj_in=world_in, user=user)
     if not obj:
         raise HTTPException(
