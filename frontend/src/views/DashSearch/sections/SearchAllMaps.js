@@ -68,7 +68,6 @@ class SearchAllMaps extends Component {
 			tags: [],
 			page: 1
 		}
-		console.log(props.type);
 	}
 
 	focusMap(id){
