@@ -7,11 +7,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import DashboardStats from 'views/DashWorldDetails/sections/DashboardStats.js'
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
+import WorldService from 'services/WorldService.js';
+import useAuthStore from 'stores/useAuthStore.ts';
 
 class DashboardContent extends Component{
 
 	constructor(props){
 		super(props);
+		this.state={
+			worldInfo: null
+		}
 	}
     cardTextStyles = {
 			marginLeft:"5%",
@@ -19,7 +24,22 @@ class DashboardContent extends Component{
 			display:"flex",
 			verticalAlign: "center",
 			maxWidth:"80%"
-    };
+	};
+
+	componentDidMount(){
+		const url = window.location.pathname;
+		console.log("COMPONENT DID MOUNT MOTHER FUCKER")
+		WorldService.getWorldDetails(url[url.length - 1])
+		  .then((res) => {
+			if (res.status == 200)
+			  return res.json()
+		  })
+		  .then((res) => {
+			  console.log(res)
+			if (res)
+			  this.setState({worldInfo:res})
+		  }).catch((error) => { useAuthStore.getState().leave() });
+	}
 
 	spanStyle = {
 		height:"30px",
@@ -32,31 +52,35 @@ class DashboardContent extends Component{
 
 	tags = () => {
 		let labels = [];
-		if(this.props.worldInfo.tags===undefined)
+		if(this.state.worldInfo.tags===undefined)
 			return;
-		if(this.props.worldInfo.tags.length===0)
+		if(this.state.worldInfo.tags.length===0)
 			labels.push(<Typography style={{color:"white"}}>No tags available for this world.</Typography>);
-		for(let i = 0; i < this.props.worldInfo.tags.length;i++){
-			labels.push(<span style={this.spanStyle}>{this.props.worldInfo.tags[i].name}</span>);
+		for(let i = 0; i < this.state.worldInfo.tags.length;i++){
+			labels.push(<span style={this.spanStyle}>{this.state.worldInfo.tags[i].name}</span>);
 		}
 
 		return labels;
 	}
 
 	date = () => {
-		if(this.props.worldInfo.creation_date===undefined)
+		if(this.state.worldInfo.creation_date===undefined)
 			return;
-		let x = this.props.worldInfo.creation_date.split("T");
+		let x = this.state.worldInfo.creation_date.split("T");
 		return x[0];
 	}
 	render(){
+		console.log("COMPONENT DID NOT WORKING")
+		if(!this.state.worldInfo){
+			return(<div></div>);
+		}
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%", width:"100%"}}>    
 				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>
 					<Col xs={10} sm={10} md={10} style={{backgroundSize:"cover", borderRadius:"15px", backgroundRepeat:"no-repeat",backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")'}}>
 						<div style={{ position: 'absolute', bottom: 0, left: 0, borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", height:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
 							<Typography noWrap variant="h3" style={this.cardTextStyles} >
-								{this.props.worldInfo.name}
+								{this.state.worldInfo.name}
 							</Typography>
 							<Typography variant="caption" style={this.cardTextStyles}>
 								Creation Date {this.date()}
@@ -73,7 +97,7 @@ class DashboardContent extends Component{
 									</Row>
 								</Col>
 								<Col>
-									<Typography style={{marginLeft:"auto", color:"white", marginTop:"10px"}}>Max Online Users: {this.props.worldInfo.max_users}</Typography>
+									<Typography style={{marginLeft:"auto", color:"white", marginTop:"10px"}}>Max Online Users: {this.state.worldInfo.max_users}</Typography>
 								</Col>
 							</Row>
 						</div>
@@ -82,7 +106,7 @@ class DashboardContent extends Component{
 					<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.props.handler(false)} style={{fontSize:"2rem"}}/></Col>
 				</Row>
 				<Row style={{minHeight:"39%", marginTop:"1%", width:"100%"}}>
-					<DashboardStats details={this.props.worldInfo} />
+					<DashboardStats details={this.state.worldInfo} />
 				</Row>
 			</div>
 		);

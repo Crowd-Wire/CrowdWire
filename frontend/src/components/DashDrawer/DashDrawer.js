@@ -83,16 +83,16 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(false);
+    if(location.pathname!=="/dashboard/search/public")
+      navigation("/dashboard/search/public");
   }
 
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(true);
+    if(location.pathname!=="/dashboard/search/joined")
+      navigation("/dashboard/search/joined");
   }
 
   const logout = () => {
@@ -100,7 +100,6 @@ export default function DashDrawer(props){
   }
 
   const onClickCreateWorld = () => {
-    console.log(st.guest_uuid+"and token "+st.token)
     navigation("/create-world");
   }
 

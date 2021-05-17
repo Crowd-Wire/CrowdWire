@@ -31,6 +31,7 @@ USERS_NOT_IN_SAME_WORLD = "One of the users has not joined this world."
 USER_ALREADY_REPORTED_IN_THIS_WORLD = "You have already reported this user in this world."
 USER_REPORT_NOT_FOUND = "This report does not exist."
 INVALID_PAGE_NUMBER = "Invalid page number."
+INVALID_WORLD_VISIBILITY_FILTER = "The filter provided is not valid."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."
