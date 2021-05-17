@@ -28,7 +28,6 @@ class DashboardContent extends Component{
 
 	componentDidMount(){
 		const url = window.location.pathname;
-		console.log("COMPONENT DID MOUNT MOTHER FUCKER")
 		WorldService.getWorldDetails(url[url.length - 1])
 		  .then((res) => {
 			if (res.status == 200)
@@ -70,7 +69,6 @@ class DashboardContent extends Component{
 		return x[0];
 	}
 	render(){
-		console.log("COMPONENT DID NOT WORKING")
 		if(!this.state.worldInfo){
 			return(<div></div>);
 		}
