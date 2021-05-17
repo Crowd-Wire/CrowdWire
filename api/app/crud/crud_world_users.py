@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -40,6 +40,12 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         Verify if user has already joined this world
         """
         return db.query(World_User).filter(World_User.user_id == user_id, World_User.world_id == world_id).first()
+
+    def get_all_registered_users(self, db: Session, world_id: int) -> List[World_User]:
+        """
+        Returns every user from a world.
+        """
+        return db.query(World_User).filter(World_User.world_id == world_id).all()
 
     def update_user_role(self, db: Session, world_id: int, user_id: int, role_id: int) \
             -> Tuple[Optional[World_User], str]:
