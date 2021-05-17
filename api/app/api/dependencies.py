@@ -121,7 +121,13 @@ async def get_websockets_user(
     if not world_obj:
         raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
-    return str(token_data.sub)
+    if not token_data.is_guest_user:
+        user = crud.crud_user.get(db, id=token_data.sub)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+
+    return schemas.GuestUser(is_guest_user=True, user_id=token_data.sub)
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency

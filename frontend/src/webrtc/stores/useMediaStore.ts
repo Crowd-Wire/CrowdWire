@@ -9,12 +9,16 @@ export const useMediaStore = create(
       mediaProducer: null as any | null,
     },
     (set) => ({
-      nullify: () =>
-        set({
-          media: null,
-          mediaStream: null,
-          mediaProducer: null,
-        }),
+      nullify: () => {
+        set((s) => {
+          if (s.media) s.media.stop()
+          return {
+            media: null,
+            mediaStream: null,
+            mediaProducer: null,
+          }
+        })
+      },
       set,
     })
   )

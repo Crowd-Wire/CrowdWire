@@ -6,8 +6,6 @@ from app.redis.connection import redis_connector
 from app.websocket.connection_manager import manager
 from datetime import datetime
 from loguru import logger
-from app.crud import crud_role
-from sqlalchemy.orm import Session
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
@@ -115,7 +113,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
     await send_groups_snapshot(world_id)
 
 
-async def join_conference(world_id: str, user_id: str, payload: dict, db: Session):
+async def join_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload['conference_id']
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
     if groups_id:
@@ -123,16 +121,43 @@ async def join_conference(world_id: str, user_id: str, payload: dict, db: Sessio
     await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
     await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
 
-    if (await crud_role.can_talk_conference(db=db, world_id=world_id, user_id=user_id))[0]:
-        await join_as_new_peer_or_speaker(world_id, conference_id, user_id)
-    else:
-        await join_as_new_peer_or_speaker(world_id, conference_id, user_id, False)
+    permission = await redis_connector.can_talk_conference(world_id, user_id)
+    await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
 
     await send_groups_snapshot(world_id)
 
 
+async def send_to_conf_managers(world_id: str, user_id: str, payload: dict):
+    conference = payload['conference']
+
+    await manager.broadcast_to_conf_managers(
+        world_id=world_id,
+        payload={'topic': protocol.REQUEST_TO_SPEAK, 'd': {'user_requested': user_id}},
+        conference=conference)
+
+
+async def send_to_conf_listener(world_id: str, user_id: str, payload: dict):
+    # check if user_id has permission to accept requests to speak here
+    if not (await redis_connector.can_manage_conferences(world_id, user_id)):
+        return
+
+    conference = payload['conference']
+    permission = payload['permission']
+    user_requested = payload['user_requested']
+
+    if permission:
+        await add_speaker(world_id, conference, user_requested)
+
+    await manager.send_personal_message(
+        {'topic': protocol.PERMISSION_TO_SPEAK, 'd': {'permission': permission}},
+        user_requested)
+
+
 async def leave_conference(world_id: str, user_id: str):
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
+
+    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': groups_id}})
+
     if groups_id:
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
 
@@ -181,9 +206,9 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, 
         one for receiving and other for sending
     """
     if permission:
-        payload = {'topic': "join-as-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': protocol.JOIN_AS_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
     else:
-        payload = {'topic': "join-as-new-peer", 'd': {'roomId': room_id, 'peerId': user_id}}
+        payload = {'topic': protocol.JOIN_AS_NEW_PEER, 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -193,7 +218,7 @@ async def add_speaker(word_id: str, room_id: str, user_id: str):
         allows an user that is already in a room call but only
         receiving data streams to start sending audio and video
     """
-    payload = {'topic': "add-speaker", 'd': {'roomId': room_id, 'peerId': user_id}}
+    payload = {'topic': protocol.ADD_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
     await rabbit_handler.publish(json.dumps(payload))
 
 
@@ -259,30 +284,3 @@ async def speaking_change(world_id: str, user_id: str, payload: dict):
             'peerId': user_id,
             'value': value},
         user_id)
-
-
-async def send_to_conf_managers(world_id: str, user_id: str, payload: dict, db: Session):
-    conference = payload['conference']
-
-    await manager.broadcast_to_conf_managers(
-        world_id=world_id,
-        payload={'topic': protocol.REQUEST_TO_SPEAK, 'd': {'user_requested': user_id}},
-        conference=conference,
-        db=db)
-
-
-async def send_to_conf_listener(world_id: str, user_id: str, payload: dict, db: Session):
-    # check if user_id has permission to accept requests to speak here
-    if not (await crud_role.can_manage_conference(db=db, world_id=world_id, user_id=user_id))[0]:
-        return
-
-    conference = payload['conference']
-    permission = payload['permission']
-    user_requested = payload['user_requested']
-
-    if permission:
-        await add_speaker(world_id, conference, user_requested)
-
-    await manager.send_personal_message(
-        {'topic': protocol.PERMISSION_TO_SPEAK, 'd': {'permission': permission}},
-        user_requested)
