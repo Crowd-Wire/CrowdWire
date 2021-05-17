@@ -266,3 +266,73 @@ class TestWorlds(TestCase):
 
             assert response.status_code == 400
             assert response.json()['detail'] == strings.INVALID_TAG
+
+    def test_create_world_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        response = client.post(
+            "/worlds/",
+            json={
+                "world_id": 1,
+                "name": "test",
+                "world_map": "",
+                "creator": 1,
+                "max_users": 1,
+                "tags": ['{"name": "aaa"}'],
+                "public": True,
+                "allow_guests": True
+            }
+        )
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_delete_world_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        response = client.delete(
+            "/worlds/1"
+        )
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_delete_world_with_permissions_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.remove") as mock_delete:
+            world = models.World(
+                world_id=1,
+                name="test",
+                world_map=bytes(),
+                creator=1,
+                max_users=1,
+                tags=[Tag(name="string")],
+                public=True,
+                allow_guests=True
+            )
+            mock_delete.return_value = world , ""
+            response = client.delete(
+                "/worlds/1"
+            )
+            assert response.status_code == 200
+            assert response.json()['world_id'] == 1
+
+    def test_delete_world_without_permissions_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.remove") as mock_delete:
+            mock_delete.return_value = None, ""
+            response = client.delete(
+                "/worlds/1"
+            )
+            assert response.status_code == 400
+
+    def test_update_world_user_info_not_joined_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
+            mock_get.return_value = None
+
+            response = client.put(
+                "/worlds/1/users",
+                json={
+                    'avatar': 'avatar1',
+                    'username': 'new_username'
+                }
+            )
+            print(response.status_code)
+            assert response.status_code == 200
