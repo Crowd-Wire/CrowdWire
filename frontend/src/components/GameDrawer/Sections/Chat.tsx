@@ -29,8 +29,8 @@ const Chat = (props) => {
             <div className={classes.chatBox}>
                 <div className={classes.chat}>
                     {
-                        messages.map((m) => (
-                            <div className={classes.message}>
+                        messages.map((m, index) => (
+                            <div key={index} className={classes.message}>
                                 <p style={{margin: '0 0.5rem', fontWeight: 'bold'}}>
                                     <span>{m.from}</span>
                                     <span style={{float: 'right'}}>{m.date}</span>

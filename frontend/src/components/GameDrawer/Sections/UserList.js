@@ -32,8 +32,8 @@ const UserList = (props) => {
   return (
     <div className={classes.root}>
     {
-      users.map((u) => (
-        <div className={classes.user}>
+      users.map((u, index) => (
+        <div key={index} className={classes.user}>
             <div className={classes.avatar}></div>
             <div className={classes.content}>
               <div className={classes.username}>{u.name}</div>
