@@ -10,6 +10,9 @@ import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import useWorldUserStore from '../../stores/useWorldUserStore';
 
+import RoomCall from "./../../components/Communications/RoomCall";
+
+
 const GamePage = (props) => {
 
   const { classes } = props;
@@ -58,6 +61,7 @@ const GamePage = (props) => {
           <GameDrawer />
           <div className={classes.gameWindow}>
             {/* Game */}
+            <RoomCall />
             <Phaser />
           </div>
         </div>

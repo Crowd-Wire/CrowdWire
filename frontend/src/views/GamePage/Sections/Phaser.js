@@ -1,40 +1,54 @@
 import React from "react";
 
 import * as Game from "phaser/Game";
-import RoomCall from "./../../../components/Communications/RoomCall";
 
 
 class Phaser extends React.Component {
+  mouseOver = false;
+  keyDown = false;
   
   componentDidMount() {
-    var game = Game.setupGame();
-    // window.addEventListener('resize', () => {
-    //   game.resize(window.innerWidth, window.innerHeight);
-    // });
-    // game.input.enabled = false;
-    // game.input.keyboard.enabled = false;
-    console.log(game)
-    console.log(game.input)
-    console.log(game.input.enabled)
-    // console.log(game.input.events._events.gameout.context.enabled)
-    // console.log(game.input.events._events.gameover.context.enabled)
-    // console.log(game.input.events._events.gameout.context.enabled)
+    const game = Game.setupGame();
+    
+    // TODO: fix when clicking out of the game while 
+    // spamming different WASD keys, user keeps walking
+    document.onkeydown = () => {this.keyDown = true };
+    document.onkeyup = () => {this.keyDown = false };
+
+    document.onpointerup = () => {
+      if (!this.keyDown) {
+        if (this.mouseOver) {
+          game.input.enabled = true;
+          game.input.keyboard.enabled = true;
+        } else {
+          game.input.enabled = false;
+          game.input.keyboard.enabled = false;
+        }
+      }
+    }
+
   }
 
   shouldComponentUpdate() {
     return false;
   }
 
+  mouseLeave = () => {
+    this.mouseOver = false;
+  }
+
+  mouseEnter = () => {
+   this.mouseOver = true;
+  }
+
   render() {
     return (
-      <div id="game-container" style={{}}>{/*style={{pointerEvents: "none", display: "none"}}>*/}
-        <RoomCall />
+      <div id="game-container" 
+        onMouseLeave={this.mouseLeave} 
+        onMouseEnter={this.mouseEnter}>
       </div>
     );
   }
 }
 
 export default Phaser;
-
-
-
