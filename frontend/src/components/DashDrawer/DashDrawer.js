@@ -145,7 +145,8 @@ export default function DashDrawer(props){
         </div>
         <Divider />
         <List>
-          <ListItem button key='My Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
+          {st.guest_uuid ? <></> :
+          <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open,})}>
             <ListItemIcon>
@@ -156,6 +157,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
+          }
           <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
           className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
             <ListItemIcon>
