@@ -89,13 +89,13 @@ class GameScene extends Phaser.Scene {
         this.physics.world.bounds.height = this.map.heightInPixels;
 
         // listen to the arrow keys
-        // this.cursors = this.input.keyboard.addKeys({
-        //     up:Phaser.Input.Keyboard.KeyCodes.W,
-        //     down:Phaser.Input.Keyboard.KeyCodes.S,
-        //     left:Phaser.Input.Keyboard.KeyCodes.A,
-        //     right:Phaser.Input.Keyboard.KeyCodes.D
-        // }, false);
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard.addKeys({
+            up:Phaser.Input.Keyboard.KeyCodes.W,
+            down:Phaser.Input.Keyboard.KeyCodes.S,
+            left:Phaser.Input.Keyboard.KeyCodes.A,
+            right:Phaser.Input.Keyboard.KeyCodes.D
+        }, true);
+        // this.cursors = this.input.keyboard.createCursorKeys();
 
         // this.cursors.onDown.add(function() {
         //     this.processKeyboardEvent(function() {
