@@ -3,7 +3,7 @@ from app.main import app
 from unittest import TestCase
 from app import models, schemas
 from unittest.mock import patch
-from app.api.dependencies import get_current_user, get_db
+from app.api.dependencies import get_current_user, get_db, get_current_user_for_invite
 from app.core.strings import WORLD_NOT_FOUND
 from app.models import Tag, User, World_User
 from app.core import strings
@@ -22,6 +22,15 @@ async def override_dependency_guest():
 
 async def override_get_db():
     return None
+
+
+async def override_get_current_user_for_invite_user():
+    return User(), models.World(world_id=1, world_map="".encode())
+
+
+async def override_get_current_user_for_invite_guest():
+    return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6"), models.World(world_id=1, world_map="".encode())
+
 
 app.dependency_overrides[get_db] = override_get_db
 
@@ -216,7 +225,6 @@ class TestWorlds(TestCase):
             assert any([tag['name'] == "string" or tag['name'] == "test" for tag in response.json()[1]['tags']])
 
     def test_create_world_correct_data_user(self):
-        # TODO: improve this
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.create") as mock_post:
 
@@ -535,3 +543,82 @@ class TestWorlds(TestCase):
                         assert response.status_code == 200
                         assert response.json()['role']['role_id'] == 1
                         assert response.json()['world_id'] == 1
+
+    def test_join_world_by_invite_in_cache_user(self):
+        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_user
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+            role = schemas.RoleInDB(role_id=1, world_id=1)
+
+            cache.return_value = schemas.World_UserWithRoleAndMap(
+                map="".encode(), role=role, role_id=1, world_id=1
+            )
+
+            response = client.get(
+                "/worlds/invite/correct"
+            )
+
+            assert response.status_code == 200
+            assert response.json()['world_id'] == 1
+            assert response.json()['role']['role_id'] == 1
+            assert cache.call_count == 1
+
+    def test_join_world_by_invite_no_cache_user(self):
+
+        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_user
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+            with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
+
+                cache.return_value = None
+                join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
+                                     models.Role(role_id=1, world_id=1))
+
+                response = client.get(
+                    "/worlds/invite/correct"
+                )
+
+                assert response.status_code == 200
+                assert response.json()['world_id'] == 1
+                assert response.json()['role']['role_id'] == 1
+                assert cache.call_count == 1
+                assert join.call_count == 1
+
+    def test_join_world_by_invite_in_cache_guest(self):
+        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_guest
+
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+            role = schemas.RoleInDB(role_id=1, world_id=1)
+
+            cache.return_value = schemas.World_UserWithRoleAndMap(
+                map="".encode(), role=role, role_id=1, world_id=1
+            )
+
+            response = client.get(
+                "/worlds/invite/correct"
+            )
+
+            assert response.status_code == 200
+            assert response.json()['world_id'] == 1
+            assert response.json()['role']['role_id'] == 1
+            assert cache.call_count == 1
+
+    def test_join_world_by_invite_no_cache_guest(self):
+        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_guest
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+            with patch("app.crud.crud_roles.CRUDRole.get_world_default") as default_role:
+                with patch("app.redis.connection.RedisConnector.join_new_guest_user") as join:
+                    role = schemas.RoleInDB(role_id=1, world_id=1)
+
+                    cache.return_value = None
+                    default_role.return_value = models.Role(role_id=1, world_id=1)
+                    join.return_value = schemas.World_UserWithRoleInDB(
+                        role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
+                    )
+                    response = client.get(
+                        "/worlds/invite/correct"
+                    )
+
+                    assert response.status_code == 200
+                    assert response.json()['world_id'] == 1
+                    assert response.json()['role']['role_id'] == 1
+                    assert cache.call_count == 1
+                    assert join.call_count == 1
