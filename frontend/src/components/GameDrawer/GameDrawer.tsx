@@ -23,6 +23,9 @@ import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
+import useMessageStore from 'stores/useMessageStore';
+
+
 const drawerWidth = 360;
 const sideBarWidth = 80;
 
@@ -86,7 +89,8 @@ const GameDrawer = () => {
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
-  const [notifications, setNotifications] = React.useState(2);
+  const [numMessagesSeen, setNumMessagesSeen] = React.useState(0);
+  let numMessages = useMessageStore(state => state.messages.length);
 
   const handleDrawerOpen = (component) => {
     if (open && drawer && component && component.type === drawer.type) {
@@ -176,9 +180,17 @@ const GameDrawer = () => {
         <div className={classes.sideTop}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleDrawerOpen(<Chat />)}
+            onClick={() => {
+              handleDrawerOpen(
+                <Chat handleMessage={() => setNumMessagesSeen(n => n + 1)} />
+              ); 
+              setNumMessagesSeen(numMessages)}}
           >
-            <Badge badgeContent={0} color="secondary">
+            {console.log(numMessages, numMessagesSeen)}
+            <Badge 
+              badgeContent={numMessagesSeen > numMessages ? 0 : numMessages - numMessagesSeen} 
+              color="secondary"
+            >
               <TextsmsIcon style={iconsStyle} />
             </Badge>
           </IconButton>
@@ -186,7 +198,7 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={() => handleDrawerOpen(<UserList />)}
           >
-            <Badge badgeContent={1} color="secondary">
+            <Badge badgeContent={-1} color="secondary">
               <PeopleAltIcon style={iconsStyle} />
             </Badge>
           </IconButton>

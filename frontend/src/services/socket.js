@@ -104,7 +104,6 @@ export const getSocket = (worldId) => {
   }
 
   const sendMessage = async (message, to) => {
-    console.log(message, to);
     const payload = {
       topic: "SEND_MESSAGE",
       text: message,
