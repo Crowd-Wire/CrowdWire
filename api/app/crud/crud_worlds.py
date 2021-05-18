@@ -148,7 +148,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                search: str,
                tags: Optional[List[str]],
                is_guest: bool = False,
-               joined: bool = False,
+               visibility: str = "public",
                user_id: int = 0,
                page: int = 1
                ) -> List[World]:
@@ -156,17 +156,21 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if not tags:
             tags = []
 
-        # check if world banned
-        if not joined:
-            query = db.query(World).filter(World.public)
-        else:
-            query = db.query(World).join(World.users).filter(User.user_id == user_id)
+        query = db.query(World)
 
         if is_guest:
+            # guests can only access public worlds
             query = query.filter(World.allow_guests.is_(True))
+        else:
+            if visibility == "public":
+                query = query.filter(World.public)
+            elif visibility == "joined":
+                query = query.join(World.users).filter(User.user_id == user_id)
+            elif visibility == "owned":
+                query = query.filter(World.creator == user_id)
 
         query = query.filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
-            or_(World.name.like("%" + search + "%"), World.description.like("%" + search + "%"))
+            or_(World.name.ilike("%" + search + "%"), World.description.ilike("%" + search + "%"))
         )
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))

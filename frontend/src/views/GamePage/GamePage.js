@@ -30,9 +30,11 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
-    WorldService.join_world(1)
-    .then((res) => res.json())
-    .then(
+    WorldService.join_world(window.location.pathname.split('/')[2])
+    .then((res) => {
+      if (res.ok) return res.json()
+      navigation("/dashboard/search");
+    }).then(
       (res) => {
         console.log(res)
         if (res.detail){
@@ -42,21 +44,22 @@ const GamePage = (props) => {
               {res.detail}
             </span>
           ,toast_props);
-          navigation("/dashboard/search");
+          navigation("/dashboard/search/public");
         }
         else {
           useWorldUserStore.getState().joinWorld(res);
-          console.log(useWorldUserStore.getState());
           setLoading(0);
         }
       }
+    ).catch(() => 
+      navigation("/dashboard/search")
     )
   }, [])
 
   useEffect(() => {
       // close socket on component unmount
       return () => {
-        getSocket(1).socket.close();
+        if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
       }
   }, [])
   

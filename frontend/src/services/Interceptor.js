@@ -30,7 +30,7 @@ export const interceptor = fetchIntercept.register({
                 return Promise.reject("Session expired");
             }
             else
-            {                
+            {
                 return AuthenticationService.refreshToken()
                         .then((data) => {
                             return data.json();

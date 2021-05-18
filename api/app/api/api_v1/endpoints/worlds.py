@@ -32,7 +32,7 @@ async def get_world(
     return db_world
 
 
-@router.get("/invite/{invite_token}")
+@router.get("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world_by_link(
         invite_token: str = None,
         *,
@@ -44,15 +44,21 @@ async def join_world_by_link(
     # If it's not the first time the user has joined the world, get it from redis(cache)
     world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
     if world_user:
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
         return world_user
     if not is_guest_user(user):
         # Otherwise, goes to PostgreSQL database, for registered users
-        world_user = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+        world_user, role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
+        delattr(world_user, 'role_id')
+        setattr(world_user, 'role', role)
+        setattr(world_user, 'map', world_obj.world_map)
         return world_user
     else:
         # Saves on Redis for Guest Users
         logger.debug('not cached:/')
-        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id)
+        world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_obj.world_id)
+        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id, role=world_default_role)
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
     return world_user
 
 
@@ -220,14 +226,18 @@ def create_world(
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
-        joined: Optional[bool] = False,
+        visibility: Optional[str] = "public",
         page: Optional[int] = 1,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
+
+    if visibility not in ["public", "owned", "joined"]:
+        raise HTTPException(status_code=400, detail=strings.INVALID_WORLD_VISIBILITY_FILTER)
+
     if not is_guest_user(user):
         list_world_objs = crud.crud_world.filter(
-            db=db, search=search, tags=tags, joined=joined, page=page, user_id=user.user_id
+            db=db, search=search, tags=tags, visibility=visibility, page=page, user_id=user.user_id
         )
     else:
         # guest cannot access visited worlds

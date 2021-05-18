@@ -83,16 +83,16 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(false);
+    if(location.pathname!=="/dashboard/search/public")
+      navigation("/dashboard/search/public");
   }
 
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(true);
+    if(location.pathname!=="/dashboard/search/joined")
+      navigation("/dashboard/search/joined");
   }
 
   const logout = () => {
@@ -100,7 +100,6 @@ export default function DashDrawer(props){
   }
 
   const onClickCreateWorld = () => {
-    console.log(st.guest_uuid+"and token "+st.token)
     navigation("/create-world");
   }
 
@@ -146,7 +145,8 @@ export default function DashDrawer(props){
         </div>
         <Divider />
         <List>
-          <ListItem button key='My Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
+          {st.guest_uuid ? <></> :
+          <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open,})}>
             <ListItemIcon>
@@ -157,6 +157,7 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
+          }
           <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
           className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
             <ListItemIcon>

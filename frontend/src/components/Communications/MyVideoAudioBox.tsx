@@ -15,7 +15,6 @@ import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import { wsend } from "../../services/socket.js";
-import { createTransport } from "../../webrtc/utils/createTransport";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
@@ -67,11 +66,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
   const requestToSpeak = () => {
     setHasRequested(true);
-    wsend({ topic: "REQUEST_TO_SPEAK", 'conference': in_conference });
+    if (useWorldUserStore.getState().world_user.in_conference) {
+      wsend({ topic: "REQUEST_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference });
+    }
   }
 
   const handleRequestToSpeak = (user_id: any, permit: boolean, toast_id: any) => {
-    wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': in_conference, 'permission': permit, 'user_requested': user_id});
+    if (useWorldUserStore.getState().world_user.in_conference) {
+      wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference, 'permission': permit, 'user_requested': user_id});
+    }
     toast.dismiss(toast_id);
   }
 
@@ -110,10 +113,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           draggable: true,
         }
       );
-      createTransport(d.roomId, "send", d.sendTransportOptions).then(() => {
-        sendVoice(d.roomId);
-        sendVideo(d.roomId);
-      });
       if (d.permission) setAllowedToSpeak(d.permission)
     })
   }, [])
