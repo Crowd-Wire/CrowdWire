@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
 from app.main import app
 from unittest import TestCase
-from app import models
+from app import models, schemas
 from unittest.mock import patch
 from app.api.dependencies import get_current_user
 from app.core.strings import WORLD_NOT_FOUND
-from app.models import Tag, User
+from app.models import Tag, User, World_User
 from app.core import strings
 from app.schemas import GuestUser
 
@@ -212,7 +212,7 @@ class TestWorlds(TestCase):
 
     def test_create_world_correct_data_user(self):
         # TODO: improve this
-        app.dependency_overrides[get_current_user] = override_dependency_guest
+        app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.create") as mock_post:
 
             world = models.World(
@@ -240,12 +240,11 @@ class TestWorlds(TestCase):
                     "allow_guests": True
                 }
             )
-
             assert response.json()['name'] == world.name
             assert response.status_code == 200
 
     def test_create_world_invalid_tags_user(self):
-        app.dependency_overrides[get_current_user] = override_dependency_guest
+        app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.create") as mock_post:
 
             mock_post.return_value = (None, strings.INVALID_TAG)
@@ -329,10 +328,67 @@ class TestWorlds(TestCase):
 
             response = client.put(
                 "/worlds/1/users",
+                json={}
+            )
+            assert response.status_code == 400
+
+    def test_update_world_user_info_joined_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
+            with patch("app.crud.crud_world_users.CRUDWorld_User.update") as mock_update:
+                mock_get.return_value = World_User(role_id=1, avatar="avatar_1", username="name")
+                mock_update.return_value = World_User(
+                    role_id=1, avatar="avatar_1", username="new_username", world_id=1
+                )
+
+                response = client.put(
+                    "/worlds/1/users",
+                    json={
+                        'username': 'new_username'
+                    }
+                )
+
+                assert response.status_code == 200
+                assert response.json()['username'] == "new_username"
+                assert response.json()['avatar'] == 'avatar_1'
+                assert response.json()['world_id'] == 1
+
+    def test_update_world_user_info_not_joined_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
+            mock_get.return_value = None
+
+            response = client.put(
+                "/worlds/1/users",
                 json={
-                    'avatar': 'avatar1',
                     'username': 'new_username'
                 }
             )
-            print(response.status_code)
-            assert response.status_code == 200
+            assert response.status_code == 400
+
+    def test_update_world_user_info_joined_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
+            with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_post:
+                role = {'role_id': 1, 'world_id': 1}
+
+                mock_get.return_value = schemas.World_UserWithRoleInDB(
+                    world_id=1,
+                    user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6",
+                    avatar='avatar_2',
+                    username='name',
+                    role=schemas.RoleInDB(**role)
+                )
+
+                response = client.put(
+                    "/worlds/1/users",
+                    json={
+                        'username': 'new_username',
+                        'avatar': 'avatar_1'
+                    }
+                )
+
+                assert response.status_code == 200
+                assert response.json()['world_id'] == 1
+                assert response.json()['username'] == 'new_username'
+                assert response.json()['avatar'] == 'avatar_1'

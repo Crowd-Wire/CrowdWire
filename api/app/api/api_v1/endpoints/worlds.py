@@ -155,7 +155,7 @@ async def update_world(
 
 
 @router.put("/{world_id}/users",
-            response_model=Union[schemas.World_UserInDB, schemas.World_UserWithRoleInDB])
+            response_model=schemas.World_UserInDB)
 async def update_world_user_info(
         world_id: int,
         user_data: schemas.World_UserUpdate,
@@ -194,7 +194,7 @@ async def update_world_user_info(
             user_id=user.user_id,
             data=data
         )
-        world_user = {'world_id': world_id, 'user_id': user.user_id}
+        world_user = {'world_id': world_id, 'user_id': user.user_id, 'role_id': world_user_obj.role.role_id}
         world_user.update(data)
         logger.debug(world_user)
     return world_user
