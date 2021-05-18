@@ -29,19 +29,19 @@ const Chat = (props) => {
         <div className={classes.chatRoot}>
             <div className={classes.chatBox}>
                 <div className={classes.chat}>
-                    {
-                        messages.map((m) => (
-                            <div className={classes.message}>
-                                <p style={{margin: '0 0.5rem', fontWeight: 'bold'}}>
-                                    <span>{m.from}</span>
-                                    <span style={{float: 'right'}}>{m.date}</span>
-                                </p>
-                                <p style={{margin: '0 0.5rem'}}>
-                                    {m.text}
-                                </p>
-                            </div>
-                        ))
-                    }
+                {
+                    messages.map((m, index) => (
+                        <div key={index} className={classes.message}>
+                            <p style={{margin: '0 0.5rem', fontWeight: 'bold'}}>
+                                <span>{m.from}</span>
+                                <span style={{float: 'right'}}>{m.date}</span>
+                            </p>
+                            <p style={{margin: '0 0.5rem'}}>
+                                {m.text}
+                            </p>
+                        </div>
+                    ))
+                }
                 </div>
             </div>
             <div className={classes.chatInput}>

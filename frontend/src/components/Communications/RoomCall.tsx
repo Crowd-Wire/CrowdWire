@@ -50,25 +50,25 @@ export default class RoomCall extends React.Component<{}, State> {
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam,
       mic: useVoiceStore.getState().mic,
-      media : useMediaStore.getState().media
+      media: useMediaStore.getState().media
     }
 
     this.consumerStoreSub = useConsumerStore.subscribe((consumerMap) => {
-      this.setState({consumerMap})
+      this.setState({ consumerMap })
     }, (state) => state.consumerMap);
 
     this.videoStoreSub = useVideoStore.subscribe((cam) => {
-      this.setState({cam});
+      this.setState({ cam });
       sendVideo();
     }, (state) => state.cam);
 
     this.voiceStoreSub = useVoiceStore.subscribe((mic) => {
-      this.setState({mic});
+      this.setState({ mic });
       sendVoice();
     }, (state) => state.mic);
 
     this.mediaStoreSub = useMediaStore.subscribe((media) => {
-      this.setState({media});
+      this.setState({ media });
     }, (state) => state.media);
   }
   myId: string = 'myUsernameId';
@@ -80,29 +80,29 @@ export default class RoomCall extends React.Component<{}, State> {
 
   setNavigatorToStream = () => {
     if (this.accessVideo || this.accessMic) {
-      getVideoAudioStream(this.accessVideo, this.accessMic).then((stream:MediaStream) => {
+      getVideoAudioStream(this.accessVideo, this.accessMic).then((stream: MediaStream) => {
         if (stream) {
-          useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
-          useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
+          useVideoStore.getState().set({ camStream: stream, cam: stream.getVideoTracks()[0] })
+          useVoiceStore.getState().set({ micStream: stream, mic: stream.getAudioTracks()[0] })
         }
       })
     }
   }
 
   handleFullscreen = () => {
-    this.setState({fullscreen: !this.state.fullscreen});
+    this.setState({ fullscreen: !this.state.fullscreen });
   }
-  
+
   reInitializeStream = () => {
     if (this.accessMic || this.accessVideo) {
       const media = getVideoAudioStream(this.accessMic, this.accessVideo);
       return new Promise((resolve) => {
-        media.then((stream:MediaStream) => {
-              useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})
-              useVoiceStore.getState().set({micStream: stream, mic: stream.getAudioTracks()[0]})
-              resolve(true);
-            });
-          });
+        media.then((stream: MediaStream) => {
+          useVideoStore.getState().set({ camStream: stream, cam: stream.getVideoTracks()[0] })
+          useVoiceStore.getState().set({ micStream: stream, mic: stream.getAudioTracks()[0] })
+          resolve(true);
+        });
+      });
     }
   }
 
@@ -112,7 +112,7 @@ export default class RoomCall extends React.Component<{}, State> {
     })
 
 
-    useCheckMediaAccess().then( (data) => {
+    useCheckMediaAccess().then((data) => {
       this.accessVideo = data[0]
       this.accessMic = data[1]
       const toast_props = {
@@ -129,23 +129,23 @@ export default class RoomCall extends React.Component<{}, State> {
       if (this.accessMic) {
         useMuteStore.getState().setAudioMute(false)
         toast.dark(
-        <span>
-          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          <span>
+            <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
           Microphone Detected 🎙️
         </span>
-        ,toast_props);
+          , toast_props);
       }
       if (this.accessVideo) {
         useMuteStore.getState().setVideoMute(false)
         toast.dark(
           <span>
-            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-            Camera Detected 📹 
+            <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
+            Camera Detected 📹
           </span>
           , toast_props);
       }
       this.setNavigatorToStream();
-    }).catch((err)=> {
+    }).catch((err) => {
       console.log(err)
     });
   }
@@ -164,8 +164,8 @@ export default class RoomCall extends React.Component<{}, State> {
     }
   }
 
-  
-  render () {
+
+  render() {
     let numberUsers = 0;
     for (const value of Object.values(this.state.consumerMap)) {
       //@ts-ignore
@@ -204,85 +204,88 @@ export default class RoomCall extends React.Component<{}, State> {
       mobileBreakpoint: 600
     }
     return (
-      <div style={{
-        position: 'fixed',
-        paddingRight: 80,
-        zIndex: 99,
-        height: this.state.fullscreen ? '100%' : '25%',
-        width:'100%',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center'
-      }}>
-        
-        
-        {/* <ActiveSpeakerListener/> */}
+      <>
+      {numberUsers > 0 ?
 
-        {numberUsers > 0 ? 
-        
-        (
-          <div  style={{height: '100%', padding: 2, width: numberUsers < 6 ? `${18*numberUsers}%` : '100%'}}>
-            <div style={{position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100}}>
-              {this.state.fullscreen ?
-                  (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenExitIcon/></Button>)
-                : numberUsers > 6 ?
-                    (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Expand View<FullscreenIcon/></Button>)
-                  : ''
-              }
-            </div>
-          <Carousel {...gridSettings}>
+(   
+        <div style={{
+          position: 'fixed',
+          paddingRight: 80,
+          zIndex: 99,
+          // height: this.state.fullscreen ? '100%' : '25%',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
 
-            { Object.keys(this.state.consumerMap).length > 0 
-              && Object.keys(this.state.consumerMap).map((peerId) => {
-                const { consumerAudio, consumerVideo, consumerMedia,
-                  volume: userVolume, active,
-                  videoToggle, audioToggle
-                } = this.state.consumerMap[peerId];
-                let item = <></>
-                if (consumerMedia)
-                  item = (
-                    <Carousel.Item key={peerId+"_crs_media_item"}>
-                      <div key={peerId+"_crs_media_item2"} style={{height: '100%'}}>
-                        <MediaStreamBox
-                          username={peerId}
-                          id={peerId+'_media'}
-                          mediaTrack={consumerMedia._track}
-                        />
-                      </div>
-                    </Carousel.Item>
-                  )
-                return [
-                    (
-                      <Carousel.Item key={peerId+"_crs_item"}>
-                        <div key={peerId+"_crs_item2"} style={{height: '100%'}}>
-                          <VideoAudioBox
-                            active={active}
-                            username={peerId}
-                            id={peerId}
-                            audioTrack={consumerAudio ? consumerAudio._track : null}
-                            videoTrack={consumerVideo ? consumerVideo._track : null}
-                            volume={(userVolume / 200)}
-                            videoToggle={videoToggle}
-                            audioToggle={audioToggle}
-                          />
-                        </div>
-                      </Carousel.Item>
-                    ),item
-                ]
-              })
-            }
-            
-          </Carousel>
-        </div>) : '' }
 
-        <div style={{position: 'fixed', width:'18%', height: 'auto', right: 10, bottom: 5}}>
-          { this.state.media ? 
+          {/* <ActiveSpeakerListener/> */}
+
+          
+              <div style={{ height: '100%', padding: 2, width: numberUsers < 6 ? `${18 * numberUsers}%` : '100%' }}>
+                <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
+                  {this.state.fullscreen ?
+                    (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenExitIcon /></Button>)
+                    : numberUsers > 6 ?
+                      (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Expand View<FullscreenIcon /></Button>)
+                      : ''
+                  }
+                </div>
+                <Carousel {...gridSettings}>
+
+                  {Object.keys(this.state.consumerMap).length > 0
+                    && Object.keys(this.state.consumerMap).map((peerId) => {
+                      const { consumerAudio, consumerVideo, consumerMedia,
+                        volume: userVolume, active,
+                        videoToggle, audioToggle
+                      } = this.state.consumerMap[peerId];
+                      let item = <></>
+                      if (consumerMedia)
+                        item = (
+                          <Carousel.Item key={peerId + "_crs_media_item"}>
+                            <div key={peerId + "_crs_media_item2"} style={{ height: '100%' }}>
+                              <MediaStreamBox
+                                username={peerId}
+                                id={peerId + '_media'}
+                                mediaTrack={consumerMedia._track}
+                              />
+                            </div>
+                          </Carousel.Item>
+                        )
+                      return [
+                        (
+                          <Carousel.Item key={peerId + "_crs_item"}>
+                            <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
+                              <VideoAudioBox
+                                active={active}
+                                username={peerId}
+                                id={peerId}
+                                audioTrack={consumerAudio ? consumerAudio._track : null}
+                                videoTrack={consumerVideo ? consumerVideo._track : null}
+                                volume={(userVolume / 200)}
+                                videoToggle={videoToggle}
+                                audioToggle={audioToggle}
+                              />
+                            </div>
+                          </Carousel.Item>
+                        ), item
+                      ]
+                    })
+                  }
+
+                </Carousel>
+              </div>
+        </div>
+        ) : null}
+        <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99 }}>
+          {this.state.media ?
             <MyMediaStreamBox
               username={this.myId}
-              id={this.myId+'_media'}
+              id={this.myId + '_media'}
               mediaTrack={this.state.media}
             />
-          : '' }
+            : ''}
           <MyVideoAudioBox
             username={this.myId}
             id={this.myId}
@@ -290,7 +293,7 @@ export default class RoomCall extends React.Component<{}, State> {
             videoTrack={this.state.cam}
           />
         </div>
-      </div>
+      </>
     );
   }
 }
