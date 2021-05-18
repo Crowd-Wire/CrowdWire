@@ -3,7 +3,7 @@ from app.main import app
 from unittest import TestCase
 from app import models, schemas
 from unittest.mock import patch
-from app.api.dependencies import get_current_user
+from app.api.dependencies import get_current_user, get_db
 from app.core.strings import WORLD_NOT_FOUND
 from app.models import Tag, User, World_User
 from app.core import strings
@@ -19,6 +19,11 @@ async def override_dependency_user(token: str = None):
 async def override_dependency_guest():
     return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6")
 
+
+async def override_get_db():
+    return None
+
+app.dependency_overrides[get_db] = override_get_db
 
 # TODO: add more tests for guests and users
 class TestWorlds(TestCase):
@@ -392,3 +397,141 @@ class TestWorlds(TestCase):
                 assert response.json()['world_id'] == 1
                 assert response.json()['username'] == 'new_username'
                 assert response.json()['avatar'] == 'avatar_1'
+
+    def test_update_world_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        response = client.put(
+            "/worlds/1", json={}
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_update_world_no_access_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.is_editable_to_user") as mock_get:
+            mock_get.return_value = None, ""
+            response = client.put(
+                "/worlds/1", json={}
+            )
+            assert response.status_code == 400
+
+    def test_update_world_correct_access_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.is_editable_to_user") as mock_get:
+            with patch("app.crud.crud_worlds.CRUDWorld.update") as mock_put:
+
+                mock_get.return_value = models.World(), ""
+                mock_put.return_value = models.World(
+                    world_id=1, name="test", creator=1, world_map=bytes("".encode()), max_users=10
+                ), ""
+                response = client.put(
+                    "/worlds/1", json={
+                        "name": "test"
+                    }
+                )
+
+                assert response.status_code == 200
+                assert response.json()['name'] == "test"
+                assert response.json()['world_id'] == 1
+
+    def test_update_world_incorrect_data_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.is_editable_to_user") as mock_get:
+            with patch("app.crud.crud_worlds.CRUDWorld.update") as mock_put:
+                mock_get.return_value = models.World(), ""
+                mock_put.return_value = None, ""
+                response = client.put(
+                    "/worlds/1", json={
+                        "name": "test"
+                    }
+                )
+                assert response.status_code == 400
+
+    def test_join_world_no_access_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available") as mock_get:
+            mock_get.return_value = None, ""
+            response = client.get(
+                "/worlds/1/users"
+            )
+            assert response.status_code == 400
+
+    def test_join_world_in_cache_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+                role = schemas.RoleInDB(role_id=1, world_id=1)
+                access.return_value = models.World(world_map= "".encode()), ""
+                cache.return_value = schemas.World_UserWithRoleAndMap(
+                    map= "".encode(), role=role, role_id=1, world_id=1
+                )
+                response = client.get(
+                    "/worlds/1/users"
+                )
+                assert response.status_code == 200
+                assert response.json()['role']['role_id'] == 1
+                assert response.json()['world_id'] == 1
+
+    def test_join_world_no_cache_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+                with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
+                    access.return_value = models.World(world_map="".encode()), ""
+                    cache.return_value = None
+                    join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
+                                         models.Role(role_id=1,world_id=1))
+
+                    response = client.get(
+                        "/worlds/1/users"
+                    )
+                    assert response.status_code == 200
+                    assert response.json()['world_id'] == 1
+                    assert response.json()['role']['role_id'] == 1
+
+    def test_join_world_no_access_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
+            access.return_value = None, ""
+            response = client.get(
+                "/worlds/1/users"
+            )
+            assert response.status_code == 400
+
+    def test_join_world_in_cache_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+                role = schemas.RoleInDB(role_id=1, world_id=1)
+                access.return_value = models.World(world_map="".encode()), ""
+                cache.return_value = schemas.World_UserWithRoleAndMap(
+                    map="".encode(), role=role, role_id=1, world_id=1
+                )
+                response = client.get(
+                    "/worlds/1/users"
+                )
+                assert response.status_code == 200
+                assert response.json()['role']['role_id'] == 1
+                assert response.json()['world_id'] == 1
+
+    def test_join_world_no_cache_guest(self):
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+                with patch("app.crud.crud_roles.CRUDRole.get_world_default") as default_role:
+                    with patch("app.redis.connection.RedisConnector.join_new_guest_user") as join:
+                        role = schemas.RoleInDB(role_id=1, world_id=1)
+
+                        access.return_value = models.World(world_map="".encode()), ""
+                        cache.return_value = None
+                        default_role.return_value = models.Role(role_id=1, world_id=1)
+                        join.return_value = schemas.World_UserWithRoleInDB(
+                            role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
+                        )
+                        response = client.get(
+                            "/worlds/1/users"
+                        )
+                        assert response.status_code == 200
+                        assert response.json()['role']['role_id'] == 1
+                        assert response.json()['world_id'] == 1
