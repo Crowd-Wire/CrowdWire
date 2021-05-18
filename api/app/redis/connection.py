@@ -172,7 +172,6 @@ class RedisConnector:
 
         return None, ""
 
-
     async def can_talk_conference(self, world_id: int, user_id: Union[int, uuid4]) \
             -> bool:
         """

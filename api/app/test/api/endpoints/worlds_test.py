@@ -783,7 +783,6 @@ class TestWorlds(TestCase):
             assert response.status_code == 400
             assert access.call_count == 1
 
-
     def test_get_all_users_from_world_with_access_user(self):
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as access:

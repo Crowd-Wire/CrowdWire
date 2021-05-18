@@ -1,5 +1,4 @@
 from typing import Union, Optional, List
-from pydantic import UUID4
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import schemas, models
@@ -85,6 +84,7 @@ async def delete_role_in_world(
     if not role_obj_deleted:
         raise HTTPException(status_code=400, detail=msg)
     return role_obj_deleted
+
 
 @router.post("/{role_id}/users", response_model=schemas.World_UserInDB)
 async def assign_role_to_user(

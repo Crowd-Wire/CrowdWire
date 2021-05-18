@@ -264,6 +264,7 @@ async def delete_world(
         )
     return world_obj
 
+
 @router.get("/{world_id}/users", response_model=List[schemas.World_UserInDB])
 async def get_all_users_from_world(
         world_id: int,
