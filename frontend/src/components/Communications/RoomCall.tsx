@@ -203,11 +203,11 @@ export default class RoomCall extends React.Component<{}, State> {
           position: 'fixed',
           paddingRight: 80,
           zIndex: 99,
-          height: this.state.fullscreen ? '100%' : '25%',
+          // height: this.state.fullscreen ? '100%' : '25%',
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         }}>
 
 
