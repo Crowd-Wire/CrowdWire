@@ -4,25 +4,27 @@ const chatStyle = {
         display: 'flex',
         "flex-direction": 'column',
         height: '100%',
-        padding: '1rem 0',
     },
     chatBox: {
+        height: "calc(100vh - 64px - 64px - 1px)",
+        "box-sizing": "border-box",
         display: 'flex',
-        flexGrow: 1,
+        padding: '10px 10px',
     },
     chatInput: {
+        height: "64px",
         display: 'flex',
-        flexBasis: '3rem',
         justifyContent: 'center',
-        margin: '15px'
+        padding: '0 10px',
     },
     chat: {
+        height : "100%",
+        overflow: "auto",
         display: 'flex',
         "flex-direction": 'column',
         border: '2px solid #f50057',
         borderRadius: '5px',
         width: '100%',
-        margin: '15px',
     },
     message: {
         "white-space": "pre-wrap",      /* CSS3 */   

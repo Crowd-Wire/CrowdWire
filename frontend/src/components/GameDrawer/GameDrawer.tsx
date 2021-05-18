@@ -68,7 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerHeader: {
       display: 'flex',
+      height: "64px",
       alignItems: 'center',
+      "box-sizing": "border-box",
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
@@ -87,9 +89,13 @@ const GameDrawer = () => {
   const [notifications, setNotifications] = React.useState(2);
 
   const handleDrawerOpen = (component) => {
-    setOpen(true);
-    setDrawer(component);
-    setPage(null);
+    if (open && drawer && component && component.type.displayName === drawer.type.displayName) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+      setDrawer(component);
+      setPage(null);
+    }
   };
 
   const handleDrawerClose = () => {
@@ -97,17 +103,19 @@ const GameDrawer = () => {
   };
 
   const handleOpen = (component) => {
-    setPage(component);
-    setDrawer(null);
+    if (component) console.log(component.type)
+    if (page) console.log(page.type)
+
+    if (page && component && component.type.displayName === page.type.displayName) {
+      setPage(null);
+    } else {
+      setPage(component);
+      setDrawer(null);
+    }
   };
 
   const handleClose = () => {
     setPage(null);
-  };
-
-  const handleOpenInvite = () => {
-    setPage(<GenerateInviteCard/>);
-    setDrawer(null);
   };
 
   document.addEventListener('fullscreenchange', (event) => {
@@ -189,7 +197,7 @@ const GameDrawer = () => {
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpenInvite()}
+            onClick={() => handleOpen(<GenerateInviteCard />)}
           >
             <LinkIcon style={iconsStyle} />
           </IconButton>
@@ -202,9 +210,7 @@ const GameDrawer = () => {
           </IconButton>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpen(
-                <WSettingsContent />
-            )}
+            onClick={() => handleOpen(<WSettingsContent />)}
           >
             <SettingsIcon style={iconsStyle} />
           </IconButton>
