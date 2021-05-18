@@ -1,5 +1,5 @@
 from typing import Union, Optional, List
-
+from pydantic import UUID4
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import schemas, models
@@ -86,37 +86,40 @@ async def delete_role_in_world(
         raise HTTPException(status_code=400, detail=msg)
     return role_obj_deleted
 
-@router.post("/{role_id}/users")
+@router.post("/{role_id}/users", response_model=schemas.World_UserInDB)
 async def assign_role_to_user(
         role_id: int,
         world_id: int,
+        user_to_change: schemas.AnyUser,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ):
-    role, msg = crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
-    if role is None:
+    """
+    For registered the users the role is changed in the database and in redis cache if it exists.
+    For guests it is only changed in redis cache.
+    """
+
+    if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    if not is_guest_user(user):
-        # updates the user role in the database. In case it doesnt exists, it cannot exist in cache
-        db_role, msg = crud_world_user.update_user_role(db=db, world_id=world_id, user_id=user.user_id, role_id=role_id)
-        if db_role is None:
-            raise HTTPException(status_code=400, detail=strings.USER_NOT_IN_WORLD)
+    # verifies if the user and role exist and if the request user has permissions to change role
+    new_role, msg = await crud_role.can_assign_new_role_to_user(
+        db=db, role_id=role_id, world_id=world_id, request_user=user.user_id, user_to_change=user_to_change)
+    if new_role is None:
+        raise HTTPException(status_code=400, detail=msg)
 
-    # updates the cache for the user and guest
-    world_user_data = await redis_connector.get_world_user_data()
-    if world_user_data is None:
-        # if there is no information about the guest in cache then it has not joined this world
-        if is_guest_user(user):
-            raise HTTPException(status_code=400, detail=strings.USER_NOT_IN_WORLD)
-    else:
-        new_role = crud_role.get(db=db, role_id=role_id)
-        if world_user_data.role.role_id == role_id:
-            # if the role is not going to change, it is better to return it already
-            return world_user_data
+    # updates the user role in the database. In case it doesnt exists, it cannot exist in cache
+    if not user_to_change.is_guest_user:
+        world_user, msg = crud_world_user.update_user_role(
+            db=db, world_id=world_id, user_id=user_to_change.user_id, role_id=role_id)
+        if world_user is None:
+            raise HTTPException(status_code=400, detail=msg)
 
-        await self.save_world_user_data(
-            world_id=world_id,
-            user_id=user_id,
-            data={'role': new_role}
-        )
+    # changes redis cache
+    world_user_data, msg = await redis_connector.assign_role_to_user(
+        user_id=user_to_change.user_id, is_guest=user_to_change.is_guest_user, world_id=world_id, role=new_role)
+    # if there is nothing in cache, the guests are not in this world
+    if world_user_data is None and user_to_change.is_guest_user:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return world_user

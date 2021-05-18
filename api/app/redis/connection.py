@@ -8,6 +8,7 @@ from app.utils import generate_guest_username, choose_avatar
 from app import schemas, models
 from uuid import uuid4
 from loguru import logger
+from app.core import strings
 
 
 class RedisConnector:
@@ -147,6 +148,30 @@ class RedisConnector:
             )
 
         return None
+
+    async def assign_role_to_user(self, world_id: int, role: models.Role, user_id: int, is_guest: bool):
+
+        # updates the cache for the user and guest
+        world_user_data = await self.get_world_user_data(world_id=world_id, user_id=user_id)
+        if world_user_data is None:
+            # if there is no information about the guest in cache then it has not joined this world
+            if is_guest:
+                return None, strings.USER_NOT_IN_WORLD
+        else:
+            if world_user_data.role.role_id == role.role_id:
+                # if the role is not going to change, it is better to return it already
+                return world_user_data, ""
+
+            await self.save_world_user_data(
+                world_id=world_id,
+                user_id=user_id,
+                data={'role': role}
+            )
+            world_user_data.role = role
+            return world_user_data, ""
+
+        return None, ""
+
 
     async def can_talk_conference(self, world_id: int, user_id: Union[int, uuid4]) \
             -> bool:
