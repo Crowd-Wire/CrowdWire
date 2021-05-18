@@ -156,12 +156,12 @@ async def update_world(
 
 
 @router.put("/{world_id}/users",
-            response_model=Union[schemas.World_UserInDB, schemas.World_UserWithRoleInDB])
+            response_model=schemas.World_UserInDB)
 async def update_world_user_info(
         world_id: int,
         user_data: schemas.World_UserUpdate,
         db: Session = Depends(deps.get_db),
-        user: Optional[models.User] = Depends(deps.get_current_user_authorizer(required=False))
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
     """
     Update User info for a given world: username and avatar name usually
@@ -171,7 +171,6 @@ async def update_world_user_info(
         world_user_obj = crud.crud_world_user.get_user_joined(db, world_id, user.user_id)
         if not world_user_obj:
             raise HTTPException(status_code=400, detail=strings.USER_NOT_IN_WORLD)
-
         # no need to return error, override user_id
         user_data.user_id = user.user_id
         world_user = crud.crud_world_user.update(
@@ -196,7 +195,7 @@ async def update_world_user_info(
             user_id=user.user_id,
             data=data
         )
-        world_user = {'world_id': world_id, 'user_id': user.user_id}
+        world_user = {'world_id': world_id, 'user_id': user.user_id, 'role_id': world_user_obj.role.role_id}
         world_user.update(data)
         logger.debug(world_user)
     return world_user
@@ -209,10 +208,10 @@ def create_world(
         db: Session = Depends(deps.get_db),
         user: models.User = Depends(deps.get_current_user_authorizer(required=True))
 ) -> Any:
-    world_in.creator = user
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
+    world_in.creator = user
     obj, message = crud.crud_world.create(db=db, obj_in=world_in, user=user)
     if not obj:
         raise HTTPException(
