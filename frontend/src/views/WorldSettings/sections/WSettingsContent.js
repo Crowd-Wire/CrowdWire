@@ -17,12 +17,13 @@ class WSettingsContent extends Component {
 		this.state = 
 		{
 			value: 0,
-			roles: {
-				'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
-				'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
-				'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
-				'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
-			},
+			// roles: {
+			// 	'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
+			// 	'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
+			// 	'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
+			// 	'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
+			// },
+			roles: {},
 			users: ['Silvia','Marco','Teixeira'],
 			reports: [
 				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
@@ -35,22 +36,22 @@ class WSettingsContent extends Component {
 		};
 	}
 	
-	getRoles = () => {
-		RoleService.getAllRoles(1)
-		.then((res) => {
-			return res.json();
-		})
-		.then((res) => {
-			let newRoles = this.state.roles;
-			console.log(res);
-			res.forEach((role)=>{
-				newRoles[role.id]={"ban":res.ban,"chat":res.chat,"conference_manage":res.conference_manage,"invite":res.invite,"is_default":res.is_default,"name":res.name,"role_manage":res.role_manage,"talk":res.talk,"talk_conference":res.talk_conference,"walk":res.walk,"world_mute":res.world_mute};
-				this.setState({roles:newRoles});
-			})
-			console.log(this.state.roles);
-			console.log(res);
-		})
-	}
+	// getRoles = () => {
+	// 	RoleService.getAllRoles(1)
+	// 	.then((res) => {
+	// 		return res.json();
+	// 	})
+	// 	.then((res) => {
+	// 		console.log(res)
+	// 		let newRoles = this.state.roles;
+	// 		res.forEach((role)=>{
+	// 			console.log(role.role_id)
+	// 			newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute};
+	// 			console.log(newRoles)
+	// 			this.setState({roles:newRoles});
+	// 		})
+	// 	})
+	// }
 	setUsers = (item, rName) => {
 		this.setState(state => {
 
@@ -95,7 +96,8 @@ class WSettingsContent extends Component {
 		})
 		.then((res)=>{
 			this.setState({worldName: res.name});
-		})
+		});
+		//this.getRoles();
 	}
 
 
@@ -113,7 +115,7 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel roles={this.getRoles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<RolePanel getRoles={this.getRoles} roles={this.state.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
 						{/* <KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel> */}
 					</div>
 			</div>

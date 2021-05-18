@@ -12,8 +12,17 @@ class RoleService {
             }
         })
     }
-
-
+    addRole(world_id, name) {
+        return fetch(API_BASE + 'worlds/'+world_id+'/roles/', {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify({ world_id: world_id, name: name, is_default: false})
+        })
+    }
 }
 
 export default new RoleService();
