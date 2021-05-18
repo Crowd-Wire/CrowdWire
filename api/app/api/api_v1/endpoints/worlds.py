@@ -65,7 +65,6 @@ async def join_world_by_link(
 @router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
-        user_id: int,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
@@ -277,6 +276,6 @@ async def get_all_users_from_world(
 
     role, msg = await crud.crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if role is None:
-        raise HTTPException(status_code=400, detail=message)
+        raise HTTPException(status_code=400, detail=msg)
 
     return crud.crud_world_user.get_all_registered_users(db=db, world_id=world_id)
