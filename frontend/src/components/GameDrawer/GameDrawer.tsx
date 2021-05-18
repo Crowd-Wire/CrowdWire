@@ -89,7 +89,7 @@ const GameDrawer = () => {
   const [notifications, setNotifications] = React.useState(2);
 
   const handleDrawerOpen = (component) => {
-    if (open && drawer && component && component.type.displayName === drawer.type.displayName) {
+    if (open && drawer && component && component.type === drawer.type) {
       setOpen(false);
     } else {
       setOpen(true);
@@ -103,14 +103,11 @@ const GameDrawer = () => {
   };
 
   const handleOpen = (component) => {
-    if (component) console.log(component.type)
-    if (page) console.log(page.type)
-
-    if (page && component && component.type.displayName === page.type.displayName) {
+    if (page && component && component.type === page.type) {
       setPage(null);
     } else {
       setPage(component);
-      setDrawer(null);
+      setOpen(false);
     }
   };
 
