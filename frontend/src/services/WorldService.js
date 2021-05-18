@@ -87,7 +87,7 @@ class WorldService {
     inviteJoin(inviteToken){
         // change url
         return fetch(API_BASE + 'worlds/invite/' + inviteToken, {
-            method: 'GET',
+            method: 'POST',
             mode: 'cors',
             headers: {
                 "Authorization" : "Bearer " + AuthenticationService.getToken()
@@ -112,7 +112,7 @@ class WorldService {
 
         return fetch(API_BASE + 'worlds/' + world_id + '/users',{
 
-            method: 'GET',
+            method: 'POST',
             mode: 'cors',
             headers: {
                 "Authorization" : "Bearer " + AuthenticationService.getToken()
