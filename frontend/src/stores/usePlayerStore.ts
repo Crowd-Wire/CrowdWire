@@ -53,16 +53,20 @@ const usePlayerStore = create(
                     const groupPlayers = {...s.groupPlayers};
                     for (const id of ids)
                         groupPlayers[id] = { name: `User ${id}` };
-                    return { groupPlayers };
-                }, merge);
+                    if (merge)
+                        return { groupPlayers };
+                    return { ...s, groupPlayers };
+                }, !merge);
             },
             unwirePlayers: (ids: string[], merge: boolean) => {
                 return set((s) => {
                     const groupPlayers = {...s.groupPlayers};
                     for (const id of ids)
                         delete groupPlayers[id];
-                    return { groupPlayers };
-                }, merge);
+                    if (merge)
+                        return { groupPlayers };
+                    return { ...s, groupPlayers };
+                }, !merge);
             },
             movePlayer: (id: string, position: Vector, velocity: Vector) => {
                 return set((s) => {

@@ -76,7 +76,7 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     add_users.add(user_id)
     for uid in add_users:
-        await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - uid)}, uid)
+        await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - {uid})}, uid)
     await send_groups_snapshot(world_id)
 
 
