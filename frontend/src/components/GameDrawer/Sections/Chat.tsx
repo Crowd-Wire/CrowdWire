@@ -43,7 +43,7 @@ const Chat = (props) => {
                 }
                 </div>
             </div>
-            <div className={classes.chatInput} id="input-de-merda">
+            <div className={classes.chatInput}>
                 <TextField
                     id="outlined-basic" 
                     label={text ? "" : "Send message..."}
