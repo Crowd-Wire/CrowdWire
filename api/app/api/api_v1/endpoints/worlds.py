@@ -32,7 +32,7 @@ async def get_world(
     return db_world
 
 
-@router.get("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world_by_link(
         invite_token: str = None,
         *,
@@ -62,7 +62,7 @@ async def join_world_by_link(
     return world_user
 
 
-@router.get("/{world_id}/users/{user_id}", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
         user_id: int,
