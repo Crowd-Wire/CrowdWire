@@ -19,8 +19,6 @@ var globalVar = true;
 
 class GameScene extends Phaser.Scene {
     static inRangePlayers = new Set();
-    static map = null;
-    static roomLayer = null;
 
     remotePlayers = {};
     localPlayers = {};
@@ -197,9 +195,10 @@ class GameScene extends Phaser.Scene {
             }
             else {
                 if (useWorldUserStore.getState().world_user.in_conference) {
-                    useConsumerStore.getState().closeRoom(useWorldUserStore.getState().world_user.in_conference);
+                    const conferenceId = useWorldUserStore.getState().world_user.in_conference;
+                    useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    player.ws.leaveConference();
+                    player.ws.leaveConference(conferenceId);
                 }
             }
         }

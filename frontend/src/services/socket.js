@@ -157,6 +157,12 @@ export const getSocket = (worldId) => {
         case "PLAYERS_SNAPSHOT":
             usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
+        case "WIRE_PLAYER":
+            usePlayerStore.getState().wirePlayers(data.ids, data.merge);
+            break;
+        case "UNWIRE_PLAYER":
+            usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
+            break;
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);
             break;

@@ -10,6 +10,11 @@ interface Vector {
 interface Player {
     position: Vector;
     velocity: Vector;
+    //name
+}
+
+interface Player2 {
+    name: string
 }
 
 const usePlayerStore = create(
@@ -17,6 +22,7 @@ const usePlayerStore = create(
         {   
             groups: {} as Record<string, string[]>,
             players: {} as Record<string, Player>,
+            groupPlayers: {} as Record<string, Player2>,
         },
         (set) => ({
             connectPlayers: (snapshot: Record<string, Vector>) => {
@@ -42,6 +48,22 @@ const usePlayerStore = create(
                     return { players };
                 });
             },
+            wirePlayers: (ids: string[], merge: boolean) => {
+                return set((s) => {
+                    const groupPlayers = {...s.groupPlayers};
+                    for (const id of ids)
+                        groupPlayers[id] = { name: `User ${id}` };
+                    return { groupPlayers };
+                }, merge);
+            },
+            unwirePlayers: (ids: string[], merge: boolean) => {
+                return set((s) => {
+                    const groupPlayers = {...s.groupPlayers};
+                    for (const id of ids)
+                        delete groupPlayers[id];
+                    return { groupPlayers };
+                }, merge);
+            },
             movePlayer: (id: string, position: Vector, velocity: Vector) => {
                 return set((s) => {
                     const players = {...s.players};
@@ -51,7 +73,6 @@ const usePlayerStore = create(
             },
             setGroups: (grps: Record<string, string[]>) => {
                 return set((s) => {
-                    console.log('snapshot', grps)
                     return { ...s, groups: grps };
                 }, true);
             },

@@ -95,7 +95,7 @@ class ConnectionManager:
             f"Disconnected User {user_id} from World {world_id} and room {room_id}"
         )
 
-    async def send_personal_message(self, message: Any, user_id):
+    async def send_personal_message(self, message: Any, user_id: str):
         if user_id in self.users_ws:
             await self.users_ws[user_id].send_json(message)
 
