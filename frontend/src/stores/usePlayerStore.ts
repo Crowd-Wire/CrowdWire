@@ -1,6 +1,7 @@
 import create from "zustand";
 import { combine } from "zustand/middleware";
 
+import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 
 interface Vector {
     x: number;
@@ -67,8 +68,10 @@ const usePlayerStore = create(
                 return set((s) => {
                     if (merge) {
                         const groupPlayers = {...s.groupPlayers};
-                        for (const id of ids)
+                        for (const id of ids) {
+                            useConsumerStore.getState().closePeer(id);
                             delete groupPlayers[id];
+                        }
                         return { groupPlayers };
                     }
                     const groupPlayers = {} as Record<string, Player2>;
