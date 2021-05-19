@@ -104,7 +104,6 @@ export const getSocket = (worldId) => {
   }
 
   const sendMessage = async (message, to) => {
-    console.log(message, to);
     const payload = {
       topic: "SEND_MESSAGE",
       text: message,
@@ -156,6 +155,12 @@ export const getSocket = (worldId) => {
             break;
         case "PLAYERS_SNAPSHOT":
             usePlayerStore.getState().connectPlayers(data.snapshot);
+            break;
+        case "WIRE_PLAYER":
+            usePlayerStore.getState().wirePlayers(data.ids, data.merge);
+            break;
+        case "UNWIRE_PLAYER":
+            usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
             break;
         case "GROUPS_SNAPSHOT":
             usePlayerStore.getState().setGroups(data.groups);

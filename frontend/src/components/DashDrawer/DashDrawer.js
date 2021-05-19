@@ -75,8 +75,8 @@ export default function DashDrawer(props){
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const addWorld = theme.spacing.unit*2+100;
-  const definitions = theme.spacing.unit*2+50;
+  const addWorld = theme.spacing(2)+100;
+  const definitions = theme.spacing(2)+50;
   
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -191,7 +191,7 @@ export default function DashDrawer(props){
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Leave" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
+            button key="Leave" style={{position: "fixed", bottom: theme.spacing(2)}}
             onClick={() => logout()}
           >
           <ListItemIcon>

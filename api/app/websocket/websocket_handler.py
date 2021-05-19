@@ -74,6 +74,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     # actions made to groups
     await handle_actions(actions)
 
+    add_users.add(user_id)
+    for uid in add_users:
+        await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - {uid})}, uid)
     await send_groups_snapshot(world_id)
 
 
@@ -110,6 +113,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         # add user to a new group with the still nearby users
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
+    await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'merge': True, 'ids': users_id}, user_id)
     await send_groups_snapshot(world_id)
 
 
@@ -124,6 +128,11 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
     permission = await redis_connector.can_talk_conference(world_id, user_id)
     await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
 
+    await manager.send_personal_message({
+        'topic': protocol.WIRE_PLAYER,
+        'merge': False,
+        'ids': await redis_connector.get_group_users(conference_id)
+    }, user_id)
     await send_groups_snapshot(world_id)
 
 
@@ -161,6 +170,11 @@ async def leave_conference(world_id: str, user_id: str):
     if groups_id:
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
 
+    await manager.send_personal_message({
+        'topic': protocol.UNWIRE_PLAYER,
+        'merge': False,
+        'ids': []
+    }, user_id)
     await send_groups_snapshot(world_id)
 
 

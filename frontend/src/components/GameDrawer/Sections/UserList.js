@@ -6,6 +6,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 
 import style from "assets/jss/my-kit-react/components/GameDrawer/userListStyle.js";
+import usePlayerStore from 'stores/usePlayerStore';
 
 
 const example = [
@@ -16,11 +17,9 @@ const example = [
   {name: "Tina", request: false},
 ]
 
-
-
 const UserList = (props) => {
   const {classes} = props;
-  const [users, setUsers] = React.useState(example);
+  const users = usePlayerStore(state => state.groupPlayers);
 
   const buttonStyle = {
     width: "0.5rem",
@@ -32,7 +31,7 @@ const UserList = (props) => {
   return (
     <div className={classes.root}>
     {
-      users.map((u, index) => (
+      Object.values(users).map((u, index) => (
         <div key={index} className={classes.user}>
             <div className={classes.avatar}></div>
             <div className={classes.content}>
