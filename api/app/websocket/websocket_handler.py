@@ -122,6 +122,14 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
 async def join_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload['conference_id']
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
+
+    for gid in groups_id:
+        for uid in await redis_connector.get_group_users(world_id, gid):
+            await manager.send_personal_message({
+                'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
+
     if groups_id:
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
     await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
@@ -130,6 +138,7 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
     permission = await redis_connector.can_talk_conference(world_id, user_id)
     await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
 
+    
     conference_users = set(await redis_connector.get_group_users(world_id, conference_id))
     await manager.send_personal_message({
         'topic': protocol.WIRE_PLAYER, 'merge': False,
