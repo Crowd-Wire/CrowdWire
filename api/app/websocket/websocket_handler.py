@@ -9,25 +9,27 @@ from loguru import logger
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
-    room_id = payload['room_id']
     position = payload['position']
-    await manager.connect_room(world_id, room_id, user_id, position)
     # store position on redis
-    await redis_connector.set_user_position(world_id, room_id, user_id, position)
-    # store room on redis
+    await redis_connector.set_user_position(world_id, user_id, position)
 
+    # broadcast join player
+    await manager.broadcast(
+        world_id,
+        {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': position},
+        user_id
+    )
     await send_groups_snapshot(world_id)  # TODO: remove after tests
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
-    room_id = payload['room_id']
     velocity = payload['velocity']
     position = payload['position']
     # store position on redis
-    await redis_connector.set_user_position(world_id, room_id, user_id, position)
+    await redis_connector.set_user_position(world_id, user_id, position)
 
     await manager.broadcast(
-        world_id, room_id,
+        world_id,
         {'topic': protocol.PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
         user_id
     )
@@ -49,7 +51,7 @@ async def send_groups_snapshot(world_id: str):
     for uid in manager.users_ws:
         groups[uid] = await redis_connector.smembers(f"world:{world_id}:user:{uid}:groups")
 
-    await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
+    await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
@@ -128,11 +130,18 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
     permission = await redis_connector.can_talk_conference(world_id, user_id)
     await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
 
+    conference_users = set(await redis_connector.get_group_users(world_id, conference_id))
     await manager.send_personal_message({
-        'topic': protocol.WIRE_PLAYER,
-        'merge': False,
-        'ids': await redis_connector.get_group_users(conference_id)
-    }, user_id)
+            'topic': protocol.WIRE_PLAYER, 'merge': False,
+            'ids': list(conference_users - {user_id})
+        }, user_id)
+    for uid in conference_users:
+        if uid != user_id:
+            await manager.send_personal_message({
+                'topic': protocol.WIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
+
     await send_groups_snapshot(world_id)
 
 
@@ -162,19 +171,23 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict):
         user_requested)
 
 
-async def leave_conference(world_id: str, user_id: str):
-    groups_id = await redis_connector.get_user_groups(world_id, user_id)
+async def leave_conference(world_id: str, user_id: str, payload: dict):
+    conference_id = payload["conference_id"]
 
-    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': groups_id}})
-
-    if groups_id:
-        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
+    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': [conference_id]}})
+    await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, conference_id))
 
     await manager.send_personal_message({
-        'topic': protocol.UNWIRE_PLAYER,
-        'merge': False,
+        'topic': protocol.UNWIRE_PLAYER, 'merge': False,
         'ids': []
     }, user_id)
+    for uid in await redis_connector.get_group_users(world_id, conference_id):
+        if uid != user_id:
+            await manager.send_personal_message({
+                'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
+
     await send_groups_snapshot(world_id)
 
 
