@@ -4,6 +4,7 @@ from kubernetes import client, config
 from kubernetes.client import ApiException
 from kubernetes.config import ConfigException
 from loguru import logger
+from app.core import strings
 
 
 class KubernetesHandler:
@@ -18,7 +19,7 @@ class KubernetesHandler:
             self.client = client.CoreV1Api()
             self.apps = client.AppsV1Api()
         except ConfigException:
-            logger.info("No cluster found!")
+            logger.info(strings.K8S_CLUSTER_NOT_FOUND)
 
     def get_all_pods(self):
         return self.client.list_pod_for_all_namespaces(watch=False).items
@@ -34,7 +35,7 @@ class KubernetesHandler:
         try:
             self.apps.patch_namespaced_deployment(
                 name='crowdwire-mediaserver', namespace='default', body=json.loads(p))
-            logger.info("Successing updating number of replicas!")
+            logger.info(strings.SCALE_UP_SUCCESS)
         except ApiException as e:
             logger.warning(e)
 
