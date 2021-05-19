@@ -11,6 +11,7 @@ interface Player {
     position: Vector;
     velocity: Vector;
     //name
+    //avatar
 }
 
 interface Player2 {
@@ -29,7 +30,7 @@ const usePlayerStore = create(
                 return set(() => {
                     const players = {};
                     for (const [id, position] of Object.entries(snapshot)) {
-                        players[id] = { position: position, velocity: { x: 0, y: 0 } };
+                        players[id] = { position, velocity: { x: 0, y: 0 } };
                     }
                     return { players };
                 });
@@ -37,7 +38,7 @@ const usePlayerStore = create(
             connectPlayer: (id: string, position: Vector) => {
                 return set((s) => {
                     const players = {...s.players};
-                    players[id] = { position: position, velocity: { x: 0, y: 0 } };
+                    players[id] = { position, velocity: { x: 0, y: 0 } };
                     return { players };
                 });
             },
@@ -50,21 +51,29 @@ const usePlayerStore = create(
             },
             wirePlayers: (ids: string[], merge: boolean) => {
                 return set((s) => {
-                    const groupPlayers = {...s.groupPlayers};
+                    if (merge) {
+                        const groupPlayers = {...s.groupPlayers};
+                        for (const id of ids)
+                            groupPlayers[id] = { name: `User ${id}` };
+                        return { groupPlayers };
+                    }
+                    const groupPlayers = {} as Record<string, Player2>;
                     for (const id of ids)
                         groupPlayers[id] = { name: `User ${id}` };
-                    if (merge)
-                        return { groupPlayers };
                     return { ...s, groupPlayers };
                 }, !merge);
             },
             unwirePlayers: (ids: string[], merge: boolean) => {
                 return set((s) => {
-                    const groupPlayers = {...s.groupPlayers};
-                    for (const id of ids)
-                        delete groupPlayers[id];
-                    if (merge)
+                    if (merge) {
+                        const groupPlayers = {...s.groupPlayers};
+                        for (const id of ids)
+                            delete groupPlayers[id];
                         return { groupPlayers };
+                    }
+                    const groupPlayers = {} as Record<string, Player2>;
+                    for (const id of ids)
+                        groupPlayers[id] = { name: `User ${id}` };
                     return { ...s, groupPlayers };
                 }, !merge);
             },
