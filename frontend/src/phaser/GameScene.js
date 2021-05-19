@@ -113,7 +113,7 @@ class GameScene extends Phaser.Scene {
         this.player = new Player(this, 50, 50);
 
         // connect to room
-        this.ws.joinRoom('1', {x: 50, y: 50});
+        this.ws.joinRoom({x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
@@ -219,7 +219,7 @@ class GameScene extends Phaser.Scene {
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
                     // wire players
-                    this.ws.wirePlayer('1', 
+                    this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
                             const entered = !GameScene.inRangePlayers.has(id);
                             if (entered) GameScene.inRangePlayers.add(id);
@@ -228,7 +228,7 @@ class GameScene extends Phaser.Scene {
                     );
                 } else {
                     // unwire players
-                    this.ws.unwirePlayer('1', 
+                    this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
                             const left = !rangePlayers.includes(id);
                             if (left) {
@@ -382,7 +382,7 @@ class Player extends Phaser.GameObjects.Container {
         this.body.velocity.normalize().scale(this.speed);
 
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-            this.ws.sendMovement('1', this.body.position.clone().subtract(this.body.offset), this.body.velocity);
+            this.ws.sendMovement(this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
             this.scene.updateConferences(this);
         }

@@ -51,7 +51,7 @@ let consumerQueue = [];
 
 export const getSocket = (worldId) => {
 
-  const joinRoom = async (roomId, position) => {
+  const joinRoom = async (position) => {
     const payload = {
       topic: "JOIN_PLAYER",
       position
@@ -59,7 +59,7 @@ export const getSocket = (worldId) => {
     await wsend(payload);
   }
 
-  const sendMovement = async (roomId, position, velocity) => {
+  const sendMovement = async (position, velocity) => {
     const payload = {
       topic: "PLAYER_MOVEMENT",
       position,
@@ -84,7 +84,7 @@ export const getSocket = (worldId) => {
     await wsend(payload);
   }
 
-  const wirePlayer = async (roomId, usersId) => {
+  const wirePlayer = async (usersId) => {
     const payload = {
       topic: "WIRE_PLAYER",
       users_id: usersId,
@@ -92,7 +92,7 @@ export const getSocket = (worldId) => {
     await wsend(payload);
   }
 
-  const unwirePlayer = async (roomId, usersId) => {
+  const unwirePlayer = async (usersId) => {
     const payload = {
       topic: "UNWIRE_PLAYER",
       users_id: usersId,
