@@ -132,9 +132,9 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
 
     conference_users = set(await redis_connector.get_group_users(world_id, conference_id))
     await manager.send_personal_message({
-            'topic': protocol.WIRE_PLAYER, 'merge': False,
-            'ids': list(conference_users - {user_id})
-        }, user_id)
+        'topic': protocol.WIRE_PLAYER, 'merge': False,
+        'ids': list(conference_users - {user_id})
+    }, user_id)
     for uid in conference_users:
         if uid != user_id:
             await manager.send_personal_message({

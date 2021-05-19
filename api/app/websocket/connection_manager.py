@@ -30,7 +30,7 @@ class ConnectionManager:
     async def connect(self, world_id: str, websocket: WebSocket, user_id: int):
         await websocket.accept()
         await websocket.receive_json()
-        
+
         # store user's corresponding websocket
         self.users_ws[user_id] = websocket
 
