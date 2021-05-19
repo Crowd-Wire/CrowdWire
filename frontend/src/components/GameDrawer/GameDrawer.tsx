@@ -112,14 +112,9 @@ const GameDrawer = () => {
    * Remove notifications when scroll to bottom
    */
   const handleScroll = () => {
-    console.log("LISTENING")
-    if (textChat.scrollTop === textChat.scrollHeight - textChat.clientHeight) {
+    if (textChat.scrollTop === textChat.scrollHeight - textChat.clientHeight)
       setNumMessagesSeen(numMessages);
-      console.log("BOTTOM")
-    }
   }
-
-  window['lixo'] = () => {console.log(textChat)}
 
   const handleDrawerOpen = (component) => {
     if (open && drawer && component && component.type === drawer.type) {

@@ -16,13 +16,6 @@ const Chat = (props) => {
   const messages = useMessageStore(state => state.messages);
   const chat = React.useRef();
 
-  // window.onscroll = () => {
-  //   console.log(chat, chat['offsetHeight'])
-  //   if ((window.innerHeight + window.scrollY) >= chat['offsetHeight']) {
-  //     console.log("BOOOTTTOOMM")
-  //   }
-  // };
-
   const handleChange = (event) => {
     setText(event.target.value);
   }
