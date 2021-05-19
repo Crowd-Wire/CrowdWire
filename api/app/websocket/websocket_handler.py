@@ -132,7 +132,7 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
         'topic': protocol.WIRE_PLAYER,
         'merge': False,
         'ids': await redis_connector.get_group_users(conference_id)
-        }, user_id)
+    }, user_id)
     await send_groups_snapshot(world_id)
 
 
@@ -174,7 +174,7 @@ async def leave_conference(world_id: str, user_id: str):
         'topic': protocol.UNWIRE_PLAYER,
         'merge': False,
         'ids': []
-        }, user_id)
+    }, user_id)
     await send_groups_snapshot(world_id)
 
 
