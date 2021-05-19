@@ -122,7 +122,6 @@ export const getSocket = (worldId) => {
               clearInterval(heartbeat);
             }
         }, 5000);
-        await socket.send(JSON.stringify({token: '', room_id: '1'}));//lixo lixo lixo falhar PR
     };
 
     socket.onmessage = (event) => {
