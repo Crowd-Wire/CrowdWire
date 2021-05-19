@@ -193,7 +193,7 @@ class GameScene extends Phaser.Scene {
                 const conferenceId = tile.properties.id;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
-                    this.inRangePlayers = new Set();
+                    GameScene.inRangePlayers = new Set();
                     player.ws.joinConference(conferenceId);
                 }
             }
