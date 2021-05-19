@@ -177,26 +177,26 @@ async def update_world_user_info(
             db_obj=world_user_obj,
             obj_in=user_data
         )
-    else:
-        # for guest users retrieve data from redis
-        # no need to verify the privacy of the world, since it already done when a user
-        # joins the world for the first time
-        world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
-        if not world_user_obj:
-            raise HTTPException(
-                status_code=400,
-                detail=strings.USER_NOT_IN_WORLD
-            )
-        data = {'username': user_data.username, 'avatar': user_data.avatar}
-        # updates the data present
-        await redis_connector.save_world_user_data(
-            world_id=world_id,
-            user_id=user.user_id,
-            data=data
+
+    # for guest users retrieve data from redis
+    # no need to verify the privacy of the world, since it already done when a user
+    # joins the world for the first time
+    world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
+    if not world_user_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=strings.USER_NOT_IN_WORLD
         )
-        world_user = {'world_id': world_id, 'user_id': user.user_id, 'role_id': world_user_obj.role.role_id}
-        world_user.update(data)
-        logger.debug(world_user)
+    data = {'username': user_data.username, 'avatar': user_data.avatar}
+    # updates the data present
+    await redis_connector.save_world_user_data(
+        world_id=world_id,
+        user_id=user.user_id,
+        data=data
+    )
+
+    world_user = {'world_id': world_id, 'user_id': user.user_id, 'role_id': world_user_obj.role.role_id}
+    world_user.update(data)
     return world_user
 
 
