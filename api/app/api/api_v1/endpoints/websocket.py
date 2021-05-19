@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
-from app.websocket.connection_manager import manager
-from app.websocket import websocket_handler as wh
+from app.websockets.connection_manager import manager
+from app.websockets import websocket_handler as wh
 from app.api import dependencies as deps
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol

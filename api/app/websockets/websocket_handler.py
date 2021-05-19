@@ -3,7 +3,7 @@ import json
 from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
-from app.websocket.connection_manager import manager
+from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 
