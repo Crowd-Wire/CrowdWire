@@ -138,7 +138,6 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
     permission = await redis_connector.can_talk_conference(world_id, user_id)
     await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
 
-    
     conference_users = set(await redis_connector.get_group_users(world_id, conference_id))
     await manager.send_personal_message({
         'topic': protocol.WIRE_PLAYER, 'merge': False,
