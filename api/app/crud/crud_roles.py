@@ -4,9 +4,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app.models import Role, World_User, User, World
 from .base import CRUDBase
-from app.schemas import RoleCreate, RoleUpdate
+from app.schemas import RoleCreate, RoleUpdate, AnyUser
 from ..core import strings
 from ..redis.redis_decorator import cache, clear_cache_by_model
+from app.crud import crud_user
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
@@ -66,6 +67,25 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if not role:
             return None, strings.ROLES_NOT_FOUND
         return role, ""
+
+    async def can_assign_new_role_to_user(
+            self, db: Session, world_id: int, request_user: int, user_to_change: AnyUser, role_id: int):
+
+        # verifies if the given user is present in the database
+        if not user_to_change.is_guest_user:
+            if not crud_user.get(db=db, id=user_to_change.user_id):
+                return None, strings.USER_NOT_FOUND
+
+        # verifies if the user can access_roles
+        role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=request_user)
+        if role is None:
+            return None, strings.ACCESS_FORBIDDEN
+
+        # checks if the provided role exists and returns it
+        new_role, msg = await crud_role.get_by_role_id(db=db, role_id=role_id)
+        if new_role is None:
+            return None, msg
+        return new_role, ""
 
     @cache(model="Role")
     async def get_by_role_id_and_world_id(self, db: Session, role_id: int, world_id: int) -> Tuple[Optional[Role], str]:

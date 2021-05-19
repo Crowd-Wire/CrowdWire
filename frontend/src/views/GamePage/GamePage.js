@@ -12,6 +12,9 @@ import useWorldUserStore from '../../stores/useWorldUserStore';
 import { useNavigate } from "react-router-dom";
 import { getSocket } from "../../services/socket.js";
 
+import RoomCall from "./../../components/Communications/RoomCall";
+
+
 const GamePage = (props) => {
 
   const { classes } = props;
@@ -72,6 +75,7 @@ const GamePage = (props) => {
           <GameDrawer />
           <div className={classes.gameWindow}>
             {/* Game */}
+            <RoomCall />
             <Phaser />
           </div>
         </div>

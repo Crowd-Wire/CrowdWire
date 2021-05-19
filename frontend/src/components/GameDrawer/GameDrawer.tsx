@@ -12,7 +12,7 @@ import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
-import UserList from './Sections/UserList';
+import UserList from './Sections/UserList.js';
 import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
@@ -68,7 +68,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerHeader: {
       display: 'flex',
+      height: "64px",
       alignItems: 'center',
+      "box-sizing": "border-box",
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
@@ -80,32 +82,37 @@ const useStyles = makeStyles((theme: Theme) =>
 const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
   const [notifications, setNotifications] = React.useState(2);
 
   const handleDrawerOpen = (component) => {
-    setDrawer(component);
-    setPage(null);
+    if (open && drawer && component && component.type === drawer.type) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+      setDrawer(component);
+      setPage(null);
+    }
   };
 
   const handleDrawerClose = () => {
-    setDrawer(null);
+    setOpen(false);
   };
 
   const handleOpen = (component) => {
-    setPage(component);
-    setDrawer(null);
+    if (page && component && component.type === page.type) {
+      setPage(null);
+    } else {
+      setPage(component);
+      setOpen(false);
+    }
   };
 
   const handleClose = () => {
     setPage(null);
-  };
-
-  const handleOpenInvite = () => {
-    setPage(<GenerateInviteCard/>);
-    setDrawer(null);
   };
 
   document.addEventListener('fullscreenchange', (event) => {
@@ -187,7 +194,7 @@ const GameDrawer = () => {
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpenInvite()}
+            onClick={() => handleOpen(<GenerateInviteCard />)}
           >
             <LinkIcon style={iconsStyle} />
           </IconButton>
@@ -200,9 +207,7 @@ const GameDrawer = () => {
           </IconButton>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpen(
-                <WSettingsContent />
-            )}
+            onClick={() => handleOpen(<WSettingsContent />)}
           >
             <SettingsIcon style={iconsStyle} />
           </IconButton>
@@ -218,7 +223,7 @@ const GameDrawer = () => {
         className={classes.drawer}
         variant="persistent"
         anchor="left"
-        open={drawer != null}
+        open={open}
         classes={{
           paper: classes.drawerPaper,
         }}
