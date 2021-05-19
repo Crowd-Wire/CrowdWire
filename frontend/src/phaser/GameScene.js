@@ -163,12 +163,10 @@ class GameScene extends Phaser.Scene {
 
     handlePlayerConnection = (players, prevPlayers) => {
         const storePlayers = usePlayerStore.getState().players;
-        console.log("CHANGE", storePlayers, players, prevPlayers)
         if (players.length > prevPlayers.length) {
             // connection
             for (const id of players) {
                 if (!(id in this.remotePlayers)) {
-                    console.log("PHASER CONNECTION")
                     const position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
                     this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
@@ -178,7 +176,6 @@ class GameScene extends Phaser.Scene {
             // disconnection
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
-                    console.log("PHASER DISCONNECTION")
                     if (this.remotePlayers[id]) {
                         this.remotePlayers[id].disconnect();
                         delete this.remotePlayers[id];
@@ -389,16 +386,6 @@ class Player extends Phaser.GameObjects.Container {
             this.lastVelocity = this.body.velocity.clone();
             this.scene.updateConferences(this);
         }
-
-        // if (this.step == 1 && !this.body.speed) {
-        //     this.ws.sendMovement('1', this.body.position, this.body.velocity);
-        //     this.step = 0;
-        //     console.log(this)
-        // } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-        //     this.ws.sendMovement('1', this.body.position.subtract(this.body.newVelocity), this.body.velocity);
-        //     this.lastVelocity = this.body.velocity.clone();
-        //     this.step = 1;
-        // }
     }
 
     updateAnimation(velocity) {

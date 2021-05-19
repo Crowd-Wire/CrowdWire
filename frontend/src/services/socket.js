@@ -133,7 +133,7 @@ export const getSocket = (worldId) => {
 
       var data = JSON.parse(event.data);
 
-      console.info(`[message] Data received for topic ${data.topic}`, data);
+      console.info(`[message] Data received for topic ${data.topic}`);
 
       switch (data.topic) {
         case "SEND_MESSAGE":
