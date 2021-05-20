@@ -1,4 +1,4 @@
-from .users import UserInLogin, GuestUser, UserCreate, UserUpdate, UserInDB, UserCreateGoogle, AnyUser
+from .users import UserInLogin, GuestUser, UserCreate, UserUpdate, UserInDB, UserCreateGoogle
 from .worlds import WorldCreate, WorldUpdate, WorldInDB, WorldMapInDB
 from .tags import TagInDB
 from .token import Token, TokenPayload, TokenGuest, InviteTokenPayload
