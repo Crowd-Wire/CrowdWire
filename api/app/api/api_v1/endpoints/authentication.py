@@ -154,6 +154,7 @@ def reset_token(
         "expire_date": str(expires),
     }
 
+
 @router.post('/login/google')
 async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.get_db)):
     """
@@ -161,7 +162,7 @@ async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.ge
     """
     try:
         user = id_token.verify_oauth2_token(token.token, requests.Request(), settings.CLIENT_ID)
-    except OAuthError:
+    except Exception:
         return {"error": "Invalid Authentication"}
 
     print(user)
