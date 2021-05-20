@@ -26,6 +26,7 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
+import GoogleLogin from 'react-google-login';
 
 class LoginPage extends React.Component {
 
@@ -111,6 +112,20 @@ class LoginPage extends React.Component {
 
   }
 
+  handleGoogle = (response) => {
+    console.log(response.tokenId);
+    AuthenticationService.googleAuth(response.tokenId)
+    .then((res) => {
+      if(res.ok)
+        return res.json();
+    }).then((res)=>{
+      if(res.access_token!==undefined){
+        this.notify("Auth");
+        AuthenticationService.setToken(res, "AUTH");
+      }
+    })
+  }
+
 
   render() {
     return (
@@ -131,15 +146,12 @@ class LoginPage extends React.Component {
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                       <h4>Login</h4>
                       <div className={this.props.classes.socialLine}>
-                        <Button
-                          justIcon
-                          target="_blank"
-                          color="transparent"
-                          style={{ border: "1px solid #476385" }}
-                          onClick={e => e.preventDefault()}
-                        >
-                          <i className={"fab fa-google"} />
-                        </Button>
+                        <GoogleLogin
+                          clientId="251817047000-upjua2t776rni76i52grnpmbi2ju1i2c.apps.googleusercontent.com"
+                          buttonText="Join"
+                          onSuccess={this.handleGoogle}
+                          onFailure={this.handleGoogle}
+                        />                        
                       </div>
                     </CardHeader>
                     <p className={this.props.classes.divider}>Or Be Classical</p>
