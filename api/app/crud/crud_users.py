@@ -83,7 +83,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         A User cannot be normally registered in the application and then try to login with google.
         """
 
-        user_db = self.get_sub(db=db, sub=user.sub)
+        user_db = self.get_sub(db=db, sub=user.get('sub'))
 
         if user_db and self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
             # If there is already an account with that google email that is not linked to google
@@ -93,7 +93,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             # User is not registered
             # Create an account
             user_create = UserCreateGoogle(
-                email=user.email, name=user.name, sub=user.sub
+                email=user.get('email'), name=user.get('name'), sub=user.get('sub')
             )
             return crud_user.create_google(db=db, user=user_create)
 
