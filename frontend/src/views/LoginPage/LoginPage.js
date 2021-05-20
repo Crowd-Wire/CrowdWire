@@ -126,6 +126,12 @@ class LoginPage extends React.Component {
     })
   }
 
+  handleGoogleFail = (response) =>{
+    console.log("fail")
+    // TODO: handle this case
+
+  }
+
 
   render() {
     return (
@@ -148,9 +154,8 @@ class LoginPage extends React.Component {
                       <div className={this.props.classes.socialLine}>
                         <GoogleLogin
                           clientId="251817047000-upjua2t776rni76i52grnpmbi2ju1i2c.apps.googleusercontent.com"
-                          buttonText="Join"
                           onSuccess={this.handleGoogle}
-                          onFailure={this.handleGoogle}
+                          onFailure={this.handleGoogleFail}
                         />                        
                       </div>
                     </CardHeader>

@@ -1,27 +1,21 @@
 from datetime import timedelta
 from typing import Any, Union
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from authlib.integrations.starlette_client import OAuth, OAuthError
-from starlette.config import Config
-from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
 from google.oauth2 import id_token
 from google.auth.transport import requests
-
-
+from app.core.config import settings
+from app.utils import is_guest_user
 # from app.core.security import get_password_hash
 # from app.utils import (
 # generate_password_reset_token,
 # send_reset_password_email,
 # verify_password_reset_token,
 # )
-from app.core.config import settings
-from app.utils import is_guest_user
 
 router = APIRouter()
 
