@@ -32,6 +32,7 @@ USER_ALREADY_REPORTED_IN_THIS_WORLD = "You have already reported this user in th
 USER_REPORT_NOT_FOUND = "This report does not exist."
 INVALID_PAGE_NUMBER = "Invalid page number."
 INVALID_WORLD_VISIBILITY_FILTER = "The filter provided is not valid."
+K8S_CLUSTER_NOT_FOUND = "No Kubernetes cluster found!"
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 AUTHENTICATION_SUCCESS = "Success Authenticating."
@@ -41,3 +42,4 @@ WORLD_DELETED_SUCCESS = "Success Deleting World"
 ROLE_UPDATED_SUCCESS = "Success Updating Role"
 ROLE_DELETED_SUCCESS = "Success Deleting Role"
 ROLE_CHANGED_SUCCESS = "Changed Role with Success"
+SCALE_UP_SUCCESS = "Success updating number of replicas"

@@ -31,7 +31,7 @@ class ConnectionManager:
         await websocket.accept()
         await websocket.receive_json()
 
-        # store user's corresponding websocket
+        # store user's corresponding websockets
         self.users_ws[user_id] = websocket
 
         # send players snapshot
