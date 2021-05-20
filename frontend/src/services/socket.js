@@ -51,19 +51,17 @@ let consumerQueue = [];
 
 export const getSocket = (worldId) => {
 
-  const joinRoom = async (roomId, position) => {
+  const joinRoom = async (position) => {
     const payload = {
       topic: "JOIN_PLAYER",
-      room_id: roomId,
       position
     }
     await wsend(payload);
   }
 
-  const sendMovement = async (roomId, position, velocity) => {
+  const sendMovement = async (position, velocity) => {
     const payload = {
       topic: "PLAYER_MOVEMENT",
-      room_id: roomId,
       position,
       velocity,
     }
@@ -78,26 +76,25 @@ export const getSocket = (worldId) => {
     await wsend(payload);
   }
 
-  const leaveConference = async () => {
+  const leaveConference = async (conferenceId) => {
     const payload = {
       topic: "LEAVE_CONFERENCE",
+      conference_id: conferenceId,
     }
     await wsend(payload);
   }
 
-  const wirePlayer = async (roomId, usersId) => {
+  const wirePlayer = async (usersId) => {
     const payload = {
       topic: "WIRE_PLAYER",
-      // room_id: roomId,
       users_id: usersId,
     }
     await wsend(payload);
   }
 
-  const unwirePlayer = async (roomId, usersId) => {
+  const unwirePlayer = async (usersId) => {
     const payload = {
       topic: "UNWIRE_PLAYER",
-      // room_id: roomId,
       users_id: usersId,
     }
     await wsend(payload);
@@ -125,7 +122,6 @@ export const getSocket = (worldId) => {
               clearInterval(heartbeat);
             }
         }, 5000);
-        await socket.send(JSON.stringify({token: '', room_id: '1'}));
     };
 
     socket.onmessage = (event) => {
