@@ -38,7 +38,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
     payload['from'] = f"User{user_id}"
-    await manager.broadcast(world_id, '1', payload, None)
+    await manager.broadcast(world_id, payload)
 
 
 # TODO: remove after tests
@@ -51,7 +51,7 @@ async def send_groups_snapshot(world_id: str):
     for uid in manager.users_ws:
         groups[uid] = await redis_connector.smembers(f"world:{world_id}:user:{uid}:groups")
 
-    await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
+    await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups})
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
