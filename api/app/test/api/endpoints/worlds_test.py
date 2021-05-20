@@ -386,7 +386,6 @@ class TestWorlds(TestCase):
             assert response.status_code == 400
             assert mock_delete.call_count == 1
 
-
     def test_update_world_user_info_change_others_guest(self):
         """
         Expects 400 Bad Request when guest tries to change another user info.
@@ -474,76 +473,44 @@ class TestWorlds(TestCase):
         Expects 400 Bad Request when user tries to update its info in a not joined world.
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
-            mock_get.return_value = None
+        with patch("app.crud.crud_world_users.CRUDWorld_User.update_world_user_info") as mock_put:
+            mock_put.return_value = None , ""
 
             response = client.put(
                 "/worlds/1/users/1",
                 json={}
             )
             assert response.status_code == 400
-            assert mock_get.call_count == 1
+            assert mock_put.call_count == 1
 
-
-    def test_update_world_user_info_joined_user(self):
+    def test_update_world_user_info_access_user(self):
         """
         Expects 200 Ok when a user tries to update its info in a joined world.
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
-            with patch("app.crud.crud_world_users.CRUDWorld_User.update") as mock_update:
-                mock_get.return_value = World_User(role_id=1, avatar="avatar_1", username="name")
-                mock_update.return_value = World_User(
-                    role_id=1, avatar="avatar_1", username="new_username", world_id=1
-                )
+        with patch("app.crud.crud_world_users.CRUDWorld_User.update_world_user_info") as db_update:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
+                with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_put:
+                    role = models.Role(role_id=1, world_id=1)
 
-                response = client.put(
-                    "/worlds/1/users/1",
-                    json={
-                        'username': 'new_username'
-                    }
-                )
+                    db_update.return_value = World_User(role_id=1, avatar="avatar_1", username="name"), ""
+                    mock_get.return_value = schemas.World_UserWithRoleInDB(
+                        role_id=1, avatar='avatar_1', username='name', role=role, world_id=1
+                    )
 
-                assert response.status_code == 200
-                assert response.json()['username'] == "new_username"
-                assert response.json()['avatar'] == 'avatar_1'
-                assert response.json()['world_id'] == 1
-                assert mock_get.call_count == 1
-                assert mock_update.call_count == 1
+                    response = client.put(
+                        "/worlds/1/users/1",
+                        json={
+                            'username': 'new_username'
+                        }
+                    )
 
-
-    def test_update_world_user_info_joined_guest(self):
-        """
-        Expects 200 Ok when a guest updates tries to update its info in a joined world.
-        """
-
-        app.dependency_overrides[get_current_user] = override_dependency_guest
-        with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
-            with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_post:
-                role = {'role_id': 1, 'world_id': 1}
-
-                mock_get.return_value = schemas.World_UserWithRoleInDB(
-                    world_id=1,
-                    user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6",
-                    avatar='avatar_2',
-                    username='name',
-                    role=schemas.RoleInDB(**role)
-                )
-
-                response = client.put(
-                    "/worlds/1/users/1",
-                    json={
-                        'username': 'new_username',
-                        'avatar': 'avatar_1'
-                    }
-                )
-
-                assert response.status_code == 200
-                assert response.json()['world_id'] == 1
-                assert response.json()['username'] == 'new_username'
-                assert response.json()['avatar'] == 'avatar_1'
-                assert mock_get.call_count == 1
-                assert mock_post.call_count == 1
+                    assert response.status_code == 200
+                    assert response.json()['username'] == "new_username"
+                    assert response.json()['avatar'] == 'avatar_1'
+                    assert db_update.call_count == 1
+                    assert mock_get.call_count == 1
+                    assert mock_put.call_count == 1
 
     def test_update_world_guest(self):
         """
