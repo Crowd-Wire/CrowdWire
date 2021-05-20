@@ -198,15 +198,14 @@ async def update_world_user_info(
             status_code=400,
             detail=strings.USER_NOT_IN_WORLD
         )
-    data = dict(user_data)
-    logger.debug(data)
+
+    data = { k:v for k, v in dict(user_data).items() if v is not None }
     # updates the data present
     await redis_connector.save_world_user_data(
         world_id=world_id,
         user_id=user_id,
         data=data
     )
-
     world_user = {
         'world_id': world_id,
         'user_id': user.user_id,

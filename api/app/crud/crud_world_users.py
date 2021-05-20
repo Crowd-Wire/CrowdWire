@@ -101,7 +101,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         )
         return world_user, ""
 
-
     async def join_world(self, db: Session, _world: World, _user: User) -> Tuple[World_User, Role]:
         """
         Create an entry in the World_User table and in Redis if user doesn't exist already.
