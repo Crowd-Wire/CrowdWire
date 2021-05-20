@@ -113,7 +113,7 @@ class GameScene extends Phaser.Scene {
         this.player = new Player(this, 50, 50);
 
         // connect to room
-        this.ws.joinRoom('1', {x: 50, y: 50});
+        this.ws.joinRoom({x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
@@ -127,6 +127,11 @@ class GameScene extends Phaser.Scene {
             globalVar = !globalVar;
         }, this);
         
+        Object.entries(usePlayerStore.getState().players).forEach(([id, player]) => {
+            const position = player.position;
+            this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
+            this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
+        })
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
         // TODO: remove after testing
@@ -158,12 +163,11 @@ class GameScene extends Phaser.Scene {
 
     handlePlayerConnection = (players, prevPlayers) => {
         const storePlayers = usePlayerStore.getState().players;
-        
         if (players.length > prevPlayers.length) {
             // connection
             for (const id of players) {
                 if (!(id in this.remotePlayers)) {
-                    let position = usePlayerStore.getState().players[id].position;
+                    const position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
                     this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
                 }
@@ -189,7 +193,7 @@ class GameScene extends Phaser.Scene {
                 const conferenceId = tile.properties.id;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
-                    this.inRangePlayers = new Set();
+                    GameScene.inRangePlayers = new Set();
                     player.ws.joinConference(conferenceId);
                 }
             }
@@ -215,7 +219,7 @@ class GameScene extends Phaser.Scene {
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
                     // wire players
-                    this.ws.wirePlayer('1', 
+                    this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
                             const entered = !GameScene.inRangePlayers.has(id);
                             if (entered) GameScene.inRangePlayers.add(id);
@@ -224,7 +228,7 @@ class GameScene extends Phaser.Scene {
                     );
                 } else {
                     // unwire players
-                    this.ws.unwirePlayer('1', 
+                    this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
                             const left = !rangePlayers.includes(id);
                             if (left) {
@@ -378,20 +382,10 @@ class Player extends Phaser.GameObjects.Container {
         this.body.velocity.normalize().scale(this.speed);
 
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-            this.ws.sendMovement('1', this.body.position.clone().subtract(this.body.offset), this.body.velocity);
+            this.ws.sendMovement(this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
             this.scene.updateConferences(this);
         }
-
-        // if (this.step == 1 && !this.body.speed) {
-        //     this.ws.sendMovement('1', this.body.position, this.body.velocity);
-        //     this.step = 0;
-        //     console.log(this)
-        // } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-        //     this.ws.sendMovement('1', this.body.position.subtract(this.body.newVelocity), this.body.velocity);
-        //     this.lastVelocity = this.body.velocity.clone();
-        //     this.step = 1;
-        // }
     }
 
     updateAnimation(velocity) {
