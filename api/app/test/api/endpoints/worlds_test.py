@@ -586,7 +586,7 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             access.return_value = None, ""
-            response = client.get(
+            response = client.post(
                 "/worlds/1/users"
             )
             assert response.status_code == 400
@@ -604,7 +604,7 @@ class TestWorlds(TestCase):
                 cache.return_value = schemas.World_UserWithRoleAndMap(
                     map="".encode(), role=role, role_id=1, world_id=1
                 )
-                response = client.get(
+                response = client.post(
                     "/worlds/1/users"
                 )
                 assert response.status_code == 200
@@ -626,7 +626,7 @@ class TestWorlds(TestCase):
                     join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
                                          models.Role(role_id=1, world_id=1))
 
-                    response = client.get(
+                    response = client.post(
                         "/worlds/1/users"
                     )
                     assert response.status_code == 200
@@ -643,7 +643,7 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_guest
         with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
             access.return_value = None, ""
-            response = client.get(
+            response = client.post(
                 "/worlds/1/users"
             )
             assert response.status_code == 400
@@ -661,7 +661,7 @@ class TestWorlds(TestCase):
                 cache.return_value = schemas.World_UserWithRoleAndMap(
                     map="".encode(), role=role, role_id=1, world_id=1
                 )
-                response = client.get(
+                response = client.post(
                     "/worlds/1/users"
                 )
                 assert response.status_code == 200
@@ -687,8 +687,8 @@ class TestWorlds(TestCase):
                         join.return_value = schemas.World_UserWithRoleInDB(
                             role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
                         )
-                        response = client.get(
-                            "/worlds/1/users"
+                        response = client.post(
+                            "/worlds/1/users",
                         )
                         assert response.status_code == 200
                         assert response.json()['role']['role_id'] == 1
@@ -710,7 +710,7 @@ class TestWorlds(TestCase):
                 map="".encode(), role=role, role_id=1, world_id=1
             )
 
-            response = client.get(
+            response = client.post(
                 "/worlds/invite/correct"
             )
 
@@ -731,7 +731,7 @@ class TestWorlds(TestCase):
                 join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
                                      models.Role(role_id=1, world_id=1))
 
-                response = client.get(
+                response = client.post(
                     "/worlds/invite/correct"
                 )
 
@@ -754,7 +754,7 @@ class TestWorlds(TestCase):
                 map="".encode(), role=role, role_id=1, world_id=1
             )
 
-            response = client.get(
+            response = client.post(
                 "/worlds/invite/correct"
             )
 
@@ -779,7 +779,7 @@ class TestWorlds(TestCase):
                     join.return_value = schemas.World_UserWithRoleInDB(
                         role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
                     )
-                    response = client.get(
+                    response = client.post(
                         "/worlds/invite/correct"
                     )
 
@@ -789,3 +789,53 @@ class TestWorlds(TestCase):
                     assert cache.call_count == 1
                     assert default_role.call_count == 1
                     assert join.call_count == 1
+
+    def test_get_all_users_from_world_guest(self):
+        """
+        Expects 403 Forbidden when a guest tries to retrieve all users from world.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+
+        response = client.get(
+            "/worlds/1/users"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_get_all_users_from_world_no_access_user(self):
+        """
+        Expects 400 Bad Request when user tries to access all users from world without permission.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as access:
+            access.return_value = None, ""
+
+            response = client.get(
+                "/worlds/1/users"
+            )
+
+            assert response.status_code == 400
+            assert access.call_count == 1
+
+    def test_get_all_users_from_world_with_access_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as access:
+            with patch("app.crud.crud_world_users.CRUDWorld_User.get_all_registered_users") as get_users:
+
+                access.return_value = models.Role(), ""
+                get_users.return_value = [
+                    models.World_User(world_id=1, role_id=1, user_id=1),
+                    models.World_User(world_id=1, role_id=1, user_id=2)
+                ]
+
+                response = client.get(
+                    "/worlds/1/users"
+                )
+
+                assert response.status_code == 200
+                assert len(response.json()) == 2
+                assert response.json()[0]['user_id'] == 1
+                assert response.json()[1]['user_id'] == 2
+                assert access.call_count == 1
+                assert get_users.call_count == 1

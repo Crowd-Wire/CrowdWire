@@ -33,7 +33,7 @@ async def get_world(
     return db_world
 
 
-@router.get("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world_by_link(
         invite_token: str = None,
         *,
@@ -63,7 +63,7 @@ async def join_world_by_link(
     return world_user
 
 
-@router.get("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -280,3 +280,20 @@ async def delete_world(
             detail=message
         )
     return world_obj
+
+
+@router.get("/{world_id}/users", response_model=List[schemas.World_UserInDB])
+async def get_all_users_from_world(
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user),
+) -> Any:
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    role, msg = await crud.crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    if role is None:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return crud.crud_world_user.get_all_registered_users(db=db, world_id=world_id)
