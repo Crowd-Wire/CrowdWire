@@ -64,6 +64,43 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         db.commit()
         return updated_objs, ""
 
+    async def update_world_user_info(
+            self, db: Session, world_id: int, request_user: User, user_to_change: int, world_user_data: World_UserUpdate
+    ):
+
+        # checks if the user has already joined this world
+        world_user_obj = self.get_user_joined(db=db, world_id=world_id, user_id=user_to_change)
+        if not world_user_obj:
+            return None, strings.USER_NOT_IN_WORLD
+
+        # checks if the user has access to change status if status is given
+        role, msg = await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=request_user.user_id)
+        if world_user_data.status and role is None:
+            return None, strings.USER_NO_ROLE_PERMISSIONS
+
+        # checks if the user is either itself or has access to change user status
+        if request_user.user_id != user_to_change and role is None:
+            return None, strings.USER_NO_ROLE_PERMISSIONS
+
+        # checks if it is the world the one changing its username or avatar
+        if request_user.user_id != user_to_change and (world_user_obj.username or world_user_obj.avatar):
+            return None, strings.CHANGE_USER_INFO_FORBIDDEN
+
+        if world_user_data.status is None:
+            delattr(world_user_data, 'status')
+        if world_user_data.username is None:
+            delattr(world_user_data, 'username')
+        if world_user_data.avatar is None:
+            delattr(world_user_data, 'avatar')
+
+        # no need to return error
+        world_user = self.update(
+            db=db,
+            db_obj=world_user_obj,
+            obj_in=world_user_data
+        )
+        return world_user, ""
+
     async def join_world(self, db: Session, _world: World, _user: User) -> Tuple[World_User, Role]:
         """
         Create an entry in the World_User table and in Redis if user doesn't exist already.

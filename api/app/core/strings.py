@@ -32,6 +32,9 @@ USER_ALREADY_REPORTED_IN_THIS_WORLD = "You have already reported this user in th
 USER_REPORT_NOT_FOUND = "This report does not exist."
 INVALID_PAGE_NUMBER = "Invalid page number."
 INVALID_WORLD_VISIBILITY_FILTER = "The filter provided is not valid."
+USER_NO_ROLE_PERMISSIONS = "Your role does not have access to this functionality."
+USER_IS_NOT_BANNABLE = "You cannot ban this user."
+CHANGE_USER_INFO_FORBIDDEN = "You cannot change this user info."
 K8S_CLUSTER_NOT_FOUND = "No Kubernetes cluster found!"
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
