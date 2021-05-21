@@ -202,17 +202,26 @@ class RedisConnector:
             return role['conference_manage']
         return False
 
-    async def get_user_position(self, world_id: str, room_id: str, user_id: str) -> dict:
+    async def get_user_position(self, world_id: str, user_id: str) -> dict:
         """Get last user position received"""
         pairs = await self.master.execute('hgetall',
-                                          f"world:{world_id}:room:{room_id}:user:{user_id}:position", encoding="utf-8")
+                                          f"world:{world_id}:user:{user_id}:position", encoding="utf-8")
         return {k: float(v) for k, v in zip(pairs[::2], pairs[1::2])}
 
-    async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
+    async def set_user_position(self, world_id: str, user_id: str, position: dict):
         """Update last user position received"""
         return await self.master.execute('hmset',
-                                         f"world:{world_id}:room:{room_id}:user:{user_id}:position", 'x', position['x'],
+                                         f"world:{world_id}:user:{user_id}:position", 'x', position['x'],
                                          'y', position['y'])
+
+    async def get_world_users(self, world_id: str):
+        return await self.smembers(f"world:{world_id}:users")
+
+    async def add_users_to_world(self, world_id: str, user_id: str, *users_id: List[str]):
+        return await self.sadd(f"world:{world_id}:users", user_id, *users_id)
+
+    async def rem_users_from_world(self, world_id: str, user_id: str, *users_id: List[str]):
+        return await self.srem(f"world:{world_id}:users", user_id, *users_id)
 
     async def get_user_users(self, world_id: str, user_id: str):
         """Get nearby users from a user"""

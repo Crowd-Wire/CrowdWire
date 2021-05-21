@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app.models import Role, World_User, User, World
 from .base import CRUDBase
-from app.schemas import RoleCreate, RoleUpdate, AnyUser
+from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
@@ -69,11 +69,11 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         return role, ""
 
     async def can_assign_new_role_to_user(
-            self, db: Session, world_id: int, request_user: int, user_to_change: AnyUser, role_id: int):
+            self, db: Session, world_id: int, request_user: int, user_id: int, is_guest: bool, role_id: int):
 
         # verifies if the given user is present in the database
-        if not user_to_change.is_guest_user:
-            if not crud_user.get(db=db, id=user_to_change.user_id):
+        if not is_guest:
+            if not crud_user.get(db=db, id=user_id):
                 return None, strings.USER_NOT_FOUND
 
         # verifies if the user can access_roles

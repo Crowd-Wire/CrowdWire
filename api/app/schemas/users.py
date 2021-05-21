@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Optional
 from pydantic import BaseModel, EmailStr, UUID4
 import datetime
 
@@ -15,11 +15,6 @@ class UserBase(BaseModel):
 class GuestUser(UserBase):
     user_id: UUID4
     is_guest_user: bool = True
-
-
-class AnyUser(UserBase):
-    user_id: Union[int, UUID4]
-    is_guest_user: bool
 
 
 # schema for Login
