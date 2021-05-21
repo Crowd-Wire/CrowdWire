@@ -21,6 +21,7 @@ export default function RolePanel(props){
 	const [showDialog, setShowDialog] = React.useState(false);
 	const [name, setName] = React.useState("");
 	const [usersInRole, setUsersInRole] = React.useState([]);
+	let roleUsers;
 
 	const handleClose = () => {
 		setShowDialog(false);
@@ -43,7 +44,6 @@ export default function RolePanel(props){
 			return res.json();
 		})
 		.then((res)=>{
-			console.log(res);
 			if(!res)
 				return;
 			setRoles([]);
@@ -83,13 +83,12 @@ export default function RolePanel(props){
 			let temp = [];
 
 			Object.keys(roles).forEach((key) => {
-				let roleUsers = []
+				roleUsers = [];
 				if(usersInRole.length){
 					let i = 0;
 					for(let user of usersInRole){
 						if(user.role_id===parseInt(key)){
 							roleUsers.push(user);
-							usersInRole.splice(i,1)
 						}
 						i++;
 					}
@@ -101,6 +100,7 @@ export default function RolePanel(props){
 				);
 				setRolekeys(temp);
 			})
+			console.log(rolekeys);
 		}
 	},[roles, props.world, usersInRole])
 

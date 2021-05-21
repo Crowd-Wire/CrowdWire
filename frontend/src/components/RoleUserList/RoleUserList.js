@@ -51,6 +51,7 @@ export default function RoleUserList(props){
                 <Col id="droppable" ref={drop} style={{width:"100%", minHeight:"20px", border:"1px solid #58B6B8", borderRadius:"10px"}}>
                     {value.map((user, index) => {
                         console.log(roleName);
+                        console.log(user);
                         return <UserRow key={index} user={user.username} index={[roleName, index]} id={index} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
                     })
                     }
