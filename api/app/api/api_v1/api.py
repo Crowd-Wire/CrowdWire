@@ -9,6 +9,6 @@ api_router.include_router(
     websocket.router, prefix="/ws", tags=["websockets"]
 )
 api_router.include_router(worlds.router, prefix="/worlds", tags=["worlds"])
-api_router.include_router(roles.router, prefix="/worlds/{world_id}/roles", tags=["roles"])
 api_router.include_router(tags.router, prefix="/tags", tags=["tags"])
+api_router.include_router(roles.router, prefix="/worlds/{world_id}/roles", tags=["roles"])
 api_router.include_router(world_reports.router, prefix="/worlds/{world_id}/reports", tags=["reports"])
