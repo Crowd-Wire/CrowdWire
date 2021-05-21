@@ -188,8 +188,8 @@ async def get_room_users_files(world_id: str, user_id: str):
 async def request_to_download(world_id: str, user_id: str, payload: dict):
     file_data = payload['file']
     await manager.send_personal_message(
-            {'topic': protocol.REQUEST_TO_DOWNLOAD},
-            file_data['owner'])
+        {'topic': protocol.REQUEST_TO_DOWNLOAD},
+        file_data['owner'])
 
 
 async def leave_conference(world_id: str, user_id: str):
