@@ -297,3 +297,21 @@ async def get_all_users_from_world(
         raise HTTPException(status_code=400, detail=msg)
 
     return crud.crud_world_user.get_all_registered_users(db=db, world_id=world_id)
+
+
+@router.get("/reports/", response_model=List[schemas.ReportWorldInDBWithEmail])
+async def get_all_worlds_reports(
+        page: Optional[int] = 1,
+        limit: Optional[int] = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    logger.debug("dentro crl")
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    if not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.WORLD_REPORT_ACCESS_FORBIDDEN)
+
+    reports, msg = crud.crud_report_world.get_all_world_reports(db=db, page=page, limit=limit)
+    return reports

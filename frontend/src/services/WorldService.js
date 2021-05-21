@@ -107,7 +107,6 @@ class WorldService {
         
     }
 
-
     join_world(world_id){
 
         return fetch(API_BASE + 'worlds/' + world_id + '/users',{
@@ -119,6 +118,17 @@ class WorldService {
             }
         })
 
+    }
+
+    get_all_reports(page){
+
+        return fetch(API_BASE + "worlds/reports/?page=" + page, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
     }
 
 }
