@@ -11,7 +11,7 @@ from app.schemas import World_UserCreate, World_UserUpdate
 from app.utils import choose_avatar
 from app.core import strings
 from sqlalchemy import or_
-
+from loguru import logger
 
 class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
 
@@ -73,23 +73,27 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
     async def update_world_user_info(
             self, db: Session, world_id: int, request_user: User, user_to_change: int, world_user_data: World_UserUpdate
     ):
-
+        logger.info("starting...")
         # checks if the user has already joined this world
         world_user_obj = self.get_user_joined(db=db, world_id=world_id, user_id=user_to_change)
         if not world_user_obj:
+            logger.debug("here")
             return None, strings.USER_NOT_IN_WORLD
 
         # checks if the user has access to change status if status is given
         role, msg = await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=request_user.user_id)
-        if world_user_data.status and role is None:
+        if world_user_data.status and role is None and not request_user.is_superuser:
             return None, strings.USER_NO_ROLE_PERMISSIONS
 
-        # checks if the user is either itself or has access to change user status
-        if request_user.user_id != user_to_change and role is None:
+        # checks if the user is either itself or has access to change user
+        # status (through its role or being a superuser)
+        if request_user.user_id != user_to_change and role is None and not request_user.is_superuser:
             return None, strings.USER_NO_ROLE_PERMISSIONS
 
         # checks if it is the world the one changing its username or avatar
-        if request_user.user_id != user_to_change and (world_user_obj.username or world_user_obj.avatar):
+        if request_user.user_id != user_to_change \
+                and (world_user_obj.username or world_user_obj.avatar)\
+                and not request_user.is_superuser:
             return None, strings.CHANGE_USER_INFO_FORBIDDEN
 
         if world_user_data.status is None:
@@ -116,7 +120,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         world_user = self.get_user_joined(db=db, world_id=_world.world_id, user_id=_user.user_id)
         current_time = datetime.now()
 
-        role = None
         if not world_user:
             role = crud_role.get_world_default(db=db, world_id=_world.world_id)
             assigned_avatar = choose_avatar()

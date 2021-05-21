@@ -132,6 +132,9 @@ class RedisConnector:
         role = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'role'
         )
+        logger.debug(username)
+        logger.debug(avatar)
+        logger.debug(role)
 
         if username and avatar and role:
             data = {
