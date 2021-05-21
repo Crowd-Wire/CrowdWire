@@ -28,14 +28,14 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
             World.name.label("world_name"),
             User.email.label("reporter_email")
         ).filter(
-            Report_World.reporter == User.user_id
+            Report_World.reporter == User.user_id,
+            Report_World.reported == World.world_id
         )
 
         # if world_id is not provided returns reports from all worlds
         if world_id:
             reports = reports.filter(
                 Report_World.reported == world_id,
-                World.world_id == world_id,
             )
         reports = reports.offset(page_size * (page - 1)).limit(page_size).all()
 

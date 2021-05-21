@@ -1,5 +1,5 @@
 from typing import Union, Optional, List, Any
-
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import schemas, models
@@ -27,17 +27,20 @@ async def get_all_reports_from_world(
     if not user.is_superuser:
         raise HTTPException(status_code=403, detail=strings.WORLD_REPORT_ACCESS_FORBIDDEN)
 
-    reports, msg = crud_report_world.get_all_world_reports(db=db, world_id=1, page=page, limit=limit)
+    reports, msg = crud_report_world.get_all_world_reports(db=db, world_id=world_id, page=page, limit=limit)
     return reports
 
 
 @router.post("/", response_model=ReportWorldInDB)
 async def create_world_report(
+        world_id: int,
         report: ReportWorldCreate,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
 
+    report.reported = world_id
+    report.timestamp = datetime.now()
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 

@@ -19,6 +19,7 @@ const useStyles = makeStyles({
 
 export default function WorldReportCard(props) {
 
+    const report = props.report;
     const classes = useStyles();
 
     const handleBan = () => {
@@ -34,13 +35,13 @@ export default function WorldReportCard(props) {
             <CardActionArea>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                        {props.report.world_id}
+                        {report.world_name}
                     </Typography>
                     <Typography variant="subtitle1">
-                        {props.report.reporter} {props.report.timestamp}
+                        {report.reporter_email} {report.timestamp}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
-                        {props.report.comment}
+                        {report.comment}
                     </Typography>
                 </CardContent>
             </CardActionArea>
