@@ -20,6 +20,8 @@ export default function RolePanel(props){
 	const [rolekeys,setRolekeys] = React.useState([]);
 	const [showDialog, setShowDialog] = React.useState(false);
 	const [name, setName] = React.useState("");
+	const [usersInRole, setUsersInRole] = React.useState([]);
+
 	const handleClose = () => {
 		setShowDialog(false);
 	  };
@@ -31,7 +33,7 @@ export default function RolePanel(props){
 			});
 			return;
 		}
-		RoleService.addRole(1,name).then((res)=>{
+		RoleService.addRole(props.world,name).then((res)=>{
 			if(res.status!==200){
 				toast.error("Something went wrong!", {
 					position: toast.POSITION.TOP_CENTER
@@ -49,18 +51,16 @@ export default function RolePanel(props){
 				position: toast.POSITION.TOP_CENTER
 			});
 			setShowDialog(false)
-		})
+		});
 	};
 
 	const handleChange = (event) => {
 		setName(event.target.value);
-	  };
+	};
 
 	useEffect(()=>{
-		console.log("useeffect")
-		console.log(roles)
-		if(roles.length===0){
-			RoleService.getAllRoles(1)
+		if(roles.length===0 && props.world.split("/").length===1){
+			RoleService.getAllRoles(props.world)
 			.then((res) => {
 				return res.json();
 			})
@@ -71,22 +71,38 @@ export default function RolePanel(props){
 				})
 				setRoles(newRoles);
 			});
+			RoleService.getWorldUsersWRoles(props.world)
+			.then((res)=>{
+				return res.json();
+			})
+			.then((res)=>{
+				setUsersInRole(res);
+			})
 		}
-		else{
-			let temp = []
+		else if(roles !== null){
+			let temp = [];
+
 			Object.keys(roles).forEach((key) => {
-				console.log(key);
-				console.log(roles[key])
+				let roleUsers = []
+				if(usersInRole.length){
+					let i = 0;
+					for(let user of usersInRole){
+						if(user.role_id===parseInt(key)){
+							roleUsers.push(user);
+							usersInRole.splice(i,1)
+						}
+						i++;
+					}
+				}
 				temp.push(
-					<div id={"role" + key} key={"role"+key}>
-						<RoleUserList setUsers={setUsers} roleName={roles[key].name} value={roles[key]} allRoles={Object.keys(roles)}/>
+					<div id={key} key={key}>
+						<RoleUserList setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
 					</div>
 				);
-				console.log(temp)
 				setRolekeys(temp);
 			})
 		}
-	},[roles])
+	},[roles, props.world, usersInRole])
 
 
 

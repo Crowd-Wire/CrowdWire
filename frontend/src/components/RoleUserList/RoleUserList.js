@@ -48,12 +48,13 @@ export default function RoleUserList(props){
                 </Col>
             </Row>
             <Row>
-                {/* <Col id="droppable" ref={drop} style={{width:"100%", minHeight:"20px", border:"1px solid #58B6B8", borderRadius:"10px"}}>
-                    {value.users.map((user, index) => {
-                        return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
+                <Col id="droppable" ref={drop} style={{width:"100%", minHeight:"20px", border:"1px solid #58B6B8", borderRadius:"10px"}}>
+                    {value.map((user, index) => {
+                        console.log(roleName);
+                        return <UserRow key={index} user={user.username} index={[roleName, index]} id={index} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
                     })
                     }
-                </Col> */}
+                </Col>
             </Row>
         </div>
     );

@@ -4,7 +4,7 @@ import AuthenticationService from "services/AuthenticationService.js";
 
 class RoleService {
     getAllRoles(id) {
-        return fetch(API_BASE + 'worlds/'+id+'/roles?page=1&limit=10', {
+        return fetch(API_BASE + 'worlds/'+id+'/roles?page=1', {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -21,6 +21,15 @@ class RoleService {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify({ world_id: world_id, name: name, is_default: false})
+        })
+    }
+    getWorldUsersWRoles(world_id){
+        return fetch(API_BASE + 'worlds/'+world_id+'/users', {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
         })
     }
 }

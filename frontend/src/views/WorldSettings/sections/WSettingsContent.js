@@ -35,23 +35,7 @@ class WSettingsContent extends Component {
 			mapName:""
 		};
 	}
-	
-	// getRoles = () => {
-	// 	RoleService.getAllRoles(1)
-	// 	.then((res) => {
-	// 		return res.json();
-	// 	})
-	// 	.then((res) => {
-	// 		console.log(res)
-	// 		let newRoles = this.state.roles;
-	// 		res.forEach((role)=>{
-	// 			console.log(role.role_id)
-	// 			newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute};
-	// 			console.log(newRoles)
-	// 			this.setState({roles:newRoles});
-	// 		})
-	// 	})
-	// }
+
 	setUsers = (item, rName) => {
 		this.setState(state => {
 
@@ -97,7 +81,6 @@ class WSettingsContent extends Component {
 		.then((res)=>{
 			this.setState({worldName: res.name});
 		});
-		//this.getRoles();
 	}
 
 
@@ -115,7 +98,7 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel getRoles={this.getRoles} roles={this.state.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<RolePanel getRoles={this.getRoles} roles={this.state.roles} world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
 						{/* <KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel> */}
 					</div>
 			</div>
