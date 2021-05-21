@@ -153,6 +153,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
   function toggleModalFile() {
     setShowModalFile(!showModalFile)
+    if (showModalFile) {
+      wsend({ topic: "REMOVE_ALL_USER_FILES"});
+    }
   }
 
   const handleFullscreen = () => {
@@ -260,6 +263,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       </Button>
 
       <FullScreen handle={handle}>
+        <File></File>
         <Card style={{padding: 4,
           background: 'rgba(65, 90, 90, 0.5)',
           overflow: 'hidden',

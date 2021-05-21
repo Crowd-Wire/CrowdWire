@@ -56,10 +56,7 @@ export const File: React.FC<FileProps> = ({
     const classes = useStyles();
     const BYTES_PER_CHUNK = 20000;
     var file;
-    var fileReader = new FileReader();
     var fileInput;
-    var dataProducers = [];
-    const [readyToSend, setReadyToSend] = useState(false);
 
     function sendChunk(currentChunk, dataProducer, file) {
       var fileReader = new FileReader();
@@ -80,39 +77,38 @@ export const File: React.FC<FileProps> = ({
       }
     };
 
-    
-    const prepareToSend = () => {
-      sendFile().then((producers) => {dataProducers = producers})
-    }
-
     const sendNewFile = () => {
-      fileInput = (document.getElementById('my-file') as HTMLInputElement);
-      if (fileInput.value != '') {
-        console.log(fileInput)
-        file = fileInput.files[0];
-        console.log(file.name)
-        console.log(file.size)
-        // send to api to list of files of current room
-      }
+      sendFile().then((dataProducers) => {
+        if (dataProducers) {
+          fileInput = (document.getElementById('my-file') as HTMLInputElement);
+          if (fileInput.value != '') {
+            console.log(fileInput)
+            file = fileInput.files[0];
+            console.log(file.name)
+            console.log(file.size)
+            // send to api to list of files of current room
 
-      useWsHandlerStore.getState().addWsListener(`REQUEST_TO_DOWNLOAD`, (d) => {
-        fileInput = (document.getElementById('my-file') as HTMLInputElement);
-        if (fileInput.value != '') {
-          console.log(fileInput)
-          file = fileInput.files[0];
-          console.log(file.name)
-          console.log(file.size)
-          dataProducers.forEach(function (dataProducer) {
-            sendChunk(0, dataProducer, file);
-          })
+            useWsHandlerStore.getState().addWsListener(`REQUEST_TO_DOWNLOAD`, (d) => {
+              fileInput = (document.getElementById('my-file') as HTMLInputElement);
+              if (fileInput.value != '') {
+                console.log(fileInput)
+                file = fileInput.files[0];
+                console.log(file.name)
+                console.log(file.size)
+                dataProducers.forEach(function (dataProducer) {
+                  sendChunk(0, dataProducer, file);
+                })
+              }
+            })
+
+            for (let i=0; i<dataProducers.length; i++) {
+              console.log(file);
+              sendChunk(0, dataProducers[i], file);
+            }
+          }
         }
-      })
-       
-      for (let i=0; i<dataProducers.length; i++) {
-        console.log(file);
-        sendChunk(0, dataProducers[i], file);
-      }
       // send to api to list of files of current room
+      })
     }
 
     const downloadFile = (file) => {
@@ -131,7 +127,6 @@ export const File: React.FC<FileProps> = ({
     
     return (
         <>
-            <button onClick={() => prepareToSend()}>Prepare to Send Files</button>
             <button onClick={() => sendNewFile()}>Send file</button>
             <button onClick={() => downloadFile("0")}>Prepare to Receive File from user 0</button>
             <div className={classes.root}>

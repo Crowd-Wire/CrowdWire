@@ -19,16 +19,36 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
+import DownloadIcon from '@material-ui/icons/GetApp';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import 'react-dropzone-uploader/dist/styles.css'
+import { wsend } from 'services/socket.js';
+import { toast } from 'react-toastify';
+import logo from 'assets/crowdwire_white_logo.png';
+import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
+import { useConsumerStore } from "webrtc/stores/useConsumerStore";
+import useWorldUserStore from "stores/useWorldUserStore";
+import { sendFile } from 'webrtc/utils/sendFile';
+
+const toast_props = {
+  position: toast.POSITION.TOP_RIGHT,
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  draggable: true,
+  pauseOnFocusLoss: false,
+  pauseOnHover: false,
+  progress: undefined,
+}
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
     overflow:'auto',
-    maxHeight: '20vh',
+    maxHeight: '33vh',
+    height: '33vh',
     backgroundColor: theme.palette.background.paper,
   },
   demo: {
@@ -54,16 +74,60 @@ interface FileSharingProps {
 
 export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
     const classes = useStyles();
-
+    const [myFiles, setMyFiles] = useState([]);
     const MAX_FILE_SIZE =  20000000;
+    const [listOfFiles, setListOfFiles] = useState([]);
+    const myUserId = useWorldUserStore.getState().world_user.user_id;
 
-    const handleChangeStatus = ({ meta }, status) => {
-      console.log(status, meta)
+    useEffect(() => {
+      wsend({ topic: "GET_ROOM_USERS_FILES"});
+
+      useWsHandlerStore.getState().addWsListener(`GET_ROOM_USERS_FILES`, (d) => {
+        setListOfFiles(d.files)
+      })
+      
+      useWsHandlerStore.getState().addWsListener(`ADD_USER_FILES`, (d) => {
+        setListOfFiles(listOfFiles => listOfFiles.concat(d.files))
+      })
+  
+      useWsHandlerStore.getState().addWsListener(`REMOVE_USER_FILE`, (d) => {
+        setListOfFiles(listOfFiles => listOfFiles.filter( file => file.id !== d.file.id ))
+      })
+  
+      useWsHandlerStore.getState().addWsListener(`REMOVE_ALL_USER_FILES`, (d) => {
+        setListOfFiles(listOfFiles => listOfFiles.filter( file => file.owner !== d.user_id ))
+      })
+    }, [])
+
+    const removeFile = (file) => {
+      setMyFiles(myFiles => myFiles.filter( f => f.name !== file.name ))
+      setListOfFiles(listOfFiles => listOfFiles.filter( f => f.id !== file.id ))
+      wsend({ topic:'REMOVE_USER_FILE', 'file': file })
+    }
+
+    const requestDownloadFile = (file) => {
+      console.log(file)
     }
   
     const handleSubmit = (files, allFiles) => {
-      console.log(files.map(f => f.meta))
-      allFiles.forEach(f => f.remove())
+      let add_files = []
+      if ( ( myFiles.length + allFiles.length ) <= 3) {
+        for (let i=0; i<allFiles.length; i++) {
+          allFiles[i].meta['owner'] = myUserId;
+          myFiles.push(allFiles[i].file);
+          add_files.push(allFiles[i].meta);
+          allFiles[i].remove();
+        }
+        wsend({ topic: "ADD_USER_FILES", 'files': add_files });
+      } else{
+        toast.error(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Already Uploaded the Maximum Number of Files (3)!
+          </span>
+          , toast_props
+        );
+      }
     }
 
     const checkFileSizes = (files) => {
@@ -92,53 +156,58 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
           </div>
 
           <Row>
-            <Col sm={12}>
-            <div style={{textAlign: 'left'}}>
-              <h4 style={{color: '#f50057', fontWeight: 'bold'}}>Upload File</h4>
-            </div>
+            <Col sm={12} md={6}>
+              <div style={{textAlign: 'left'}}>
+                <h4 style={{color: '#f50057', fontWeight: 'bold'}}>Upload File</h4>
+              </div>
               <Dropzone
-                onChangeStatus={handleChangeStatus}
                 onSubmit={handleSubmit}
                 maxFiles={3}
                 inputContent="Drop Files (max. 3)"
-                styles={{ dropzone: { minHeight: 150, maxHeight: '20vh', color: '#f50057' },
+                styles={{ dropzone: {minHeight: 100, height: '35vh', maxHeight: '35vh', color: '#f50057' },
                 submitButton: { background: 'transparent', color: '#f50057', border: '1px solid #f50057'},
                 inputLabel : { color: '#f50057'},
                 inputLabelWithFiles: { background: '#f50057', color: 'white', border: '1px solid white'} }}
                 submitButtonDisabled={files => checkFileSizes(files)}
               />
             </Col>
-          </Row>
 
-          <Row>
-            <Col sm={12}>
-              <div style={{textAlign: 'left', paddingTop:20}}>
+            <Col sm={12} md={6}>
+              <div style={{textAlign: 'left', paddingTop:10}}>
                 <h4 style={{color: '#f50057', fontWeight: 'bold'}}>List of Files</h4>
               </div>
-              <Grid container spacing={2} style={{paddingBottom: 40 }}>
+              <Grid container spacing={2}>
                 <Grid item xs={12} className={classes.demo}>
                   <div className={classes.demo}>
-                    <List dense={false} className={classes.root}>
-                      {generate(
-                        <>
-                        <ListItem alignItems="flex-start">
-                          <ListItemAvatar>
-                            <Avatar>
-                              <FolderIcon />
-                            </Avatar>
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary="Single-line item"
-                            secondary='Secondary text'
-                          />
-                          <ListItemSecondaryAction>
-                            <IconButton edge="end" aria-label="delete">
-                              <DeleteIcon />
-                            </IconButton>
-                          </ListItemSecondaryAction>
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                        </>,
+                    <List dense={true} className={classes.root}>
+                      { listOfFiles.map((file, index) => 
+                        <div key={index}>
+                          <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                              <Avatar alt={`${file.owner}`}>
+                                <FolderIcon />
+                              </Avatar>
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={file.name}
+                              secondary={`Size: ${file.size} ${"  Type: "} ${file.type} ${"  Owner: "} ${file.owner}`}
+                            />
+                            { file.owner == myUserId ?
+                                <ListItemSecondaryAction>
+                                  <IconButton edge="end" aria-label="delete" onClick={() => removeFile(file)}>
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </ListItemSecondaryAction>
+                              :
+                                <ListItemSecondaryAction>
+                                  <IconButton edge="end" aria-label="download" onClick={() => requestDownloadFile(file)}>
+                                    <DownloadIcon />
+                                  </IconButton>
+                                </ListItemSecondaryAction>
+                            }
+                          </ListItem>
+                          <Divider variant="inset" component="li" />
+                        </div>,
                       )}
                     </List>
                   </div>
@@ -147,8 +216,8 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
             </Col>
           </Row>
 
-          <div style={{textAlign: "center"}}>
-            <Button onClick={() => closeModal()} style={{width: '35%'}} variant="contained" color="primary">
+          <div style={{textAlign: "center", paddingTop: 15}}>
+            <Button onClick={() => closeModal()} style={{width: '35%' }} variant="contained" color="primary">
               Leave File Share
             </Button>
           </div>

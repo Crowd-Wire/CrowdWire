@@ -97,11 +97,14 @@ async def world_websocket(
             elif topic == protocol.REMOVE_ALL_USER_FILES:
                 await wh.remove_all_user_files(world_id=world_id, user_id=user_id)
 
-            elif topic == protocol.ADD_USER_FILE:
-                await wh.add_user_file(world_id=world_id, user_id=user_id, payload=payload)
+            elif topic == protocol.ADD_USER_FILES:
+                await wh.add_user_files(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.REMOVE_USER_FILE:
                 await wh.remove_user_file(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.REQUEST_TO_DOWNLOAD:
+                await wh.request_to_download(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
