@@ -11,7 +11,7 @@ from app.schemas import World_UserCreate, World_UserUpdate
 from app.utils import choose_avatar
 from app.core import strings
 from sqlalchemy import or_
-from loguru import logger
+
 
 class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
 
@@ -64,7 +64,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         """
         updated_objs = db.query(World_User) \
             .filter(world_id == world_id,
-                    World_User.role_id == role_changed_id)\
+                    World_User.role_id == role_changed_id) \
             .update({World_User.role_id: role_to_change_id})
 
         db.commit()
@@ -92,7 +92,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
 
         # checks if it is the world the one changing its username or avatar
         if request_user.user_id != user_to_change \
-                and (world_user_obj.username or world_user_obj.avatar)\
+                and (world_user_obj.username or world_user_obj.avatar) \
                 and not request_user.is_superuser:
             return None, strings.CHANGE_USER_INFO_FORBIDDEN
 
