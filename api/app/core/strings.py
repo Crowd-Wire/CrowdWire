@@ -38,6 +38,7 @@ CHANGE_USER_INFO_FORBIDDEN = "You cannot change this user info."
 K8S_CLUSTER_NOT_FOUND = "No Kubernetes cluster found!"
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
+USER_EDITED_SUCCESS = "User has been edited succesfully"
 AUTHENTICATION_SUCCESS = "Success Authenticating."
 WORLD_CREATED_SUCCESS = "World Created Successfully"
 WORLD_UPDATE_SUCCESS = "Success Updating World"
