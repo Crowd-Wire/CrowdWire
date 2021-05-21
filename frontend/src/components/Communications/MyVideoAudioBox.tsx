@@ -19,6 +19,7 @@ import { sendVoice } from "../../webrtc/utils/sendVoice";
 import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
+import { FileSharing } from "./FileSharing";
 import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useMediaStore } from "../../webrtc/stores/useMediaStore";
@@ -29,6 +30,7 @@ import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
 import Button from "@material-ui/core/Button";
+import { File } from "../../webrtc/components/FileSharing/File";
 
 
 interface MyVideoAudioBoxProps {
@@ -47,6 +49,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [audioPauseState, setAudioPauseState] = useState(true);
   const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showModalFile, setShowModalFile] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -148,6 +151,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setShowModal(!showModal)
   }
 
+  function toggleModalFile() {
+    setShowModalFile(!showModalFile)
+  }
+
   const handleFullscreen = () => {
     if (!fullscreen) {
       handle.enter()
@@ -247,6 +254,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         width: '100%',
         overflow: 'auto',
       }}>
+        
+      <Button variant='contained'  color="primary" onClick={() => toggleModalFile()}>
+        File Sharing
+      </Button>
+
       <FullScreen handle={handle}>
         <Card style={{padding: 4,
           background: 'rgba(65, 90, 90, 0.5)',
@@ -269,7 +281,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 }
                 { !videoTrack || !videoPauseState ?
                   (
-                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%'}}>
+                  <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%',  paddingBottom: '15%'}}>
                     <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
                   </div>
                   )
@@ -286,23 +298,31 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 width: '100%',
                 WebkitTextStroke: '0.5px white',
                 backgroundColor: 'rgba(0,0,0, 0.3)',
-                paddingRight: 10
+                paddingRight: 10,
+                overflow: 'hidden'
               }}>
-                <span>{username}</span>
-                { fullscreen ?
-                  <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
-                :
-                  <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
-                }
-                <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
-                  onClick={() => toggleModal()}/>
+                <Row>
+                  <Col sm={8}>
+                    <span>{username}</span>
+                  </Col>
+                  <Col sm={4}>
+                    { fullscreen ?
+                      <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+                    :
+                      <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+                    }
+                    <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
+                      onClick={() => toggleModal()}/>
+                  </Col>
+                </Row>
               </div>
 
               <div style={{
                 position: 'absolute',
                 fontSize: '1em',
                 bottom: 2,
-                width: '96%',
+                width: '100%',
+                overflow: 'hidden',
                 paddingLeft: 2,
                 paddingBottom: 2,
                 fontWeight: 500,
@@ -329,7 +349,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                     }
                   </Col>
 
-                  <Col style={{textAlign: 'right'}} sm={6}>
+                  <Col style={{textAlign: 'right', paddingRight: '10%'}} sm={6}>
                       { mediaOffState ? 
                         <ScreenShareIcon style={{'cursor': 'pointer', color:'white'}} onClick={() => toggleMedia()}/>
                         :
@@ -341,6 +361,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
           </Card>
         { showModal ? 
           <DeviceSettings closeModal={toggleModal}/>
+        : ''}
+        { showModalFile ? 
+          <FileSharing closeModal={toggleModalFile}/>
         : ''}
       </FullScreen>
     </div>

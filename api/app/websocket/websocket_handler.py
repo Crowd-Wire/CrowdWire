@@ -153,6 +153,39 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict):
         user_requested)
 
 
+async def add_user_file(world_id: str, user_id: str, payload: dict):
+    if len(await redis_connector.get_user_files_len(world_id, user_id)) >= 3:
+        await manager.send_personal_message(
+            {'topic': protocol.ADD_USER_FILE, 'd': {'error': 'Already Uploaded The Maximum Number of Files (3)'}},
+            user_id)
+        return
+
+    files = payload['files']
+    for file_data in files:
+        await redis_connector.add_user_file(world_id, user_id, file_data)
+
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.ADD_USER_FILE, 'd': {'files': files}}, user_id)
+
+
+async def remove_user_file(world_id: str, user_id: str, payload: dict):
+    file_data = payload['file']
+    await redis_connector.remove_user_file(world_id, user_id, file_data)
+
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_USER_FILE, 'd': {'file': file_data}}, user_id)
+
+
+async def remove_all_user_files(world_id: str, user_id: str):
+    await redis_connector.remove_all_user_files(world_id, user_id)
+
+
+async def get_room_users_files(world_id: str, user_id:str):
+    users_ids = await redis_connector.get_user_users(world_id, user_id)
+    list_of_files = []
+    for user_id in users_ids:
+        list_of_files.extend(await redis_connector.get_user_files(world_id, user_id))
+    return list_of_files
+
+
 async def leave_conference(world_id: str, user_id: str):
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
 
@@ -163,7 +196,7 @@ async def leave_conference(world_id: str, user_id: str):
 
     await send_groups_snapshot(world_id)
 
-
+    
 async def disconnect_user(world_id: str, user_id: str):
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))

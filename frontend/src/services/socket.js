@@ -4,6 +4,7 @@ import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
 import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
+import { consumeDataStream } from "../webrtc/utils/consumeDataStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
@@ -208,6 +209,13 @@ export const getSocket = (worldId) => {
               consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
             }
           }
+          break;
+        case "new-peer-data-producer":
+          console.log(data)
+          const roomId = data.d.roomId;
+            if (useRoomStore.getState().rooms[roomId].recvTransport) {
+              consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
+            }
           break;
         case "active-speaker":
           console.log(data)

@@ -71,7 +71,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.setState({media});
     }, (state) => state.media);
   }
-  myId: string = 'myUsernameId';
+  myId: string = useWorldUserStore.getState().world_user.user_id;
   accessMic: boolean = false;
   accessVideo: boolean = false;
   socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
@@ -94,8 +94,10 @@ export default class RoomCall extends React.Component<{}, State> {
   }
   
   reInitializeStream = () => {
-    if (this.accessMic || this.accessVideo) {
-      const media = getVideoAudioStream(this.accessMic, this.accessVideo);
+    const useMic = (this.accessMic && !(useMuteStore.getState().videoMuted))
+    const useCam = (this.accessVideo && !(useMuteStore.getState().audioMuted))
+    if (useMic|| useCam) {
+      const media = getVideoAudioStream(useMic, useCam);
       return new Promise((resolve) => {
         media.then((stream:MediaStream) => {
               useVideoStore.getState().set({camStream: stream, cam: stream.getVideoTracks()[0]})

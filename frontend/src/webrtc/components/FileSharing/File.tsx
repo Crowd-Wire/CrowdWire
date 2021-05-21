@@ -1,9 +1,10 @@
-import React, { Fragment } from 'react';
-import { FormattedMessage } from 'react-intl';
-import magnet from 'magnet-uri';
-import Typography from '@material-ui/core/Typography';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from "@material-ui/core/styles";
+import file_pic from '../../../assets/file.png';
+import { sendFile } from 'webrtc/utils/sendFile';
+import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
+import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -46,106 +47,97 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export const File: React.FC<{}> = ({
+interface FileProps {
+  }
+  
 
+export const File: React.FC<FileProps> = ({
   }) => {
     const classes = useStyles();
+    const BYTES_PER_CHUNK = 20000;
+    var file;
+    var fileReader = new FileReader();
+    var fileInput;
+    var dataProducers = [];
+    const [readyToSend, setReadyToSend] = useState(false);
 
+    function sendChunk(currentChunk, dataProducer, file) {
+      var fileReader = new FileReader();
+      console.log('sending chunk '+ currentChunk)
+      var start = BYTES_PER_CHUNK * currentChunk;
+      var end = Math.min( file.size, start + BYTES_PER_CHUNK );
+      fileReader.readAsArrayBuffer( file.slice( start, end ) );
+
+      fileReader.onload = function() {
+        dataProducer.send(fileReader.result)
+        console.log(fileReader.result)
+        currentChunk++;
+        if ( BYTES_PER_CHUNK * currentChunk < file.size ) {
+          setTimeout(() => { sendChunk(currentChunk, dataProducer, file) }, 100);
+        } else {
+          console.log("DONE SENDING FILE")
+        }
+      }
+    };
+
+    
+    const prepareToSend = () => {
+      sendFile().then((producers) => {dataProducers = producers})
+    }
+
+    const sendNewFile = () => {
+      fileInput = (document.getElementById('my-file') as HTMLInputElement);
+      if (fileInput.value != '') {
+        console.log(fileInput)
+        file = fileInput.files[0];
+        console.log(file.name)
+        console.log(file.size)
+        // send to api to list of files of current room
+      }
+
+      useWsHandlerStore.getState().addWsListener(`REQUEST_TO_DOWNLOAD`, (d) => {
+        fileInput = (document.getElementById('my-file') as HTMLInputElement);
+        if (fileInput.value != '') {
+          console.log(fileInput)
+          file = fileInput.files[0];
+          console.log(file.name)
+          console.log(file.size)
+          dataProducers.forEach(function (dataProducer) {
+            sendChunk(0, dataProducer, file);
+          })
+        }
+      })
+       
+      for (let i=0; i<dataProducers.length; i++) {
+        console.log(file);
+        sendChunk(0, dataProducers[i], file);
+      }
+      // send to api to list of files of current room
+    }
+
+    const downloadFile = (file) => {
+      console.log(useConsumerStore.getState().consumerMap)
+      if (useConsumerStore.getState().consumerMap[file] && useConsumerStore.getState().consumerMap[file].dataConsumer) {
+        // send download warning to file owner so he can send file through data producer
+        useConsumerStore.getState().consumerMap[file].dataConsumer.on('message', (message) => {
+          console.log('message received from '+file);
+          console.log(message)
+        })
+      } else {
+        alert('Still creating transports please try again')
+      }
+    }
+    
+    
     return (
-        <div className={classes.root}>
-            <img alt='Avatar' className={classes.avatar} src={picture} />
-
-            <div className={classes.fileContent}>
-                { file.files &&
-                    <Fragment>
-                        <Typography className={classes.text}>
-                            <FormattedMessage
-                                id='filesharing.finished'
-                                defaultMessage='File finished downloading'
-                            />
-                        </Typography>
-
-                        { file.files.map((sharedFile, i) => (
-                            <div className={classes.fileInfo} key={i}>
-                                <Typography className={classes.text}>
-                                    {sharedFile.name}
-                                </Typography>
-                                <Button
-                                    variant='contained'
-                                    component='span'
-                                    className={classes.button}
-                                    onClick={() =>
-                                    {
-                                        roomClient.saveFile(sharedFile);
-                                    }}
-                                >
-                                    <FormattedMessage
-                                        id='filesharing.save'
-                                        defaultMessage='Save'
-                                    />
-                                </Button>
-                            </div>
-                        ))}
-                    </Fragment>
-                }
-                <Typography className={classes.text}>
-                    <FormattedMessage
-                        id='filesharing.sharedFile'
-                        defaultMessage='{displayName} shared a file'
-                        values={{
-                            displayName
-                        }}
-                    />
-                </Typography>
-
-                { (!file.active && !file.files) &&
-                    <div className={classes.fileInfo}>
-                        <Typography className={classes.text}>
-                            { magnet.decode(magnetUri).dn }
-                        </Typography>
-                        { canShareFiles ?
-                            <Button
-                                variant='contained'
-                                component='span'
-                                className={classes.button}
-                                onClick={() =>
-                                {
-                                    roomClient.handleDownload(magnetUri);
-                                }}
-                            >
-                                <FormattedMessage
-                                    id='filesharing.download'
-                                    defaultMessage='Download'
-                                />
-                            </Button>
-                            :
-                            <Typography className={classes.text}>
-                                <FormattedMessage
-                                    id='label.fileSharingUnsupported'
-                                    defaultMessage='File sharing not supported'
-                                />
-                            </Typography>
-                        }
-                    </div>
-                }
-
-                { file.timeout &&
-                    <Typography className={classes.text}>
-                        <FormattedMessage
-                            id='filesharing.missingSeeds'
-                            defaultMessage={
-                                `If this process takes a long time, there might not
-                                be anyone seeding this torrent. Try asking someone to
-                                reupload the file that you want.`
-                            }
-                        />
-                    </Typography>
-                }
-
-                { file.active &&
-                    <progress value={file.progress} />
-                }
+        <>
+            <button onClick={() => prepareToSend()}>Prepare to Send Files</button>
+            <button onClick={() => sendNewFile()}>Send file</button>
+            <button onClick={() => downloadFile("0")}>Prepare to Receive File from user 0</button>
+            <div className={classes.root}>
+              <img alt='Avatar' className={classes.avatar} src={file_pic} />
+              <input  id="my-file" type="file"  />
             </div>
-        </div>
+        </>
     );
 }

@@ -27,8 +27,8 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    # user_id = manager.get_next_user_id()
-    user_id = str(user.user_id)
+    user_id = manager.get_next_user_id()
+    # user_id = str(user.user_id)
     # default room id when joining world
     # maybe on the function disconnect_room()
     # check which room he is on instead of this
@@ -53,7 +53,7 @@ async def world_websocket(
 
             if topic in (
                 protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
-                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
+                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK, protocol.SEND_FILE
             ):
                 await wh.handle_transport_or_track(world_id, user_id, payload)
 
@@ -90,6 +90,18 @@ async def world_websocket(
                 # check if user who accepted has permission
                 # warn the user who has been accepted or denied
                 await wh.send_to_conf_listener(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.GET_ROOM_USERS_FILES:
+                await wh.get_room_users_files(world_id=world_id, user_id=user_id)
+
+            elif topic == protocol.REMOVE_ALL_USER_FILES:
+                await wh.remove_all_user_files(world_id=world_id, user_id=user_id)
+
+            elif topic == protocol.ADD_USER_FILE:
+                await wh.add_user_file(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.REMOVE_USER_FILE:
+                await wh.remove_user_file(world_id=world_id, user_id=user_id, payload=payload)
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
