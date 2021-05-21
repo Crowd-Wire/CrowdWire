@@ -48,6 +48,7 @@ class WebsocketProtocol:
     TOGGLE_PEER_PRODUCER = 'toggle-peer-producer'
     SPEAKING_CHANGE = 'speaking_change'
 
+
 class RabbitProtocol:
     GET_RECV_TRACKS_DONE = '@get-recv-tracks-done'
     SEND_TRACK_SEND_DONE = '@send-track-send-done'

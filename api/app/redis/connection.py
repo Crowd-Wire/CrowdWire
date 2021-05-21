@@ -65,6 +65,22 @@ class RedisConnector:
         """Adds one or more members to a set"""
         return await self.master.execute('sadd', key, member, *members)
 
+    async def lrange(self, key: str, start: int, finish: int):
+        """Gets the items of a list from indexes start to finish"""
+        return await self.master.execute('lrange', key, start, finish)
+
+    async def lpush(self, key: str, item: any):
+        """Adds one item to a list"""
+        return await self.master.execute('lpush', key, item)
+
+    async def llen(self, key: str):
+        """Checks the length of the list"""
+        return await self.master.execute('llen', key)
+
+    async def lrem(self, key: str, occurences: str, item: any):
+        """Removes the number of occurences that match an item"""
+        return await self.master.execute('lrem', key, occurences, item)
+
     async def scard(self, key: str):
         """Get the number of members in a set"""
         return await self.master.execute('scard', key, encoding="utf-8")
@@ -342,6 +358,27 @@ class RedisConnector:
         for gid in groups_id:
             actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
         return actions
+
+    async def get_user_files(self, world_id: str, user_id: str) -> List[dict]:
+        """Get a list of files associated to a user"""
+        file_list = await self.lrange(f"world:{str(world_id)}:user:{str(user_id)}:files", 0, 2)
+        return [pickle.loads(x) for x in file_list]
+
+    async def add_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Add a file to the user list of files"""
+        return await self.lpush(f"world:{str(world_id)}:user:{str(user_id)}:files", pickle.dumps(file_data))
+
+    async def remove_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Remove a file from the user list of files"""
+        return await self.lrem(f"world:{str(world_id)}:user:{str(user_id)}:files", 1, pickle.dumps(file_data))
+
+    async def remove_all_user_files(self, world_id: str, user_id: str) -> any:
+        """Remove a file from the user list of files"""
+        return await self.delete(f"world:{str(world_id)}:user:{str(user_id)}:files")
+
+    async def get_user_files_len(self, world_id: str, user_id: str) -> int:
+        """Get the length of the user list of file"""
+        return await self.llen(f"world:{str(world_id)}:user:{str(user_id)}:files")
 
 
 redis_connector = RedisConnector()

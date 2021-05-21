@@ -30,7 +30,7 @@ async def on_message(message: IncomingMessage) -> None:
 
             await manager.send_personal_message(msg, user_id)
         elif topic == protocol.NEW_PEER_PRODUCER\
-            or topic == protocol.NEW_PEER_DATA_PRODUCER:
+                or topic == protocol.NEW_PEER_DATA_PRODUCER:
             # uid identifies to whom the message is suppost to be sent to
             # peerId identifies the new peerId that joined
             user_id = msg['uid']

@@ -178,7 +178,7 @@ async def remove_all_user_files(world_id: str, user_id: str):
     await redis_connector.remove_all_user_files(world_id, user_id)
 
 
-async def get_room_users_files(world_id: str, user_id:str):
+async def get_room_users_files(world_id: str, user_id: str):
     users_ids = await redis_connector.get_user_users(world_id, user_id)
     list_of_files = []
     for user_id in users_ids:
@@ -196,7 +196,7 @@ async def leave_conference(world_id: str, user_id: str):
 
     await send_groups_snapshot(world_id)
 
-    
+
 async def disconnect_user(world_id: str, user_id: str):
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
