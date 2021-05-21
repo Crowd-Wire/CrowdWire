@@ -29,6 +29,7 @@ async def world_websocket(
     # overwrites user_id given by token TODO: remove after tests
     # user_id = manager.get_next_user_id()
     user_id = str(user.user_id)
+    world_id = str(world_id)
 
     await manager.connect(world_id, websocket, user_id)
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
