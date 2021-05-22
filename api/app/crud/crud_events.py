@@ -6,12 +6,11 @@ from sqlalchemy.orm import Session
 from app.models.event import Event
 from .crud_world_users import crud_world_user
 from ..core import strings
-from loguru import logger
+
 """
 Events dont follow the same CRUD Rules from the Base Class
 since they cannot be created/updated/deleted through the REST API
 """
-
 
 class CRUDEvents:
 
@@ -26,7 +25,7 @@ class CRUDEvents:
             world_id: int,
             user_id: int = None,
             page_num: int = 1,
-            limit: int = 2,
+            limit: int = 10,
             event_type: str = None,
             order_desc: bool = True
     ):
@@ -40,7 +39,6 @@ class CRUDEvents:
         if not order_desc:
             query = query.order_by(Event.timestamp.asc())
         else:
-            logger.debug("Here")
             query = query.order_by(Event.timestamp.desc())
 
         return query.offset(limit * (page_num - 1)).limit(limit).all()

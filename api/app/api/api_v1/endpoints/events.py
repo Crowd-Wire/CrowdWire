@@ -20,7 +20,7 @@ def get_world_events(
         user_id: Optional[int] = None,
         order_desc: bool = True,
         page: int = 1,
-        limit: int = 2,
+        limit: int = 10,
 ):
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
