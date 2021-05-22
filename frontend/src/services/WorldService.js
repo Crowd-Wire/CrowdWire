@@ -141,7 +141,6 @@ class WorldService {
 
     }
 
-
     joinWorld(world_id) {
 
         return fetch(API_BASE + 'worlds/' + world_id + '/users', {
@@ -153,7 +152,6 @@ class WorldService {
         })
 
     }
-
 }
 
 export default new WorldService();
