@@ -132,7 +132,7 @@ class SearchAllMaps extends Component {
 					<Row>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
 						this.state.maps.map((m, i) => {
-							return (<MapCard focusMap={this.focusMap} map={m} />)
+							return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
 						})
 						:
 						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>

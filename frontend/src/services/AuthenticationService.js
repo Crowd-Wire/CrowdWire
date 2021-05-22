@@ -67,6 +67,13 @@ class AuthenticationService {
         })
     }
 
+    googleAuth(token){
+        return fetch(API_BASE + 'login/google',{ 
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({token: token})
+        })
+    }
 }
 
 export default new AuthenticationService();

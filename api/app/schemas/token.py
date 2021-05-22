@@ -27,3 +27,7 @@ class InviteTokenPayload(BaseModel):
     # is of type int and not UUID4(the type for guest users)
     inviter: int
     world_id: int
+
+
+class GoogleToken(BaseModel):
+    token: str

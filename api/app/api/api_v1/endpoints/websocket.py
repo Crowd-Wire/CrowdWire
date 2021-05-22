@@ -1,8 +1,10 @@
 from typing import Any, Optional, Union
 
-from app.websocket.connection_manager import manager
-from app.websocket import websocket_handler as wh
+from app.utils import is_guest_user
+from app.websockets.connection_manager import manager
+from app.websockets import websocket_handler as wh
 from app.api import dependencies as deps
+from app.crud.crud_events import crud_event
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
@@ -27,12 +29,9 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    user_id = manager.get_next_user_id()
-    # user_id = str(user.user_id)
-    # default room id when joining world
-    # maybe on the function disconnect_room()
-    # check which room he is on instead of this
-    room_id = 0
+    # user_id = manager.get_next_user_id()
+    user_id = str(user.user_id)
+    world_id = str(world_id)
 
     await manager.connect(world_id, websocket, user_id)
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
@@ -67,14 +66,28 @@ async def world_websocket(
                 await wh.send_message(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_PLAYER:
-                room_id = payload['room_id']
                 await wh.join_player(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_PLAYER)
 
             elif topic == protocol.JOIN_CONFERENCE:
                 await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_CONFERENCE)
 
             elif topic == protocol.LEAVE_CONFERENCE:
-                await wh.leave_conference(world_id, user_id)
+                await wh.leave_conference(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.LEAVE_CONFERENCE)
 
             elif topic == protocol.CLOSE_MEDIA:
                 await wh.close_media(world_id, user_id, payload)
@@ -113,11 +126,13 @@ async def world_websocket(
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
         logger.info("disconnected ")
-        manager.disconnect(world_id, user_id)
-        await manager.disconnect_room(world_id, room_id, user_id)
-        await wh.disconnect_user(world_id, user_id)
     # except BaseException:
     #     logger.info("base exc")
-    #     manager.disconnect(world_id, user_id)
-    #     await manager.disconnect_room(world_id, room_id, user_id)
-    #     await wh.disconnect_user(world_id, user_id)
+
+    await manager.disconnect(world_id, user_id)
+    await wh.disconnect_user(world_id, user_id)
+    if not is_guest_user(user):
+        crud_event.create(db=db,
+                          user_id=user.user_id,
+                          world_id=world_id,
+                          event_type=protocol.LEAVE_PLAYER)

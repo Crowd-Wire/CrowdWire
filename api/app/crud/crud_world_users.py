@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 from sqlalchemy.orm import Session
 from loguru import logger
@@ -41,6 +41,12 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         """
         return db.query(World_User).filter(World_User.user_id == user_id, World_User.world_id == world_id).first()
 
+    def get_all_registered_users(self, db: Session, world_id: int) -> List[World_User]:
+        """
+        Returns every user from a world.
+        """
+        return db.query(World_User).filter(World_User.world_id == world_id).all()
+
     def update_user_role(self, db: Session, world_id: int, user_id: int, role_id: int) \
             -> Tuple[Optional[World_User], str]:
         world_user = self.get_user_joined(db=db, world_id=world_id, user_id=user_id)
@@ -58,11 +64,52 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         """
         updated_objs = db.query(World_User) \
             .filter(world_id == world_id,
-                    World_User.role_id == role_changed_id)\
+                    World_User.role_id == role_changed_id) \
             .update({World_User.role_id: role_to_change_id})
 
         db.commit()
         return updated_objs, ""
+
+    async def update_world_user_info(
+            self, db: Session, world_id: int, request_user: User, user_to_change: int, world_user_data: World_UserUpdate
+    ):
+        logger.info("starting...")
+        # checks if the user has already joined this world
+        world_user_obj = self.get_user_joined(db=db, world_id=world_id, user_id=user_to_change)
+        if not world_user_obj:
+            logger.debug("here")
+            return None, strings.USER_NOT_IN_WORLD
+
+        # checks if the user has access to change status if status is given
+        role, msg = await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=request_user.user_id)
+        if world_user_data.status and role is None and not request_user.is_superuser:
+            return None, strings.USER_NO_ROLE_PERMISSIONS
+
+        # checks if the user is either itself or has access to change user
+        # status (through its role or being a superuser)
+        if request_user.user_id != user_to_change and role is None and not request_user.is_superuser:
+            return None, strings.USER_NO_ROLE_PERMISSIONS
+
+        # checks if it is the world the one changing its username or avatar
+        if request_user.user_id != user_to_change \
+                and (world_user_obj.username or world_user_obj.avatar) \
+                and not request_user.is_superuser:
+            return None, strings.CHANGE_USER_INFO_FORBIDDEN
+
+        if world_user_data.status is None:
+            delattr(world_user_data, 'status')
+        if world_user_data.username is None:
+            delattr(world_user_data, 'username')
+        if world_user_data.avatar is None:
+            delattr(world_user_data, 'avatar')
+
+        # no need to return error
+        world_user = self.update(
+            db=db,
+            db_obj=world_user_obj,
+            obj_in=world_user_data
+        )
+        return world_user, ""
 
     async def join_world(self, db: Session, _world: World, _user: User) -> Tuple[World_User, Role]:
         """
@@ -73,7 +120,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         world_user = self.get_user_joined(db=db, world_id=_world.world_id, user_id=_user.user_id)
         current_time = datetime.now()
 
-        role = None
         if not world_user:
             role = crud_role.get_world_default(db=db, world_id=_world.world_id)
             assigned_avatar = choose_avatar()

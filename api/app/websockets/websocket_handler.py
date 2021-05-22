@@ -3,31 +3,33 @@ import json
 from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
-from app.websocket.connection_manager import manager
+from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
-    room_id = payload['room_id']
     position = payload['position']
-    await manager.connect_room(world_id, room_id, user_id, position)
     # store position on redis
-    await redis_connector.set_user_position(world_id, room_id, user_id, position)
-    # store room on redis
+    await redis_connector.set_user_position(world_id, user_id, position)
 
+    # broadcast join player
+    await manager.broadcast(
+        world_id,
+        {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': position},
+        user_id
+    )
     await send_groups_snapshot(world_id)  # TODO: remove after tests
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
-    room_id = payload['room_id']
     velocity = payload['velocity']
     position = payload['position']
     # store position on redis
-    await redis_connector.set_user_position(world_id, room_id, user_id, position)
+    await redis_connector.set_user_position(world_id, user_id, position)
 
     await manager.broadcast(
-        world_id, room_id,
+        world_id,
         {'topic': protocol.PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
         user_id
     )
@@ -36,7 +38,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
     payload['from'] = f"User{user_id}"
-    await manager.broadcast(world_id, '1', payload, None)
+    await manager.broadcast(world_id, payload)
 
 
 # TODO: remove after tests
@@ -49,7 +51,7 @@ async def send_groups_snapshot(world_id: str):
     for uid in manager.users_ws:
         groups[uid] = await redis_connector.smembers(f"world:{world_id}:user:{uid}:groups")
 
-    await manager.broadcast(world_id, '1', {'topic': 'GROUPS_SNAPSHOT', 'groups': groups}, None)
+    await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups})
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
@@ -74,6 +76,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     # actions made to groups
     await handle_actions(actions)
 
+    add_users.add(user_id)
+    for uid in add_users:
+        await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - {uid})}, uid)
     await send_groups_snapshot(world_id)
 
 
@@ -110,12 +115,21 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         # add user to a new group with the still nearby users
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
+    await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'merge': True, 'ids': users_id}, user_id)
     await send_groups_snapshot(world_id)
 
 
 async def join_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload['conference_id']
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
+
+    for gid in groups_id:
+        for uid in await redis_connector.get_group_users(world_id, gid):
+            await manager.send_personal_message({
+                'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
+
     if groups_id:
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
     await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
@@ -123,6 +137,18 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
 
     permission = await redis_connector.can_talk_conference(world_id, user_id)
     await join_as_new_peer_or_speaker(world_id, conference_id, user_id, permission)
+
+    conference_users = set(await redis_connector.get_group_users(world_id, conference_id))
+    await manager.send_personal_message({
+        'topic': protocol.WIRE_PLAYER, 'merge': False,
+        'ids': list(conference_users - {user_id})
+    }, user_id)
+    for uid in conference_users:
+        if uid != user_id:
+            await manager.send_personal_message({
+                'topic': protocol.WIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
 
     await send_groups_snapshot(world_id)
 
@@ -192,13 +218,22 @@ async def request_to_download(world_id: str, user_id: str, payload: dict):
         file_data['owner'])
 
 
-async def leave_conference(world_id: str, user_id: str):
-    groups_id = await redis_connector.get_user_groups(world_id, user_id)
+async def leave_conference(world_id: str, user_id: str, payload: dict):
+    conference_id = payload["conference_id"]
 
-    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': groups_id}})
+    await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': [conference_id]}})
+    await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, conference_id))
 
-    if groups_id:
-        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
+    await manager.send_personal_message({
+        'topic': protocol.UNWIRE_PLAYER, 'merge': False,
+        'ids': []
+    }, user_id)
+    for uid in await redis_connector.get_group_users(world_id, conference_id):
+        if uid != user_id:
+            await manager.send_personal_message({
+                'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                'ids': [user_id]
+            }, uid)
 
     await send_groups_snapshot(world_id)
 

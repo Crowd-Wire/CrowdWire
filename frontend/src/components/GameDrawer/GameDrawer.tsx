@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -12,7 +12,7 @@ import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import Chat from './Sections/Chat';
-import UserList from './Sections/UserList';
+import UserList from './Sections/UserList.js';
 import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
@@ -22,6 +22,9 @@ import LinkIcon from '@material-ui/icons/Link';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
+
+import useMessageStore from 'stores/useMessageStore';
+
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -68,7 +71,9 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawerHeader: {
       display: 'flex',
+      height: "64px",
       alignItems: 'center',
+      "box-sizing": "border-box",
       padding: theme.spacing(0, 1),
       // necessary for content to be below app bar
       ...theme.mixins.toolbar,
@@ -80,32 +85,62 @@ const useStyles = makeStyles((theme: Theme) =>
 const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
-  const [notifications, setNotifications] = React.useState(2);
+  const [hasScroll, setHasScroll] = React.useState(false);
+  const [numMessagesSeen, setNumMessagesSeen] = React.useState(0);
+  let numMessages = useMessageStore(state => state.messages.length);
+  let textChat = document.getElementById('text-chat');;
+  
+  useEffect(() => {
+    if (!textChat) {
+      textChat = document.getElementById('text-chat');
+    } else {
+      textChat.addEventListener('scroll', handleScroll);
+      setHasScroll(textChat.scrollHeight > textChat.clientHeight);
+    }
+
+    return () => {
+      if (textChat)
+        textChat.removeEventListener('scroll', handleScroll);
+    }
+  })
+
+  /**
+   * Remove notifications when scroll to bottom
+   */
+  const handleScroll = () => {
+    if (textChat.scrollTop === textChat.scrollHeight - textChat.clientHeight)
+      setNumMessagesSeen(numMessages);
+  }
 
   const handleDrawerOpen = (component) => {
-    setDrawer(component);
-    setPage(null);
+    if (open && drawer && component && component.type === drawer.type) {
+      setOpen(false);
+    } else {
+      setOpen(true);
+      setDrawer(component);
+      setPage(null);
+    }
   };
 
   const handleDrawerClose = () => {
-    setDrawer(null);
+    setOpen(false);
   };
 
   const handleOpen = (component) => {
-    setPage(component);
-    setDrawer(null);
+    if (page && component && component.type === page.type) {
+      setPage(null);
+    } else {
+      setPage(component);
+      setOpen(false);
+    }
   };
 
   const handleClose = () => {
     setPage(null);
-  };
-
-  const handleOpenInvite = () => {
-    setPage(<GenerateInviteCard/>);
-    setDrawer(null);
   };
 
   document.addEventListener('fullscreenchange', (event) => {
@@ -169,9 +204,17 @@ const GameDrawer = () => {
         <div className={classes.sideTop}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleDrawerOpen(<Chat />)}
+            onClick={() => {
+              handleDrawerOpen(
+                <Chat handleMessage={() => setNumMessagesSeen(n => n + 1)} />
+              ); 
+              setNumMessagesSeen(numMessages)}}
           >
-            <Badge badgeContent={0} color="secondary">
+            <Badge 
+              badgeContent={!hasScroll || numMessagesSeen > numMessages ? 
+                            0 : numMessages - numMessagesSeen} 
+              color="secondary"
+            >
               <TextsmsIcon style={iconsStyle} />
             </Badge>
           </IconButton>
@@ -179,7 +222,7 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={() => handleDrawerOpen(<UserList />)}
           >
-            <Badge badgeContent={1} color="secondary">
+            <Badge badgeContent={-1} color="secondary">
               <PeopleAltIcon style={iconsStyle} />
             </Badge>
           </IconButton>
@@ -187,7 +230,7 @@ const GameDrawer = () => {
         <div className={classes.sideBot}>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpenInvite()}
+            onClick={() => handleOpen(<GenerateInviteCard />)}
           >
             <LinkIcon style={iconsStyle} />
           </IconButton>
@@ -200,9 +243,7 @@ const GameDrawer = () => {
           </IconButton>
           <IconButton
             aria-label="open drawer"
-            onClick={() => handleOpen(
-                <WSettingsContent />
-            )}
+            onClick={() => handleOpen(<WSettingsContent />)}
           >
             <SettingsIcon style={iconsStyle} />
           </IconButton>
@@ -218,7 +259,7 @@ const GameDrawer = () => {
         className={classes.drawer}
         variant="persistent"
         anchor="left"
-        open={drawer != null}
+        open={open}
         classes={{
           paper: classes.drawerPaper,
         }}

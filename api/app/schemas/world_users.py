@@ -31,8 +31,16 @@ class World_UserCreate(World_UserBase):
     world_id: int
 
 
-class World_UserUpdate(World_UserBase):
-    pass
+class World_UserUpdate(BaseModel):
+    username: Optional[str]
+    avatar: Optional[str]
+    status: Optional[int]
+
+    @validator("avatar")
+    def validate_avatar(cls, v):
+        if v is not None and v not in AVATARS_LIST:
+            raise ValueError("Avatar name not Valid!")
+        return v
 
 
 # Base Schema to retrieve data from DB

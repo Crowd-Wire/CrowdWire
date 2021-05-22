@@ -8,6 +8,7 @@ from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
 from app.core import strings
+from loguru import logger
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -26,6 +27,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if not user_obj:
             return user_obj, strings.USER_NOT_FOUND
         if request_user.user_id != id and not request_user.is_superuser:
+            logger.debug(request_user.user_id)
+            logger.debug(id)
+            logger.debug(request_user.is_superuser)
             return None, strings.USER_EDITION_FORBIDDEN
         return user_obj, ""
 
@@ -83,7 +87,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         A User cannot be normally registered in the application and then try to login with google.
         """
 
-        user_db = self.get_sub(db=db, sub=user.sub)
+        user_db = self.get_sub(db=db, sub=user.get('sub'))
 
         if user_db and self.get_by_email(db=db, email=user_db.email).sub != user_db.sub:
             # If there is already an account with that google email that is not linked to google
@@ -93,7 +97,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             # User is not registered
             # Create an account
             user_create = UserCreateGoogle(
-                email=user.email, name=user.name, sub=user.sub
+                email=user.get('email'), name=user.get('name'), sub=user.get('sub')
             )
             return crud_user.create_google(db=db, user=user_create)
 
@@ -114,18 +118,25 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
+        # verify if email already exists
+        if 'email' in update_data:
+            obj = self.get_by_email(db=db, email=update_data['email'])
+            if obj and obj.email != db_obj.email:
+                return None, strings.EMAIl_ALREADY_IN_USE
+        # verify password
         if 'password' in update_data:
             hashed_password = get_password_hash(update_data["password"])
             del update_data["password"]
             update_data["hashed_password"] = hashed_password
         # no need to return any error here
+        # only superusers may update the status of the user
         if not request_user.is_superuser:
             if 'status' in update_data:
                 del update_data['status']
             if 'is_guest_user' in update_data:
                 del update_data['is_guest_user']
-
-        return super().update(db, db_obj=db_obj, obj_in=update_data)
+        updated_obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        return updated_obj, strings.USER_EDITED_SUCCESS
 
     def authenticate(self, db: Session, *, email: str, password: str) -> Tuple[Optional[User], str]:
         """

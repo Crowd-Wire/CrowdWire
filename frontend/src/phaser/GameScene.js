@@ -19,8 +19,6 @@ var globalVar = true;
 
 class GameScene extends Phaser.Scene {
     static inRangePlayers = new Set();
-    static map = null;
-    static roomLayer = null;
 
     remotePlayers = {};
     localPlayers = {};
@@ -31,21 +29,21 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        GameScene.map = this.add.tilemap('map');
+        this.map = this.add.tilemap('map');
 
         // MapBuilder(this, 'map');
 
-        const wallTileset = GameScene.map.addTilesetImage('wall-tiles');
-        const utilTileset = GameScene.map.addTilesetImage('util-tiles');
-        const tableTileset = GameScene.map.addTilesetImage('table-tiles');
-        const jardimTileset = GameScene.map.addTilesetImage('jardim');
-        const arrowTileset = GameScene.map.addTilesetImage('arrow');
-        const boardTileset = GameScene.map.addTilesetImage('board');
-        const plankTileset = GameScene.map.addTilesetImage('wooden-plank');
-        const tableVTileset = GameScene.map.addTilesetImage('table-V');
-        const tableHTileset = GameScene.map.addTilesetImage('table-H');
-        const brickTileset = GameScene.map.addTilesetImage('bricks');
-        const chairTileset = GameScene.map.addTilesetImage('chair');
+        const wallTileset = this.map.addTilesetImage('wall-tiles');
+        const utilTileset = this.map.addTilesetImage('util-tiles');
+        const tableTileset = this.map.addTilesetImage('table-tiles');
+        const jardimTileset = this.map.addTilesetImage('jardim');
+        const arrowTileset = this.map.addTilesetImage('arrow');
+        const boardTileset = this.map.addTilesetImage('board');
+        const plankTileset = this.map.addTilesetImage('wooden-plank');
+        const tableVTileset = this.map.addTilesetImage('table-V');
+        const tableHTileset = this.map.addTilesetImage('table-H');
+        const brickTileset = this.map.addTilesetImage('bricks');
+        const chairTileset = this.map.addTilesetImage('chair');
 
         const allTiles = [
             wallTileset,
@@ -61,10 +59,10 @@ class GameScene extends Phaser.Scene {
             chairTileset
         ]
 
-        GameScene.map.createDynamicLayer('Ground', allTiles);
-        GameScene.roomLayer = GameScene.map.createDynamicLayer('Room', allTiles).setVisible(false);
-        this.collisionLayer = GameScene.map.createDynamicLayer('Collision', allTiles);
-        this.floatLayer = GameScene.map.createDynamicLayer('Float', allTiles).setDepth(1000);
+        this.map.createDynamicLayer('Ground', allTiles);
+        this.roomLayer = this.map.createDynamicLayer('Room', allTiles).setVisible(false);
+        this.collisionLayer = this.map.createDynamicLayer('Collision', allTiles);
+        this.floatLayer = this.map.createDynamicLayer('Float', allTiles).setDepth(1000);
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
@@ -74,7 +72,7 @@ class GameScene extends Phaser.Scene {
         // });
 
         // Let's get the object objects, these are NOT sprites
-        // const objectLayer = GameScene.map.createFromObjects('Object', {key: 'table-V'});
+        // const objectLayer = this.map.createFromObjects('Object', {key: 'table-V'});
 
         // Now we create objects in our sprite group for each object in our map
         // objectLayer['objects'].forEach(obj => {
@@ -87,23 +85,24 @@ class GameScene extends Phaser.Scene {
         this.collisionLayer.setCollisionByExclusion([-1]);
 
         // create the map borders
-        this.physics.world.bounds.width = GameScene.map.widthInPixels;
-        this.physics.world.bounds.height = GameScene.map.heightInPixels;
+        this.physics.world.bounds.width = this.map.widthInPixels;
+        this.physics.world.bounds.height = this.map.heightInPixels;
 
         // listen to the arrow keys
-        // this.cursors = this.input.keyboard.addKeys({
-        //     up:Phaser.Input.Keyboard.KeyCodes.W,
-        //     down:Phaser.Input.Keyboard.KeyCodes.S,
-        //     left:Phaser.Input.Keyboard.KeyCodes.A,
-        //     right:Phaser.Input.Keyboard.KeyCodes.D
-        // }, false);
-        this.cursors = this.input.keyboard.createCursorKeys();
+        // this.cursors = this.input.keyboard.createCursorKeys();
+        this.cursors = this.input.keyboard.addKeys({
+            up: Phaser.Input.Keyboard.KeyCodes.W,
+            down: Phaser.Input.Keyboard.KeyCodes.S,
+            left: Phaser.Input.Keyboard.KeyCodes.A,
+            right: Phaser.Input.Keyboard.KeyCodes.D
+        }, false);
 
-        // this.cursors.onDown.add(function() {
-        //     this.processKeyboardEvent(function() {
-        //        // do something
-        //     });
-        // });
+        this.game.input.events.on('pause', () => {
+            this.cursors.left.isDown = false;
+            this.cursors.right.isDown = false;
+            this.cursors.up.isDown = false;
+            this.cursors.down.isDown = false;
+        }, this);
 
         // static players for range test
         // this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
@@ -114,10 +113,9 @@ class GameScene extends Phaser.Scene {
         this.player = new Player(this, 50, 50);
 
         // connect to room
-        this.ws.joinRoom('1', {x: 50, y: 50});
+        this.ws.joinRoom({x: 50, y: 50});
 
         // make camera follow player
-        //this.cameras.main.setBounds(0, 0, GameScene.map.widthInPixels, GameScene.map.heightInPixels);
         this.cameras.main.startFollow(this.player)
             .setBackgroundColor("#0C1117")//'#080C10');
             .setZoom(1.5);
@@ -129,6 +127,11 @@ class GameScene extends Phaser.Scene {
             globalVar = !globalVar;
         }, this);
         
+        Object.entries(usePlayerStore.getState().players).forEach(([id, player]) => {
+            const position = player.position;
+            this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
+            this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
+        })
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
         // TODO: remove after testing
@@ -160,12 +163,11 @@ class GameScene extends Phaser.Scene {
 
     handlePlayerConnection = (players, prevPlayers) => {
         const storePlayers = usePlayerStore.getState().players;
-        
         if (players.length > prevPlayers.length) {
             // connection
             for (const id of players) {
                 if (!(id in this.remotePlayers)) {
-                    let position = usePlayerStore.getState().players[id].position;
+                    const position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
                     this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
                 }
@@ -183,9 +185,9 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    static updateConferences = (player) => {
-        if (GameScene.roomLayer) {
-            const tile = GameScene.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
+    updateConferences = (player) => {
+        if (this.roomLayer) {
+            const tile = this.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
 
             if (tile) {
                 const conferenceId = tile.properties.id;
@@ -197,9 +199,10 @@ class GameScene extends Phaser.Scene {
             }
             else {
                 if (useWorldUserStore.getState().world_user.in_conference) {
-                    useConsumerStore.getState().closeRoom(useWorldUserStore.getState().world_user.in_conference);
+                    const conferenceId = useWorldUserStore.getState().world_user.in_conference;
+                    useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    player.ws.leaveConference();
+                    player.ws.leaveConference(conferenceId);
                 }
             }
         }
@@ -216,7 +219,7 @@ class GameScene extends Phaser.Scene {
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
                     // wire players
-                    this.ws.wirePlayer('1', 
+                    this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
                             const entered = !GameScene.inRangePlayers.has(id);
                             if (entered) GameScene.inRangePlayers.add(id);
@@ -225,7 +228,7 @@ class GameScene extends Phaser.Scene {
                     );
                 } else {
                     // unwire players
-                    this.ws.unwirePlayer('1', 
+                    this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
                             const left = !rangePlayers.includes(id);
                             if (left) {
@@ -357,10 +360,6 @@ class Player extends Phaser.GameObjects.Container {
         this.updateMovement();
         this.updateAnimation();
     }
-
-    updateRoom() {
-
-    }
     
     updateMovement() {
         const direction = new Phaser.Math.Vector2();
@@ -383,20 +382,10 @@ class Player extends Phaser.GameObjects.Container {
         this.body.velocity.normalize().scale(this.speed);
 
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-            this.ws.sendMovement('1', this.body.position.clone().subtract(this.body.offset), this.body.velocity);
+            this.ws.sendMovement(this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
-            GameScene.updateConferences(this);
+            this.scene.updateConferences(this);
         }
-
-        // if (this.step == 1 && !this.body.speed) {
-        //     this.ws.sendMovement('1', this.body.position, this.body.velocity);
-        //     this.step = 0;
-        //     console.log(this)
-        // } else if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
-        //     this.ws.sendMovement('1', this.body.position.subtract(this.body.newVelocity), this.body.velocity);
-        //     this.lastVelocity = this.body.velocity.clone();
-        //     this.step = 1;
-        // }
     }
 
     updateAnimation(velocity) {

@@ -31,10 +31,14 @@ async def edit_user(
 ):
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     user_obj, msg = crud_user.can_update(db=db, request_user=user, id=user_id)
     if not user_obj:
         raise HTTPException(status_code=400, detail=msg)
-    updated_user_obj = crud_user.update(db=db, db_obj=user_obj, obj_in=update_user, request_user=user)
+
+    updated_user_obj, msg = crud_user.update(db=db, db_obj=user_obj, obj_in=update_user, request_user=user)
+    if not updated_user_obj:
+        raise HTTPException(status_code=400, detail=msg)
     return updated_user_obj
 
 

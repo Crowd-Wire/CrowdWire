@@ -33,6 +33,7 @@
     "react-dom": "16.13.1",
     "react-dropzone-uploader": "^2.11.0",
     "react-full-screen": "^1.0.2",
+    "react-google-login": "^5.2.2",
     "react-grid-carousel": "^1.0.1",
     "react-hotkeys": "^2.0.0",
     "react-query": "^3.13.5",

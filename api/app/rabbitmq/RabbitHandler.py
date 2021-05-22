@@ -2,7 +2,7 @@ from aio_pika import connect_robust, Channel, IncomingMessage, Message
 from aio_pika.pool import Pool
 from loguru import logger
 from app.core.config import settings
-from app.websocket.connection_manager import manager
+from app.websockets.connection_manager import manager
 import json
 from app.core.consts import RabbitProtocol as protocol
 
