@@ -6,9 +6,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas, crud
 from app.api import dependencies as deps
 from app.core import strings
-from app.core.consts import WebsocketProtocol as protocol
 from app.utils import is_guest_user
-from app import crud
 
 router = APIRouter()
 
@@ -26,10 +24,6 @@ def get_world_events(
 ):
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
-    crud.crud_event.create(db=db,
-                           user_id=user.user_id,
-                           world_id=world_id,
-                           event_type=protocol.LEAVE_PLAYER)
     events = crud.crud_event.filter(
         db=db, world_id=world_id,
         user_id=user_id,
