@@ -120,9 +120,39 @@ class WorldService {
 
     }
 
-    getAllReports(page){
+    getAllReports(world, reporter, reviewed, banned, order_by, order, page, limit ){
 
-        return fetch(API_BASE + "worlds/reports/?page=" + page, {
+        let url = 'worlds/reports/';
+        let query = [];
+    
+        if(world !== "")
+            query.push('world=' + world);
+
+        if(reporter !== reporter)
+            query.push('reporter=' + reporter);
+
+        if(reviewed !== undefined)
+            query.push(reviewed);
+        
+        if(banned !== undefined)
+            query.push(banned);
+        
+        if(order_by !== undefined)
+            query.push(order_by);
+        
+        if(order !== undefined)
+            query.push(order);
+        
+        if(page !== undefined)
+            query.push(page);
+
+        if(limit !== undefined)
+            query.push(limit);
+
+        if(query.length !== 0)
+            url = url.concat('?'+query.join('&'));
+
+        return fetch(API_BASE + url , {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -141,8 +171,21 @@ class WorldService {
             },
             body: JSON.stringify({reporter: reporter, reviewed: reviewed})
         }) 
-
     }
+
+    banWorld(world_id, status){
+
+        // 0: normal, 1: banned, 2: deleted
+        return fetch(API_BASE + 'worlds/' + world_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({status: status})
+        })
+    }
+
 }
 
 export default new WorldService();

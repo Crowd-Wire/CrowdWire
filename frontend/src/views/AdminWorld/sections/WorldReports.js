@@ -8,7 +8,7 @@ export default function WorldReports(props) {
     const [page, setPage] = React.useState("1");
     const [reports, setReports] = React.useState([]);
 
-    React.useEffect(() => {
+    const request = (page) => {
         WorldService.getAllReports(page)
         .then((res) => {
             return res.json();
@@ -17,13 +17,16 @@ export default function WorldReports(props) {
             console.log(res);
             setReports(res);
         })
+    }
 
+    React.useEffect(() => {
+        request(1);
     },[])
 
     return (
         <div>
             {reports.map((r, i) => {     
-                return (<WorldReportCard key={i} report={r}/>)
+                return (<WorldReportCard key={i} report={r} reset={() => request(1)}/>)
             })}
             
         </div>

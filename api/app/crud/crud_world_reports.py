@@ -1,9 +1,9 @@
 from typing import Optional, Tuple, List
-
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import Session
 from .base import CRUDBase
 from app.models import World, User, Report_World
-from app.core import strings
+from app.core import strings, consts
 from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail, ReportWorldUpdate, ReportWorldInDB
 from .crud_world_users import crud_world_user
 
@@ -11,7 +11,12 @@ from .crud_world_users import crud_world_user
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpdate]):
 
     def get_all_world_reports(
-            self, db: Session, page: int, limit: int, world_id: Optional[int] = None
+            self, db: Session,
+            page: int, limit: int,
+            banned: bool, reviewed: bool,
+            order_by: str, order: str,
+            world: Optional[str] = None,
+            user: Optional[str] = None
     ) -> List[ReportWorldInDBWithEmail]:
         """
         Returns every report for that world.
@@ -20,7 +25,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         page_size = 10
 
         # this query gets all reports for a world and gets the email and name the of the world
-        reports = db.query(
+        query = db.query(
             Report_World.reported,
             Report_World.reporter,
             Report_World.comment,
@@ -30,15 +35,37 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
             User.email.label("reporter_email")
         ).filter(
             Report_World.reporter == User.user_id,
-            Report_World.reported == World.world_id
+            Report_World.reported == World.world_id,
+            World.status != consts.WORLD_DELETED_STATUS
         )
 
-        # if world_id is not provided returns reports from all worlds
-        if world_id:
-            reports = reports.filter(
-                Report_World.reported == world_id,
-            )
-        reports = reports.offset(page_size * (page - 1)).limit(page_size).all()
+        # shows only the worlds that are not banned or deleted
+        if not banned:
+            query = query.filter(World.status == consts.WORLD_NORMAL_STATUS)
+
+        # shows the reports that have been reviewed as well
+        if reviewed:
+           query = query.filter(Report_World.reviewed == True)
+
+        # if the world is provided it will search for a world with that name
+        if world:
+            query = query.filter(World.name.ilike("%" + world + "%"))
+
+        # if the user is provided it will search for the reports made by a user with that email
+        if user:
+            query = query.filter(User.email == world)
+
+        # assigns a function to variable so that it can be called later
+        if order == 'desc':
+            ord = desc
+        else:
+            ord = asc
+
+        # add more later
+        if order_by == 'timestamp':
+            query = query.order_by(ord(Report_World.timestamp))
+
+        reports = query.offset(page_size * (page - 1)).limit(page_size).all()
 
         # the results are not inside a dict so it is hard to conver to json
         return [r._asdict() for r in reports], ""

@@ -26,6 +26,12 @@ export default function WorldReportCard(props) {
 
     const handleBan = () => {
         console.log("Ban");
+        WorldService.banWorld(report.reported, 1)
+        .then((res) => {
+            // resets the
+            if(res.ok)
+                props.reset();
+        })
     }
 
     const handleReview = () => {
