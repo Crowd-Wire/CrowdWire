@@ -25,6 +25,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
             Report_World.reporter,
             Report_World.comment,
             Report_World.timestamp,
+            Report_World.reviewed,
             World.name.label("world_name"),
             User.email.label("reporter_email")
         ).filter(

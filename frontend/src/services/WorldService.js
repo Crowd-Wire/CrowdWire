@@ -120,7 +120,7 @@ class WorldService {
 
     }
 
-    get_all_reports(page){
+    getAllReports(page){
 
         return fetch(API_BASE + "worlds/reports/?page=" + page, {
             method: 'GET',
@@ -131,6 +131,18 @@ class WorldService {
         })
     }
 
+    reviewWorldReport(world_id, reporter, reviewed){
+
+        return fetch(API_BASE + "worlds/" + world_id + "/reports", { 
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({reporter: reporter, reviewed: reviewed})
+        }) 
+
+    }
 }
 
 export default new WorldService();

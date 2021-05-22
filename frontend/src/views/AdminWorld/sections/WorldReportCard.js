@@ -7,6 +7,8 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import WorldService from '../../../services/WorldService.js';
+
 
 const useStyles = makeStyles({
     root: {
@@ -19,7 +21,7 @@ const useStyles = makeStyles({
 
 export default function WorldReportCard(props) {
 
-    const report = props.report;
+    const [report, setReport] = React.useState(props.report);
     const classes = useStyles();
 
     const handleBan = () => {
@@ -28,6 +30,16 @@ export default function WorldReportCard(props) {
 
     const handleReview = () => {
         console.log("Review");
+        WorldService.reviewWorldReport(report.reported, report.reporter, !report.reviewed)
+        .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log(res);
+            if(res && res.reporter)
+                setReport({...report, reviewed: res.reviewed});
+            console.log(report);
+        })
     }
 
     return (
@@ -49,8 +61,8 @@ export default function WorldReportCard(props) {
                 <Button onClick={handleBan} size="small" color="primary">
                     Ban
                 </Button>
-                <Button onClick={handleReview} size="small" color="primary">
-                    Review
+                <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "primary" : "secondary"}>
+                    {report.reviewed ? "Review" : "Remove Review"}
                 </Button>
             </CardActions>
         </Card>

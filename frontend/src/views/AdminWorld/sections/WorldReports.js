@@ -9,7 +9,7 @@ export default function WorldReports(props) {
     const [reports, setReports] = React.useState([]);
 
     React.useEffect(() => {
-        WorldService.get_all_reports(page)
+        WorldService.getAllReports(page)
         .then((res) => {
             return res.json();
         })
