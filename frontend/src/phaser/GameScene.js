@@ -97,12 +97,7 @@ class GameScene extends Phaser.Scene {
             right: Phaser.Input.Keyboard.KeyCodes.D
         }, false);
 
-        this.game.input.events.on('pause', () => {
-            this.cursors.left.isDown = false;
-            this.cursors.right.isDown = false;
-            this.cursors.up.isDown = false;
-            this.cursors.down.isDown = false;
-        }, this);
+        this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // static players for range test
         // this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
