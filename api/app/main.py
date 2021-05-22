@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from app.db.session import SessionLocal
 from app.db.init_db import init_db
 from app.api.api_v1.api import api_router
@@ -36,6 +37,7 @@ def get_application() -> FastAPI:
     app.add_event_handler("startup", redis_connector.sentinel_connection)
     app.add_event_handler("startup", rabbit_handler.start_pool)
     app.include_router(api_router)
+    app.mount("/static", StaticFiles(directory="static"), name="static")
     return app
 
 
