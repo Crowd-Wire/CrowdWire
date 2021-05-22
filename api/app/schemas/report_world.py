@@ -15,11 +15,17 @@ class ReportWorldCreate(ReportWorldBase):
     comment: str
 
 
+class ReportWorldUpdate(BaseModel):
+    reporter: int
+    reviewed: bool
+
+
 class ReportWorldInDB(ReportWorldBase):
     reported: int
     reporter: int
     timestamp: datetime
     comment: str
+    reviewed: bool
 
     class Config:
         orm_mode = True

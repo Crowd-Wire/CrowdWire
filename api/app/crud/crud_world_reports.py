@@ -4,11 +4,11 @@ from sqlalchemy.orm import Session
 from .base import CRUDBase
 from app.models import World, User, Report_World
 from app.core import strings
-from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail
+from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail, ReportWorldUpdate, ReportWorldInDB
 from .crud_world_users import crud_world_user
 
 
-class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
+class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpdate]):
 
     def get_all_world_reports(
             self, db: Session, page: int, limit: int, world_id: Optional[int] = None
@@ -76,6 +76,20 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, None]):
         obj_in.reporter = request_user.user_id
 
         report = super().create(db=db, obj_in=obj_in)
+        return report, ""
+
+    def update(self, db: Session, world_id: int, obj: ReportWorldUpdate) -> ReportWorldInDB:
+
+        report, msg = self.get_world_report_for_user(db=db, world_id=world_id, user_id=obj.reporter)
+        if report is None:
+            return None, strings.WORLD_NOT_REPORTED_BY_USER
+
+        if report.reviewed == obj.reviewed:
+            return None, strings.NO_EFFECT_REQUEST
+
+        report = super().update(db=db, db_obj=report, obj_in=obj)
+        if not report:
+            return None, strings.UPDATE_FAIL
         return report, ""
 
     def remove(self, db: Session, world_id: int, user_id: int) -> Tuple[Optional[Report_World], str]:
