@@ -1,28 +1,25 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import Dropzone from 'react-dropzone-uploader'
 import { Button, Card } from '@material-ui/core';
 import CardBody from "../Card/CardBody.js";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import DownloadIcon from '@material-ui/icons/GetApp';
 import DeleteIcon from '@material-ui/icons/Delete';
 import Divider from '@material-ui/core/Divider';
-import ListSubheader from '@material-ui/core/ListSubheader';
+import InfoIcon from '@material-ui/icons/Info';
 import 'react-dropzone-uploader/dist/styles.css'
 import { wsend } from 'services/socket.js';
 import { toast } from 'react-toastify';
@@ -31,6 +28,11 @@ import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
 import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 import useWorldUserStore from "stores/useWorldUserStore";
 import { sendFile } from 'webrtc/utils/sendFile';
+import Popover from "@material-ui/core/Popover";
+import styles from "assets/jss/material-kit-react/views/componentsSections/javascriptStyles.js";
+
+//@ts-ignore
+const useStylesSecond = makeStyles(styles);
 
 const toast_props = {
   position: toast.POSITION.TOP_RIGHT,
@@ -60,13 +62,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function generate(element) {
-  return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((value) =>
-    React.cloneElement(element, {
-      key: value,
-    }),
-  );
-}
 
 interface FileSharingProps {
   closeModal: any;
@@ -74,10 +69,18 @@ interface FileSharingProps {
 
 export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
     const classes = useStyles();
+    const classes2 = useStylesSecond();
     const [myFiles, setMyFiles] = useState([]);
-    const MAX_FILE_SIZE =  20000000;
+    const MAX_FILE_SIZE =  500000000;
+    const BYTES_PER_CHUNK = 20000;
     const [listOfFiles, setListOfFiles] = useState([]);
+    const [sendingFile, setSendingFile] = useState(false);
+    const [anchorElBottom, setAnchorElBottom] = React.useState(null);
+    const [receivingFile, setReceivingFile] = useState(null);
+    const [progress, setProgress] = useState([]);
     const myUserId = useWorldUserStore.getState().world_user.user_id;
+    var incomingFileData = [];
+    var bytesReceived = 0;
 
     useEffect(() => {
       wsend({ topic: "GET_ROOM_USERS_FILES"});
@@ -99,6 +102,27 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
       })
     }, [])
 
+
+    function sendChunk(currentChunk, dataProducer, file) {
+      var fileReader = new FileReader();
+      console.log('sending chunk '+ currentChunk)
+      var start = BYTES_PER_CHUNK * currentChunk;
+      var end = Math.min( file.size, start + BYTES_PER_CHUNK );
+      fileReader.readAsArrayBuffer( file.slice( start, end ) );
+
+      fileReader.onload = function() {
+        dataProducer.send(fileReader.result)
+        console.log(fileReader.result)
+        currentChunk++;
+        if ( BYTES_PER_CHUNK * currentChunk < file.size ) {
+          setTimeout(() => { sendChunk(currentChunk, dataProducer, file) }, 100);
+        } else {
+          console.log("DONE SENDING FILE")
+          setSendingFile(false)
+        }
+      }
+    };
+
     const removeFile = (file) => {
       setMyFiles(myFiles => myFiles.filter( f => f.name !== file.name ))
       setListOfFiles(listOfFiles => listOfFiles.filter( f => f.id !== file.id ))
@@ -106,19 +130,103 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
     }
 
     const requestDownloadFile = (file) => {
+      if (receivingFile) {
+        toast.error(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            Already Downloading a File!
+          </span>
+          , toast_props
+        );
+        return;
+      }
+
+      const owner = file.owner;
       console.log(file)
+      console.log(useConsumerStore.getState().consumerMap);
+      if (useConsumerStore.getState().consumerMap[owner] && useConsumerStore.getState().consumerMap[owner].dataConsumer) {
+        useConsumerStore.getState().consumerMap[owner].dataConsumer.on('message', (message) => {
+          console.log('message received from ' + owner);
+          console.log(message)
+          progressDownload( message, file );
+        })
+        setReceivingFile(file)
+        // send download warning to file owner so he can send file through data producer
+        wsend({ topic:'REQUEST_TO_DOWNLOAD', 'file': file })
+        return;
+      }
+
+      toast.error(
+        <span>
+          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+          Something went wrong when trying to download the file!
+        </span>
+        , toast_props
+      );
+    }
+  
+    function progressDownload( data, file ) {
+      bytesReceived += data.byteLength;
+      incomingFileData.push( data );
+      setProgress([(bytesReceived / file.size) * 100, ((file.size - bytesReceived)/BYTES_PER_CHUNK/10).toFixed(2)])
+      if( bytesReceived === file.size ) {
+        setReceivingFile(null)
+        endDownload(file.name);
+      }
+    }
+
+    function endDownload(file_name) {
+      var blob = new window.Blob( incomingFileData );
+      var anchor = document.createElement( 'a' );
+      anchor.href = URL.createObjectURL( blob );
+      anchor.download = file_name
+      anchor.textContent = 'XXXXXXX';
+  
+      if( anchor.click ) {
+        anchor.click();
+      } else {
+        var evt = document.createEvent( 'MouseEvents' );
+        evt.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
+        anchor.dispatchEvent( evt );
+      }
     }
   
     const handleSubmit = (files, allFiles) => {
       let add_files = []
+      
       if ( ( myFiles.length + allFiles.length ) <= 3) {
-        for (let i=0; i<allFiles.length; i++) {
-          allFiles[i].meta['owner'] = myUserId;
-          myFiles.push(allFiles[i].file);
-          add_files.push(allFiles[i].meta);
-          allFiles[i].remove();
-        }
-        wsend({ topic: "ADD_USER_FILES", 'files': add_files });
+        sendFile().then((dataProducers) => {
+          for (let i=0; i<allFiles.length; i++) {
+            allFiles[i].meta['owner'] = myUserId;
+            myFiles.push(allFiles[i].file);
+            add_files.push(allFiles[i].meta);
+            allFiles[i].remove();
+          }
+          wsend({ topic: "ADD_USER_FILES", 'files': add_files });
+
+          useWsHandlerStore.getState().addWsListener(`REQUEST_TO_DOWNLOAD`, (d) => {
+            if (!sendingFile) {
+              setSendingFile(true);
+              console.log(dataProducers)
+              if (dataProducers) {
+                for (let i=0; i<dataProducers.length; i++) {
+                  console.log(d)
+                  let file = null;
+                  for (let i=0; i<myFiles.length; i++) {
+                    console.log(myFiles[i])
+                    if (myFiles[i].name == d.file.name){
+                      file = myFiles[i];
+                      break;
+                    }
+                  }
+                  if (file)
+                    sendChunk(0, dataProducers[i], file);
+                }
+              }
+            }
+          })
+
+        })
       } else{
         toast.error(
           <span>
@@ -152,7 +260,33 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
       }}>
         <CardBody>
           <div style={{textAlign: 'center'}}>
-            <h3 style={{color: '#3f51b5', fontWeight: 'bold'}}>File Sharing</h3>
+            <Button onClick={event => setAnchorElBottom(event.currentTarget)} style={{color: '#f50057', fontWeight: 'bold', fontSize: 15}}>
+              File Sharing Board <InfoIcon />
+            </Button>
+            <Popover
+              classes={{
+                paper: classes2.popover
+              }}
+              open={Boolean(anchorElBottom)}
+              anchorEl={anchorElBottom}
+              onClose={() => setAnchorElBottom(null)}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "center"
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "center"
+              }}
+            >
+              <h3 className={classes2.popoverHeader}>Limitations</h3>
+              <div className={classes2.popoverBody}>
+               <p>There are some limitations to be able to successfully share a file:</p>
+               <p>• It is only possible to share a file with one user at a time.</p>
+               <p>• Both must be on this board at the time the file is uploaded.</p>
+               <p>• Maximum file size is of 20MB.</p>
+              </div>
+            </Popover>
           </div>
 
           <Row>
@@ -190,7 +324,10 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                             </ListItemAvatar>
                             <ListItemText
                               primary={file.name}
-                              secondary={`Size: ${file.size} ${"  Type: "} ${file.type} ${"  Owner: "} ${file.owner}`}
+                              secondary={`Size: ${(file.size*0.000001).toFixed(2)}
+                              ${"  Type: "} ${file.type}
+                              ${"  Owner: "} ${file.owner}
+                              ${"  ETA: "} ${(file.size/BYTES_PER_CHUNK/10).toFixed(2)}`}
                             />
                             { file.owner == myUserId ?
                                 <ListItemSecondaryAction>
@@ -216,11 +353,23 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
             </Col>
           </Row>
 
+          {receivingFile ? 
+            <div style={{paddingTop: 15}}>
+              <h5>{receivingFile.name}</h5>
+              <h6>File size: {(receivingFile.size * 0.000001).toFixed(2)} {" "} MB</h6>
+              <h6>Estimated Time Left: {progress[1]} {" "} seconds</h6>
+              <ProgressBar animated now={progress[0]}/>
+            </div>
+            :
+            ''
+          }
+
           <div style={{textAlign: "center", paddingTop: 15}}>
             <Button onClick={() => closeModal()} style={{width: '35%' }} variant="contained" color="primary">
               Leave File Share
             </Button>
           </div>
+
 
         </CardBody>
       </Card>

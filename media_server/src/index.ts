@@ -135,7 +135,7 @@ async function main() {
         const peerState = state[theirPeerId];
         if (theirPeerId === myPeerId || !peerState ||
           (!peerState.producer?.has('audio') && !peerState.producer?.has('video')
-          && !peerState.producer?.has('media'))) {
+          && !peerState.producer?.has('media') && !peerState.producer?.has('file'))) {
           continue;
         }
         try {
@@ -148,6 +148,16 @@ async function main() {
                   //@ts-ignore
                   value,
                   rtpCapabilities,
+                  transport,
+                  myPeerId,
+                  state[theirPeerId]
+                ), 'kind': key}
+              );
+            } else {
+              consumerParametersArr.push(
+                {'consumer': await createDataConsumer(
+                  //@ts-ignore
+                  producer,
                   transport,
                   myPeerId,
                   state[theirPeerId]
@@ -318,8 +328,7 @@ async function main() {
               });
           })
         }
-        console.log("AQUI")
-        console.log(sctpStreamParameters)
+
         const producer = await transport.produceData({
           sctpStreamParameters,
           appData: { ...appData, peerId: myPeerId, transportId },
@@ -336,14 +345,12 @@ async function main() {
           if (theirPeerId === myPeerId) {
             continue;
           }
-          console.log("AQUI2")
+
           const peerTransport = state[theirPeerId]?.recvTransport;
           if (!peerTransport) {
             continue;
           }
           try {
-            console.log("AQUI3")
-
             const d = await createDataConsumer(
               producer,
               peerTransport,

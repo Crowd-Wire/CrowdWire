@@ -37,8 +37,14 @@ async function consumeAll(consumerParametersArr, roomId) {
   try {
     console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
-        break;
+      if (kind === 'file') {
+        if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
+          break;
+        }
+      } else{
+        if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
+          break;
+        }
       }
     }
   } catch (err) {
