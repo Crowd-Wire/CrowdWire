@@ -12,6 +12,7 @@ Events dont follow the same CRUD Rules from the Base Class
 since they cannot be created/updated/deleted through the REST API
 """
 
+
 class CRUDEvents:
 
     def get_all_by_world_id(self, db: Session, world_id: int) -> Optional[List[Event]]:
