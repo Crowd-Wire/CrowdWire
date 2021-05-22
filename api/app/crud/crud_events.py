@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.event import Event
 from .crud_world_users import crud_world_user
 from ..core import strings
-
+from loguru import logger
 """
 Events dont follow the same CRUD Rules from the Base Class
 since they cannot be created/updated/deleted through the REST API
@@ -16,7 +16,34 @@ since they cannot be created/updated/deleted through the REST API
 class CRUDEvents:
 
     def get_all_by_world_id(self, db: Session, world_id: int) -> Optional[List[Event]]:
-        return db.query(Event).filter(Event.world_id == world_id).all()
+        return db.query(Event).filter(Event.world_id == world_id).order_by(
+            Event.timestamp.desc()
+        ).all()
+
+    def filter(
+            self,
+            db: Session,
+            world_id: int,
+            user_id: int = None,
+            page_num: int = 1,
+            limit: int = 2,
+            event_type: str = None,
+            order_desc: bool = True
+    ):
+        query = db.query(Event).filter(Event.world_id == world_id)
+        if user_id:
+            query = query.filter(Event.user_id == user_id)
+
+        if event_type:
+            query = query.filter(Event.event_type.ilike('%' + event_type + '%'))
+
+        if not order_desc:
+            query = query.order_by(Event.timestamp.asc())
+        else:
+            logger.debug("Here")
+            query = query.order_by(Event.timestamp.desc())
+
+        return query.offset(limit * (page_num - 1)).limit(limit).all()
 
     def create(
             self,

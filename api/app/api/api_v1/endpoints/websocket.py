@@ -1,8 +1,10 @@
 from typing import Any, Optional, Union
 
+from app.utils import is_guest_user
 from app.websockets.connection_manager import manager
 from app.websockets import websocket_handler as wh
 from app.api import dependencies as deps
+from app.crud.crud_events import crud_event
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
@@ -65,12 +67,27 @@ async def world_websocket(
 
             elif topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_PLAYER)
 
             elif topic == protocol.JOIN_CONFERENCE:
                 await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_CONFERENCE)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.LEAVE_CONFERENCE)
 
             elif topic == protocol.CLOSE_MEDIA:
                 await wh.close_media(world_id, user_id, payload)
@@ -99,3 +116,8 @@ async def world_websocket(
 
     await manager.disconnect(world_id, user_id)
     await wh.disconnect_user(world_id, user_id)
+    if not is_guest_user(user):
+        crud_event.create(db=db,
+                          user_id=user.user_id,
+                          world_id=world_id,
+                          event_type=protocol.LEAVE_PLAYER)
