@@ -47,7 +47,13 @@ export const useRoomStore = create(
         }),
       removeRoom: (roomId: string) =>
         set((s) => {
-          if (s.rooms[roomId]) delete s.rooms[roomId];
+          if (s.rooms[roomId]) {
+            if (s.rooms[roomId].recvTransport)
+              s.rooms[roomId].recvTransport.close()
+            if (s.rooms[roomId].sendTransport)
+              s.rooms[roomId].sendTransport.close()
+            delete s.rooms[roomId];
+          } 
           return {
             rooms: {
               ...s.rooms

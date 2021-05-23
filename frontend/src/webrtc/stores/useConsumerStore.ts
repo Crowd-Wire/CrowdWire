@@ -215,6 +215,20 @@ export const useConsumerStore = create(
             },
           }
         }),
+      closeDataConsumers: () =>
+        set((s) => {
+          for (const [key, value] of Object.entries(s.consumerMap)) {
+            if (value.dataConsumer) {
+              value.dataConsumer.close()
+              s.consumerMap[key].dataConsumer = null;
+            };
+          }
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          }
+        }),
       closePeer: (userId) =>
         set((s) => {
           let user = s.consumerMap[userId]

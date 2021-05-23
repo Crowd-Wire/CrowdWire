@@ -56,7 +56,7 @@ async function main() {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
         peer?.producer?.get('audio')?.close();
-        // peer?.sendTransport?.close();
+        peer?.sendTransport?.close();
       }
     },
     ['remove-user-from-groups']: ({ roomIds, peerId }) => {

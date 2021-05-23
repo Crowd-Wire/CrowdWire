@@ -25,6 +25,7 @@ import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useMediaStore } from "../../webrtc/stores/useMediaStore";
 import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
+import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import useWorldUserStore from "../../stores/useWorldUserStore";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
@@ -155,6 +156,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setShowModalFile(!showModalFile)
     if (showModalFile) {
       wsend({ topic: "REMOVE_ALL_USER_FILES"});
+      console.log(useConsumerStore.getState().consumerMap)
+      useConsumerStore.getState().closeDataConsumers();
+      console.log(useConsumerStore.getState().consumerMap)
     }
   }
 
@@ -224,8 +228,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setMediaOffState(useMediaStore.getState().media ? false : true)
     for (let roomId in rooms)
       wsend({ topic: "close-media" })
-    console.log("sending close media")
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useMediaStore.getState().media])
 
   useEffect(() => {
@@ -253,7 +257,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     <div
       style={{
         height:'100%',
-        maxWidth:400,
+        maxWidth: 400,
+        minWidth: 160,
+        minHeight: 120,
         width: '100%',
         overflow: 'auto',
       }}>
@@ -263,7 +269,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       </Button>
 
       <FullScreen handle={handle}>
-        <File></File>
         <Card style={{padding: 4,
           background: 'rgba(65, 90, 90, 0.5)',
           overflow: 'hidden',

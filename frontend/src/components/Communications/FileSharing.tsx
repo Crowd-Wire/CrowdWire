@@ -193,7 +193,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
   
     const handleSubmit = (files, allFiles) => {
       let add_files = []
-      
+
       if ( ( myFiles.length + allFiles.length ) <= 3) {
         sendFile().then((dataProducers) => {
           for (let i=0; i<allFiles.length; i++) {
@@ -225,7 +225,6 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
               }
             }
           })
-
         })
       } else{
         toast.error(
@@ -284,7 +283,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                <p>There are some limitations to be able to successfully share a file:</p>
                <p>• It is only possible to share a file with one user at a time.</p>
                <p>• Both must be on this board at the time the file is uploaded.</p>
-               <p>• Maximum file size is of 20MB.</p>
+               <p>• Maximum file size is of 500 MB.</p>
               </div>
             </Popover>
           </div>
@@ -325,9 +324,9 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                             <ListItemText
                               primary={file.name}
                               secondary={`Size: ${(file.size*0.000001).toFixed(2)}
-                              ${"  Type: "} ${file.type}
+                              ${"MBs  Type: "} ${file.type}
                               ${"  Owner: "} ${file.owner}
-                              ${"  ETA: "} ${(file.size/BYTES_PER_CHUNK/10).toFixed(2)}`}
+                              ${"  ETA: "} ${(file.size/BYTES_PER_CHUNK/10).toFixed(2)} s`}
                             />
                             { file.owner == myUserId ?
                                 <ListItemSecondaryAction>
@@ -356,7 +355,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
           {receivingFile ? 
             <div style={{paddingTop: 15}}>
               <h5>{receivingFile.name}</h5>
-              <h6>File size: {(receivingFile.size * 0.000001).toFixed(2)} {" "} MB</h6>
+              <h6>File size: {(receivingFile.size * 0.000001).toFixed(2)} {" "} MBs</h6>
               <h6>Estimated Time Left: {progress[1]} {" "} seconds</h6>
               <ProgressBar animated now={progress[0]}/>
             </div>
