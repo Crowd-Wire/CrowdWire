@@ -29,8 +29,8 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    user_id = manager.get_next_user_id()
-    # user_id = str(user.user_id)
+    # user_id = manager.get_next_user_id()
+    user_id = str(user.user_id)
     world_id = str(world_id)
     logger.info(user_id)
     await manager.connect(world_id, websocket, user_id)
@@ -126,12 +126,9 @@ async def world_websocket(
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
         logger.info("disconnected ")
-    # except BaseException:
-    #     logger.info("base exc")
         await manager.disconnect(world_id, user_id)
         await wh.disconnect_user(world_id, user_id)
         if not is_guest_user(user):
-            crud_event.create(db=db,
-                            user_id=user.user_id,
-                            world_id=world_id,
-                            event_type=protocol.LEAVE_PLAYER)
+            crud_event.create(db=db, user_id=user.user_id, world_id=world_id, event_type=protocol.LEAVE_PLAYER)
+    # except BaseException:
+    #     logger.info("base exc")
