@@ -45,8 +45,8 @@ class World_UserUpdate(BaseModel):
 
 # Base Schema to retrieve data from DB
 class World_UserInDBBase(BaseModel):
-    # user_id is an UUID1 for Guest Users
-    user_id: Optional[Union[int, UUID4]]
+    # user_id is an UUID4 for Guest Users
+    user_id: Optional[Union[UUID4, int]]
     world_id: int
 
     class Config:
