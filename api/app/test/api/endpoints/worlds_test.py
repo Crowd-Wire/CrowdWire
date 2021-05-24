@@ -891,8 +891,8 @@ class TestWorlds(TestCase):
             assert response.json()[0]['comment'] == 'test'
             assert response.json()[0]['reported'] == 1
             assert response.json()[0]['reporter'] == 1
-            assert response.json()[0]['reviewed'] == True
-            assert response.json()[0]['banned'] == False
+            assert response.json()[0]['reviewed']
+            assert not response.json()[0]['banned']
             assert response.json()[0]['world_name'] == 'test'
             assert response.json()[0]['reporter_email'] == 'test@test.com'
             assert mock_get.call_count == 1
