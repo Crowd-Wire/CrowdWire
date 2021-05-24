@@ -34,3 +34,4 @@ class ReportWorldInDB(ReportWorldBase):
 class ReportWorldInDBWithEmail(ReportWorldInDB):
     reporter_email: str
     world_name: str
+    banned: int

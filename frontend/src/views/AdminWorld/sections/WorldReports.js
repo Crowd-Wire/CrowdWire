@@ -80,17 +80,13 @@ export default function WorldReports(props) {
         let input = event.target.value;
         if(numberRegex.test(input))      
             setWorld(event.target.value);
-        else
-            console.log("that is not a number");
     }
 
     const handleReporter = (event) => {
         let input = event.target.value;
-        console.log(input)
         if(numberRegex.test(input))      
             setReporter(input);
-        else
-            console.log("that is not a number");
+      
     }
 
     const handleSubmit = () => {
@@ -185,8 +181,9 @@ export default function WorldReports(props) {
             <hr/>
             <div className="">
                 {reports.map((r, i) => {
-                    return (<Row className="my-3"><Col></Col>
-                        <Col><WorldReportCard key={i} report={r} reset={() => request(1)}/> </Col>
+                    console.log(JSON.stringify(r));
+                    return (<Row key={r.reported + '_' + r.reporter} className="my-3"><Col></Col>
+                        <Col><WorldReportCard  report={r} reset={() => handleSubmit()}/> </Col>
                         <Col></Col>
                         </Row>)
                 })}

@@ -24,8 +24,7 @@ export default function WorldReportCard(props) {
     const classes = useStyles();
 
     const handleBan = () => {
-        console.log("Ban");
-        WorldService.banWorld(report.reported, 1)
+        WorldService.banWorld(report.reported, report.banned == 0 ? 1 : 0 )
         .then((res) => {
             // resets the
             if(res.ok)
@@ -34,16 +33,15 @@ export default function WorldReportCard(props) {
     }
 
     const handleReview = () => {
-        console.log("Review");
         WorldService.reviewWorldReport(report.reported, report.reporter, !report.reviewed)
         .then((res) => {
             return res.json();
         })
         .then((res) => {
-            console.log(res);
-            if(res && res.reporter)
+            if(res && res.reporter){
                 setReport({...report, reviewed: res.reviewed});
-            console.log(report);
+                props.reset();
+            }
         })
     }
 
@@ -63,8 +61,8 @@ export default function WorldReportCard(props) {
                 </CardContent>
             </CardActionArea>
             <CardActions>
-                <Button onClick={handleBan} size="small" color="primary">
-                    Ban
+                <Button onClick={handleBan} size="small" color={report.banned ? "primary" : "secondary"}>
+                    {report.banned ? "Remove Ban" : "Ban"}
                 </Button>
                 <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "secondary" : "primary"}>
                     {report.reviewed ? "Remove Review" : "Review"}

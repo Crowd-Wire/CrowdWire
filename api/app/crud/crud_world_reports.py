@@ -32,7 +32,8 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
             Report_World.timestamp,
             Report_World.reviewed,
             World.name.label("world_name"),
-            User.email.label("reporter_email")
+            User.email.label("reporter_email"),
+            World.status.label("banned")
         ).filter(
             Report_World.reporter == User.user_id,
             Report_World.reported == World.world_id,
@@ -42,10 +43,14 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         # shows only the worlds that are not banned or deleted
         if not banned:
             query = query.filter(World.status == consts.WORLD_NORMAL_STATUS)
+        else:
+            query = query.filter(World.status == consts.WORLD_BANNED_STATUS)
 
         # shows the reports that have been reviewed as well
         if reviewed:
            query = query.filter(Report_World.reviewed == True)
+        else:
+            query = query.filter(Report_World.reviewed == False)
 
         # if the world is provided it will search for a world with that name
         if world:
