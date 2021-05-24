@@ -309,7 +309,7 @@ async def get_all_users_from_world(
 
 
 @router.get("/reports/", response_model=List[schemas.ReportWorldInDBWithEmail])
-async def get_all_worlds_reports(
+async def get_worlds_reports(
         world: Optional[int] = None,
         reporter: Optional[int] = None,
         reviewed: Optional[bool] = False,
