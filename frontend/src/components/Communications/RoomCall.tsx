@@ -27,6 +27,7 @@ import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 
+
 interface State {
   displayStream: boolean;
   fullscreen: boolean;
@@ -71,7 +72,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.setState({ media });
     }, (state) => state.media);
   }
-  myId: string = 'myUsernameId';
+  myId: string = useWorldUserStore.getState().world_user.user_id;
   accessMic: boolean = false;
   accessVideo: boolean = false;
   socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
@@ -94,8 +95,10 @@ export default class RoomCall extends React.Component<{}, State> {
   }
 
   reInitializeStream = () => {
-    if (this.accessMic || this.accessVideo) {
-      const media = getVideoAudioStream(this.accessMic, this.accessVideo);
+    const useMic = (this.accessMic && !(useMuteStore.getState().videoMuted))
+    const useCam = (this.accessVideo && !(useMuteStore.getState().audioMuted))
+    if (useMic|| useCam) {
+      const media = getVideoAudioStream(useMic, useCam);
       return new Promise((resolve) => {
         media.then((stream: MediaStream) => {
           useVideoStore.getState().set({ camStream: stream, cam: stream.getVideoTracks()[0] })
@@ -176,12 +179,11 @@ export default class RoomCall extends React.Component<{}, State> {
     };
     // if (this.state.media)
     //   numberUsers += 1;
-    let numberCols = numberUsers > 6 ? 6 : numberUsers;
-    let numberRows = this.state.fullscreen ? numberUsers > 12 ? 3 : numberUsers > 6 ? 2 : 1 : 1;
+    let bigScreen = window.innerWidth > 1200;
+    let numberCols = bigScreen ? numberUsers > 6 ? 6 : numberUsers : numberUsers > 4 ? 4 : numberUsers;
+    let numberRows = bigScreen ? this.state.fullscreen ? numberUsers > 12 ? 3 : numberUsers > 6 ? 2 : 1 : 1 : this.state.fullscreen ? 2 : 1;
     let hasNextPage = numberUsers > (numberCols * numberRows) ? true : false;
-    let smallNumberCols = numberUsers > 4 ? 4 : numberUsers;
-    let smallNumberRows = this.state.fullscreen ? 2 : 1;
-    let smallHasNextPage = numberUsers > (smallNumberCols * smallNumberRows) ? true : false;
+
     const gridSettings = {
       cols: numberCols,
       rows: numberRows,
@@ -189,18 +191,6 @@ export default class RoomCall extends React.Component<{}, State> {
       loop: true,
       hideArrow: !hasNextPage,
       showDots: hasNextPage,
-      responsiveLayout: [
-        {
-          breakpoint: 1200,
-          cols: smallNumberCols,
-          rows: smallNumberRows,
-          gap: 5,
-          loop: true,
-          autoplay: 0,
-          hideArrow: !smallHasNextPage,
-          showDots: smallHasNextPage,
-        }
-      ],
       mobileBreakpoint: 600
     }
     return (
@@ -223,7 +213,7 @@ export default class RoomCall extends React.Component<{}, State> {
           {/* <ActiveSpeakerListener/> */}
 
           
-              <div style={{ height: '100%', padding: 2, width: numberUsers < 6 ? `${18 * numberUsers}%` : '100%' }}>
+              <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600}}>
                 <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
                   {this.state.fullscreen ?
                     (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenExitIcon /></Button>)
@@ -240,6 +230,8 @@ export default class RoomCall extends React.Component<{}, State> {
                         volume: userVolume, active,
                         videoToggle, audioToggle
                       } = this.state.consumerMap[peerId];
+                      
+                     
                       let item = <></>
                       if (consumerMedia)
                         item = (
@@ -254,8 +246,7 @@ export default class RoomCall extends React.Component<{}, State> {
                           </Carousel.Item>
                         )
                       return [
-                        (
-                          <Carousel.Item key={peerId + "_crs_item"}>
+                        (<Carousel.Item key={peerId + "_crs_item"}>
                             <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
                               <VideoAudioBox
                                 active={active}
@@ -268,9 +259,7 @@ export default class RoomCall extends React.Component<{}, State> {
                                 audioToggle={audioToggle}
                               />
                             </div>
-                          </Carousel.Item>
-                        ), item
-                      ]
+                          </Carousel.Item>), item]
                     })
                   }
 
@@ -278,7 +267,7 @@ export default class RoomCall extends React.Component<{}, State> {
               </div>
         </div>
         ) : null}
-        <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99 }}>
+        <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
           {this.state.media ?
             <MyMediaStreamBox
               username={this.myId}

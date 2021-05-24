@@ -51,6 +51,10 @@ export const sendVoice = async (roomId:string = null) => {
           appData: { mediaTag: "audio" },
         }).then((producer) => {
           set({micProducer: producer});
+          producer.on("transportclose", () => {
+            producer.close();
+            set({mic: null, micStream: null, micProducer: null})
+          })
         }).catch((err) => {
           console.log(err)
           mic.onended = function(event) {

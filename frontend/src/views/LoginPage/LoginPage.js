@@ -234,7 +234,7 @@ class LoginPage extends React.Component {
                           </Col>
                           <Col sm={6} md={6} lg={6}>
                             <Row>
-                              <Button onClick={this.handleGuestJoin} style={{ margin: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
+                              <Button onClick={this.handleGuestJoin} style={{ marginLeft: "auto", marginRight: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
                             </Row>
                           </Col>
                         </Row>

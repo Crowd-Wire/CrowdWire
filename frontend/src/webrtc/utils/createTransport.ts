@@ -20,11 +20,13 @@ export async function createTransport(
     direction === "recv"
       ? await device!.createRecvTransport(transportOptions)
       : await device!.createSendTransport(transportOptions);
-
+      
+  const sctpParameters = transportOptions.sctpParameters
   // mediasoup-client will emit a connect event when media needs to
   // start flowing for the first time. send dtlsParameters to the
   // server, then call callback() on success or errback() on failure.
   transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
+    console.log(sctpParameters)
     useWsHandlerStore
       .getState()
       .addWsListener(`@connect-transport-${direction}-done`, (d) => {
@@ -45,7 +47,7 @@ export async function createTransport(
       console.log('sending connect-transport')
       socket.send(JSON.stringify({
         topic: "@connect-transport",
-        d: { roomId: _roomId, transportId: transportOptions.id, dtlsParameters, direction },
+        d: { roomId: _roomId, transportId: transportOptions.id, dtlsParameters, sctpParameters, direction },
       }));
     }
   });
@@ -86,6 +88,39 @@ export async function createTransport(
               paused,
               appData,
               direction,
+            },
+          }));
+        }
+      }
+    );
+
+
+    transport.on(
+      "producedata",
+      async (parameters, callback, errback) => {
+        console.log(parameters)
+        useWsHandlerStore
+          .getState()
+          .addWsListener(`@send-file-${direction}-done`, (d) => {
+            if (d.error) {
+              console.log(`send-file ${direction} failed`, d.error);
+              errback();
+            } else {
+              console.log(`send-file-transport ${direction} success`);
+              callback({ id: d.id });
+            }
+          });
+        
+        if (socket.readyState === WebSocket.OPEN) {
+          socket.send(JSON.stringify({
+            topic: "@send-file",
+            d: {
+              roomId: _roomId,
+              transportId: transportOptions.id,
+              sctpStreamParameters: parameters.sctpStreamParameters,
+              protocol: parameters.protocol,
+              appData: parameters.appData,
+              direction
             },
           }));
         }

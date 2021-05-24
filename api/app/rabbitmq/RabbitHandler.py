@@ -4,6 +4,7 @@ from loguru import logger
 from app.core.config import settings
 from app.websockets.connection_manager import manager
 import json
+from app.core.consts import RabbitProtocol as protocol
 
 
 # Message Receiving format
@@ -14,28 +15,30 @@ async def on_message(message: IncomingMessage) -> None:
         topic = msg['topic']
         # logger.info(" [x] Received message for topic  %r" % topic)
 
-        if topic == "@get-recv-tracks-done"\
-                or topic == "@send-track-send-done"\
-                or topic == "@connect-transport-recv-done"\
-                or topic == "@connect-transport-send-done"\
-                or topic == 'you-joined-as-peer'\
-                or topic == 'you-joined-as-speaker'\
-                or topic == 'you-are-now-a-speaker':
+        if topic == protocol.GET_RECV_TRACKS_DONE\
+                or topic == protocol.SEND_TRACK_SEND_DONE\
+                or topic == protocol.SEND_FILE_SEND_DONE\
+                or topic == protocol.CONNECT_TRANSPORT_RECV_DONE\
+                or topic == protocol.CONNECT_TRANSPORT_SEND_DONE\
+                or topic == protocol.YOU_JOINED_AS_PEER\
+                or topic == protocol.YOU_JOINED_AS_SPEAKER\
+                or topic == protocol.YOU_ARE_NOW_A_SPEAKER:
 
             if 'error' in msg['d']:
                 return
             user_id = msg['d']['peerId']
 
             await manager.send_personal_message(msg, user_id)
-        elif topic == "new-peer-producer":
+        elif topic == protocol.NEW_PEER_PRODUCER\
+                or topic == protocol.NEW_PEER_DATA_PRODUCER:
             # uid identifies to whom the message is suppost to be sent to
             # peerId identifies the new peerId that joined
             user_id = msg['uid']
 
             await manager.send_personal_message(msg, user_id)
-        elif topic == "close_consumer":
+        elif topic == protocol.CLOSE_CONSUMER:
             logger.info(msg)
-        elif topic == "error":
+        elif topic == protocol.ERROR:
             logger.info(msg)
         else:
             logger.error(f"Unknown topic \"{topic}\"")

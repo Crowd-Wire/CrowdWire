@@ -4,6 +4,7 @@ import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
 import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
+import { consumeDataStream } from "../webrtc/utils/consumeDataStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
@@ -36,8 +37,14 @@ async function consumeAll(consumerParametersArr, roomId) {
   try {
     console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
-        break;
+      if (kind === 'file') {
+        if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
+          break;
+        }
+      } else{
+        if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
+          break;
+        }
       }
     }
   } catch (err) {
@@ -209,6 +216,13 @@ export const getSocket = (worldId) => {
               consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
             }
           }
+          break;
+        case "new-peer-data-producer":
+          console.log(data)
+          const roomId = data.d.roomId;
+            if (useRoomStore.getState().rooms[roomId].recvTransport) {
+              consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
+            }
           break;
         case "active-speaker":
           console.log(data)
