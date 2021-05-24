@@ -17,7 +17,7 @@ interface Role {
 }
 
 interface WorldUser {
-    user_id: number;
+    user_id: string;
     world_id: number;
     avatar: string;
     role: Role;

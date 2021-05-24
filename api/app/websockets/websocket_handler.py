@@ -179,6 +179,68 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict):
         user_requested)
 
 
+async def add_user_files(world_id: str, user_id: str, payload: dict):
+    if (await redis_connector.get_user_files_len(world_id, user_id)) <= 3:
+        files = payload['files']
+        for file_data in files:
+            await redis_connector.add_user_file(world_id, user_id, file_data)
+
+        await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.ADD_USER_FILES, 'd': {'files': files}}, user_id)
+        await manager.send_personal_message({'topic': protocol.ADD_USER_FILES, 'd': {'files': files}}, user_id)
+
+
+async def remove_user_file(world_id: str, user_id: str, payload: dict):
+    file_data = payload['file']
+    await redis_connector.remove_user_file(world_id, user_id, file_data)
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_USER_FILE, 'd': {'file': file_data}}, user_id)
+
+
+async def remove_all_user_files(world_id: str, user_id: str):
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
+    await redis_connector.remove_all_user_files(world_id, user_id)
+
+
+async def get_room_users_files(world_id: str, user_id: str):
+    users_ids = await redis_connector.get_user_users(world_id, user_id)
+    list_of_files = []
+    for uid in users_ids:
+        list_of_files.extend(await redis_connector.get_user_files(world_id, uid))
+
+    await manager.send_personal_message(
+        {'topic': protocol.GET_ROOM_USERS_FILES, 'd': {'files': list_of_files}},
+        user_id)
+
+
+async def download_request(world_id: str, user_id: str, payload: dict):
+    file_data = payload['file']
+    await manager.send_personal_message(
+        {'topic': protocol.DOWNLOAD_REQUEST, 'd': {'file': file_data, 'user_id': user_id}},
+        str(file_data['owner']))
+
+
+async def deny_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    reason = payload['d']['reason']
+    await manager.send_personal_message(
+        {'topic': protocol.DENY_DOWNLOAD_REQUEST, 'd': {'user_id': user_id, 'reason': reason}},
+        str(user_id))
+
+
+async def accept_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    file_data = payload['d']['file']
+    await manager.send_personal_message(
+        {'topic': protocol.ACCEPT_DOWNLOAD_REQUEST, 'd': {'file': file_data}},
+        str(user_id))
+
+
+async def start_download(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    await manager.send_personal_message(
+        {'topic': protocol.START_DOWNLOAD},
+        str(user_id))
+
+
 async def leave_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload["conference_id"]
 
@@ -200,6 +262,9 @@ async def leave_conference(world_id: str, user_id: str, payload: dict):
 
 
 async def disconnect_user(world_id: str, user_id: str):
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
+    await redis_connector.remove_all_user_files(world_id, user_id)
+
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
     if group_ids:
