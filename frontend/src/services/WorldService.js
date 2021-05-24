@@ -7,7 +7,7 @@ class WorldService {
         /*
             search: string,
             tags: List[string]
-            joined: boolean
+            type: boolean
             page: int
         */
 
@@ -120,37 +120,40 @@ class WorldService {
 
     }
 
-    getAllReports(world, reporter, reviewed, banned, order_by, order, page, limit ){
+    getAllReports(world, reporter, reviewed, banned, order_by, order, page, limit){
 
         let url = 'worlds/reports/';
         let query = [];
     
-        if(world !== "")
+        if(world !== undefined && world !== '')
             query.push('world=' + world);
 
-        if(reporter !== reporter)
+        if(reporter !== undefined && reporter !== '')
             query.push('reporter=' + reporter);
 
         if(reviewed !== undefined)
-            query.push(reviewed);
+            query.push("reviewed=" + reviewed);
         
         if(banned !== undefined)
-            query.push(banned);
+            query.push("banned=" + banned);
         
         if(order_by !== undefined)
-            query.push(order_by);
+            query.push("order_by=" + order_by);
         
         if(order !== undefined)
-            query.push(order);
+            query.push("order=" + order);
         
         if(page !== undefined)
-            query.push(page);
+            query.push("page=" + page);
 
         if(limit !== undefined)
-            query.push(limit);
+            query.push("limit=" + limit);
 
+        console.log(query);
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
+
+        console.log(url);
 
         return fetch(API_BASE + url , {
             method: 'GET',

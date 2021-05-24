@@ -15,8 +15,8 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
             page: int, limit: int,
             banned: bool, reviewed: bool,
             order_by: str, order: str,
-            world: Optional[str] = None,
-            user: Optional[str] = None
+            world: Optional[int] = None,
+            user: Optional[int] = None
     ) -> List[ReportWorldInDBWithEmail]:
         """
         Returns every report for that world.
@@ -49,11 +49,11 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
 
         # if the world is provided it will search for a world with that name
         if world:
-            query = query.filter(World.name.ilike("%" + world + "%"))
+            query = query.filter(World.world_id == world)
 
         # if the user is provided it will search for the reports made by a user with that email
         if user:
-            query = query.filter(User.email == world)
+            query = query.filter(User.user_id == user)
 
         # assigns a function to variable so that it can be called later
         if order == 'desc':

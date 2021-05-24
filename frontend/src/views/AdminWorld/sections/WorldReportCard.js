@@ -9,7 +9,6 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import WorldService from '../../../services/WorldService.js';
 
-
 const useStyles = makeStyles({
     root: {
         maxWidth: 345,
@@ -67,8 +66,8 @@ export default function WorldReportCard(props) {
                 <Button onClick={handleBan} size="small" color="primary">
                     Ban
                 </Button>
-                <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "primary" : "secondary"}>
-                    {report.reviewed ? "Review" : "Remove Review"}
+                <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "secondary" : "primary"}>
+                    {report.reviewed ? "Remove Review" : "Review"}
                 </Button>
             </CardActions>
         </Card>
