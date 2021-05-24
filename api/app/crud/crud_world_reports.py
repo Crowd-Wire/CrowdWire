@@ -48,9 +48,9 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
 
         # shows the reports that have been reviewed as well
         if reviewed:
-           query = query.filter(Report_World.reviewed == True)
+            query = query.filter(Report_World.reviewed.is_(True))
         else:
-            query = query.filter(Report_World.reviewed == False)
+            query = query.filter(Report_World.reviewed.is_(False))
 
         # if the world is provided it will search for a world with that name
         if world:

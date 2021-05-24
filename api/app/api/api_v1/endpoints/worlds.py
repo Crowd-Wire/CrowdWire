@@ -139,17 +139,17 @@ async def update_world(
     """
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
-    
+
     # first checking if this user can edit the world(creator only)
     world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
-    
+
     # admins can also change the status of the world whenever they want
     if not world_obj and not user.is_superuser:
         raise HTTPException(
             status_code=400,
             detail=message,
         )
-    
+
     # creator cannot change the world if it is banned
     if world_obj.status == consts.WORLD_BANNED_STATUS and not user.is_superuser:
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
