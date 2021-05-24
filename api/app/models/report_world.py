@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, String, TIMESTAMP
+from sqlalchemy import Column, Integer, ForeignKey, String, TIMESTAMP, Boolean
 from app.db.base_class import Base
 from app.core.config import settings
 
@@ -18,3 +18,4 @@ class Report_World(Base):
                       )
     timestamp = Column(TIMESTAMP, nullable=False)
     comment = Column(String(300))
+    reviewed = Column(Boolean, default=False, server_default='f')

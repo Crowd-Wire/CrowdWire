@@ -36,6 +36,8 @@ USER_NO_ROLE_PERMISSIONS = "Your role does not have access to this functionality
 USER_IS_NOT_BANNABLE = "You cannot ban this user."
 CHANGE_USER_INFO_FORBIDDEN = "You cannot change this user info."
 K8S_CLUSTER_NOT_FOUND = "No Kubernetes cluster found!"
+NO_EFFECT_REQUEST = "This request has no effect."
+UPDATE_FAIL = "There was an error when updating the data."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 USER_EDITED_SUCCESS = "User has been edited succesfully"
