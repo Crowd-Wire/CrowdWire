@@ -84,7 +84,6 @@ class WorldService {
                 name: wName,
                 public: accessibility,
                 allow_guests: guests,
-                world_map: "",
                 max_users: maxUsers,
                 tags: tag_array,
                 description: desc

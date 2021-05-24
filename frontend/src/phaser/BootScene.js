@@ -1,5 +1,9 @@
 import * as Phaser from 'phaser';
 
+import useWorldUserStore from "stores/useWorldUserStore";
+
+import MapManager from "./MapManager.ts";
+
 
 const sceneConfig = {
     active: false,// hum, n sei o q faz ainda
@@ -11,43 +15,102 @@ class BootScene extends Phaser.Scene {
     
     constructor() {
         super(sceneConfig);
-        this.count = 0;
     }
 
     preload() {
-        // map tiles
-        this.load.image('wall-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wall-tiles.png`);
-        this.load.image('util-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/util-tiles.png`);
-        this.load.image('table-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-tiles.png`);
-        this.load.image('table-V',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-V.png`);
-        this.load.image('table-H',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-H.png`);
-        this.load.image('jardim',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/jardim.png`);
-        this.load.image('wooden-plank',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wooden-plank.png`);
-        this.load.image('arrow',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/arrow.png`);
-        this.load.image('board',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/board.png`);
-        this.load.image('bricks',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/bricks.png`);
-        this.load.image('chair',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/chair.png`);
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
 
-        // map in json format
-        this.load.tilemapTiledJSON('map', `${process.env.PUBLIC_URL}/assets/tilemaps/maps/minimap.json`);
+        const progressBar = this.add.graphics();
+        const progressBox = this.add.graphics();
+        progressBox.fillStyle(0x222222, 0.8);
+        progressBox.fillRect(width/2 - 160, height/2 - 75, 320, 50);
+
+        const loadingText = this.make.text({
+            x: width / 2,
+            y: height / 2 - 50,
+            text: 'Loading...',
+            style: {
+                font: '20px monospace',
+                fill: '#ffffff'
+            }
+        });
+        loadingText.setOrigin(0.5, 0.5);
+        
+        const percentText = this.make.text({
+            x: width / 2,
+            y: height / 2 - 5,
+            text: '0%',
+            style: {
+                font: '18px monospace',
+                fill: '#ffffff'
+            }
+        });
+        percentText.setOrigin(0.5, 0.5);
+        
+        const assetText = this.make.text({
+            x: width / 2,
+            y: height / 2 + 50,
+            text: '',
+            style: {
+                font: '18px monospace',
+                fill: '#ffffff'
+            }
+        });
+
+        assetText.setOrigin(0.5, 0.5);
+        
+        this.load.on('progress', function (value) {
+            percentText.setText(parseInt(value * 100) + '%');
+            progressBar.clear();
+            progressBar.fillStyle(0xffffff, 1);
+            progressBar.fillRect(width/2 - 150, height/2 - 65, 300 * value, 30);
+        });
+        
+        this.load.on('fileprogress', function (file) {
+            assetText.setText('Loading asset: ' + file.key);
+        });
+
+        this.load.once('complete', function () {
+            setTimeout(() => {
+                progressBar.destroy();
+                progressBox.destroy();
+                loadingText.destroy();
+                percentText.destroy();
+                assetText.destroy();
+                console.log("FINISHED PRELOAD");
+                this.scene.start('GameScene');
+            }, 500);
+        }, this);
+        
+
+        const mapManager = new MapManager('2');
+        this.registry.set('mapManager', mapManager);
+        
+        mapManager.fetchMap();
+        // while(mapManager.state === undefined);
+        mapManager.loadMap(this);
+
+
         // our two characters???
         this.load.spritesheet('player', `${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
 
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.xml`);
+
     }
 
-    create() {
-        this.marker = this.add.graphics();
-        this.marker.lineStyle(2, 0x000000, 1);
-        this.marker.strokeRect(0, 0, 6 * 32, 6 * 32);
+    // create() {
+    //     this.marker = this.add.graphics();
+    //     this.marker.lineStyle(2, 0x000000, 1);
+    //     this.marker.strokeRect(0, 0, 6 * 32, 6 * 32);
+    //     console.log("FINISHED CREATE");
+    // }
 
-        this.scene.start('GameScene');
+    loadMap() {
+        const worldId = useWorldUserStore.getState().world_user.world_id;
     }
 
-    update() {
-        this.count += 1;
-        this.text.setText(`${this.count}`)
-    }
+    saveMap() {}
     
 }
 

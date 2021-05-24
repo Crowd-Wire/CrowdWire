@@ -29,57 +29,57 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.map = this.add.tilemap('map');
+        console.log("WTFFFFFFFFFFFFFFFFFFFFF")
 
-        // MapBuilder(this, 'map');
+        const mapManager = this.registry.get('mapManager');
 
-        const wallTileset = this.map.addTilesetImage('wall-tiles');
-        const utilTileset = this.map.addTilesetImage('util-tiles');
-        const tableTileset = this.map.addTilesetImage('table-tiles');
-        const jardimTileset = this.map.addTilesetImage('jardim');
-        const arrowTileset = this.map.addTilesetImage('arrow');
-        const boardTileset = this.map.addTilesetImage('board');
-        const plankTileset = this.map.addTilesetImage('wooden-plank');
-        const tableVTileset = this.map.addTilesetImage('table-V');
-        const tableHTileset = this.map.addTilesetImage('table-H');
-        const brickTileset = this.map.addTilesetImage('bricks');
-        const chairTileset = this.map.addTilesetImage('chair');
+        console.log(mapManager);
 
-        const allTiles = [
-            wallTileset,
-            utilTileset,
-            tableTileset,
-            jardimTileset,
-            arrowTileset,
-            boardTileset,
-            plankTileset,
-            tableVTileset,
-            tableHTileset,
-            brickTileset,
-            chairTileset
-        ]
+        mapManager.buildMap(this);
+        this.map = mapManager.getTilemap();
 
-        this.map.createDynamicLayer('Ground', allTiles);
-        this.roomLayer = this.map.createDynamicLayer('Room', allTiles).setVisible(false);
-        this.collisionLayer = this.map.createDynamicLayer('Collision', allTiles);
-        this.floatLayer = this.map.createDynamicLayer('Float', allTiles).setDepth(1000);
+
+        this.roomLayer = this.map.getLayer('Room').tilemapLayer.setVisible(false);
+        this.collisionLayer = this.map.getLayer('Collision').tilemapLayer;
+        this.floatLayer = this.map.getLayer('Float').tilemapLayer.setDepth(1000);
+        console.log(this.map.layers)
+        console.log(this.roomLayer, this.collisionLayer, this.floatLayer)
+
+        console.log(this.map)
+
+
+        const objects = this.map.createFromObjects('Object', [
+            { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
+            { "gid": 249, key: 'arrow' },
+        ]);
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
-        // this.objects = this.physics.add.group({
-        //     allowGravity: false,
-        //     immovable: true
-        // });
+        this.objects = this.physics.add.staticGroup(
+            objects,
+        );
 
         // Let's get the object objects, these are NOT sprites
-        // const objectLayer = this.map.createFromObjects('Object', {key: 'table-V'});
+        // const objectLayer = this.map.createFromObjects('Object', [
+        //     { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
+        //     { "gid": 249, key: 'arrow' },
+        // ]);
+        console.log(objects, this.objects)
 
-        // Now we create objects in our sprite group for each object in our map
+        // main player
+        this.player = new Player(this, 50, 50);
+
+        // // Now we create objects in our sprite group for each object in our map
         // objectLayer['objects'].forEach(obj => {
-        //     console.log(obj)
-        //     // Add new objects to our sprite group, change the start y position to meet the platform
-        //     const object = this.objects.create(obj.x, obj.y + 200 - obj.height, 'table-H').setOrigin(0, 0);
+        // this.objects.getChildren().forEach(obj => {
+        //     // this.physics.world.enable(obj);
+        //     this.physics.add.collider(this.player, obj);
+        //     // obj.moves = false;
+        //     // // Add new objects to our sprite group, change the start y position to meet the platform
+        //     // const object = this.objects.create(obj.x, obj.y + 200 - obj.height, 'table-H').setOrigin(0, 0);
         // });
+
+        this.physics.add.collider(this.objects, this.player);
 
         // -1 makes all tiles on this layer collidable
         this.collisionLayer.setCollisionByExclusion([-1]);
