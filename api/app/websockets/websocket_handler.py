@@ -6,18 +6,19 @@ from app.redis.connection import redis_connector
 from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
+from typing import Union
+from app import models, schemas
 
-
-async def join_player(world_id: str, user_id: str, payload: dict):
+async def join_player(world_id: str, user: Union[models.User, schemas.GuestUser], payload: dict):
     position = payload['position']
     # store position on redis
-    await redis_connector.set_user_position(world_id, user_id, position)
+    await redis_connector.set_user_position(world_id, str(user.user_id), position)
 
     # broadcast join player
     await manager.broadcast(
         world_id,
-        {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': position},
-        user_id
+        {'topic': protocol.JOIN_PLAYER, 'user': user, 'position': position},
+        str(user.user_id)
     )
     await send_groups_snapshot(world_id)  # TODO: remove after tests
 

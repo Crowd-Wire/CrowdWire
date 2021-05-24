@@ -66,7 +66,7 @@ async def world_websocket(
                 await wh.send_message(world_id, user_id, payload)
 
             elif topic == protocol.JOIN_PLAYER:
-                await wh.join_player(world_id, user_id, payload)
+                await wh.join_player(world_id, user, payload)
                 if not is_guest_user(user):
                     crud_event.create(db=db,
                                       user_id=user.user_id,

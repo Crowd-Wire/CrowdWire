@@ -36,10 +36,15 @@ class ConnectionManager:
 
         # send players snapshot
         players_snapshot = {}
+        players_data = []
         for uid in await redis_connector.get_world_users(world_id):
+            player_data = await redis_connector.get_world_user_data_dict(world_id, uid)
+            if player_data:
+                players_data.append(player_data)
             players_snapshot[uid] = await redis_connector.get_user_position(world_id, uid)
+        logger.info(players_data)
         await self.send_personal_message(
-            {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot}, user_id)
+            {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot, 'players_data': players_data}, user_id)
 
         # save user on redis
         await redis_connector.add_users_to_world(world_id, user_id)

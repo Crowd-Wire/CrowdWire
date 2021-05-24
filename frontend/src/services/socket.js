@@ -146,7 +146,8 @@ export const getSocket = (worldId) => {
             useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
             break;
         case "JOIN_PLAYER":
-            usePlayerStore.getState().connectPlayer(data.user_id, data.position);
+            console.log(data)
+            usePlayerStore.getState().connectPlayer(data.user.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
             useConsumerStore.getState().closePeer(data.user_id);

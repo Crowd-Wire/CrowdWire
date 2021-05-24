@@ -21,7 +21,7 @@ interface Player2 {
 
 const usePlayerStore = create(
     combine(
-        {   
+        {
             groups: {} as Record<string, string[]>,
             players: {} as Record<string, Player>,
             groupPlayers: {} as Record<string, Player2>,
