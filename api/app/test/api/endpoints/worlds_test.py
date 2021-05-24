@@ -8,6 +8,7 @@ from app.core.strings import WORLD_NOT_FOUND
 from app.models import Tag, User, World_User
 from app.core import strings
 from app.schemas import GuestUser
+from datetime import datetime
 
 client = TestClient(app)
 
@@ -18,6 +19,10 @@ async def override_dependency_user(token: str = None):
 
 async def override_dependency_guest():
     return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6")
+
+
+async def override_dependency_super_user():
+    return User(is_superuser=True)
 
 
 async def override_get_db():
@@ -839,3 +844,55 @@ class TestWorlds(TestCase):
                 assert response.json()[1]['user_id'] == 2
                 assert access.call_count == 1
                 assert get_users.call_count == 1
+
+    def test_get_worlds_reports_guest(self):
+        """
+        Expects 403 Forbidden when guest tries to access world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+
+        response = client.get(
+            "/worlds/reports/"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_get_worlds_reports_not_super_user(self):
+        """
+        Expects 403 Forbidden when a user that is not super user tries to access the world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+
+        response = client.get(
+            "/worlds/reports/"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.WORLD_REPORT_ACCESS_FORBIDDEN
+
+    def test_get_worlds_reports_is_superuser(self):
+        """
+        Expects 200 Ok when a super user tries to access the world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_super_user
+
+        with patch("app.crud.crud_world_reports.CRUDReport_World.get_all_world_reports") as mock_get:
+            mock_get.return_value = [{'reported': 1, 'reporter': 1, 'comment': 'test',
+                                      'timestamp': datetime.now(), 'reviewed': True, 'banned': False,
+                                      'world_name': 'test', 'reporter_email': 'test@test.com'}], ""
+
+            response = client.get(
+                "/worlds/reports/"
+            )
+
+            assert response.status_code == 200
+            assert len(response.json()) == 1
+            assert response.json()[0]['comment'] == 'test'
+            assert response.json()[0]['reported'] == 1
+            assert response.json()[0]['reporter'] == 1
+            assert response.json()[0]['reviewed']
+            assert not response.json()[0]['banned']
+            assert response.json()[0]['world_name'] == 'test'
+            assert response.json()[0]['reporter_email'] == 'test@test.com'
+            assert mock_get.call_count == 1
