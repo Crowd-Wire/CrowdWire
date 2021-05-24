@@ -69,8 +69,6 @@ class ConnectionManager:
         if user_id in self.users_ws:
             await self.users_ws[user_id].send_json(message)
         else:
-            logger.info(self.users_ws)
-            logger.info(type(user_id))
             logger.error(f"Unrecognized User {user_id}")
 
     async def broadcast(self, world_id: str, payload: Any, sender_id: str = None):
