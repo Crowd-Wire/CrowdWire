@@ -315,7 +315,6 @@ async function main() {
         return;
       }
       try {
-        console.log(appData.mediaTag)
         if (previousProducer && previousProducer.has(appData.mediaTag)) {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
@@ -416,7 +415,6 @@ async function main() {
       }
 
       console.log("connect-transport", peerId, transport.appData);
-      console.log(sctpParameters)
       try {
         await transport.connect({ dtlsParameters, sctpParameters });
       } catch (e) {

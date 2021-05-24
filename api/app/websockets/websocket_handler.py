@@ -211,11 +211,34 @@ async def get_room_users_files(world_id: str, user_id: str):
         user_id)
 
 
-async def request_to_download(world_id: str, user_id: str, payload: dict):
+async def download_request(world_id: str, user_id: str, payload: dict):
     file_data = payload['file']
     await manager.send_personal_message(
-        {'topic': protocol.REQUEST_TO_DOWNLOAD, 'd': {'file': file_data}},
+        {'topic': protocol.DOWNLOAD_REQUEST, 'd': {'file': file_data, 'user_id': user_id}},
         str(file_data['owner']))
+
+
+async def deny_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    reason = payload['d']['reason']
+    await manager.send_personal_message(
+        {'topic': protocol.DENY_DOWNLOAD_REQUEST, 'd': {'user_id': user_id, 'reason': reason}},
+        str(user_id))
+
+
+async def accept_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    file_data = payload['d']['file']
+    await manager.send_personal_message(
+        {'topic': protocol.ACCEPT_DOWNLOAD_REQUEST, 'd': {'file': file_data}},
+        str(user_id))
+
+
+async def start_download(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    await manager.send_personal_message(
+        {'topic': protocol.START_DOWNLOAD},
+        str(user_id))
 
 
 async def leave_conference(world_id: str, user_id: str, payload: dict):

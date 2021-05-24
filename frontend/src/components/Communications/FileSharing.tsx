@@ -31,6 +31,7 @@ import { sendFile } from 'webrtc/utils/sendFile';
 import Popover from "@material-ui/core/Popover";
 import styles from "assets/jss/material-kit-react/views/componentsSections/javascriptStyles.js";
 
+
 //@ts-ignore
 const useStylesSecond = makeStyles(styles);
 
@@ -100,24 +101,50 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
       useWsHandlerStore.getState().addWsListener(`REMOVE_ALL_USER_FILES`, (d) => {
         setListOfFiles(listOfFiles => listOfFiles.filter( file => file.owner !== d.user_id ))
       })
+
+      useWsHandlerStore.getState().addWsListener(`ACCEPT_DOWNLOAD_REQUEST`, (d) => {
+        if (useConsumerStore.getState().consumerMap[d.file.owner] && useConsumerStore.getState().consumerMap[d.file.owner].dataConsumer) {
+          wsend({ topic: 'START_DOWNLOAD', d: {'user_id': d.file.owner}} )
+          useConsumerStore.getState().consumerMap[d.file.owner].dataConsumer.on('message', (message) => {
+            progressDownload( message, d.file );
+          })
+          // send download warning to file owner so he can send file through data producer
+        } else {
+          toast.error(
+            <span>
+              <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+              Something went wrong when trying to download the file!
+            </span>
+            , toast_props
+          );
+        }
+      })
+
+      useWsHandlerStore.getState().addWsListener(`DENY_DOWNLOAD_REQUEST`, (d) => {
+        setReceivingFile(null)
+        toast.error(
+          <span>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            {d.reason}
+          </span>
+          , toast_props
+        );
+      })
     }, [])
 
 
     function sendChunk(currentChunk, dataProducer, file) {
       var fileReader = new FileReader();
-      console.log('sending chunk '+ currentChunk)
       var start = BYTES_PER_CHUNK * currentChunk;
       var end = Math.min( file.size, start + BYTES_PER_CHUNK );
       fileReader.readAsArrayBuffer( file.slice( start, end ) );
 
       fileReader.onload = function() {
         dataProducer.send(fileReader.result)
-        console.log(fileReader.result)
         currentChunk++;
         if ( BYTES_PER_CHUNK * currentChunk < file.size ) {
           setTimeout(() => { sendChunk(currentChunk, dataProducer, file) }, 100);
         } else {
-          console.log("DONE SENDING FILE")
           setSendingFile(false)
         }
       }
@@ -140,29 +167,11 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
         );
         return;
       }
-
+      
       const owner = file.owner;
-      console.log(file)
-      console.log(useConsumerStore.getState().consumerMap);
-      if (useConsumerStore.getState().consumerMap[owner] && useConsumerStore.getState().consumerMap[owner].dataConsumer) {
-        useConsumerStore.getState().consumerMap[owner].dataConsumer.on('message', (message) => {
-          console.log('message received from ' + owner);
-          console.log(message)
-          progressDownload( message, file );
-        })
-        setReceivingFile(file)
-        // send download warning to file owner so he can send file through data producer
-        wsend({ topic:'REQUEST_TO_DOWNLOAD', 'file': file })
-        return;
-      }
 
-      toast.error(
-        <span>
-          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          Something went wrong when trying to download the file!
-        </span>
-        , toast_props
-      );
+      wsend({ topic:'DOWNLOAD_REQUEST', 'file': file })
+      setReceivingFile(file);
     }
   
     function progressDownload( data, file ) {
@@ -189,6 +198,29 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
         evt.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
         anchor.dispatchEvent( evt );
       }
+      incomingFileData = [];
+      bytesReceived = 0;
+      setProgress([0, 0])
+    }
+
+    const handleRequestDownload = (dataProducers, file, user_requested) => {
+      wsend({topic: 'ACCEPT_DOWNLOAD_REQUEST', d: {'file': file, 'user_id': user_requested}})
+      useWsHandlerStore.getState().addWsListener(`START_DOWNLOAD`, (d) => {
+        setSendingFile(true);
+        if (dataProducers) {
+          for (let i=0; i<dataProducers.length; i++) {
+            let file_to_send = null;
+            for (let i=0; i<myFiles.length; i++) {
+              if (myFiles[i].name == file.name){
+                file_to_send = myFiles[i];
+                break;
+              }
+            }
+            if (file_to_send)
+              sendChunk(0, dataProducers[i], file_to_send);
+          }
+        }
+      })
     }
   
     const handleSubmit = (files, allFiles) => {
@@ -204,25 +236,30 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
           }
           wsend({ topic: "ADD_USER_FILES", 'files': add_files });
 
-          useWsHandlerStore.getState().addWsListener(`REQUEST_TO_DOWNLOAD`, (d) => {
+          useWsHandlerStore.getState().addWsListener(`DOWNLOAD_REQUEST`, (d) => {
             if (!sendingFile) {
-              setSendingFile(true);
-              console.log(dataProducers)
-              if (dataProducers) {
-                for (let i=0; i<dataProducers.length; i++) {
-                  console.log(d)
-                  let file = null;
-                  for (let i=0; i<myFiles.length; i++) {
-                    console.log(myFiles[i])
-                    if (myFiles[i].name == d.file.name){
-                      file = myFiles[i];
-                      break;
-                    }
-                  }
-                  if (file)
-                    sendChunk(0, dataProducers[i], file);
+              toast.info(
+                <span>
+                  <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+                  The User {d.user_id} Requested To Download the file {d.file.name}
+                  <Button onClick={() => {handleRequestDownload(dataProducers, d.file, d.user_id); toast.dismiss("downReqId"+d.user_id);}}>Accept</Button>
+                  <Button onClick={() =>
+                  {wsend({topic: 'DENY_DOWNLOAD_REQUEST', d: {'user_id': d.user_id, 'reason': 'User declined the file transfer!'}}); toast.dismiss("downReqId"+d.user_id);}}>
+                  Deny
+                  </Button>
+                </span>
+                , {
+                  position: toast.POSITION.TOP_RIGHT,
+                  autoClose: 60000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  draggable: true,
+                  progress: undefined,
+                  toastId: "downReqId"+d.user_id
                 }
-              }
+              );
+            } else {
+              wsend({topic: 'DENY_DOWNLOAD_REQUEST', d: {'user_id': d.user_id, 'reason': 'User is already sharing a file!'}})
             }
           })
         })

@@ -31,7 +31,6 @@ import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
 import Button from "@material-ui/core/Button";
-import { File } from "../../webrtc/components/FileSharing/File";
 
 
 interface MyVideoAudioBoxProps {
@@ -156,9 +155,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setShowModalFile(!showModalFile)
     if (showModalFile) {
       wsend({ topic: "REMOVE_ALL_USER_FILES"});
-      console.log(useConsumerStore.getState().consumerMap)
       useConsumerStore.getState().closeDataConsumers();
-      console.log(useConsumerStore.getState().consumerMap)
     }
   }
 

@@ -231,9 +231,7 @@ export default class RoomCall extends React.Component<{}, State> {
                         videoToggle, audioToggle
                       } = this.state.consumerMap[peerId];
                       
-                      if (!consumerVideo && !consumerMedia && !consumerAudio)
-                        return '';
-                      
+                     
                       let item = <></>
                       if (consumerMedia)
                         item = (

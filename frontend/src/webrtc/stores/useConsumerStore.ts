@@ -37,19 +37,31 @@ export const useConsumerStore = create(
             : s
         );
       },
-      addDataConsumer: (c: DataConsumer, userId: string) => {
+      addDataConsumer: (c: DataConsumer, userId: string, roomId: any) => {
         set((s) => {
-            return {
-              consumerMap: {
-                ...s.consumerMap,
-                [userId]: {
-                  ...s.consumerMap[userId],
-                  dataConsumer: c,
-                },
-              }
-            }
+          let ori_consumer : {
+            roomId: string;
+            consumerAudio: Consumer;
+            consumerVideo: Consumer;
+            consumerMedia: Consumer;
+            dataConsumer: DataConsumer;
+            volume: number;
+            active: boolean;
+            videoToggle: boolean;
+            audioToggle: boolean;
+          } = {roomId: roomId, consumerAudio: null, consumerMedia: null, consumerVideo: null, dataConsumer: null,
+            volume: null, active: null, videoToggle: null, audioToggle: null};
+          let consumer_map = {...s.consumerMap};
+          if (consumer_map[userId]) {
+            consumer_map[userId].dataConsumer = c;
+          } else{
+            ori_consumer.dataConsumer = c;
+            consumer_map[userId] = ori_consumer;
           }
-        );
+          return {
+            consumerMap: consumer_map,
+          }
+        });
       },
       add: (c: Consumer, roomId:string, userId: string, kind: string) =>
         set((s) => {

@@ -27,7 +27,7 @@ export const consumeDataStream = async (consumerParameters: any, roomId: string,
     },
   });
 
-  useConsumerStore.getState().addDataConsumer(dataConsumer, peerId);
+  useConsumerStore.getState().addDataConsumer(dataConsumer, peerId, roomId);
 
   console.log(useConsumerStore.getState())
   return true;

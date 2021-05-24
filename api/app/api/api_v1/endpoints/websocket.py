@@ -116,12 +116,20 @@ async def world_websocket(
             elif topic == protocol.REMOVE_USER_FILE:
                 await wh.remove_user_file(world_id=world_id, user_id=user_id, payload=payload)
 
-            elif topic == protocol.REQUEST_TO_DOWNLOAD:
-                await wh.request_to_download(world_id=world_id, user_id=user_id, payload=payload)
+            elif topic == protocol.DOWNLOAD_REQUEST:
+                await wh.download_request(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.DENY_DOWNLOAD_REQUEST:
+                await wh.deny_download_request(world_id=world_id, payload=payload)
+
+            elif topic == protocol.ACCEPT_DOWNLOAD_REQUEST:
+                await wh.accept_download_request(world_id=world_id, payload=payload)
+
+            elif topic == protocol.START_DOWNLOAD:
+                await wh.start_download(world_id=world_id, payload=payload)
 
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
-
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
