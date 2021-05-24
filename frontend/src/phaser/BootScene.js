@@ -87,16 +87,13 @@ class BootScene extends Phaser.Scene {
         const mapManager = new MapManager('2');
         this.registry.set('mapManager', mapManager);
         
-        mapManager.fetchMap();
-        // while(mapManager.state === undefined);
-        mapManager.loadMap(this);
-
+        mapManager.fetchMap().then(() => mapManager.loadMap(this));
 
         // our two characters???
         this.load.spritesheet('player', `${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
 
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.xml`);
-
+        console.log("all done")
     }
 
     // create() {

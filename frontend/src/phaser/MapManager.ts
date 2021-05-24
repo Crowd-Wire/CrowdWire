@@ -34,36 +34,23 @@ class MapManager {
         this.worldId = worldId;
     }
 
-    fetchMap(): void {
-        //     WorldService.getWorldDetails(world_id)
-        //         .then((res) => {
-        //             console.log(res.json());
-        //         })
-
-        fetch(API_BASE + "static/default_map.json", {
-            method: 'GET',
-            // mode: 'cors',
-            // headers: {
-            //     "Authorization": "Bearer " + AuthenticationService.getToken()
-            // }
-        }).then((res) => {
-            return res.json();
-        }).then((res) => {
-            this.mapJson = res;
-            console.log(this.mapJson, typeof(this.mapJson));
-            // this.state = MapManagerState.FETCHED;
-        })
-        this.state = MapManagerState.FETCHED;
+    async fetchMap(): Promise<void> {
+        await WorldService.getWorldDetails(this.worldId)
+            .then((res) => {
+                return res.json();
+            }).then((res) => {
+                this.mapJson = JSON.parse(res.world_map);
+                this.state = MapManagerState.FETCHED;
+            })
     }
 
     loadMap(scene: Scene): void {
         if (this.state !== MapManagerState.FETCHED)
-            throw Error("Illegal call to function with the current state.");
+            throw Error(`Illegal call to function with the current state ${this.state}`);
 
         // map in json format
         // var hmmm = scene.load.tilemapTiledJSON('map', API_BASE + "static/default_map.json");
-        var hmmm = scene.load.tilemapTiledJSON('map', exampleJson);
-        console.log('hmmmm', hmmm)
+        var hmmm = scene.load.tilemapTiledJSON('map', this.mapJson);
 
         // map tiles
         scene.load.image('wall-tiles', wallTiles);
@@ -72,7 +59,7 @@ class MapManager {
         scene.load.image('table-V',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-V.png`);
         scene.load.image('table-H',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-H.png`);
         scene.load.image('jardim',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/jardim.png`);
-        scene.load.image('wooden-plank',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wooden-plank.png`);
+        scene.load.image('deti',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wooden-plank.png`);
         scene.load.image('arrow',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/arrow.png`);
         scene.load.image('board',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/board.png`);
         scene.load.image('bricks',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/bricks.png`);
@@ -95,7 +82,7 @@ class MapManager {
         const jardimTileset = this.map.addTilesetImage('jardim');
         const arrowTileset = this.map.addTilesetImage('arrow');
         const boardTileset = this.map.addTilesetImage('board');
-        const plankTileset = this.map.addTilesetImage('wooden-plank');
+        const plankTileset = this.map.addTilesetImage('deti');
         const tableVTileset = this.map.addTilesetImage('table-V');
         const tableHTileset = this.map.addTilesetImage('table-H');
         const brickTileset = this.map.addTilesetImage('bricks');
@@ -125,12 +112,12 @@ class MapManager {
 
     saveMap(): void {
         if (this.state !== MapManagerState.BUILT)
-            throw Error("Illegal call to function with the current state.");
+            throw Error(`Illegal call to function with the current state ${this.state}`);
     }
 
     getTilemap(): Tilemap {
         if (this.state !== MapManagerState.BUILT)
-            throw Error("Illegal call to function with the current state.");
+            throw Error(`Illegal call to function with the current state ${this.state}`);
         return this.map;
     }
 }
