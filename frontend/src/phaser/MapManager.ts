@@ -1,12 +1,9 @@
-import Tilemap from "phaser/src/tilemaps/Tilemap";
-import TilemapLayer from "phaser/src/tilemaps/TilemapLayer";
-import Scene from "phaser/src/scene/Scene";
-
 import WorldService from "services/WorldService.js";
 
 import exampleJson from "assets/tilemaps/maps/test.json";
 
 import { API_BASE } from "config";
+import { GameObjects, Scene, Tilemaps } from "phaser";
 
 const wallTiles = require("assets/tilemaps/tiles/wall-tiles.png");
 
@@ -17,18 +14,21 @@ enum MapManagerState {
 }
 
 // interface Layers {
-//     floatLayers: TilemapLayer[];
-//     groundLayers: TilemapLayer[];
-//     collisionLayer: TilemapLayer;
-//     roomLayer: TilemapLayer;
+//     floatLayers: Tilemaps.TilemapLayer[];
+//     groundLayers: Tilemaps.TilemapLayer[];
+//     collisionLayer: Tilemaps.TilemapLayer;
+//     roomLayer: Tilemaps.TilemapLayer;
 // }
 
 class MapManager {
     // private layers: Layers;
-    private map: Tilemap;
+    private map: Tilemaps.Tilemap;
     private mapJson: any;
     private state: MapManagerState;
     private worldId: string;
+
+    private tileKeys: number[];
+    private objectKeys: number[];
 
     constructor(worldId: string) {
         this.worldId = worldId;
@@ -49,8 +49,28 @@ class MapManager {
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
         // map in json format
-        // var hmmm = scene.load.tilemapTiledJSON('map', API_BASE + "static/default_map.json");
-        var hmmm = scene.load.tilemapTiledJSON('map', this.mapJson);
+        // scene.load.tilemapTiledJSON('map', API_BASE + "static/default_map.json");
+        scene.load.tilemapTiledJSON('map', this.mapJson);
+
+        console.log(this.mapJson)
+
+        this.tileKeys = [];
+        this.objectKeys = [];
+        this.mapJson.tilesets.forEach((tileset) => {
+            if ('grid' in tileset) {
+                // object layer
+                tileset.tiles.forEach((tile) => {
+                    const imageId = tileset.firstgid + tile.id;
+                    scene.load.image(imageId.toString(), API_BASE + "static/" + tile.image);
+                    this.objectKeys.push(imageId);
+                })
+            } else {
+                // tile layer
+                const imageId = tileset.name;
+                scene.load.image(imageId, API_BASE + "static/" + tileset.image);
+                this.tileKeys.push(imageId);
+            }
+        })
 
         // map tiles
         scene.load.image('wall-tiles', wallTiles);
@@ -75,8 +95,15 @@ class MapManager {
 
         this.map = scene.add.tilemap('map');
 
-        const wallTileset = this.map.addTilesetImage('wall-tiles');
+        const tilesetImages: Tilemaps.Tileset[] = []
+        this.tileKeys.forEach((key) => {
+            tilesetImages.push( this.map.addTilesetImage(key.toString()) );
+        })
+        this.objectKeys.forEach((key) => {
+            this.map.addTilesetImage(key.toString());
+        });
 
+        const wallTileset = this.map.addTilesetImage('wall-tiles');
         const utilTileset = this.map.addTilesetImage('util-tiles');
         const tableTileset = this.map.addTilesetImage('table-tiles');
         const jardimTileset = this.map.addTilesetImage('jardim');
@@ -101,11 +128,12 @@ class MapManager {
             brickTileset,
             chairTileset
         ]
+        console.log('allTiles', tilesetImages, allTiles)
 
-        this.map.createDynamicLayer('Ground', allTiles);
-        this.map.createDynamicLayer('Room', allTiles);
-        this.map.createDynamicLayer('Collision', allTiles);
-        this.map.createDynamicLayer('Float', allTiles);
+        this.map.createLayer('Ground', allTiles);
+        this.map.createLayer('Room', allTiles);
+        this.map.createLayer('Collision', allTiles);
+        this.map.createLayer('Float', allTiles);
 
         this.state = MapManagerState.BUILT;
     }
@@ -115,10 +143,18 @@ class MapManager {
             throw Error(`Illegal call to function with the current state ${this.state}`);
     }
 
-    getTilemap(): Tilemap {
+    getTilemap(): Tilemaps.Tilemap {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
         return this.map;
+    }
+
+    getObjects(): GameObjects.GameObject[] {
+        if (this.state !== MapManagerState.BUILT)
+            throw Error(`Illegal call to function with the current state ${this.state}`);
+        return this.map.createFromObjects('Object', this.objectKeys.map((key) => (
+            {gid: key, key: key.toString()}
+        )));
     }
 }
 

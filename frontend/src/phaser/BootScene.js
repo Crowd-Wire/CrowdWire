@@ -84,7 +84,7 @@ class BootScene extends Phaser.Scene {
         }, this);
         
 
-        const mapManager = new MapManager('2');
+        const mapManager = new MapManager(useWorldUserStore.getState().world_user.world_id);
         this.registry.set('mapManager', mapManager);
         
         mapManager.fetchMap().then(() => mapManager.loadMap(this));
@@ -95,20 +95,6 @@ class BootScene extends Phaser.Scene {
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.xml`);
         console.log("all done")
     }
-
-    // create() {
-    //     this.marker = this.add.graphics();
-    //     this.marker.lineStyle(2, 0x000000, 1);
-    //     this.marker.strokeRect(0, 0, 6 * 32, 6 * 32);
-    //     console.log("FINISHED CREATE");
-    // }
-
-    loadMap() {
-        const worldId = useWorldUserStore.getState().world_user.world_id;
-    }
-
-    saveMap() {}
-    
 }
 
 export default BootScene;
