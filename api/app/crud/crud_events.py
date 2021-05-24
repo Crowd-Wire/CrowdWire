@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.event import Event
 from .crud_world_users import crud_world_user
 from ..core import strings
+from loguru import logger
 
 """
 Events dont follow the same CRUD Rules from the Base Class
@@ -28,6 +29,8 @@ class CRUDEvents:
             page_num: int = 1,
             limit: int = 10,
             event_type: str = None,
+            start_date: datetime.datetime = None,
+            end_date: datetime.datetime = None,
             order_desc: bool = True
     ):
         query = db.query(Event).filter(Event.world_id == world_id)
@@ -36,6 +39,16 @@ class CRUDEvents:
 
         if event_type:
             query = query.filter(Event.event_type.ilike('%' + event_type + '%'))
+
+        if start_date:
+            logger.debug(Event.timestamp)
+            logger.debug(end_date)
+            query = query.filter(Event.timestamp >= start_date)
+
+        if end_date:
+            logger.debug(Event.timestamp)
+            logger.debug(end_date)
+            query = query.filter(Event.timestamp <= end_date)
 
         if not order_desc:
             query = query.order_by(Event.timestamp.asc())

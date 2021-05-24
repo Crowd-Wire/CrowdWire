@@ -1,3 +1,4 @@
+import datetime
 from typing import Union, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -19,6 +20,8 @@ def get_world_events(
         event_type: Optional[str] = None,
         user_id: Optional[int] = None,
         order_desc: bool = True,
+        start_date: datetime.datetime = None,
+        end_date: datetime.datetime = None,
         page: int = 1,
         limit: int = 10,
 ):
@@ -30,5 +33,8 @@ def get_world_events(
         page_num=page,
         limit=limit,
         event_type=event_type,
-        order_desc=order_desc)
+        order_desc=order_desc,
+        start_date=start_date,
+        end_date=end_date
+    )
     return events
