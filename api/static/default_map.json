@@ -288,6 +288,18 @@
                  "width":32,
                  "x":224,
                  "y":544
+                }, 
+                {
+                 "gid":26,
+                 "height":96,
+                 "id":23,
+                 "name":"",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":64,
+                 "x":352,
+                 "y":480
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -308,7 +320,7 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":23,
+ "nextobjectid":24,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.4.2",

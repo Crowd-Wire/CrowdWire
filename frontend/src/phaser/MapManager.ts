@@ -112,26 +112,34 @@ class MapManager {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
+        const collisionObjects = this.map.createFromObjects('ObjectCollision', this.objectKeys.map((key) => (
+            {gid: key, key: key.toString()}
+        )));
         const objects = this.map.createFromObjects('Object', this.objectKeys.map((key) => (
             {gid: key, key: key.toString()}
         )));
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
-        const objectsGroup = scene.physics.add.staticGroup(
+        const collisionObjectsGroup = scene.physics.add.staticGroup(
+            collisionObjects,
+        );
+
+        const objectsGroup = scene.physics.add.group(
             objects,
         );
 
-        (<GameObjects.Sprite[]> objectsGroup.getChildren()).forEach((obj) => {
-            if (obj.texture.key in this.objectProps) {
-                // has custom collider
-                const {x, y, width, height} = this.objectProps[obj.texture.key];
-                const body = obj.body as Phaser.Physics.Arcade.Body;
-                body.setOffset(x, y);
-                body.setSize(width, height, false);
-            }
-        })
-        return objects;
+        (<GameObjects.Sprite[]> collisionObjectsGroup.getChildren().concat(objectsGroup.getChildren()))
+            .forEach((obj) => {
+                if (obj.texture.key in this.objectProps) {
+                    // has custom collider
+                    const {x, y, width, height} = this.objectProps[obj.texture.key];
+                    const body = obj.body as Phaser.Physics.Arcade.Body;
+                    body.setOffset(x, y);
+                    body.setSize(width, height, false);
+                }
+            })
+        return collisionObjects;
     }
 
     saveMap(): void {
