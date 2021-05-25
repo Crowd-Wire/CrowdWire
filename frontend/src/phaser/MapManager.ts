@@ -30,6 +30,8 @@ class MapManager {
     private tileKeys: number[];
     private objectKeys: number[];
 
+    private objectProps: any;
+
     constructor(worldId: string) {
         this.worldId = worldId;
     }
@@ -56,6 +58,7 @@ class MapManager {
 
         this.tileKeys = [];
         this.objectKeys = [];
+        this.objectProps = {};
         this.mapJson.tilesets.forEach((tileset) => {
             if ('grid' in tileset) {
                 // object layer
@@ -63,6 +66,11 @@ class MapManager {
                     const imageId = tileset.firstgid + tile.id;
                     scene.load.image(imageId.toString(), API_BASE + "static/" + tile.image);
                     this.objectKeys.push(imageId);
+                    if ('objectgroup' in tile) {
+                        // custom object collider
+                        const {x, y, width, height} = tile.objectgroup.objects[0];
+                        this.objectProps[imageId] = {x, y, width, height} as Phaser.Geom.Rectangle;
+                    }
                 })
             } else {
                 // tile layer
@@ -76,7 +84,7 @@ class MapManager {
         console.log("LOADING COMPLETED")
     }
 
-    buildMap(scene: Scene): void {
+    buildMap(scene: Scene): Tilemaps.Tilemap {
         if (this.state !== MapManagerState.LOADED)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
@@ -97,25 +105,38 @@ class MapManager {
         })
 
         this.state = MapManagerState.BUILT;
+        return this.map;
+    }
+
+    buildObjects(scene: Scene): GameObjects.GameObject[] {
+        if (this.state !== MapManagerState.BUILT)
+            throw Error(`Illegal call to function with the current state ${this.state}`);
+
+        const objects = this.map.createFromObjects('Object', this.objectKeys.map((key) => (
+            {gid: key, key: key.toString()}
+        )));
+
+        // Create a sprite group for all objects, set common properties to ensure that
+        // sprites in the group don't move via gravity or by player collisions
+        const objectsGroup = scene.physics.add.staticGroup(
+            objects,
+        );
+
+        (<GameObjects.Sprite[]> objectsGroup.getChildren()).forEach((obj) => {
+            if (obj.texture.key in this.objectProps) {
+                // has custom collider
+                const {x, y, width, height} = this.objectProps[obj.texture.key];
+                const body = obj.body as Phaser.Physics.Arcade.Body;
+                body.setOffset(x, y);
+                body.setSize(width, height, false);
+            }
+        })
+        return objects;
     }
 
     saveMap(): void {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
-    }
-
-    getTilemap(): Tilemaps.Tilemap {
-        if (this.state !== MapManagerState.BUILT)
-            throw Error(`Illegal call to function with the current state ${this.state}`);
-        return this.map;
-    }
-
-    getObjects(): GameObjects.GameObject[] {
-        if (this.state !== MapManagerState.BUILT)
-            throw Error(`Illegal call to function with the current state ${this.state}`);
-        return this.map.createFromObjects('Object', this.objectKeys.map((key) => (
-            {gid: key, key: key.toString()}
-        )));
     }
 }
 

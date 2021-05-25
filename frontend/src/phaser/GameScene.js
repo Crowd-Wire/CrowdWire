@@ -29,66 +29,28 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-        console.log("WTFFFFFFFFFFFFFFFFFFFFF")
-
         const mapManager = this.registry.get('mapManager');
 
         console.log(mapManager);
 
-        mapManager.buildMap(this);
-        this.map = mapManager.getTilemap();
-
+        this.map = mapManager.buildMap(this);
 
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Room"))
                 this.roomLayer = layer.tilemapLayer.setVisible(false);
             else if (layer.name.startsWith("Collision"))
-                this.collisionLayer = layer.tilemapLayer;
+                // -1 makes all tiles on this layer collidable
+                this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
             else if (layer.name.startsWith("Float"))
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        console.log(this.map.layers)
-        console.log(this.roomLayer, this.collisionLayer)
-
-        console.log(this.map);
-
-        const objects = mapManager.getObjects();
-        // const objects = this.map.createFromObjects('Object', [
-        //     { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
-        //     { "gid": 249, key: 'arrow' },
-        // ]);
-
-        // Create a sprite group for all objects, set common properties to ensure that
-        // sprites in the group don't move via gravity or by player collisions
-        this.objects = this.physics.add.staticGroup(
-            objects,
-        );
-
-        // Let's get the object objects, these are NOT sprites
-        // const objectLayer = this.map.createFromObjects('Object', [
-        //     { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
-        //     { "gid": 249, key: 'arrow' },
-        // ]);
-        console.log(objects, this.objects)
+        this.objects = mapManager.buildObjects(this);
 
         // main player
         this.player = new Player(this, 50, 50);
 
-        // // Now we create objects in our sprite group for each object in our map
-        // objectLayer['objects'].forEach(obj => {
-        // this.objects.getChildren().forEach(obj => {
-        //     // this.physics.world.enable(obj);
-        //     this.physics.add.collider(this.player, obj);
-        //     // obj.moves = false;
-        //     // // Add new objects to our sprite group, change the start y position to meet the platform
-        //     // const object = this.objects.create(obj.x, obj.y + 200 - obj.height, 'table-H').setOrigin(0, 0);
-        // });
-
         this.physics.add.collider(this.objects, this.player);
-
-        // -1 makes all tiles on this layer collidable
-        this.collisionLayer.setCollisionByExclusion([-1]);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
