@@ -9,32 +9,32 @@ class EventService {
 
         let query = []
 
-        if(event_type !== null){
-            query.push('event_type=' + event_type)
+        if(event_type){
+            query.push('event_type=' + event_type);
         }
 
-        if(user_id !== null){
-            query.push('user_id=' + user_id)
+        if(user_id){
+            query.push('user_id=' + user_id);
         }
 
-        if(start_date !== null){
-            query.push('start_date=' + start_date)
+        if(start_date){
+            query.push('start_date=' + start_date);
         }
 
-        if(end_date !== null){
-            query.push('end_date=' + end_date)
+        if(end_date){
+            query.push('end_date=' + end_date);
         }
 
-        if(order_desc !== null){
-            query.push('order_desc=' + order_desc)
+        if(order_desc){
+            query.push('order_desc=' + order_desc);
         }
 
-        if(limit !== null){
-            query.push('limit=' + limit)
+        if(limit){
+            query.push('limit=' + limit);
         }
 
-        if(page_num !== null){
-            query.push('page_num=' + page_num)
+        if(page_num){
+            query.push('page_num=' + page_num);
         }
 
         if(query.length != 0){

@@ -19,9 +19,9 @@ class AdminStatistics extends Component {
     }
 
     handleCallBack = (event_type,world,startDate,endDate,ordering) => {
-        let order = ordering == "Descending"
-        let parsestartDate = startDate == null ? null : startDate.toISOString()
-        let parseendDate = endDate == null ? null : endDate.toISOString()
+        let order = ordering == "Descending";
+        let parsestartDate = startDate == null ? null : startDate.toISOString();
+        let parseendDate = endDate == null ? null : endDate.toISOString();
 
         EventService.getEvents(
             event_type,world,
@@ -33,11 +33,10 @@ class AdminStatistics extends Component {
             1)
             .then( (res) => {
                 if(res.status == 200) 
-                    return res.json()
+                    return res.json();
             })
             .then( (res) => {
-                this.setState({events: res})
-                console.log(this.state.events)
+                this.setState({events: res});
             })
 
     }
@@ -46,11 +45,11 @@ class AdminStatistics extends Component {
         WorldService.search("",[],"public", 1)
         .then((res) => {
             if(res.status == 200) 
-                return res.json()
+                return res.json();
         })
         .then((res) => {
             if(res)
-                this.setState({ worlds: res }) 
+                this.setState({ worlds: res });
         }).catch((error) => {useAuthStore.getState().leave()});
     }
 
