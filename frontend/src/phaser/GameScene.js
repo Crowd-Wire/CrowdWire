@@ -21,7 +21,6 @@ class GameScene extends Phaser.Scene {
     static inRangePlayers = new Set();
 
     remotePlayers = {};
-    localPlayers = {};
     ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
     constructor() {
@@ -45,12 +44,10 @@ class GameScene extends Phaser.Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        this.group = mapManager.buildObjects(this);
+        this.collisionGroup = mapManager.buildObjects(this);
 
         // main player
         this.player = new Player(this, 50, 50);
-
-        this.physics.add.collider(this.group, this.player);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -67,11 +64,6 @@ class GameScene extends Phaser.Scene {
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
-        // static players for range test
-        // this.localPlayers['-1'] = new LocalPlayer(this, 0, 500, '-1');
-        // this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
-        // this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
-
         // connect to room
         this.ws.joinRoom({ x: 50, y: 50 });
 
@@ -81,7 +73,6 @@ class GameScene extends Phaser.Scene {
             .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        this.physics.add.collider(this.player, this.collisionLayer);
 
         this.input.keyboard.on('keydown-Q', () => {
             globalVar = !globalVar;
@@ -90,16 +81,13 @@ class GameScene extends Phaser.Scene {
         Object.entries(usePlayerStore.getState().players).forEach(([id, player]) => {
             const position = player.position;
             this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
-            this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
         })
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
 
-        this.physics.add.collider(Object.values(this.remotePlayers), this.collisionLayer);
     }
-
 
     // TODO: remove after tests
     // allows devs to see in frontend the groups assigned to the users
@@ -108,9 +96,6 @@ class GameScene extends Phaser.Scene {
         for (const [id, grps] of Object.entries(groups)) {
             if (id in this.remotePlayers) {
                 let text = this.remotePlayers[id].getText();
-                text.setText([text.text.split('\n')[0], grps.join(', ')]);
-            } else if (id in this.localPlayers) {
-                let text = this.localPlayers[id].getText();
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
             } else {
                 // own player
@@ -129,7 +114,6 @@ class GameScene extends Phaser.Scene {
                 if (!(id in this.remotePlayers)) {
                     const position = usePlayerStore.getState().players[id].position;
                     this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
-                    this.physics.add.collider(this.remotePlayers[id], this.collisionLayer);
                 }
             }
         } else {
@@ -175,7 +159,7 @@ class GameScene extends Phaser.Scene {
             var bodies = this.physics.overlapCirc(
                 this.player.body.center.x, this.player.body.center.y, 150, true, true)
             if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
-                const rangePlayers = bodies.filter((b) => b.gameObject instanceof LocalPlayer || b.gameObject instanceof RemotePlayer)
+                const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
                     // wire players
@@ -208,9 +192,16 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    updateDepth() {
+        this.player.depth = this.player.y;
+        Object.values(this.remotePlayers).forEach((player) => {
+            player.depth = player.y;
+        });
+    }
+
     update(time, delta) {
         this.player.update();
-        this.player.depth = this.player.y;
+        this.updateDepth();
 
         // // Convert the mouse position to world position within the camera
         // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
@@ -251,6 +242,7 @@ class Player extends Phaser.GameObjects.Container {
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        scene.physics.add.collider(this, [scene.collisionLayer, scene.collisionGroup]);
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, 'player', 6)
@@ -369,19 +361,6 @@ class Player extends Phaser.GameObjects.Container {
         } else {
             this.getSprite().anims.stop();
         }
-    }
-}
-
-
-class LocalPlayer extends Player {
-
-    constructor(scene, x, y, id) {
-        super(scene, x, y);
-        this.id = id;
-        this.getText().setText([
-            `User ${this.id}`,
-            'G???',
-        ]);
     }
 }
 

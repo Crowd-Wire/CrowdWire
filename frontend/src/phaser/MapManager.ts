@@ -1,11 +1,8 @@
 import WorldService from "services/WorldService.js";
 
-import exampleJson from "assets/tilemaps/maps/test.json";
-
 import { API_BASE } from "config";
 import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
 
-const wallTiles = require("assets/tilemaps/tiles/wall-tiles.png");
 
 enum MapManagerState {
     FETCHED = "FETCHED",
@@ -13,12 +10,6 @@ enum MapManagerState {
     BUILT = "BUILT",
 }
 
-// interface Layers {
-//     floatLayers: Tilemaps.TilemapLayer[];
-//     groundLayers: Tilemaps.TilemapLayer[];
-//     collisionLayer: Tilemaps.TilemapLayer;
-//     roomLayer: Tilemaps.TilemapLayer;
-// }
 
 class MapManager {
     // private layers: Layers;
@@ -54,8 +45,6 @@ class MapManager {
         // scene.load.tilemapTiledJSON('map', API_BASE + "static/default_map.json");
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
-        console.log(this.mapJson)
-
         this.tileKeys = [];
         this.objectKeys = [];
         this.objectProps = {};
@@ -79,9 +68,7 @@ class MapManager {
                 this.tileKeys.push(imageId);
             }
         })
-
         this.state = MapManagerState.LOADED;
-        console.log("LOADING COMPLETED")
     }
 
     buildMap(scene: Scene): Tilemaps.Tilemap {
