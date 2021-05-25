@@ -6,8 +6,7 @@ from app.redis.connection import redis_connector
 from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
-from typing import Union
-from app import models, schemas
+
 
 async def join_player(world_id: str, user_id: str, payload: dict):
     position = payload['position']

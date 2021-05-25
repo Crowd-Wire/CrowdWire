@@ -146,17 +146,13 @@ export const getSocket = (worldId) => {
             useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
             break;
         case "JOIN_PLAYER":
-            console.log(data)
             useWorldUserStore.getState().addUserInfo(data.user)
-            console.log(useWorldUserStore.getState())
             usePlayerStore.getState().connectPlayer(data.user.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
             let user_id = data.user_id;
             useWorldUserStore.getState().removeUserInfo(user_id)
             useConsumerStore.getState().closePeer(user_id);
-            console.log(useWorldUserStore.getState())
-
             usePlayerStore.getState().disconnectPlayer(user_id);
             break;
         case "PLAYER_MOVEMENT":
@@ -164,9 +160,7 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
-            console.log(data)
             useWorldUserStore.getState().setUsersInfo(data.players_data)
-            console.log(useWorldUserStore.getState())
             usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
         case "WIRE_PLAYER":
