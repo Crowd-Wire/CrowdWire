@@ -58,7 +58,7 @@ let consumerQueue = [];
 
 export const getSocket = (worldId) => {
 
-  const joinRoom = async (position) => {
+  const joinPlayer = async (position) => {
     const payload = {
       topic: "JOIN_PLAYER",
       position
@@ -283,7 +283,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
+  return {socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
 }
 
 export const wsend = async (d) => {

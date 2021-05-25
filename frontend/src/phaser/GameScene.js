@@ -113,7 +113,7 @@ class GameScene extends Phaser.Scene {
         this.player = new Player(this, 50, 50);
 
         // connect to room
-        this.ws.joinRoom({x: 50, y: 50});
+        this.ws.joinPlayer({x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
