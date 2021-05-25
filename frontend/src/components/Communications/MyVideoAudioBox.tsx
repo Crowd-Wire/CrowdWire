@@ -31,6 +31,7 @@ import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
 import Button from "@material-ui/core/Button";
+import usePlayerStore from 'stores/usePlayerStore';
 
 
 interface MyVideoAudioBoxProps {
@@ -75,6 +76,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   const handleRequestToSpeak = (user_id: any, permit: boolean, toast_id: any) => {
+    usePlayerStore.getState().setRequested(user_id, false)
     if (useWorldUserStore.getState().world_user.in_conference) {
       wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference, 'permission': permit, 'user_requested': user_id});
     }
@@ -87,10 +89,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       if (d.user_requested in useWorldUserStore.getState().users_info) {
         username = useWorldUserStore.getState().users_info[d.user_requested].username;
       }
+      usePlayerStore.getState().setRequested(d.user_requested, true)
       toast.info(
         <span>
-          <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          The User {username} Requested To Speak
+          <p>
+            <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+            The User {username} Requested To Speak
+          </p>
           <Button onClick={() => handleRequestToSpeak(d.user_requested, true, "customId"+d.user_requested)}>Accept</Button>
           <Button onClick={() => handleRequestToSpeak(d.user_requested, false, "customId"+d.user_requested)}>Deny</Button>
         </span>

@@ -25,6 +25,7 @@ const usePlayerStore = create(
             groups: {} as Record<string, string[]>,
             players: {} as Record<string, Player>,
             groupPlayers: {} as Record<string, Player2>,
+            requestsToSpeak: 0,
         },
         (set) => ({
             connectPlayers: (snapshot: Record<string, Vector>) => {
@@ -92,7 +93,20 @@ const usePlayerStore = create(
                     return { ...s, groups: grps };
                 }, true);
             },
-
+            setRequested: (user_id:string, has_requested: boolean) => {
+                return set((s) => {
+                    let groupPlayers = {...s.groupPlayers}
+                    groupPlayers[user_id].requested = has_requested;
+                    let requestsToSpeak = s.requestsToSpeak;
+                    if (has_requested)
+                        requestsToSpeak += 1;
+                    else
+                        requestsToSpeak -= 1;
+                    return { ...s,
+                        groupPlayers,
+                        requestsToSpeak };
+                })
+            },
         })
     )
 );

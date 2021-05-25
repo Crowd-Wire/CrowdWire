@@ -8,6 +8,9 @@ import DoneIcon from '@material-ui/icons/Done';
 import style from "assets/jss/my-kit-react/components/GameDrawer/userListStyle.js";
 import usePlayerStore from 'stores/usePlayerStore';
 import useWorldUserStore from 'stores/useWorldUserStore';
+import { wsend } from "services/socket.js";
+import { toast } from 'react-toastify';
+
 
 const useContextMenu = () => {
   const [xPos, setXPos] = useState("0px");
@@ -59,6 +62,14 @@ const UserList = (props) => {
   const { xPos, yPos, showMenu } = useContextMenu();
   const users = usePlayerStore(state => state.groupPlayers);
 
+  const handleRequestToSpeak = (user_id, permit) => {
+    usePlayerStore.getState().setRequested(user_id, false)
+    if (useWorldUserStore.getState().world_user.in_conference) {
+      wsend({ topic: "PERMISSION_TO_SPEAK", 'conference': useWorldUserStore.getState().world_user.in_conference, 'permission': permit, 'user_requested': user_id});
+    }
+    toast.dismiss("customId"+user_id)
+  }
+
   const buttonStyle = {
     width: "0.5rem",
     height: "0.5rem",
@@ -83,10 +94,10 @@ const UserList = (props) => {
                 users[user_id].requested && 
                   <div className={classes.request}>
                     Request to speak
-                    <Button justIcon round color="primary" style={buttonStyle}>
+                    <Button justIcon round color="primary" style={buttonStyle} onClick={() => handleRequestToSpeak(user_id, true)}>
                       <DoneIcon />
                     </Button>
-                    <Button justIcon round style={buttonStyle}>
+                    <Button justIcon round style={buttonStyle} onClick={() => handleRequestToSpeak(user_id, false)}>
                       <CloseIcon />
                     </Button>
                   </div>
