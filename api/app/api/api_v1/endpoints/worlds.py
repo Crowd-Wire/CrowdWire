@@ -256,6 +256,8 @@ def search_world(
         deleted: Optional[bool] = False,
         normal: Optional[bool] = False,
         creator: Optional[int] = None,
+        order_by: Optional[str] = "timestamp",
+        order: Optional[str] = "desc",
         page: Optional[int] = 1,
         limit: Optional[int] = 10,
         db: Session = Depends(deps.get_db),
@@ -267,16 +269,17 @@ def search_world(
             # admins
             list_world_objs = crud.crud_world.filter(
                 db=db, search=search, tags=tags,is_superuser=True, page=page, limit=limit,creator=creator,
-                banned=banned, deleted=deleted, normal=normal)
+                banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
         else:
             # registered users
             list_world_objs = crud.crud_world.filter(
                 db=db, search=search, tags=tags, visibility=visibility, page=page, requester_id=user.user_id,
-                limit=limit)
+                limit=limit, order_by=order_by, order=order)
     else:
         # guests
         list_world_objs = crud.crud_world.filter(
-            db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility)
+            db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility,
+            order_by=order_by, order=order)
     return list_world_objs
 
 

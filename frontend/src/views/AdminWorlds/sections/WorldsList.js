@@ -14,6 +14,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
 import MapCard from 'components/MapCard/MapCard.js';
 import Typography from '@material-ui/core/Typography';
+import Pagination from '@material-ui/lab/Pagination';
 
 
 
@@ -30,11 +31,30 @@ const useStyles = makeStyles((theme) => ({
 export default function WorldsList() {
     const classes = useStyles();
 
+    const [world, setWorld] = React.useState("");
+    const [creator, setCreator] = React.useState(null);
+    const [normal, setNormal] = React.useState(true);
     const [banned, setBanned] = React.useState(false);
     const [deleted, setDeleted] = React.useState(false);
     const [orderBy, setOrderBy] = React.useState("timestamp");
     const [order, setOrder] = React.useState("desc");
+    const [page, setPage] = React.useState(1);
+
     const [worlds, setWorlds] = React.useState([]);
+
+
+    const handleWorld = (event) => {
+        setWorld(event.target.value);
+    }
+
+    const handleCreator = (event) => {
+        setCreator(event.target.value);
+    }
+
+    // check if this the best solution
+    const handleNormal = () => {
+        setNormal(!normal);
+    }
 
     const handleBanned = () => {
         setBanned(!banned);
@@ -52,22 +72,44 @@ export default function WorldsList() {
         setOrder(event.target.value);
     }
 
-    React.useEffect(() => {
-        WorldService.search("", [], 'public', 1)
-        .then((res) => {
-            return res.json();
-        })
-        .then((res) => {
-            setWorlds(res);
-        })
+    const request = (search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) => {
+        WorldService.search(search, [], visibility, banned, deleted, normal, creator, order_by, order, page, limit)
+            .then((res) => {
+                return res.json();
+            })
+            .then((res) => {
+                setWorlds(res);
+            })
+    }
 
+
+    React.useEffect(() => {
+        request("", [], null, null, null, true, null, null, null, 1, 10);
     }, [])
+
+    const handleSearch = () => {
+        request(world, [], null, banned, deleted, normal, creator, orderBy, order, page, 10);
+    }
+
 
     return (
         <div style={{ 'marginTop': '100px' }}>
 
-            <Input type="number" placeholder="Creator Id" />
-            <Input type="number" placeholder="World Id" />
+            <TextField id="world_name" label="World Name" type="search" variant="outlined" onChange={handleWorld} />
+            <Input type="number" placeholder="Creator Id" onChange={handleCreator} />
+
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={normal}
+                        onChange={handleNormal}
+                        name="normal"
+                        color="primary"
+                    />
+                }
+                label="Show Normal"
+            />
+
 
             <FormControlLabel
                 control={
@@ -120,12 +162,24 @@ export default function WorldsList() {
                 </Select>
             </FormControl>
 
-            {worlds !== null && worlds.length !== 0 ?
+            <Button id="search" onClick={handleSearch} >Search</Button>
+
+
+            {worlds && worlds.length !== 0 ?
                 worlds.map((m, i) => {
                     return (<MapCard key={i} map={m} />)
                 })
                 :
                 <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>
+            }
+
+
+            {worlds === null || worlds.length === 0 ?
+                <></>
+                :
+                <Row style={{ marginBottom: "30px" }}>
+                    <Pagination onChange={(event, page1) => { setPage(page1); handleSearch() }} style={{ marginLeft: "auto", marginRight: "auto" }} count={10} />
+                </Row>
             }
         </div>
     )

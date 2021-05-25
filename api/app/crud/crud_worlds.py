@@ -3,7 +3,7 @@ from typing import Optional, Tuple, Union, Dict, Any, List
 
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-
+from sqlalchemy import desc, asc
 from app.core import strings
 from app.models import World, User, Tag
 from app.redis.redis_decorator import cache, clear_cache_by_model
@@ -153,6 +153,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                banned: bool = False,
                deleted: bool = False,
                creator: int = None,
+               order_by: str = "timestamp",
+               order: str = "desc",
                page: int = 1,
                limit: int = 10,
                requester_id: int = None,
@@ -189,7 +191,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                     return None, strings.INVALID_WORLD_VISIBILITY_FILTER
 
             else:
-                logger.debug("inside superuser")
                 # retrieves worlds based on the given status
                 query = query.filter(World.status.in_([i for i,s in enumerate([normal, banned, deleted]) if s]))
 
@@ -204,8 +205,15 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-        # TODO: change page size and make it not hardcoded
-        return query.offset(10 * (page - 1)).limit(10).all()
+        if order == 'desc':
+            ord = desc
+        else:
+            ord = asc
+        # TODO: change this to add more filters, also change the name of this one it is only an example
+        if order_by == 'timestamp':
+            query = query.order_by(ord(World.creation_date))
+
+        return query.offset(limit * (page - 1)).limit(limit).all()
 
     async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
         if not user_id:
