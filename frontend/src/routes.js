@@ -25,6 +25,8 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import DrawerLayout from "layouts/DrawerLayout";
 import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
+
+
 /**
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
@@ -33,7 +35,6 @@ import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
- 
 const routes = (token, guest_uuid) => [
 	{
 		path: "/",
