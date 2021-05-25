@@ -33,17 +33,27 @@ const Chat = (props) => {
       <div className={classes.chatBox}>
         <div className={classes.chat} ref={chat} id="text-chat">
           {
-            messages.map((m, index) => (
-              <div key={index} className={classes.message}>
-                <p style={{ margin: '0 0.5rem', fontWeight: 'bold' }}>
-                  <span>{m.from}</span>
-                  <span style={{ float: 'right' }}>{m.date}</span>
-                </p>
-                <p style={{ margin: '0 0.5rem' }}>
-                  {m.text}
-                </p>
-              </div>
-            ))
+            messages.map((m, index) => {
+              let from = m.from;
+              let color = 'white';
+              if (from == useWorldUserStore.getState().world_user.user_id)
+                from = useWorldUserStore.getState().world_user.username
+              else if (from in useWorldUserStore.getState().users_info) {
+                color = useWorldUserStore.getState().users_info[from].color
+                from  = useWorldUserStore.getState().users_info[from].username
+              }
+              return (
+                <div key={index} className={classes.message}>
+                  <p style={{ margin: '0 0.5rem', fontWeight: 'bold', color: color }}>
+                    <span>{from}</span>
+                    <span style={{ float: 'right' }}>{m.date}</span>
+                  </p>
+                  <p style={{ margin: '0 0.5rem' }}>
+                    {m.text}
+                  </p>
+                </div>
+              )
+            })
           }
         </div>
       </div>

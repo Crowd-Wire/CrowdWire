@@ -12,11 +12,12 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     position = payload['position']
     # store position on redis
     await redis_connector.set_user_position(world_id, user_id, position)
-
+    user = await redis_connector.get_world_user_data_dict(world_id=world_id, user_id=user_id)
+    user['user_id'] = user_id
     # broadcast join player
     await manager.broadcast(
         world_id,
-        {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': position},
+        {'topic': protocol.JOIN_PLAYER, 'user': user, 'position': position},
         user_id
     )
     await send_groups_snapshot(world_id)  # TODO: remove after tests
@@ -37,7 +38,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
 
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
-    payload['from'] = f"User{user_id}"
+    payload['from'] = user_id
     await manager.broadcast(world_id, payload)
 
 
