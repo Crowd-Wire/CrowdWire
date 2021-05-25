@@ -3,7 +3,7 @@ import WorldService from "services/WorldService.js";
 import exampleJson from "assets/tilemaps/maps/test.json";
 
 import { API_BASE } from "config";
-import { GameObjects, Scene, Tilemaps } from "phaser";
+import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
 
 const wallTiles = require("assets/tilemaps/tiles/wall-tiles.png");
 
@@ -108,7 +108,7 @@ class MapManager {
         return this.map;
     }
 
-    buildObjects(scene: Scene): GameObjects.GameObject[] {
+    buildObjects(scene: Scene): Physics.Arcade.StaticGroup {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
@@ -137,9 +137,10 @@ class MapManager {
                     const body = obj.body as Phaser.Physics.Arcade.Body;
                     body.setOffset(x, y);
                     body.setSize(width, height, false);
+                    obj.depth = obj.y;
                 }
             })
-        return collisionObjects;
+        return collisionObjectsGroup;
     }
 
     saveMap(): void {

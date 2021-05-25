@@ -45,12 +45,12 @@ class GameScene extends Phaser.Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        this.objects = mapManager.buildObjects(this);
+        this.group = mapManager.buildObjects(this);
 
         // main player
         this.player = new Player(this, 50, 50);
 
-        this.physics.add.collider(this.objects, this.player);
+        this.physics.add.collider(this.group, this.player);
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -210,6 +210,7 @@ class GameScene extends Phaser.Scene {
 
     update(time, delta) {
         this.player.update();
+        this.player.depth = this.player.y;
 
         // // Convert the mouse position to world position within the camera
         // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
