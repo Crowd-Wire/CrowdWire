@@ -9,31 +9,31 @@ class EventService {
 
         let query = []
 
-        if(event_type !== undefined){
+        if(event_type !== null){
             query.push('event_type=' + event_type)
         }
 
-        if(user_id !== undefined){
+        if(user_id !== null){
             query.push('user_id=' + user_id)
         }
 
-        if(start_date !== undefined){
+        if(start_date !== null){
             query.push('start_date=' + start_date)
         }
 
-        if(end_date !== undefined){
+        if(end_date !== null){
             query.push('end_date=' + end_date)
         }
 
-        if(order_desc !== undefined){
+        if(order_desc !== null){
             query.push('order_desc=' + order_desc)
         }
 
-        if(limit !== undefined){
+        if(limit !== null){
             query.push('limit=' + limit)
         }
 
-        if(page_num !== undefined){
+        if(page_num !== null){
             query.push('page_num=' + page_num)
         }
 

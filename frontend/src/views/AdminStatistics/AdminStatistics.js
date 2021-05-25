@@ -7,31 +7,27 @@ import Row from 'react-bootstrap/Row';
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps";
 import WorldService from "services/WorldService";
 import EventService from "services/EventService";
-import EventFilters from "./sections/EventFilters"
+import EventFilters from "./sections/EventFilters";
+import EventResults from "./sections/EventResults";
 class AdminStatistics extends Component {
     constructor(props){
         super(props)
         this.state = {
-            event_type: "",
             worlds: [],
-            world_id: 1,
-            user_id: null,
-            page:1,
-            start_date:null,
-            end_date:null,
-            order_desc: true,
             events:null
         }
     }
 
     handleCallBack = (event_type,world,startDate,endDate,ordering) => {
-        let order = ordering == "descending"
-        console.log(event_type)
+        let order = ordering == "Descending"
+        let parsestartDate = startDate == null ? null : startDate.toISOString()
+        let parseendDate = endDate == null ? null : endDate.toISOString()
+
         EventService.getEvents(
             event_type,world,
-            undefined,
-            startDate.toISOString(),
-            endDate.toISOString(),
+            null,
+            parsestartDate,
+            parseendDate,
             order,
             10,
             1)
@@ -68,6 +64,12 @@ class AdminStatistics extends Component {
                 :
                 <Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
             }
+            {this.state.worlds!==null && this.state.worlds.length!==0 ? (
+                <EventResults events = {this.state.events} />
+                )
+                :
+                <Typography style={{marginLeft:"auto", marginRight:"auto"}}>No Events</Typography>
+                }
             </div>
             </>
         )

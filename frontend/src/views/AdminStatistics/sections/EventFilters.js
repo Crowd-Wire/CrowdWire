@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import FormControl from '@material-ui/core/FormControl';
@@ -34,7 +34,7 @@ export default function EventFilters(props){
     let event_types_helper = ["JOIN_PLAYER", "LEAVE_PLAYER", "JOIN_CONFERENCE", "LEAVE_CONFERENCE"]
     const [world, setWorld] = React.useState(1);
     const [eventstypes, setEventtypes] = useState(event_types_helper)
-    const [startDate, setStartDate] = useState(new Date());
+    const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(new Date());
     const [ordering,setOrdering] = useState("Descending")
     const inputLabel = React.useRef(null);
