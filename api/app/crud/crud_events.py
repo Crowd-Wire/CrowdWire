@@ -28,18 +28,17 @@ class CRUDEvents:
             user_id: int = None,
             page_num: int = 1,
             limit: int = 10,
-            event_type: List[str] = None,
+            event_type: str = None,
             start_date: datetime.datetime = None,
             end_date: datetime.datetime = None,
             order_desc: bool = True
     ):
-        logger.debug(event_type)
         query = db.query(Event).filter(Event.world_id == world_id)
         if user_id:
             query = query.filter(Event.user_id == user_id)
 
         if event_type:
-            query = query.filter(Event.event_type.in_(event_type))
+            query = query.filter(Event.event_type.ilike('%' + event_type + '%'))
 
         if start_date:
             logger.debug(Event.timestamp)
