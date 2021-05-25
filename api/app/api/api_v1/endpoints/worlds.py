@@ -252,21 +252,31 @@ def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         visibility: Optional[str] = "public",
+        banned: Optional[bool] = False,
+        deleted: Optional[bool] = False,
+        normal: Optional[bool] = False,
+        creator: Optional[int] = None,
         page: Optional[int] = 1,
+        limit: Optional[int] = 10,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
 
-    if visibility not in ["public", "owned", "joined"]:
-        raise HTTPException(status_code=400, detail=strings.INVALID_WORLD_VISIBILITY_FILTER)
-
     if not is_guest_user(user):
-        list_world_objs = crud.crud_world.filter(
-            db=db, search=search, tags=tags, visibility=visibility, page=page, user_id=user.user_id
-        )
+        if user.is_superuser:
+            # admins
+            list_world_objs = crud.crud_world.filter(
+                db=db, search=search, tags=tags,is_superuser=True, page=page, limit=limit,creator=creator,
+                banned=banned, deleted=deleted, normal=normal)
+        else:
+            # registered users
+            list_world_objs = crud.crud_world.filter(
+                db=db, search=search, tags=tags, visibility=visibility, page=page, requester_id=user.user_id,
+                limit=limit)
     else:
-        # guest cannot access visited worlds
-        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True, page=page)
+        # guests
+        list_world_objs = crud.crud_world.filter(
+            db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility)
     return list_world_objs
 
 

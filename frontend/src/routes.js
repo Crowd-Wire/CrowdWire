@@ -26,7 +26,9 @@ import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
-import AdminWorld from 'views/AdminWorld/AdminWorld.js';
+import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
+import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
+
 /**
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
@@ -94,7 +96,8 @@ const routes = (token, guest_uuid) => [
 		path: "/admin",
 		element: token ? <AdminLayout /> : <Navigate to="/login" />,
 		children: [
-            { path: "/worlds", element: <AdminWorld /> },
+            { path: "/worlds/reports", element: <AdminWorldReports /> },
+			{ path: "/worlds", element: <AdminWorlds />}
 		],
 	},
     { path: "*", element: <NotFound /> },

@@ -147,9 +147,15 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                search: str,
                tags: Optional[List[str]],
                is_guest: bool = False,
+               is_superuser: bool = False,
                visibility: str = "public",
-               user_id: int = 0,
-               page: int = 1
+               normal: bool = False,
+               banned: bool = False,
+               deleted: bool = False,
+               creator: int = None,
+               page: int = 1,
+               limit: int = 10,
+               requester_id: int = None,
                ) -> List[World]:
 
         if not tags:
@@ -158,19 +164,43 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         query = db.query(World)
 
         if is_guest:
-            # guests can only access public worlds
-            query = query.filter(World.allow_guests.is_(True))
+            if visibility != 'public':
+                return None, strings.INVALID_WORLD_VISIBILITY_FILTER
+            # guests can only access public worlds that allow guests and are not banned or deleted
+            query = query.filter(World.allow_guests.is_(True),
+                                 World.status == consts.WORLD_NORMAL_STATUS,
+                                 World.public)
         else:
-            if visibility == "public":
-                query = query.filter(World.public)
-            elif visibility == "joined":
-                query = query.join(World.users).filter(User.user_id == user_id)
-            elif visibility == "owned":
-                query = query.filter(World.creator == user_id)
+            # for a normal user, it can search for public, joined or created worlds
+            if not is_superuser:
+                # normal users cannot access deleted worlds
+                query = query.filter(World.status != consts.WORLD_DELETED_STATUS)
 
-        query = query.filter(World.status == consts.WORLD_NORMAL_STATUS).filter(
+                if visibility == "public":
+                    # it cannot see the public banned worlds
+                    query = query.filter(World.public, World.status != consts.WORLD_BANNED_STATUS)
+                elif visibility == "joined":
+                    # if a user has joined a world and it is banned it should have feedback about it
+                    query = query.join(World.users).filter(User.user_id == requester_id)
+                elif visibility == "owned":
+                    # if a user has created a world that is now banned, the user should have feedback about it
+                    query = query.filter(World.creator == requester_id)
+                else:
+                    return None, strings.INVALID_WORLD_VISIBILITY_FILTER
+
+            else:
+                logger.debug("inside superuser")
+                # retrieves worlds based on the given status
+                query = query.filter(World.status.in_([i for i,s in enumerate([normal, banned, deleted]) if s]))
+
+                # admins can also search for the worlds created by a given user
+                if creator:
+                    query = query.filter(World.creator == creator)
+
+        query = query.filter(
             or_(World.name.ilike("%" + search + "%"), World.description.ilike("%" + search + "%"))
         )
+
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
