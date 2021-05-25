@@ -46,7 +46,7 @@ const usePlayerStore = create(
             disconnectPlayer: (id: string) => {
                 return set((s) => {
                     const players = {...s.players};
-                    delete players[id];
+                    if (id in players) delete players[id];
                     return { players };
                 });
             },

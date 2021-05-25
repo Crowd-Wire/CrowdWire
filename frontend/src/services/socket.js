@@ -147,17 +147,26 @@ export const getSocket = (worldId) => {
             break;
         case "JOIN_PLAYER":
             console.log(data)
+            useWorldUserStore.getState().addUserInfo(data.user)
+            console.log(useWorldUserStore.getState())
             usePlayerStore.getState().connectPlayer(data.user.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
-            useConsumerStore.getState().closePeer(data.user_id);
-            usePlayerStore.getState().disconnectPlayer(data.user_id);
+            let user_id = data.user_id;
+            useWorldUserStore.getState().removeUserInfo(user_id)
+            useConsumerStore.getState().closePeer(user_id);
+            console.log(useWorldUserStore.getState())
+
+            usePlayerStore.getState().disconnectPlayer(user_id);
             break;
         case "PLAYER_MOVEMENT":
             // console.log('\nRECV',data.position, data.velocity)
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
+            console.log(data)
+            useWorldUserStore.getState().setUsersInfo(data.players_data)
+            console.log(useWorldUserStore.getState())
             usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
         case "WIRE_PLAYER":

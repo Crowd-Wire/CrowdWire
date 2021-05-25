@@ -29,6 +29,7 @@ const useWorldUserStore = create(
     combine(
         {   
             world_user: null as WorldUser | null,
+            users_info: {} as Record<string, WorldUser> | null,
         },
         (set) => ({
             joinWorld: (world_user: WorldUser) => {
@@ -48,7 +49,32 @@ const useWorldUserStore = create(
                     s.world_user.role.talk_conference = permit;
                     return {world_user: s.world_user};
                 })
-            }
+            },
+            addUserInfo: (user) => {
+                return set((s) => {
+                    let new_users_info = {...s.users_info};
+                    new_users_info[user.user_id] = user
+                    return {
+                        users_info: new_users_info,
+                    }
+                })
+            },
+            setUsersInfo: (users_data) => {
+                return set((s) => {
+                    return {
+                        users_info: users_data,
+                    }
+                })
+            },
+            removeUserInfo: (user_id) => {
+                return set((s) => {
+                    let new_users_info = {...s.users_info};
+                    if (user_id in new_users_info) delete new_users_info[user_id]
+                    return {
+                        users_info: new_users_info,
+                    }
+                })
+            },
         })
     )
 );
