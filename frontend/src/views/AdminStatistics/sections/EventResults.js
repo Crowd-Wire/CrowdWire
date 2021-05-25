@@ -19,7 +19,7 @@ const useStyles = makeStyles({
 });
 
 export default function EventResults(props) {
-    let events = props.events
+    let events = props.events;
     const classes = useStyles();
     return (
         <>
