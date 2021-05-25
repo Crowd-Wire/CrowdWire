@@ -7,6 +7,7 @@ import usePlayerStore from "stores/usePlayerStore.ts";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
 import useWorldUserStore from "../stores/useWorldUserStore";
 
+
 const sceneConfig = {
     active: false,
     visible: false,
@@ -14,7 +15,6 @@ const sceneConfig = {
 };
 
 var globalVar = true;
-
 
 
 class GameScene extends Phaser.Scene {
@@ -39,19 +39,25 @@ class GameScene extends Phaser.Scene {
         this.map = mapManager.getTilemap();
 
 
-        this.roomLayer = this.map.getLayer('Room').tilemapLayer.setVisible(false);
-        this.collisionLayer = this.map.getLayer('Collision').tilemapLayer;
-        this.floatLayer = this.map.getLayer('Float').tilemapLayer.setDepth(1000);
+        this.map.layers.forEach((layer) => {
+            if (layer.name.startsWith("Room"))
+                this.roomLayer = layer.tilemapLayer.setVisible(false);
+            else if (layer.name.startsWith("Collision"))
+                this.collisionLayer = layer.tilemapLayer;
+            else if (layer.name.startsWith("Float"))
+                layer.tilemapLayer.setDepth(1000);
+        })
+
         console.log(this.map.layers)
-        console.log(this.roomLayer, this.collisionLayer, this.floatLayer)
+        console.log(this.roomLayer, this.collisionLayer)
 
-        console.log(this.map)
+        console.log(this.map);
 
-
-        const objects = this.map.createFromObjects('Object', [
-            { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
-            { "gid": 249, key: 'arrow' },
-        ]);
+        const objects = mapManager.getObjects();
+        // const objects = this.map.createFromObjects('Object', [
+        //     { "gid": 247, key: 'table-V' }, { "gid": 248, key: 'table-H' },
+        //     { "gid": 249, key: 'arrow' },
+        // ]);
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
@@ -104,11 +110,8 @@ class GameScene extends Phaser.Scene {
         // this.localPlayers['-2'] = new LocalPlayer(this, 500, 600, '-2');
         // this.localPlayers['-3'] = new LocalPlayer(this, 650, 450, '-3');
 
-        // main player
-        this.player = new Player(this, 50, 50);
-
         // connect to room
-        this.ws.joinRoom({x: 50, y: 50});
+        this.ws.joinRoom({ x: 50, y: 50 });
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
@@ -121,7 +124,7 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-Q', () => {
             globalVar = !globalVar;
         }, this);
-        
+
         Object.entries(usePlayerStore.getState().players).forEach(([id, player]) => {
             const position = player.position;
             this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
@@ -130,7 +133,7 @@ class GameScene extends Phaser.Scene {
         this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
 
         // TODO: remove after testing
-        this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({...state.groups}));
+        this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
 
         this.physics.add.collider(Object.values(this.remotePlayers), this.collisionLayer);
     }
@@ -146,7 +149,7 @@ class GameScene extends Phaser.Scene {
                 text.setText([text.text.split('\n')[0], grps.join(', ')]);
             } else if (id in this.localPlayers) {
                 let text = this.localPlayers[id].getText();
-                text.setText([text.text.split('\n')[0],grps.join(', ')]);
+                text.setText([text.text.split('\n')[0], grps.join(', ')]);
             } else {
                 // own player
                 this.teste_player_id = id;
@@ -201,7 +204,7 @@ class GameScene extends Phaser.Scene {
                 }
             }
         }
-        
+
     }
 
     updateRangePlayers = () => {
@@ -303,10 +306,10 @@ class Player extends Phaser.GameObjects.Container {
 
         this.addSprite(sprite)
             .addText(text)
-            // .add(circle);
+        // .add(circle);
 
         this.body.setSize(sprite.width * 2, sprite.height)
-            .setOffset(-sprite.width/2 * 2, 0);
+            .setOffset(-sprite.width / 2 * 2, 0);
 
         // set some default physics properties
         this.body.setCollideWorldBounds(true);
@@ -315,19 +318,19 @@ class Player extends Phaser.GameObjects.Container {
 
         this.getSprite().anims.create({
             key: 'horizontal',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13]}),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
             frameRate: 10,
             repeat: -1
         });
         this.getSprite().anims.create({
             key: 'up',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14]}),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14] }),
             frameRate: 10,
             repeat: -1
         });
         this.getSprite().anims.create({
             key: 'down',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [ 0, 6, 0, 12 ] }),
+            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [0, 6, 0, 12] }),
             frameRate: 10,
             repeat: -1
         });
@@ -355,7 +358,7 @@ class Player extends Phaser.GameObjects.Container {
         this.updateMovement();
         this.updateAnimation();
     }
-    
+
     updateMovement() {
         const direction = new Phaser.Math.Vector2();
 
@@ -386,7 +389,7 @@ class Player extends Phaser.GameObjects.Container {
     updateAnimation(velocity) {
         if (!velocity)
             velocity = this.body.velocity;
-        
+
         if (velocity.y < 0) {
             this.getSprite().anims.play('up', true);
         }
@@ -431,7 +434,7 @@ class LocalPlayer extends Player {
  */
 class RemotePlayer extends Player {
     numUpdates = 0;
-    
+
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
@@ -444,7 +447,7 @@ class RemotePlayer extends Player {
             this.updateMovement, state => state.players[this.id]);
     }
 
-    updateMovement = ({position, velocity}) => {
+    updateMovement = ({ position, velocity }) => {
         this.updateAnimation(velocity);
         this.body.reset(position.x, position.y);
         this.body.setVelocity(velocity.x, velocity.y);

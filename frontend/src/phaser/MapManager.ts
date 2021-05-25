@@ -72,19 +72,6 @@ class MapManager {
             }
         })
 
-        // map tiles
-        scene.load.image('wall-tiles', wallTiles);
-        scene.load.image('util-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/util-tiles.png`);
-        scene.load.image('table-tiles',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-tiles.png`);
-        scene.load.image('table-V',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-V.png`);
-        scene.load.image('table-H',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/table-H.png`);
-        scene.load.image('jardim',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/jardim.png`);
-        scene.load.image('deti',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/wooden-plank.png`);
-        scene.load.image('arrow',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/arrow.png`);
-        scene.load.image('board',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/board.png`);
-        scene.load.image('bricks',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/bricks.png`);
-        scene.load.image('chair',`${process.env.PUBLIC_URL}/assets/tilemaps/tiles/chair.png`);
-
         this.state = MapManagerState.LOADED;
         console.log("LOADING COMPLETED")
     }
@@ -95,6 +82,7 @@ class MapManager {
 
         this.map = scene.add.tilemap('map');
 
+        // add tileset images
         const tilesetImages: Tilemaps.Tileset[] = []
         this.tileKeys.forEach((key) => {
             tilesetImages.push( this.map.addTilesetImage(key.toString()) );
@@ -103,37 +91,10 @@ class MapManager {
             this.map.addTilesetImage(key.toString());
         });
 
-        const wallTileset = this.map.addTilesetImage('wall-tiles');
-        const utilTileset = this.map.addTilesetImage('util-tiles');
-        const tableTileset = this.map.addTilesetImage('table-tiles');
-        const jardimTileset = this.map.addTilesetImage('jardim');
-        const arrowTileset = this.map.addTilesetImage('arrow');
-        const boardTileset = this.map.addTilesetImage('board');
-        const plankTileset = this.map.addTilesetImage('deti');
-        const tableVTileset = this.map.addTilesetImage('table-V');
-        const tableHTileset = this.map.addTilesetImage('table-H');
-        const brickTileset = this.map.addTilesetImage('bricks');
-        const chairTileset = this.map.addTilesetImage('chair');
-
-        const allTiles = [
-            wallTileset,
-            utilTileset,
-            tableTileset,
-            jardimTileset,
-            arrowTileset,
-            boardTileset,
-            plankTileset,
-            tableVTileset,
-            tableHTileset,
-            brickTileset,
-            chairTileset
-        ]
-        console.log('allTiles', tilesetImages, allTiles)
-
-        this.map.createLayer('Ground', allTiles);
-        this.map.createLayer('Room', allTiles);
-        this.map.createLayer('Collision', allTiles);
-        this.map.createLayer('Float', allTiles);
+        // create tile layers with tileset images
+        this.map.layers.forEach((layer) => {
+            this.map.createLayer(layer.name, tilesetImages);
+        })
 
         this.state = MapManagerState.BUILT;
     }
