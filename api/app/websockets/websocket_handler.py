@@ -39,7 +39,7 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
 
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
-    payload['from'] = f"User{user_id}"
+    payload['from'] = user_id
     await manager.broadcast(world_id, payload)
 
 

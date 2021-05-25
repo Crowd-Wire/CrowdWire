@@ -417,8 +417,11 @@ class LocalPlayer extends Player {
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
+        this.username = id;
+        if (id in useWorldUserStore.getState().users_info)
+            this.username = useWorldUserStore.getState().users_info[id].username
         this.getText().setText([
-            `User ${this.id}`,
+            `${this.username}`,
             'G???',
         ]);
     }
@@ -440,8 +443,11 @@ class RemotePlayer extends Player {
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
+        this.username = id;
+        if (id in useWorldUserStore.getState().users_info)
+            this.username = useWorldUserStore.getState().users_info[id].username
         this.getText().setText([
-            `User ${this.id}`,
+            `${this.username}`,
             'G???',
         ]);
 

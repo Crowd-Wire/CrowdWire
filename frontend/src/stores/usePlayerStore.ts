@@ -16,7 +16,7 @@ interface Player {
 }
 
 interface Player2 {
-    name: string
+    requested: boolean
 }
 
 const usePlayerStore = create(
@@ -55,12 +55,12 @@ const usePlayerStore = create(
                     if (merge) {
                         const groupPlayers = {...s.groupPlayers};
                         for (const id of ids)
-                            groupPlayers[id] = { name: `User ${id}` };
+                            groupPlayers[id] = { requested: false};
                         return { groupPlayers };
                     }
                     const groupPlayers = {} as Record<string, Player2>;
                     for (const id of ids)
-                        groupPlayers[id] = { name: `User ${id}` };
+                        groupPlayers[id] = { requested: false};
                     return { ...s, groupPlayers };
                 }, !merge);
             },
@@ -76,7 +76,7 @@ const usePlayerStore = create(
                     }
                     const groupPlayers = {} as Record<string, Player2>;
                     for (const id of ids)
-                        groupPlayers[id] = { name: `User ${id}` };
+                        groupPlayers[id] = { requested: false};
                     return { ...s, groupPlayers };
                 }, !merge);
             },

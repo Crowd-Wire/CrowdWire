@@ -83,10 +83,14 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
   useEffect(() => {
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
+      let username = d.user_requested;
+      if (d.user_requested in useWorldUserStore.getState().users_info) {
+        username = useWorldUserStore.getState().users_info[d.user_requested].username;
+      }
       toast.info(
         <span>
           <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-          The User {d.user_requested} Requested To Speak
+          The User {username} Requested To Speak
           <Button onClick={() => handleRequestToSpeak(d.user_requested, true, "customId"+d.user_requested)}>Accept</Button>
           <Button onClick={() => handleRequestToSpeak(d.user_requested, false, "customId"+d.user_requested)}>Deny</Button>
         </span>
@@ -308,17 +312,17 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 overflow: 'hidden'
               }}>
                 <Row>
-                  <Col sm={8}>
+                  <Col sm={12} style={{textAlign: 'center'}}>
                     <span>{username}</span>
-                  </Col>
-                  <Col sm={4}>
-                    { fullscreen ?
-                      <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
-                    :
-                      <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
-                    }
-                    <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
-                      onClick={() => toggleModal()}/>
+                    <div style={{'float': 'right'}}>
+                      { fullscreen ?
+                        <FullscreenExitIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenExitIcon>
+                      :
+                        <FullscreenIcon onClick={() => handleFullscreen()} style={{'cursor': 'pointer', color:'white', float: 'right'}}></FullscreenIcon>
+                      }
+                      <SettingsIcon style={{'cursor': 'pointer', float: 'right',  color: "white"}}
+                        onClick={() => toggleModal()}/>
+                    </div>
                   </Col>
                 </Row>
               </div>

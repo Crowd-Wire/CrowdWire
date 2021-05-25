@@ -72,6 +72,7 @@ export default class RoomCall extends React.Component<{}, State> {
       this.setState({ media });
     }, (state) => state.media);
   }
+  myUsername: string = useWorldUserStore.getState().world_user.username;
   myId: string = useWorldUserStore.getState().world_user.user_id;
   accessMic: boolean = false;
   accessVideo: boolean = false;
@@ -233,12 +234,16 @@ export default class RoomCall extends React.Component<{}, State> {
                       
                      
                       let item = <></>
+                      let username = peerId;
+                      if (peerId in useWorldUserStore.getState().users_info) {
+                        username = useWorldUserStore.getState().users_info[peerId].username;
+                      }
                       if (consumerMedia)
                         item = (
                           <Carousel.Item key={peerId + "_crs_media_item"}>
                             <div key={peerId + "_crs_media_item2"} style={{ height: '100%' }}>
                               <MediaStreamBox
-                                username={peerId}
+                                username={username}
                                 id={peerId + '_media'}
                                 mediaTrack={consumerMedia._track}
                               />
@@ -250,7 +255,7 @@ export default class RoomCall extends React.Component<{}, State> {
                             <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
                               <VideoAudioBox
                                 active={active}
-                                username={peerId}
+                                username={username}
                                 id={peerId}
                                 audioTrack={consumerAudio ? consumerAudio._track : null}
                                 videoTrack={consumerVideo ? consumerVideo._track : null}
@@ -270,13 +275,13 @@ export default class RoomCall extends React.Component<{}, State> {
         <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
           {this.state.media ?
             <MyMediaStreamBox
-              username={this.myId}
+              username={this.myUsername}
               id={this.myId + '_media'}
               mediaTrack={this.state.media}
             />
             : ''}
           <MyVideoAudioBox
-            username={this.myId}
+            username={this.myUsername}
             id={this.myId}
             audioTrack={this.state.mic}
             videoTrack={this.state.cam}
