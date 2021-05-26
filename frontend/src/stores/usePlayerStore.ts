@@ -16,15 +16,16 @@ interface Player {
 }
 
 interface Player2 {
-    name: string
+    requested: boolean
 }
 
 const usePlayerStore = create(
     combine(
-        {   
+        {
             groups: {} as Record<string, string[]>,
             players: {} as Record<string, Player>,
             groupPlayers: {} as Record<string, Player2>,
+            requestsToSpeak: 0,
         },
         (set) => ({
             connectPlayers: (snapshot: Record<string, Vector>) => {
@@ -46,7 +47,7 @@ const usePlayerStore = create(
             disconnectPlayer: (id: string) => {
                 return set((s) => {
                     const players = {...s.players};
-                    delete players[id];
+                    if (id in players) delete players[id];
                     return { players };
                 });
             },
@@ -55,12 +56,12 @@ const usePlayerStore = create(
                     if (merge) {
                         const groupPlayers = {...s.groupPlayers};
                         for (const id of ids)
-                            groupPlayers[id] = { name: `User ${id}` };
+                            groupPlayers[id] = { requested: false};
                         return { groupPlayers };
                     }
                     const groupPlayers = {} as Record<string, Player2>;
                     for (const id of ids)
-                        groupPlayers[id] = { name: `User ${id}` };
+                        groupPlayers[id] = { requested: false};
                     return { ...s, groupPlayers };
                 }, !merge);
             },
@@ -76,7 +77,7 @@ const usePlayerStore = create(
                     }
                     const groupPlayers = {} as Record<string, Player2>;
                     for (const id of ids)
-                        groupPlayers[id] = { name: `User ${id}` };
+                        groupPlayers[id] = { requested: false};
                     return { ...s, groupPlayers };
                 }, !merge);
             },
@@ -92,7 +93,20 @@ const usePlayerStore = create(
                     return { ...s, groups: grps };
                 }, true);
             },
-
+            setRequested: (user_id:string, has_requested: boolean) => {
+                return set((s) => {
+                    let groupPlayers = {...s.groupPlayers}
+                    groupPlayers[user_id].requested = has_requested;
+                    let requestsToSpeak = s.requestsToSpeak;
+                    if (has_requested)
+                        requestsToSpeak += 1;
+                    else
+                        requestsToSpeak -= 1;
+                    return { ...s,
+                        groupPlayers,
+                        requestsToSpeak };
+                })
+            },
         })
     )
 );

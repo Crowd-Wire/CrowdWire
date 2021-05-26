@@ -4,10 +4,19 @@ video {
 }
 
 .modal-device {
-  left: 0;
   z-index: 1; /* Sit on top */
   max-width:400px;
   height: 300px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-file {
+  max-height: 80%;
+  width: 70%;
+  z-index: 1; /* Sit on top */
   position: fixed;
   left: 50%;
   top: 50%;

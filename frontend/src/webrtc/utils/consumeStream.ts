@@ -25,6 +25,7 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
   }
   
   console.log("new consumer" + peerId)
+  console.log(consumerParameters)
 
   const consumer = await recvTransport.consume({
     ...consumerParameters,

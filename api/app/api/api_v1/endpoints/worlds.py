@@ -9,6 +9,7 @@ from app.redis import redis_connector
 from app.utils import is_guest_user
 from app.core import strings
 from pydantic import UUID4
+from app.core import consts
 
 router = APIRouter()
 
@@ -138,13 +139,21 @@ async def update_world(
     """
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     # first checking if this user can edit the world(creator only)
     world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
-    if not world_obj:
+
+    # admins can also change the status of the world whenever they want
+    if not world_obj and not user.is_superuser:
         raise HTTPException(
             status_code=400,
             detail=message,
         )
+
+    # creator cannot change the world if it is banned
+    if world_obj.status == consts.WORLD_BANNED_STATUS and not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     # afterwards update data and clear cache
     world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj, obj_in=world_in)
     if not world_obj_updated:
@@ -297,3 +306,29 @@ async def get_all_users_from_world(
         raise HTTPException(status_code=400, detail=msg)
 
     return crud.crud_world_user.get_all_registered_users(db=db, world_id=world_id)
+
+
+@router.get("/reports/", response_model=List[schemas.ReportWorldInDBWithEmail])
+async def get_worlds_reports(
+        world: Optional[int] = None,
+        reporter: Optional[int] = None,
+        reviewed: Optional[bool] = False,
+        banned: Optional[bool] = False,
+        order_by: Optional[str] = "timestamp",
+        order: Optional[str] = "desc",
+        page: Optional[int] = 1,
+        limit: Optional[int] = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    if not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.WORLD_REPORT_ACCESS_FORBIDDEN)
+
+    reports, msg = crud.crud_report_world.get_all_world_reports(
+        db=db, page=page, limit=limit, world=world, user=reporter,
+        reviewed=reviewed, banned=banned, order_by=order_by, order=order)
+
+    return reports

@@ -51,7 +51,13 @@ export const sendVideo = async (roomId:string = null) => {
           track: cam,
           appData: { mediaTag: "video" },
         })
-        .then((producer) => {set({camProducer: producer})})
+        .then((producer) => {
+          set({camProducer: producer})
+          producer.on("transportclose", () => {
+            producer.close();
+            set({cam: null, camStream: null, camProducer: null})
+          })
+        })
         .catch((err) => {
           console.log(err)
           cam.onended = function(event) {

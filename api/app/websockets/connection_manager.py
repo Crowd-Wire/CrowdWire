@@ -29,17 +29,21 @@ class ConnectionManager:
 
     async def connect(self, world_id: str, websocket: WebSocket, user_id: int):
         await websocket.accept()
-        await websocket.receive_json()
 
         # store user's corresponding websockets
         self.users_ws[user_id] = websocket
 
         # send players snapshot
         players_snapshot = {}
+        # send players information like username, avatars..
+        players_data = {}
         for uid in await redis_connector.get_world_users(world_id):
+            player_data = await redis_connector.get_world_user_data_dict(world_id, uid)
+            if player_data:
+                players_data[uid] = player_data
             players_snapshot[uid] = await redis_connector.get_user_position(world_id, uid)
         await self.send_personal_message(
-            {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot}, user_id)
+            {'topic': protocol.PLAYERS_SNAPSHOT, 'snapshot': players_snapshot, 'players_data': players_data}, user_id)
 
         # save user on redis
         await redis_connector.add_users_to_world(world_id, user_id)

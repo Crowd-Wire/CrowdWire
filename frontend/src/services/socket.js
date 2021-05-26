@@ -4,6 +4,7 @@ import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
 import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
+import { consumeDataStream } from "../webrtc/utils/consumeDataStream";
 import { receiveVideoVoice } from "../webrtc/utils/receiveVideoVoice";
 import { useRoomStore } from "../webrtc/stores/useRoomStore";
 import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
@@ -36,8 +37,14 @@ async function consumeAll(consumerParametersArr, roomId) {
   try {
     console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
-      if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
-        break;
+      if (kind === 'file') {
+        if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
+          break;
+        }
+      } else{
+        if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
+          break;
+        }
       }
     }
   } catch (err) {
@@ -51,7 +58,7 @@ let consumerQueue = [];
 
 export const getSocket = (worldId) => {
 
-  const joinRoom = async (position) => {
+  const joinPlayer = async (position) => {
     const payload = {
       topic: "JOIN_PLAYER",
       position
@@ -139,17 +146,21 @@ export const getSocket = (worldId) => {
             useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
             break;
         case "JOIN_PLAYER":
-            usePlayerStore.getState().connectPlayer(data.user_id, data.position);
+            useWorldUserStore.getState().addUserInfo(data.user)
+            usePlayerStore.getState().connectPlayer(data.user.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
-            useConsumerStore.getState().closePeer(data.user_id);
-            usePlayerStore.getState().disconnectPlayer(data.user_id);
+            let user_id = data.user_id;
+            useWorldUserStore.getState().removeUserInfo(user_id)
+            useConsumerStore.getState().closePeer(user_id);
+            usePlayerStore.getState().disconnectPlayer(user_id);
             break;
         case "PLAYER_MOVEMENT":
             // console.log('\nRECV',data.position, data.velocity)
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
+            useWorldUserStore.getState().setUsersInfo(data.players_data)
             usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
         case "WIRE_PLAYER":
@@ -210,6 +221,13 @@ export const getSocket = (worldId) => {
             }
           }
           break;
+        case "new-peer-data-producer":
+          console.log(data)
+          const roomId = data.d.roomId;
+            if (useRoomStore.getState().rooms[roomId].recvTransport) {
+              consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
+            }
+          break;
         case "active-speaker":
           console.log(data)
           if (data.value)
@@ -259,7 +277,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
+  return {socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
 }
 
 export const wsend = async (d) => {
