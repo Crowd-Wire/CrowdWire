@@ -251,7 +251,7 @@ def create_world(
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
-        visibility: Optional[str] = "public",
+        visibility: Optional[str] = None,
         banned: Optional[bool] = False,
         deleted: Optional[bool] = False,
         normal: Optional[bool] = False,
@@ -267,19 +267,22 @@ def search_world(
     if not is_guest_user(user):
         if user.is_superuser:
             # admins
-            list_world_objs = crud.crud_world.filter(
-                db=db, search=search, tags=tags,is_superuser=True, page=page, limit=limit,creator=creator,
-                banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
+            list_world_objs, msg = crud.crud_world.filter(
+                db=db, search=search, tags=tags, is_superuser=True, page=page, limit=limit, creator=creator,
+                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
         else:
             # registered users
-            list_world_objs = crud.crud_world.filter(
+            list_world_objs, msg = crud.crud_world.filter(
                 db=db, search=search, tags=tags, visibility=visibility, page=page, requester_id=user.user_id,
                 limit=limit, order_by=order_by, order=order)
     else:
         # guests
-        list_world_objs = crud.crud_world.filter(
+        list_world_objs, msg = crud.crud_world.filter(
             db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility,
             order_by=order_by, order=order)
+
+    if list_world_objs is None:
+        raise HTTPException(status_code=400, detail=msg)
     return list_world_objs
 
 

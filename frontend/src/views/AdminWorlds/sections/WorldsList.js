@@ -1,5 +1,6 @@
 import React from 'react';
 import WorldService from '../../../services/WorldService.js';
+import TagService from '../../../services/TagService.js';
 import { Checkbox } from '@material-ui/core';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -15,8 +16,7 @@ import Input from '@material-ui/core/Input';
 import MapCard from 'components/MapCard/MapCard.js';
 import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination';
-
-
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -39,16 +39,21 @@ export default function WorldsList() {
     const [orderBy, setOrderBy] = React.useState("timestamp");
     const [order, setOrder] = React.useState("desc");
     const [page, setPage] = React.useState(1);
+    const [selectedTags, setSelectedTags] = React.useState([]);
 
     const [worlds, setWorlds] = React.useState([]);
-
+    const [tags, setTags] = React.useState([]);
 
     const handleWorld = (event) => {
         setWorld(event.target.value);
     }
 
     const handleCreator = (event) => {
-        setCreator(event.target.value);
+        // TODO: find a cleaner way of doing this
+        let value = event.target.value;
+        if(value === '')
+            value = null;
+        setCreator(value);
     }
 
     // check if this the best solution
@@ -73,7 +78,7 @@ export default function WorldsList() {
     }
 
     const request = (search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) => {
-        WorldService.search(search, [], visibility, banned, deleted, normal, creator, order_by, order, page, limit)
+        WorldService.search(search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit)
             .then((res) => {
                 return res.json();
             })
@@ -85,10 +90,21 @@ export default function WorldsList() {
 
     React.useEffect(() => {
         request("", [], null, null, null, true, null, null, null, 1, 10);
+        TagService.getAll()
+            .then((res) => {
+                if (res.status == 200)
+                    return res.json()
+            })
+            .then((res) => {
+                let arr = [];
+                if (res)
+                    res.forEach(tag => arr.push(tag.name));
+                setTags(arr);
+            })
     }, [])
 
     const handleSearch = () => {
-        request(world, [], null, banned, deleted, normal, creator, orderBy, order, page, 10);
+        request(world, selectedTags, null, banned, deleted, normal, creator, orderBy, order, page, 10);
     }
 
 
@@ -97,6 +113,24 @@ export default function WorldsList() {
 
             <TextField id="world_name" label="World Name" type="search" variant="outlined" onChange={handleWorld} />
             <Input type="number" placeholder="Creator Id" onChange={handleCreator} />
+
+            <Autocomplete
+                limitTags={5}
+                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
+                multiple
+                value={selectedTags}
+                onChange={(event, value) => setSelectedTags(value)}
+                id="tags-standard"
+                options={tags}
+                getOptionLabel={(option) => option}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        variant="standard"
+                        label="Tags"
+                    />
+                )}
+            />
 
             <FormControlLabel
                 control={

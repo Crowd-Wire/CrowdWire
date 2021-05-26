@@ -174,25 +174,13 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                                  World.public)
         else:
             # for a normal user, it can search for public, joined or created worlds
-            if not is_superuser:
-                # normal users cannot access deleted worlds
-                query = query.filter(World.status != consts.WORLD_DELETED_STATUS)
-
-                if visibility == "public":
-                    # it cannot see the public banned worlds
-                    query = query.filter(World.public, World.status != consts.WORLD_BANNED_STATUS)
-                elif visibility == "joined":
-                    # if a user has joined a world and it is banned it should have feedback about it
-                    query = query.join(World.users).filter(User.user_id == requester_id)
-                elif visibility == "owned":
-                    # if a user has created a world that is now banned, the user should have feedback about it
-                    query = query.filter(World.creator == requester_id)
-                else:
-                    return None, strings.INVALID_WORLD_VISIBILITY_FILTER
-
+            if not is_superuser or (is_superuser and visibility):
+                query, msg = self.filter_by_visibility(query, visibility, requester_id)
+                if query is None:
+                    return None, msg
             else:
                 # retrieves worlds based on the given status
-                query = query.filter(World.status.in_([i for i,s in enumerate([normal, banned, deleted]) if s]))
+                query = query.filter(World.status.in_([i for i, s in enumerate([normal, banned, deleted]) if s]))
 
                 # admins can also search for the worlds created by a given user
                 if creator:
@@ -213,7 +201,25 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
 
-        return query.offset(limit * (page - 1)).limit(limit).all()
+        return query.offset(limit * (page - 1)).limit(limit).all(), ""
+
+    def filter_by_visibility(self, query, visibility: str, requester_id: int):
+        # normal users cannot access deleted worlds
+        query = query.filter(World.status != consts.WORLD_DELETED_STATUS)
+
+        if visibility == "public":
+            # it cannot see the public banned worlds
+            query = query.filter(World.public, World.status != consts.WORLD_BANNED_STATUS)
+        elif visibility == "joined":
+            # if a user has joined a world and it is banned it should have feedback about it
+            query = query.join(World.users).filter(User.user_id == requester_id)
+        elif visibility == "owned":
+            # if a user has created a world that is now banned, the user should have feedback about it
+            query = query.filter(World.creator == requester_id)
+        else:
+            return None, strings.INVALID_WORLD_VISIBILITY_FILTER
+
+        return query, ""
 
     async def remove(self, db: Session, *, world_id: int, user_id: int = None) -> Tuple[Optional[World], str]:
         if not user_id:
