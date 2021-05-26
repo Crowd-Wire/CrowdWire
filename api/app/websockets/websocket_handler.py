@@ -26,14 +26,17 @@ async def join_player(world_id: str, user_id: str, payload: dict):
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
     velocity = payload['velocity']
     position = payload['position']
-    # store position on redis
-    await redis_connector.set_user_position(world_id, user_id, position)
 
     await manager.broadcast(
         world_id,
         {'topic': protocol.PLAYER_MOVEMENT, 'user_id': user_id, 'velocity': velocity, 'position': position},
         user_id
     )
+
+
+async def set_user_position(world_id: str, user_id: str, payload: dict):
+    # store position on redis
+    await redis_connector.set_user_position(world_id, user_id, payload['position'])
 
 
 async def send_message(world_id: str, user_id: str, payload: dict):
