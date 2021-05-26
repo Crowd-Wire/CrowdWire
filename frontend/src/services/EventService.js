@@ -9,8 +9,8 @@ class EventService {
 
         let query = []
 
-        if(event_type){
-            query.push('event_type=' + event_type);
+        if(event_type && event_type.length !==0 ){
+            query.push('event_type=' + event_type.join('&event_type='));
         }
 
         if(user_id){
