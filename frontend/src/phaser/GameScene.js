@@ -87,6 +87,12 @@ class GameScene extends Phaser.Scene {
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
 
+        this.sprite = Phaser.Utils.Objects.Clone(this.collisionGroup.getChildren()[0]);
+
+        this.add.existing(this.sprite);
+        this.physics.add.existing(this.sprite);
+        this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
+
     }
 
     // TODO: remove after tests
@@ -203,6 +209,11 @@ class GameScene extends Phaser.Scene {
         this.player.update();
         this.updateDepth();
 
+        if (!globalVar) {
+            const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+            this.sprite.setPosition(worldPoint.x, worldPoint.y);
+        }
+
         // // Convert the mouse position to world position within the camera
         // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
@@ -215,7 +226,6 @@ class GameScene extends Phaser.Scene {
 
         if (!globalVar)
             return;
-        // this.updateConferences();
         this.updateRangePlayers();
     }
 }
