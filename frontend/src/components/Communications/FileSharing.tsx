@@ -238,10 +238,14 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
 
           useWsHandlerStore.getState().addWsListener(`DOWNLOAD_REQUEST`, (d) => {
             if (!sendingFile) {
+              let username = d.user_id;
+              if (d.user_id in useWorldUserStore.getState().users_info) {
+                username = useWorldUserStore.getState().users_info[d.user_id].username;
+              }
               toast.info(
                 <span>
                   <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-                  The User {d.user_id} Requested To Download the file {d.file.name}
+                  The User {username} Requested To Download the file {d.file.name}
                   <Button onClick={() => {handleRequestDownload(dataProducers, d.file, d.user_id); toast.dismiss("downReqId"+d.user_id);}}>Accept</Button>
                   <Button onClick={() =>
                   {wsend({topic: 'DENY_DOWNLOAD_REQUEST', d: {'user_id': d.user_id, 'reason': 'User declined the file transfer!'}}); toast.dismiss("downReqId"+d.user_id);}}>
@@ -350,38 +354,45 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                 <Grid item xs={12} className={classes.demo}>
                   <div className={classes.demo}>
                     <List dense={true} className={classes.root}>
-                      { listOfFiles.map((file, index) => 
-                        <div key={index}>
-                          <ListItem alignItems="flex-start">
-                            <ListItemAvatar>
-                              <Avatar alt={`${file.owner}`}>
-                                <FolderIcon />
-                              </Avatar>
-                            </ListItemAvatar>
-                            <ListItemText
-                              primary={file.name}
-                              secondary={`Size: ${(file.size*0.000001).toFixed(2)}
-                              ${"MBs  Type: "} ${file.type}
-                              ${"  Owner: "} ${file.owner}
-                              ${"  ETA: "} ${(file.size/BYTES_PER_CHUNK/10).toFixed(2)} s`}
-                            />
-                            { file.owner == myUserId ?
-                                <ListItemSecondaryAction>
-                                  <IconButton edge="end" aria-label="delete" onClick={() => removeFile(file)}>
-                                    <DeleteIcon />
-                                  </IconButton>
-                                </ListItemSecondaryAction>
-                              :
-                                <ListItemSecondaryAction>
-                                  <IconButton edge="end" aria-label="download" onClick={() => requestDownloadFile(file)}>
-                                    <DownloadIcon />
-                                  </IconButton>
-                                </ListItemSecondaryAction>
-                            }
-                          </ListItem>
-                          <Divider variant="inset" component="li" />
-                        </div>,
-                      )}
+                      { listOfFiles.map((file, index) => {
+                        let owner = file.owner;
+                        if (file.owner in useWorldUserStore.getState().users_info)
+                          owner = useWorldUserStore.getState().users_info[file.owner].username
+                        else if (file.owner == myUserId && useWorldUserStore.getState().world_user)
+                          owner = useWorldUserStore.getState().world_user.username
+                        return (
+                          <div key={index}>
+                            <ListItem alignItems="flex-start">
+                              <ListItemAvatar>
+                                <Avatar alt={`${owner}`}>
+                                  <FolderIcon />
+                                </Avatar>
+                              </ListItemAvatar>
+                              <ListItemText
+                                primary={file.name}
+                                secondary={`Size: ${(file.size*0.000001).toFixed(2)}
+                                ${"MBs  Type: "} ${file.type}
+                                ${"  Owner: "} ${owner}
+                                ${"  ETA: "} ${(file.size/BYTES_PER_CHUNK/10).toFixed(2)} s`}
+                              />
+                              { file.owner == myUserId ?
+                                  <ListItemSecondaryAction>
+                                    <IconButton edge="end" aria-label="delete" onClick={() => removeFile(file)}>
+                                      <DeleteIcon />
+                                    </IconButton>
+                                  </ListItemSecondaryAction>
+                                :
+                                  <ListItemSecondaryAction>
+                                    <IconButton edge="end" aria-label="download" onClick={() => requestDownloadFile(file)}>
+                                      <DownloadIcon />
+                                    </IconButton>
+                                  </ListItemSecondaryAction>
+                              }
+                            </ListItem>
+                            <Divider variant="inset" component="li" />
+                          </div>
+                        )
+                      })}
                     </List>
                   </div>
                 </Grid>

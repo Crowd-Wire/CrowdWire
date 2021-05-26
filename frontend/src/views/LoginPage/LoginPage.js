@@ -146,7 +146,7 @@ class LoginPage extends React.Component {
         >
           <div className={this.props.classes.container}>
             <GridContainer justify="center">
-              <GridItem xs={12} sm={12} md={4}>
+              <GridItem xs={12} sm={12} md={5}>
                 <Card className={this.props.classes[this.state.cardAnimaton]}>
                   <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
