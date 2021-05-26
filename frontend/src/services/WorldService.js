@@ -11,12 +11,6 @@ class WorldService {
             page: int
         */
 
-        console.log(banned)
-        console.log(deleted)
-        console.log(normal)
-        console.log(creator)
-
-
         let url = 'worlds/';
         let query = [];
     
@@ -54,7 +48,6 @@ class WorldService {
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
 
-        console.log(url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
