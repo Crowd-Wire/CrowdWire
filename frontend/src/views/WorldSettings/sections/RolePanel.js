@@ -21,6 +21,8 @@ export default function RolePanel(props){
 	const [showDialog, setShowDialog] = React.useState(false);
 	const [name, setName] = React.useState("");
 	const [usersInRole, setUsersInRole] = React.useState([]);
+	const [roleAmount, setRoleAmount] = React.useState(0);
+	const [selectedRole, setSelectedRole] = React.useState({});
 	let roleUsers;
 
 	const handleClose = () => {
@@ -76,13 +78,20 @@ export default function RolePanel(props){
 				return res.json();
 			})
 			.then((res)=>{
+				setRoleAmount(res.length)
 				setUsersInRole(res);
 			})
 		}
-		else if(roles !== null){
+		else if(roles !== null && usersInRole.length!== 0 && usersInRole.length === roleAmount){
 			let temp = [];
-
+			let flag = true;
+			let first_role;
 			Object.keys(roles).forEach((key) => {
+				if(flag){
+					setSelectedRole(roles[key]);
+					flag=false;
+				}
+
 				roleUsers = [];
 				if(usersInRole.length){
 					let i = 0;
@@ -100,7 +109,7 @@ export default function RolePanel(props){
 				);
 				setRolekeys(temp);
 			})
-			console.log(rolekeys);
+			setRoleAmount(0)
 		}
 	},[roles, props.world, usersInRole])
 
@@ -131,7 +140,7 @@ export default function RolePanel(props){
 						</Row>
 					</Col>
 					<Col xs={8} sm={8} md={8}>
-						<UserPermissions/>				
+						<UserPermissions roleName={selectedRole}/>				
 					</Col>
 				</Row>
 			)}
