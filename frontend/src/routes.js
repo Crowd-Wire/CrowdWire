@@ -28,6 +28,7 @@ import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.j
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
 import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
+import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 
 /**
  * Public and protected routes list 
@@ -97,7 +98,8 @@ const routes = (token, guest_uuid) => [
 		element: token ? <AdminLayout /> : <Navigate to="/login" />,
 		children: [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
-			{ path: "/worlds", element: <AdminWorlds />}
+			      { path: "/worlds", element: <AdminWorlds />},
+			      { path: "/statistics", element: <AdminStatistics/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

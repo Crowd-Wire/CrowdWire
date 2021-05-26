@@ -35,7 +35,6 @@ async function flushConsumerQueue(_roomId) {
 
 async function consumeAll(consumerParametersArr, roomId) {
   try {
-    console.log(consumerParametersArr)
     for (const { consumer, kind } of consumerParametersArr) {
       if (kind === 'file') {
         if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
@@ -55,14 +54,15 @@ async function consumeAll(consumerParametersArr, roomId) {
 
 let socket = null;
 let consumerQueue = [];
+let last_position = {x: 50, y: 50};
 
 export const getSocket = (worldId) => {
-
-  const joinRoom = async (position) => {
+  const joinPlayer = async (position) => {
     const payload = {
       topic: "JOIN_PLAYER",
       position
     }
+    last_position = position;
     await wsend(payload);
   }
 
@@ -72,6 +72,7 @@ export const getSocket = (worldId) => {
       position,
       velocity,
     }
+    last_position = position;
     await wsend(payload);
   }
 
@@ -124,7 +125,7 @@ export const getSocket = (worldId) => {
         console.info("[open] Connection established");
         const heartbeat = setInterval(() => {
             if (socket && socket.readyState === socket.OPEN) {
-              socket.send(JSON.stringify({'topic': 'PING'}));
+              socket.send(JSON.stringify({'topic': 'PING', 'position': last_position}));
             } else {
               clearInterval(heartbeat);
             }
@@ -133,7 +134,6 @@ export const getSocket = (worldId) => {
 
     socket.onmessage = (event) => {
       if (event.data == "PONG") {
-        console.log(event.data)
         return
       }
 
@@ -146,17 +146,20 @@ export const getSocket = (worldId) => {
             useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
             break;
         case "JOIN_PLAYER":
-            usePlayerStore.getState().connectPlayer(data.user_id, data.position);
+            useWorldUserStore.getState().addUserInfo(data.user)
+            usePlayerStore.getState().connectPlayer(data.user.user_id, data.position);
             break;
         case "LEAVE_PLAYER":
-            useConsumerStore.getState().closePeer(data.user_id);
-            usePlayerStore.getState().disconnectPlayer(data.user_id);
+            let user_id = data.user_id;
+            useWorldUserStore.getState().removeUserInfo(user_id)
+            useConsumerStore.getState().closePeer(user_id);
+            usePlayerStore.getState().disconnectPlayer(user_id);
             break;
         case "PLAYER_MOVEMENT":
-            // console.log('\nRECV',data.position, data.velocity)
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
+            useWorldUserStore.getState().setUsersInfo(data.players_data)
             usePlayerStore.getState().connectPlayers(data.snapshot);
             break;
         case "WIRE_PLAYER":
@@ -273,7 +276,7 @@ export const getSocket = (worldId) => {
     };
   }
 
-  return {socket, sendMovement, joinRoom, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
+  return {socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
 }
 
 export const wsend = async (d) => {

@@ -42,6 +42,8 @@ async def world_websocket(
 
             if topic == protocol.PING:
                 await websocket.send_text(protocol.PONG)
+                # store position on redis
+                await wh.set_user_position(world_id, user_id, payload)
                 continue
 
             if topic == protocol.PLAYER_MOVEMENT:
