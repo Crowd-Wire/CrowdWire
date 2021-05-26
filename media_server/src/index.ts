@@ -10,6 +10,7 @@ import { createTransport, transportToOptions } from "./utils/createTransport";
 import { deleteRoom } from "./utils/deleteRoom";
 import { startMediasoup } from "./utils/startMediasoup";
 import { HandlerMap, startRabbit } from "./utils/startRabbit";
+import { scalability_config } from "./scalability_config";
 
 // const log = debugModule("crowdwire:index");
 const errLog = debugModule("crowdwire:ERROR");
@@ -29,7 +30,8 @@ async function main() {
   let workers: {
     worker: Worker;
     router: Router;
-  }[];
+  } [];
+  let num_rooms: number = 0;
   try {
     workers = await startMediasoup();
   } catch (err) {
@@ -47,7 +49,11 @@ async function main() {
 
   const createRoom = () => {
     const { worker, router } = getNextWorker();
-
+    num_rooms += 1;
+    console.log(num_rooms * scalability_config.max_consumers_per_worker)
+    console.log(scalability_config.max_consumers * 0.5)
+    if (num_rooms * scalability_config.max_consumers_per_worker >= scalability_config.max_consumers * 0.5)
+      console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
     return { worker, router, state: {} };
   };
 
@@ -68,6 +74,7 @@ async function main() {
             delete rooms[roomId].state[peerId];
           }
           if (Object.keys(rooms[roomId].state).length === 0) {
+            num_rooms -= 1;
             deleteRoom(roomId, rooms);
           }
         }
@@ -78,6 +85,7 @@ async function main() {
         for (const peer of Object.values(rooms[roomId].state)) {
           closePeer(peer);
         }
+        num_rooms -= 1;
         deleteRoom(roomId, rooms);
       }
     },
@@ -105,6 +113,7 @@ async function main() {
           delete rooms[roomId].state[peerId];
         }
         if (Object.keys(rooms[roomId].state).length === 0) {
+          num_rooms -= 1;
           deleteRoom(roomId, rooms);
         }
         send({ uid, topic: "you_left_room", d: { roomId, kicked: !!kicked } });
@@ -441,7 +450,7 @@ async function main() {
       if (!rooms[roomId]?.state[peerId]) {
         return;
       }
-      
+
       console.log("add-speaker", peerId);
 
       const { router } = rooms[roomId];
