@@ -8,6 +8,7 @@ from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail, ReportWorld
 from .crud_world_users import crud_world_user
 from datetime import datetime
 
+
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpdate]):
 
     def get_all_world_reports(
