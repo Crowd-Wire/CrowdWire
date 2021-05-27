@@ -132,6 +132,8 @@ class RedisConnector:
         value = await self.get_online_users(world_id)
         updated_number = value + offset
         value = str(updated_number)
+        if updated_number < 0:
+            value = "0"
         await self.set(key=key, value=value)
         return updated_number
 
