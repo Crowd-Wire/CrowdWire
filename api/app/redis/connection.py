@@ -328,12 +328,9 @@ class RedisConnector:
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
 
-        new_group_merged = False
-
         for mgid in mergeable_groups_id:
 
             if mgid == group_id:
-                new_group_merged = True
                 mem_users_id = all_users_id
             else:
                 actions['close-room'].append({'worldId': world_id, 'roomId': mgid})
@@ -355,10 +352,6 @@ class RedisConnector:
                 if not (await self.user_in_group(world_id, uid, lowest_group_id)):
                     actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
                     await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
-
-        if not new_group_merged:
-            logger.info('new group created')
-            logger.info(group_id)
 
         return actions
 
