@@ -165,6 +165,33 @@ class RedisConnector:
 
         return None
 
+    async def get_world_user_data_dict(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[dict]:
+        """
+        Checks World_User Data if present
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        # TODO: maybe check encoding instead of converting to string
+        user_id = str(user_id)
+        world_id = str(world_id)
+        username = await self.hget(
+            f"world:{world_id}:{user_id}", 'username')
+        avatar = await self.hget(
+            f"world:{world_id}:{user_id}", 'avatar')
+        role = await self.hget(
+            f"world:{world_id}:{user_id}", 'role'
+        )
+
+        if username and avatar and role:
+            role = pickle.loads(role).__dict__
+            return {
+                'username': pickle.loads(username),
+                'avatar': pickle.loads(avatar),
+                'role': {'role_id': role['role_id'], 'name': role['name']},
+            }
+
+        return None
+
     async def assign_role_to_user(self, world_id: int, role: models.Role, user_id: int, is_guest: bool):
 
         # updates the cache for the user and guest
