@@ -62,10 +62,10 @@ const routes = (token, guest_uuid) => [
 	},
 	{
 		path:"/",
-		element:  token ? <Outlet/> : <Navigate to="/login"/>,
+		element:  token ? <Outlet /> : <Navigate to="/login"/>,
 		children: [
-			{ path: "/create-world", element: <CreateWorld/> },
-			{ path: "/join", element: <InviteJoinPage/>},
+			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage />},
 		],
 	},
 	{ 

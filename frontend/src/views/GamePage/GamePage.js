@@ -36,7 +36,7 @@ const GamePage = (props) => {
     WorldService.join_world(window.location.pathname.split('/')[2])
     .then((res) => {
       if (res.ok) return res.json()
-      navigation("/dashboard/search");
+      navigation("/dashboard/search/public");
     }).then(
       (res) => {
         console.log(res)
@@ -55,7 +55,7 @@ const GamePage = (props) => {
         }
       }
     ).catch(() => 
-      navigation("/dashboard/search")
+      navigation("/dashboard/search/public")
     )
   }, [])
 
