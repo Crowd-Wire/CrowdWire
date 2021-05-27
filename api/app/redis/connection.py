@@ -141,6 +141,32 @@ class RedisConnector:
         for k, v in data.items():
             await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
+    async def get_online_users(self, world_id: int) -> int:
+        """
+        gets the number of online users in a world
+        """
+        key = f"world:{world_id}:onlineusers"
+        value = await self.get(key)
+        value = value.decode()
+        if not value or type(value) != str or not value.isdecimal():
+            value = 0
+        return int(value)
+
+    async def update_online_users(self, world_id: int, offset: int) -> int:
+        """
+        updates the number of online users in a world
+        @return: an integer with the number of  updated online users at the moment
+        """
+        key = f"world:{world_id}:onlineusers"
+        # verify is key exists and has is an integer
+        value = await self.get_online_users(world_id)
+        updated_number = value + offset
+        value = str(updated_number)
+        if updated_number < 0:
+            value = "0"
+        await self.set(key=key, value=value)
+        return updated_number
+
     async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) \
             -> schemas.World_UserWithRoleInDB:
         """
@@ -375,7 +401,8 @@ class RedisConnector:
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
                 if not (await self.user_in_group(world_id, muid, lowest_group_id)):
-                    actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
+                    actions["add-users-to-room"].append(
+                        {'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
                     await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
 
         """Store in redis group associated to a media server"""

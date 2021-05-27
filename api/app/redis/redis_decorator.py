@@ -28,7 +28,7 @@ def cache(model: str):
             logger.info(args)
             logger.info(kwargs)
             key_data = {
-                'model': f"{function_name}-Entity",
+                'model': f"{model}-Entity",
                 'function_name': function_name,
                 'args': args,
                 'kwargs': copy_kwargs

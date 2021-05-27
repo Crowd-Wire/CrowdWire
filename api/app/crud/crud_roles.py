@@ -105,7 +105,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         ).first()
 
         if not role:
-            return None, strings. ROLES_NOT_FOUND
+            return None, strings.ROLES_NOT_FOUND
         return role, ""
 
     @cache(model="Role")
@@ -163,7 +163,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if obj_in.is_default:
             return None, strings.ROLE_DEFAULT_ALREADY_EXISTS
 
-        await clear_cache_by_model(model_name="Role", world_id=obj_in.world_id)
+        await clear_cache_by_model("Role", world_id=obj_in.world_id)
         role_obj = super().create(db=db, obj_in=obj_in)
         return role_obj, ""
 
@@ -194,11 +194,11 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         # Worth is return a error here?
         if 'is_default' in update_data and update_data['is_default']:
             update_data['is_default'] = False
-        await clear_cache_by_model('Role', world_id=Role.role_id)
+        await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
 
-    async def remove(self, db: Session, *, role_id: int, world_id: int = None, user_id: int = None)\
+    async def remove(self, db: Session, *, role_id: int, world_id: int = None, user_id: int = None) \
             -> Tuple[Optional[Role], str]:
         # TODO: Check a better way to fix this circular import
         from app.crud.crud_world_users import crud_world_user
@@ -215,6 +215,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                 role_to_change_id=default_role.role_id,
                 role_changed_id=role_id)
             role_obj = super().remove(db=db, id=role_id)
+            await clear_cache_by_model('Role', world_id=world_id)
             return role_obj, strings.ROLE_DELETED_SUCCESS
         return None, ""
 

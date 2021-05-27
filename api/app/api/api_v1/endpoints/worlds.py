@@ -59,7 +59,8 @@ async def join_world_by_link(
         # Saves on Redis for Guest Users
         logger.debug('not cached:/')
         world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_obj.world_id)
-        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id, role=world_default_role)
+        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id,
+                                                               role=world_default_role)
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
     return world_user
 
@@ -81,8 +82,13 @@ async def join_world(
 
     if not is_guest_user(user):
 
-        # checks if the world is available for him
+        # checks if the world is available for the user
         world_obj, msg = await crud.crud_world.get_available(db=db, world_id=world_id, user_id=user.user_id)
+        if not world_obj:
+            raise HTTPException(status_code=400, detail=msg)
+
+        # check whether the maximum number of users has been passed
+        world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 
@@ -115,7 +121,6 @@ async def join_world(
         # This allows the same guest to join the same world without losing its data
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
-
             # gives the guest the default role for that world
             world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
             world_user = await redis_connector.join_new_guest_user(world_id=world_id,
@@ -313,7 +318,6 @@ async def get_all_users_from_world(
         db: Session = Depends(deps.get_db),
         user: Optional[models.User] = Depends(deps.get_current_user),
 ) -> Any:
-
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
