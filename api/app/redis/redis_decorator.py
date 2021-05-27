@@ -89,9 +89,7 @@ async def clear_cache_by_model(model_name: str, *args, **kwargs):
     keys = await redis_connector.scan_match(model_name)
     for key in keys[1]:
         deserialized_value = pickle.loads(key)
-        logger.debug(deserialized_value)
         saved_kwargs = deserialized_value['kwargs']
-        logger.debug(kwargs)
         intersect_kwargs = intersect(saved_kwargs, kwargs)
         if bool(intersect_kwargs):
             logger.debug("Deleted from cache")
