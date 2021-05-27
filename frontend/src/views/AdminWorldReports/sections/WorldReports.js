@@ -33,15 +33,15 @@ export default function WorldReports(props) {
     const [order, setOrder] = React.useState("");
     const [banned, setBanned] = React.useState(false);
     const [reviewed, setReviewed] = React.useState(false);
-    const [world, setWorld] = React.useState(undefined);
-    const [reporter, setReporter] = React.useState(undefined);
+    const [world, setWorld] = React.useState(null);
+    const [reporter, setReporter] = React.useState(null);
 
     // matches positive integers and empty string
     const numberRegex = /[0-9]+|^/;
 
     const request = (world, reporter, reviewed, banned, order_by, order, page, limit) => {
 
-        // this function verifies if any of these is undefined
+        // this function verifies if any of these is null
         WorldService.getAllReports(
             world, reporter, reviewed, banned, order_by, order, page, limit
         )
@@ -57,7 +57,7 @@ export default function WorldReports(props) {
     React.useEffect(() => {
         // this will call the function with page=1
         // limit is also an option but shouldnt be used because it can complicate the css
-        request(undefined, undefined, undefined, undefined, undefined, undefined, 1, undefined);
+        request(null, null, null, null, null, null, 1, null);
     }, []);
 
     const handleOrderBy = (event) => {

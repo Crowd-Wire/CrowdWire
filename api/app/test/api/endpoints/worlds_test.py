@@ -110,7 +110,7 @@ class TestWorlds(TestCase):
             assert response.json()['detail'] == WORLD_NOT_FOUND
             assert mock_get.call_count == 1
 
-    def test_search_public_worlds_user(self):
+    def test_search_worlds_user(self):
         """
         Expects 200 Ok when user searches public worlds.
         """
@@ -119,7 +119,7 @@ class TestWorlds(TestCase):
 
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
                 '/worlds'
@@ -129,53 +129,26 @@ class TestWorlds(TestCase):
             assert len(response.json()) == 2
             assert mock_get.call_count == 1
 
-    def test_search_owned_worlds_user(self):
+    def test_search_worlds_superuser(self):
         """
-        Expects 200 Ok when user searches for owned worlds.
+        Expects 200 Ok when user searches public worlds.
         """
-        app.dependency_overrides[get_current_user] = override_dependency_user
+        app.dependency_overrides[get_current_user] = override_dependency_super_user
         with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
+
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
-                '/worlds?visibility=owned'
+                '/worlds'
             )
 
             assert response.status_code == 200
             assert len(response.json()) == 2
             assert mock_get.call_count == 1
 
-    def test_search_joined_worlds_user(self):
-        """
-        Expects 200 Ok when user searchs for joined worlds.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-            world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
-            world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds?visibility=joined'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert mock_get.call_count == 1
-
-    def test_search_invalid_worlds_visibility_user(self):
-        """
-        Expects 400 Bad Request when user provides wrong visibility parameter.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        response = client.get(
-            '/worlds?visibility=wrong'
-        )
-        assert response.status_code == 400
-
-    def test_search_public_worlds_guest(self):
+    def test_search_worlds_guest(self):
         """
         Expects 200 Ok when a guest searches public worlds.
         """
@@ -183,82 +156,13 @@ class TestWorlds(TestCase):
         with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
                 '/worlds'
             )
             assert response.status_code == 200
             assert len(response.json()) == 2
-            assert mock_get.call_count == 1
-
-    def test_search_invalid_worlds_visibility_guest(self):
-        """
-        Expects 400 Bad Request when a guest provides invalid visibility parameter.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        response = client.get(
-            '/worlds?visibility=wrong'
-        )
-        assert response.status_code == 400
-
-    def test_search_worlds_by_name_or_description(self):
-        """
-        Expects 200 Ok when user tries to search world by name or description.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-            world1 = models.World(world_id=1, name="test", world_map=bytes(), creator=1, max_users=1)
-            world2 = models.World(world_id=2, name="", description="test", world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds/?search=test'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert "test" in response.json()[0]['name'] or "test" in response.json()[0]["description"]
-            assert "test" in response.json()[1]['name'] or "test" in response.json()[1]["description"]
-            assert mock_get.call_count == 1
-
-    def test_search_worlds_by_tags(self):
-        """
-        Expects 200 Ok when guest tries to search world by tags.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_guest
-
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-
-            world1 = models.World(
-                world_id=1,
-                name="test",
-                world_map=bytes(),
-                creator=1,
-                max_users=1,
-                tags=[Tag(name="string")]
-            )
-
-            world2 = models.World(
-                world_id=2,
-                name="",
-                description="test",
-                world_map=bytes(),
-                creator=1,
-                max_users=1,
-                tags=[Tag(name="test")]
-            )
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds/?tags=test&tags=string'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert any([tag['name'] == "string" or tag['name'] == "test" for tag in response.json()[0]['tags']])
-            assert any([tag['name'] == "string" or tag['name'] == "test" for tag in response.json()[1]['tags']])
             assert mock_get.call_count == 1
 
     def test_create_world_correct_data_user(self):
