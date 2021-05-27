@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import Button from 'react-bootstrap/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -13,18 +13,15 @@ import { ThemeProvider } from "@material-ui/styles";
 import ReportService from "../../services/ReportService.js";
 import { toast } from 'react-toastify';
 
-export default function ReportWorldCard(props) {
 
-    const [open, setOpen] = React.useState(false);
+interface ReportWorldCardProps {
+  open: boolean;
+  closeModal: any;
+  world_name: string;
+  world_id: any;
+}
 
-    const handleClickOpen = () => {
-      setOpen(true);
-    };
-  
-    const handleClose = () => {
-      setOpen(false);
-    };
-    
+export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModal, world_name, world_id}) => {
     const theme = createMuiTheme({
       palette: {
         type: "dark"
@@ -32,27 +29,32 @@ export default function ReportWorldCard(props) {
     });
 
     const handleSubmit = () => {
+      //@ts-ignore
       let comment = document.getElementById("report-comment").value;
-      
       console.log(comment);
-      ReportService.sendWorldReport(1, comment)
-        .then((res) => {
-          if(res.ok){
-            toast.success("Report Sent", {
-              position: toast.POSITION.BOTTOM_RIGHT
-            });
-            return null;
-          }
-          return res.json()})
-        .then((res) => {
-            if(res){
-              toast.error(res['detail'], {
+      if (comment != "") {
+        ReportService.sendWorldReport(world_id, comment)
+          .then((res) => {
+            if(res.ok){
+              toast.success("Report Sent", {
                 position: toast.POSITION.BOTTOM_RIGHT
               });
+              return null;
             }
-            
-          setOpen(false);
+            return res.json()})
+          .then((res) => {
+              if(res){
+                toast.error(res['detail'], {
+                  position: toast.POSITION.BOTTOM_RIGHT
+                });
+              }
+            closeModal();
+          });
+      } else {
+        toast.error("Explain the reasoning behind the report!", {
+          position: toast.POSITION.BOTTOM_RIGHT
         });
+      }
     }
 
 
@@ -60,14 +62,11 @@ export default function ReportWorldCard(props) {
       <div>
         <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-          Report
-        </Button>
-        <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+        <Dialog open={open} onClose={closeModal} aria-labelledby="form-dialog-title">
           <DialogTitle id="form-dialog-title">Report World</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Please give some feedback on why you want to report the world "{props.world_name}"
+              Please give some feedback on why you want to report the world {world_name}
             </DialogContentText>
             
             <TextField
@@ -86,15 +85,14 @@ export default function ReportWorldCard(props) {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="secondary">
+            <Button onClick={closeModal} color="secondary">
               Cancel
             </Button>
             <Button
                 variant="contained"
-                color="primary"
                 className="primary"
-                endIcon={<Icon>send</Icon>}
                 onClick={handleSubmit}
+                style={{color: 'white'}}
             >
                 Send
             </Button>
