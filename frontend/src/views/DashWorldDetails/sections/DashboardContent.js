@@ -9,13 +9,15 @@ import DashboardStats from 'views/DashWorldDetails/sections/DashboardStats.js'
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import WorldService from 'services/WorldService.js';
 import useAuthStore from 'stores/useAuthStore.ts';
+import { Navigate } from 'react-router-dom';
 
 class DashboardContent extends Component{
 
 	constructor(props){
 		super(props);
 		this.state={
-			worldInfo: null
+			worldInfo: null,
+			navigate: false
 		}
 	}
     cardTextStyles = {
@@ -25,6 +27,10 @@ class DashboardContent extends Component{
 			verticalAlign: "center",
 			maxWidth:"80%"
 	};
+
+	navigate(){
+		this.setState({navigate:true});
+	}
 
 	componentDidMount(){
 		const url = window.location.pathname;
@@ -72,6 +78,8 @@ class DashboardContent extends Component{
 		if(!this.state.worldInfo){
 			return(<div></div>);
 		}
+		else if(this.state.navigate)
+			return(<Navigate to=".."></Navigate>);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%", width:"100%"}}>    
 				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>
@@ -101,7 +109,7 @@ class DashboardContent extends Component{
 						</div>
 					</Col>
 					<Col xs={1} sm={1} md={1}></Col>
-					<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.props.handler(false)} style={{fontSize:"2rem"}}/></Col>
+					<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.navigate} style={{fontSize:"2rem"}}/></Col>
 				</Row>
 				<Row style={{minHeight:"39%", marginTop:"1%", width:"100%"}}>
 					<DashboardStats details={this.state.worldInfo} />

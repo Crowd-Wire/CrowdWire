@@ -23,6 +23,7 @@ export default function RolePanel(props){
 	const [usersInRole, setUsersInRole] = React.useState([]);
 	const [roleAmount, setRoleAmount] = React.useState(0);
 	const [selectedRole, setSelectedRole] = React.useState({});
+	const [roleId, setRoleId] = React.useState(-1);
 	let roleUsers;
 
 	const handleClose = () => {
@@ -60,6 +61,12 @@ export default function RolePanel(props){
 		setName(event.target.value);
 	};
 
+	const selectRole = (key) =>{
+		console.log(key)
+		setSelectedRole(roles[key]);
+		setRoleId(key)
+	}
+
 	useEffect(()=>{
 		if(roles.length===0 && props.world.split("/").length===1){
 			RoleService.getAllRoles(props.world)
@@ -68,10 +75,12 @@ export default function RolePanel(props){
 			})
 			.then((res) => {
 				let newRoles = {};
-				res.forEach((role)=>{
-					newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute};
-				})
-				setRoles(newRoles);
+				if(res.length!==undefined){
+					res.forEach((role)=>{
+						newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute, "interact":role.interact};
+					})
+					setRoles(newRoles);
+				}
 			});
 			RoleService.getWorldUsersWRoles(props.world)
 			.then((res)=>{
@@ -89,6 +98,7 @@ export default function RolePanel(props){
 			Object.keys(roles).forEach((key) => {
 				if(flag){
 					setSelectedRole(roles[key]);
+					setRoleId(key)
 					flag=false;
 				}
 
@@ -104,7 +114,7 @@ export default function RolePanel(props){
 				}
 				temp.push(
 					<div id={key} key={key}>
-						<RoleUserList setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
+						<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
 					</div>
 				);
 				setRolekeys(temp);
@@ -140,7 +150,7 @@ export default function RolePanel(props){
 						</Row>
 					</Col>
 					<Col xs={8} sm={8} md={8}>
-						<UserPermissions roleName={selectedRole}/>				
+						<UserPermissions world_id={props.world} roleName={selectedRole} roleId={roleId}/>				
 					</Col>
 				</Row>
 			)}

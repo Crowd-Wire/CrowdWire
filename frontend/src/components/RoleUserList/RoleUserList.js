@@ -26,7 +26,7 @@ export default function RoleUserList(props){
     });
     return(
         <div style={{marginTop:"10px", marginBottom:"10px"}}>
-            <Row style={{backgroundColor:"#58B6B8"}}>
+            <Row style={{backgroundColor:"#58B6B8"}} onClick={()=>{props.selectRole(props.roleId)}}>
                 <Col sm={10} md={10}>
                     <Typography variant="body1">{roleName}</Typography>
                 </Col>
