@@ -29,8 +29,8 @@ async def world_websocket(
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
     # overwrites user_id given by token TODO: remove after tests
-    user_id = manager.get_next_user_id()
-    # user_id = str(user.user_id)
+    # user_id = manager.get_next_user_id()
+    user_id = str(user.user_id)
     world_id = str(world_id)
     logger.info(user_id)
     await manager.connect(world_id, websocket, user_id)
