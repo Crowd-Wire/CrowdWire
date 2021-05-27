@@ -41,8 +41,11 @@ async def join_world_by_link(
         db: Session = Depends(deps.get_db),
         result=Depends(deps.get_current_user_for_invite)
 ):
-    logger.info(invite_token)
     user, world_obj = result
+    # check whether the maximum number of users has been passed
+    world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
+    if not world_obj:
+        raise HTTPException(status_code=400, detail=msg)
     # If it's not the first time the user has joined the world, get it from redis(cache)
     world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
     if world_user:
@@ -115,6 +118,11 @@ async def join_world(
 
         # guests cannot join worlds that dont allow guests
         world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id)
+        if not world_obj:
+            raise HTTPException(status_code=400, detail=msg)
+
+        # check whether the maximum number of users has been passed
+        world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 

@@ -10,10 +10,10 @@ class Settings(BaseSettings):
     PRODUCTION = RUNNING_MODE is not None and RUNNING_MODE.lower() == 'production'
     DEBUG = not PRODUCTION
     API_V1_STR: str = "/api/v1"
-    # SECRET_KEY: str = secrets.token_urlsafe(32)
-    # INVITE_SECRET_TOKEN: str = secrets.token_urlsafe(32)
-    SECRET_KEY: str = 'tadR9vKVol_AIP_ve899H7iztvinsaVnlKqS3vdbGnY'
-    INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
+    SECRET_KEY: str = secrets.token_urlsafe(32)
+    INVITE_SECRET_TOKEN: str = secrets.token_urlsafe(32)
+    # SECRET_KEY: str = 'tadR9vKVol_AIP_ve899H7iztvinsaVnlKqS3vdbGnY'
+    # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
     # TODO: Change this
@@ -44,6 +44,7 @@ class Settings(BaseSettings):
 
     RABBITMQ_SENDING_QUEUE: str = "media_server_queue"
     RABBITMQ_RECEIVING_QUEUE: str = "rest_api_queue"
+    RABBITMQ_REPLICA_QUEUE: str = "replica_queue"
     REDIS_SENTINEL_HOST: str = os.getenv('REDIS_SENTINEL_HOST', 'localhost')
     REDIS_SENTINEL_PORT: int = 26379
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
