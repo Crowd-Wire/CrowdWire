@@ -69,6 +69,7 @@ export default function RolePanel(props){
 
 	useEffect(()=>{
 		if(roles.length===0 && props.world.split("/").length===1){
+			console.log(roles)
 			RoleService.getAllRoles(props.world)
 			.then((res) => {
 				return res.json();
@@ -77,6 +78,7 @@ export default function RolePanel(props){
 				let newRoles = {};
 				if(res.length!==undefined){
 					res.forEach((role)=>{
+						console.log(role)
 						newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute, "interact":role.interact};
 					})
 					setRoles(newRoles);
@@ -91,10 +93,10 @@ export default function RolePanel(props){
 				setUsersInRole(res);
 			})
 		}
-		else if(roles !== null && usersInRole.length!== 0 && usersInRole.length === roleAmount){
+		else if(roles !== null && roles.length!==0 && usersInRole.length!== 0 && usersInRole.length === roleAmount){
 			let temp = [];
 			let flag = true;
-			let first_role;
+			console.log(roles)
 			Object.keys(roles).forEach((key) => {
 				if(flag){
 					setSelectedRole(roles[key]);
@@ -150,7 +152,7 @@ export default function RolePanel(props){
 						</Row>
 					</Col>
 					<Col xs={8} sm={8} md={8}>
-						<UserPermissions world_id={props.world} roleName={selectedRole} roleId={roleId}/>				
+						<UserPermissions setRoles={setRoles} world_id={props.world} roleName={selectedRole} roleId={roleId}/>				
 					</Col>
 				</Row>
 			)}

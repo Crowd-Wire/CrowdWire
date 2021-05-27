@@ -24,20 +24,14 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UserPermissions(props) {
   const classes = useStyles();
-
-  const [state, setState] = React.useState(
-    {name: false, ban: false, obj_int: false, walk: false, talk: false, inv_users: false,
-      chat: false, conf_manage: false, talk_conf: false, role_manage:false, world_mute:false}
-  );
   const [newState, setNewState] = React.useState(
     {name:false,ban: false, obj_int: false, walk: false, talk: false, inv_users: false,
-      chat: false, conf_manage: false, talk_conf: false, role_manage:false, world_mute:false}
+      chat: false, conf_manage: false, talk_conf: false, role_manage:false, world_mute:false, is_default:false}
   );
-  const [name, setName] = React.useState("");
   const [dialog,setDialog] = React.useState(false);
+
   const [changed, setChanged] = React.useState(false);
   const handleChange = (event) => {
-    
     setNewState({ ...newState, [event.target.name]: event.target.checked });
     setChanged(true);
   };
@@ -55,6 +49,13 @@ export default function UserPermissions(props) {
 
   }
 
+  const deleteRole = () => {
+    if(props.world_id.length===1){
+      props.setRoles([]);
+      RoleService.deleteRole(props.world_id, props.roleId);
+    }
+  }
+
   const saveInfo = () => {
     console.log(newState)
     if(props.world_id.length===1)
@@ -65,14 +66,14 @@ export default function UserPermissions(props) {
       })
       .then((res)=>{
         console.log(res);
+        props.setRoles([]);
       });
   }
 
   useEffect(()=>{
     setChanged(false);
-    setState({name: props.roleName.name, ban: props.roleName.ban, obj_int: props.roleName.interact, walk:props.roleName.walk, talk: props.roleName.talk, inv_users: props.roleName.invite, chat: props.roleName.chat, conf_manage: props.roleName.conference_manage, talk_conf: props.roleName.talk_conference, role_manage: props.roleName.role_manage, world_mute: props.roleName.world_mute})
-    setNewState({name: props.roleName.name, ban: props.roleName.ban, obj_int: props.roleName.interact, walk:props.roleName.walk, talk: props.roleName.talk, inv_users: props.roleName.invite, chat: props.roleName.chat, conf_manage: props.roleName.conference_manage, talk_conf: props.roleName.talk_conference, role_manage: props.roleName.role_manage, world_mute: props.roleName.world_mute})
-  },[props.roleName, name])
+    setNewState({name: props.roleName.name, ban: props.roleName.ban, obj_int: props.roleName.interact, walk:props.roleName.walk, talk: props.roleName.talk, inv_users: props.roleName.invite, chat: props.roleName.chat, conf_manage: props.roleName.conference_manage, talk_conf: props.roleName.talk_conference, role_manage: props.roleName.role_manage, world_mute: props.roleName.world_mute, is_default:props.roleName.is_default})
+  },[props.roleName])
 
   return (
     <FormGroup style={{height:"100%"}}>
@@ -81,7 +82,7 @@ export default function UserPermissions(props) {
         {newState.name}
       </Typography>
       <Typography variant="caption" style={{marginTop:"auto", marginBottom:"auto", marginLeft:"15px"}}>
-        (double click to edit)
+        (click to edit)
       </Typography>
       </Row>
       <Row style={{height:"70%"}}>
@@ -136,6 +137,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                  disabled={newState.is_default}
                   checked={newState.inv_users}
                   onChange={handleChange}
                   name="inv_users"
@@ -151,6 +153,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                  disabled={newState.is_default}
                   checked={newState.ban}
                   onChange={handleChange}
                   name="ban"
@@ -198,8 +201,9 @@ export default function UserPermissions(props) {
           <FormControlLabel
             control={
               <Checkbox
-              checked={newState.conf_manage}
-              onChange={handleChange}
+                disabled={newState.is_default}
+                checked={newState.conf_manage}
+                onChange={handleChange}
                 name="conf_manage"
                 color="primary"
               />
@@ -213,6 +217,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                  disabled={newState.is_default}
                   checked={newState.role_manage}
                   onChange={handleChange}
                   name="role_manage"
@@ -260,8 +265,10 @@ export default function UserPermissions(props) {
         </Col>
         <Col sm={6} md={4} lg={3}>
           <Button
-          size="small"
-          style={{marginTop:"auto", marginBottom:"auto"}}
+            disabled={newState.is_default}
+            onClick={()=>deleteRole()}
+            size="small"
+            style={{marginTop:"auto", marginBottom:"auto"}}
             variant="contained"
             color="secondary"
             className={classes.button}

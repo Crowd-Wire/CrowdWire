@@ -7,7 +7,6 @@ import Tab from '@material-ui/core/Tab';
 import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
 import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
 import WorldService from 'services/WorldService.js';
-import RoleService from 'services/RoleService.js';
 class WSettingsContent extends Component {
 
 
@@ -17,13 +16,6 @@ class WSettingsContent extends Component {
 		this.state = 
 		{
 			value: 0,
-			// roles: {
-			// 	'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
-			// 	'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
-			// 	'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
-			// 	'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
-			// },
-			roles: {},
 			users: ['Silvia','Marco','Teixeira'],
 			reports: [
 				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
@@ -98,7 +90,7 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel getRoles={this.getRoles} roles={this.state.roles} world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
 						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>

@@ -12,6 +12,17 @@ class RoleService {
             }
         })
     }
+
+    deleteRole(id, role_id) {
+        return fetch(API_BASE + 'worlds/'+id+'/roles/'+role_id, {
+            method: 'DELETE',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
+        })
+    }
+
     addRole(world_id, name) {
         return fetch(API_BASE + 'worlds/'+world_id+'/roles/', {
             method: 'POST',
@@ -19,6 +30,7 @@ class RoleService {
             headers: {
                 'accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization' : "Bearer "+ AuthenticationService.getToken()  
             },
             body: JSON.stringify({ world_id: world_id, name: name, is_default: false})
         })

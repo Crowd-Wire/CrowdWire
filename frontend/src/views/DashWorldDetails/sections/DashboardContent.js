@@ -29,6 +29,7 @@ class DashboardContent extends Component{
 	};
 
 	navigate(){
+		console.log("setState")
 		this.setState({navigate:true});
 	}
 
@@ -79,7 +80,7 @@ class DashboardContent extends Component{
 			return(<div></div>);
 		}
 		else if(this.state.navigate)
-			return(<Navigate to=".."></Navigate>);
+			return(<Navigate to="../search/public"></Navigate>);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%", width:"100%"}}>    
 				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"770px"}}>
@@ -109,7 +110,7 @@ class DashboardContent extends Component{
 						</div>
 					</Col>
 					<Col xs={1} sm={1} md={1}></Col>
-					<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.navigate} style={{fontSize:"2rem"}}/></Col>
+					<Col xs={1} sm={1} md={1}><CancelIcon onClick={() => this.navigate()} style={{fontSize:"2rem"}}/></Col>
 				</Row>
 				<Row style={{minHeight:"39%", marginTop:"1%", width:"100%"}}>
 					<DashboardStats details={this.state.worldInfo} />
