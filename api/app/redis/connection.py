@@ -23,8 +23,8 @@ class RedisConnector:
             [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
             password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
+        # self.master = await aioredis.create_connection('redis://localhost/0')
         # await self.master.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
@@ -120,7 +120,7 @@ class RedisConnector:
         await self.set('room_' + group_id, media_server)
 
     async def remove_room(self, group_id: str):
-        """Associate new room with the media server that has the least rooms"""
+        """Remove room from redis and decrease number of rooms of media server"""
         media_server = await self.get('room_' + group_id)
         if media_server:
             media_server = media_server.decode()
