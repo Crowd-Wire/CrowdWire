@@ -8,7 +8,7 @@ from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
-from loguru import logger
+
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
 
@@ -105,7 +105,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         ).first()
 
         if not role:
-            return None, strings. ROLES_NOT_FOUND
+            return None, strings.ROLES_NOT_FOUND
         return role, ""
 
     @cache(model="Role")
@@ -198,7 +198,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
 
-    async def remove(self, db: Session, *, role_id: int, world_id: int = None, user_id: int = None)\
+    async def remove(self, db: Session, *, role_id: int, world_id: int = None, user_id: int = None) \
             -> Tuple[Optional[Role], str]:
         # TODO: Check a better way to fix this circular import
         from app.crud.crud_world_users import crud_world_user
