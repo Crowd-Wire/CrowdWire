@@ -28,9 +28,17 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.EDITION_FORBIDDEN
         return world_obj, ""
 
+    def is_name_in_use(self, db: Session, world_name) -> Tuple[Optional[World], str]:
+        """
+        Check if the name of a World is already in use
+        """
+        world_obj = db.query(World).filter(World.name == world_name).first()
+        if not world_obj:
+            return world_obj, ""
+        return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
+
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
-        logger.info("------>")
         world_obj = db.query(World).filter(
             World.world_id == world_id,
             World.status != consts.WORLD_DELETED_STATUS
@@ -83,6 +91,11 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         user = kwargs.get('user')
         if not user:
             return None, strings.USER_NOT_PASSED
+
+        # Verify if the name of the world is already in use
+        obj, msg = self.is_name_in_use(db=db, world_name=obj_in.name)
+        if obj:
+            return None, msg
 
         db_world = World(
             creator=user.user_id,
