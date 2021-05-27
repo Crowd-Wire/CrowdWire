@@ -176,7 +176,7 @@ class GameScene extends Phaser.Scene {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
             // detect surrounding players
             var bodies = this.physics.overlapCirc(
-                this.player.body.center.x, this.player.body.center.y, 150, true, true)
+                this.player.body.center.x, this.player.body.center.y, 150)
             if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
                 const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
                     .map((b) => b.gameObject.id);
@@ -189,7 +189,7 @@ class GameScene extends Phaser.Scene {
                             return entered;
                         })
                     );
-                } else {
+                } else if (rangePlayers.length < GameScene.inRangePlayers.size) {
                     // unwire players
                     this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
@@ -222,13 +222,13 @@ class GameScene extends Phaser.Scene {
         this.player.update();
         this.updateDepth();
 
-        if (!globalVar) {
-            const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-            this.sprite.setPosition(Math.Snap.To(worldPoint.x, 16), Math.Snap.To(worldPoint.y, 16));
-            this.sprite.setDepth(this.sprite.body.y);
-            this.sprite.body.debugBodyColor = 0xadfefe;
-            this.log(this.sprite.body.x, this.sprite.body.y, this.sprite.body.height, this.sprite.width, this.sprite.depth)
-        }
+        // if (!globalVar) {
+        //     const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+        //     this.sprite.setPosition(Math.Snap.To(worldPoint.x, 16), Math.Snap.To(worldPoint.y, 16));
+        //     this.sprite.setDepth(this.sprite.body.y);
+        //     this.sprite.body.debugBodyColor = 0xadfefe;
+        //     this.log(this.sprite.body.x, this.sprite.body.y, this.sprite.body.height, this.sprite.width, this.sprite.depth)
+        // }
 
         // // Convert the mouse position to world position within the camera
         // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
@@ -240,8 +240,6 @@ class GameScene extends Phaser.Scene {
         //         tile.setCollision(true);
         // }
 
-        if (!globalVar)
-            return;
         this.updateRangePlayers();
     }
 }
@@ -281,13 +279,13 @@ class Player extends Phaser.GameObjects.Container {
                 "Me",
                 '',
             ]);
-        // const circle = scene.add.circle(0, 0, 150)
-        //     .setOrigin(0.5)
-        //     .setStrokeStyle(1, 0x1a65ac);
+        const circle = scene.add.circle(0, 0, 150)
+            .setOrigin(0.5)
+            .setStrokeStyle(1, 0x1a65ac);
 
         this.addSprite(sprite)
             .addText(text)
-        // .add(circle);
+            .add(circle);
 
         this.body.setSize(sprite.width * 2, sprite.height)
             .setOffset(-sprite.width / 2 * 2, 0);

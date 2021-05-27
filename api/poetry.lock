@@ -1022,11 +1022,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-<<<<<<< HEAD
-content-hash = "8be251eb279af949ef12de67831462feaa17822b4b67aeeb152218340dc31a8d"
-=======
 content-hash = "6f084a50ff2edda4df80f96a5470540df455f3325d87fb9a33b76978b78b66ce"
->>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 
 [metadata.files]
 aio-pika = [

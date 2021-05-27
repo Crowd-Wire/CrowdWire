@@ -13,17 +13,6 @@ class WorldService {
 
         let url = 'worlds/';
         let query = [];
-<<<<<<< HEAD
-
-        if (search !== "")
-            query.push('search=' + search);
-
-        if (tags.length !== 0)
-            query.push('tags=' + tags.join('&tags='));
-
-        // when joined searchs for the visited worlds
-        query.push('visibility=' + type);
-=======
     
         if(search !== "")
             query.push('search='+search);
@@ -33,7 +22,6 @@ class WorldService {
         
         if(visibility !== null)
             query.push('visibility=' + visibility);
->>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 
         if(banned !== null)
             query.push('banned=' + banned);
@@ -168,24 +156,13 @@ class WorldService {
                 "Authorization": "Bearer " + AuthenticationService.getToken()
             }
         })
-<<<<<<< HEAD
 
     }
-=======
-        
-    }
-
-    join_world(world_id){
->>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 
     joinWorld(world_id) {
 
-<<<<<<< HEAD
         return fetch(API_BASE + 'worlds/' + world_id + '/users', {
-            method: 'GET',
-=======
             method: 'POST',
->>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
             mode: 'cors',
             headers: {
                 "Authorization": "Bearer " + AuthenticationService.getToken()
@@ -193,8 +170,6 @@ class WorldService {
         })
 
     }
-<<<<<<< HEAD
-=======
 
     getAllReports(world, reporter, reviewed, banned, order_by, order, page, limit){
 
@@ -265,7 +240,6 @@ class WorldService {
         })
     }
 
->>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 }
 
 export default new WorldService();
