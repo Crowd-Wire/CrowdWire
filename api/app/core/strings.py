@@ -39,6 +39,7 @@ CHANGE_USER_INFO_FORBIDDEN = "You cannot change this user info."
 K8S_CLUSTER_NOT_FOUND = "No Kubernetes cluster found!"
 NO_EFFECT_REQUEST = "This request has no effect."
 UPDATE_FAIL = "There was an error when updating the data."
+MAX_USERS_IN_WORLD = "Cannot join world. The maximum number of online users has been reached."
 # Success
 USER_REGISTERED_SUCCESS = "User has been registered successfully."
 USER_EDITED_SUCCESS = "User has been edited succesfully"
