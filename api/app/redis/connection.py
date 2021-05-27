@@ -165,6 +165,33 @@ class RedisConnector:
 
         return None
 
+    async def get_world_user_data_dict(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[dict]:
+        """
+        Checks World_User Data if present
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        # TODO: maybe check encoding instead of converting to string
+        user_id = str(user_id)
+        world_id = str(world_id)
+        username = await self.hget(
+            f"world:{world_id}:{user_id}", 'username')
+        avatar = await self.hget(
+            f"world:{world_id}:{user_id}", 'avatar')
+        role = await self.hget(
+            f"world:{world_id}:{user_id}", 'role'
+        )
+
+        if username and avatar and role:
+            role = pickle.loads(role).__dict__
+            return {
+                'username': pickle.loads(username),
+                'avatar': pickle.loads(avatar),
+                'role': {'role_id': role['role_id'], 'name': role['name']},
+            }
+
+        return None
+
     async def assign_role_to_user(self, world_id: int, role: models.Role, user_id: int, is_guest: bool):
 
         # updates the cache for the user and guest
@@ -301,9 +328,12 @@ class RedisConnector:
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
 
+        new_group_merged = False
+
         for mgid in mergeable_groups_id:
 
             if mgid == group_id:
+                new_group_merged = True
                 mem_users_id = all_users_id
             else:
                 actions['close-room'].append({'worldId': world_id, 'roomId': mgid})
@@ -325,6 +355,10 @@ class RedisConnector:
                 if not (await self.user_in_group(world_id, uid, lowest_group_id)):
                     actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
                     await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+
+        if not new_group_merged:
+            logger.info('new group created')
+            logger.info(group_id)
 
         return actions
 
