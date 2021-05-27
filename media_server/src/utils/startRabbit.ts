@@ -169,16 +169,16 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 
 export const startRabbit = async (handler: HandlerMap) => {
 
-  const k8s = require('@kubernetes/client-node');
+  // const k8s = require('@kubernetes/client-node');
 
-  const kc = new k8s.KubeConfig();
-  kc.loadFromDefault();
+  // const kc = new k8s.KubeConfig();
+  // kc.loadFromDefault();
   
-  const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+  // const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
   
-  k8sApi.listNamespacedPod('default').then((res: any) => {
-    console.log(res.body);
-  }).catch((err: any) => {console.log(err);});
+  // k8sApi.listNamespacedPod('default').then((res: any) => {
+  //   console.log(res.body);
+  // }).catch((err: any) => {console.log(err);});
 
   console.log(
     "trying to connect to: ",
