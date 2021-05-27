@@ -78,22 +78,23 @@ class BootScene extends Phaser.Scene {
                 loadingText.destroy();
                 percentText.destroy();
                 assetText.destroy();
-                console.log("FINISHED PRELOAD");
-                this.scene.start('GameScene');
+                console.log(this.registry.get('scene'))
+                this.scene.start(this.registry.get('scene'));
             }, 500);
         }, this);
         
-
-        const mapManager = new MapManager(useWorldUserStore.getState().world_user.world_id);
+        // TODO: maybe change these lines
+        const worldUser = useWorldUserStore.getState().world_user;
+        const worldId = (worldUser && worldUser.world_id) || window.location.pathname.split('/')[2]
+        
+        const mapManager = new MapManager(worldId);
         this.registry.set('mapManager', mapManager);
         
         mapManager.fetchMap().then(() => mapManager.loadMap(this));
 
-        // our two characters???
         this.load.spritesheet('player', `${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
 
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.xml`);
-        console.log("all done")
     }
 }
 

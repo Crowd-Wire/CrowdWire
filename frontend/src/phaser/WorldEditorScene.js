@@ -9,6 +9,7 @@ const sceneConfig = {
 
 
 class WorldEditorScene extends Scene {
+    
     constructor() {
         super(sceneConfig);
     }

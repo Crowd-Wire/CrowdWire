@@ -76,7 +76,7 @@ const GamePage = (props) => {
           <div className={classes.gameWindow}>
             {/* Game */}
             <RoomCall />
-            <Phaser />
+            <Phaser scene='GameScene' />
           </div>
         </div>
       }

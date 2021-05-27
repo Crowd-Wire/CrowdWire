@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import BootScene from './BootScene';
 import GameScene from './GameScene';
-import FillTilesScene from './FillTilesScene';
+import WorldEditorScene from './WorldEditorScene';
 
 const gameConfig = {
   title: 'Sample',
@@ -51,16 +51,16 @@ const gameConfig = {
       fps: 60,
     },
   },
-  scene: [
-    BootScene,
-    GameScene,
-    FillTilesScene
-  ],
   backgroundColor: '#434366',
 };
 
+const scenes = {
+  GameScene, 
+  WorldEditorScene,
+}
 
-export function setupGame() {
-  const game = new Phaser.Game(gameConfig);
+export function setupGame(scene) {
+  const game = new Phaser.Game({...gameConfig, scene: [BootScene, scenes[scene]]});
+  game.registry.set('scene', scene);
   return game;
 }

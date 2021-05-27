@@ -3,11 +3,16 @@ import React from "react";
 import * as Game from "phaser/Game";
 
 class Phaser extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.scene = props.scene;
+  }
   
   componentDidMount() {
     document.oninput = () => {this.disablePhaser()}
     document.onclick = () => {this.enablePhaser()}
-    this.game = Game.setupGame();
+    this.game = Game.setupGame(this.scene);
   }
 
   enablePhaser = () => {

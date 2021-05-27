@@ -45,7 +45,7 @@ const gameWindows = {
   },
   5: {
     tabName: 'Game',
-    tabContent: <Phaser />,
+    tabContent: <Phaser scene="WorldEditorScene" />,
   },
 }
 
