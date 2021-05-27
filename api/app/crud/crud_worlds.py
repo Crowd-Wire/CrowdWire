@@ -49,7 +49,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         await redis_connector.update_online_users(world_id=world.world_id, offset=offset)
         return world, ""
 
-
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         world_obj = db.query(World).filter(
