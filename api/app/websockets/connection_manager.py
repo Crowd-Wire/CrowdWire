@@ -13,8 +13,7 @@ class ConnectionManager:
 
     def __init__(self):
         """
-        Dictionary with the World_id as key and the List of Active Connections as
-        value
+        Dictionary with the user_id as key and the corresponding websocket as value
         """
         self.users_ws: Dict[str, WebSocket] = {}
 

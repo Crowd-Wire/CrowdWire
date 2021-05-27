@@ -18,14 +18,20 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        # self.master = await aioredis.create_connection('redis://localhost/0')
+        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
-        # await self.master.execute('flushall')
+        await self.master.execute('flushall')
+
+        if not (await redis_connector.key_exists('media_server_1')):
+            await redis_connector.hset('media_server_1', 'num_rooms', 6)
+            await redis_connector.hset('media_server_2', 'num_rooms', 5)
+            await redis_connector.hset('media_server_3', 'num_rooms', 2)
+        logger.info((await redis_connector.get_media_server()))
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -97,6 +103,31 @@ class RedisConnector:
     async def srem(self, key: str, member: str, *members):
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
+
+    async def get_media_server(self) -> str:
+        """Get the media server that currently has the less amount of room calls associated"""
+        media_servers = await self.scan_match_all('media_server')
+        least_rooms_media_server = 'media_server_1'
+        min_rooms = await self.hget('media_server_1', 'num_rooms')
+        for media_server in media_servers:
+            num_rooms = await self.hget(media_server, 'num_rooms')
+            if num_rooms < min_rooms:
+                min_rooms = num_rooms
+                least_rooms_media_server = media_server
+        return least_rooms_media_server.decode(), int(min_rooms.decode())
+
+    async def add_room_to_media_server(self, group_id: str):
+        """Associate new room with the media server that has the least rooms"""
+        media_server, num_rooms = await self.get_media_server()
+        await self.hset(media_server, 'num_rooms', num_rooms+1)
+        await self.set('room_' + group_id, media_server)
+
+    async def remove_room(self, group_id: str):
+        """Associate new room with the media server that has the least rooms"""
+        media_server = await self.get('room_' + group_id)
+        num_rooms = await self.hget(media_server, 'num_rooms')
+        await self.hset(media_server, 'num_rooms', num_rooms-1)
+        await self.delete('room_' + group_id)
 
     async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
         """Determine if a given user is a member of a group"""
@@ -327,10 +358,13 @@ class RedisConnector:
                 mergeable_groups_id.add(mgid)
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
+        
+        new_group_created = True
 
         for mgid in mergeable_groups_id:
 
             if mgid == group_id:
+                new_group_created = False
                 mem_users_id = all_users_id
             else:
                 actions['close-room'].append({'worldId': world_id, 'roomId': mgid})
@@ -344,6 +378,11 @@ class RedisConnector:
                 if not (await self.user_in_group(world_id, muid, lowest_group_id)):
                     actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
                     await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
+
+        """Store in redis group associated to a media server"""
+        if new_group_created:
+            logger.info("new group created")
+            await self.add_room_to_media_server(group_id)
 
         """Add users to the normalized group"""
         if not mergeable_groups_id:
