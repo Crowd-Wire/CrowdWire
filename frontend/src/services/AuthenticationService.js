@@ -56,12 +56,24 @@ class AuthenticationService {
     }
 
     joinAsGuest(){
-        return fetch(API_BASE + 'join-guest/', {
+        console.log(API_BASE)
+        return fetch(API_BASE + 'join-guest', {
             method: 'POST',
-            mode: 'cors'
+            mode: 'cors',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
         })
     }
 
+    googleAuth(token){
+        return fetch(API_BASE + 'login/google',{ 
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({token: token})
+        })
+    }
 }
 
 export default new AuthenticationService();

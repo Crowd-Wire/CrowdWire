@@ -27,30 +27,31 @@ spec:
       serviceAccountName: {{ include "mediaserver.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      initContainers:
-      - name: check-rabbitmq-ready
-        image: busybox
-        env:
-          - name: RABBITMQ_SERVICE_NAME
-            value: {{ include "mediaserver.rabbitmqservicename" . }}
-          - name: RABBITMQ_USERNAME
-            valueFrom:
-              secretKeyRef:
-                key: rabbitmq-username
-                name: {{ include "mediaserver.rabbitmqservicename" . }}
-          - name: RABBITMQ_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                key: rabbitmq-password
-                name: {{ include "mediaserver.rabbitmqservicename" . }}
-        command: [ 'sh', '-c',
-            'until wget http://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_SERVICE_NAME):15672/api/aliveness-test/%2F;
-            do echo waiting for rabbitmq; sleep 2; done;' ]
+      #initContainers:
+      #- name: check-rabbitmq-ready
+      #  image: busybox
+      #  env:
+      #    - name: RABBITMQ_SERVICE_NAME
+      #      value: {{ include "mediaserver.rabbitmqservicename" . }}
+      #    - name: RABBITMQ_USERNAME
+      #      valueFrom:
+      #        secretKeyRef:
+      #          key: rabbitmq-username
+      #          name: {{ include "mediaserver.rabbitmqservicename" . }}
+      #    - name: RABBITMQ_PASSWORD
+      #      valueFrom:
+      #        secretKeyRef:
+      #          key: rabbitmq-password
+      #          name: {{ include "mediaserver.rabbitmqservicename" . }}
+      #  command: [ 'sh', '-c',
+      #      'until wget http://$(RABBITMQ_USERNAME):$(RABBITMQ_PASSWORD)@$(RABBITMQ_SERVICE_NAME):15672/api/aliveness-test/%2F;
+      #      do echo waiting for rabbitmq; sleep 2; done;' ]
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          args: [{{ include "mediaserver.rabbitmqservicename" . }}]
           env:
           - name: RABBITMQ_SERVICE_NAME
             value: {{ include "mediaserver.rabbitmqservicename" . }}

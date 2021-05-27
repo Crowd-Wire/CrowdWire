@@ -2,6 +2,11 @@ FROM python:3.8.1-slim
 
 ENV PYTHONUNBUFFERED 1
 
+# install netcat
+RUN apt-get update && \
+    apt-get -y install netcat && \
+    apt-get clean
+
 EXPOSE 8000
 WORKDIR /app
 
@@ -20,6 +25,10 @@ COPY . ./
 #test api
 HEALTHCHECK --interval=21s --timeout=3s --start-period=10s CMD curl --fail http://localhost:8000/ping || exit 1
 
-#run poetry and fastapi server
-#poetry run alembic upgrade head
-CMD poetry run uvicorn --host=0.0.0.0 app.main:app	
+
+# add entrypoint.sh
+COPY ./entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+ENTRYPOINT ["./entrypoint.sh"]
+

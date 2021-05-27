@@ -1,64 +1,85 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { withStyles } from "@material-ui/core";
 
 import GameDrawer from 'components/GameDrawer/GameDrawer';
 import Phaser from "./Sections/Phaser.js";
 
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import FullscreenIcon from '@material-ui/icons/Fullscreen';
-import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
-
 import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 import WorldService from "../../services/WorldService";
+import { toast } from 'react-toastify';
+import logo from '../../assets/crowdwire_white_logo.png';
+import useWorldUserStore from '../../stores/useWorldUserStore';
+import { useNavigate } from "react-router-dom";
+import { getSocket } from "../../services/socket.js";
+
+import RoomCall from "./../../components/Communications/RoomCall";
+
 
 const GamePage = (props) => {
 
   const { classes } = props;
-  const handle = useFullScreenHandle();
-  const [fullScreen, setFullscreen] = useState(false)
+  const [loading, setLoading] = useState(1)
+  const navigation = useNavigate();
 
-  const style = {
-    position: 'absolute',
-    top: 0, 
-    right: 0, 
-    fontSize: '2.5rem',
-    cursor: 'pointer',
-    zIndex: 100
+  const toast_props = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    draggable: true,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+    progress: undefined,
   }
 
-  document.addEventListener('fullscreenchange', (event) => {
-    if (document.fullscreenElement) {
-      // entered full-screen mode
-      setFullscreen(true);
-    } else {
-      setFullscreen(false);
-    }
-  })
+  useEffect(() => {
+    WorldService.join_world(window.location.pathname.split('/')[2])
+    .then((res) => {
+      if (res.ok) return res.json()
+      navigation("/dashboard/search");
+    }).then(
+      (res) => {
+        console.log(res)
+        if (res.detail){
+          toast.dark(
+            <span>
+              <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+              {res.detail}
+            </span>
+          ,toast_props);
+          navigation("/dashboard/search/public");
+        }
+        else {
+          useWorldUserStore.getState().joinWorld(res);
+          setLoading(0);
+        }
+      }
+    ).catch(() => 
+      navigation("/dashboard/search")
+    )
+  }, [])
 
-  const handleFullscreen = () => {
-    if (!fullScreen) {
-      handle.enter()
-    } else {
-      handle.exit()
-    }
-  }
+  useEffect(() => {
+      // close socket on component unmount
+      return () => {
+        if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+      }
+  }, [])
   
   return (
     <>
-      <FullScreen handle={handle}>
+      {loading ? 
+        ''
+      : 
         <div className={classes.wrapper}>
           <GameDrawer />
           <div className={classes.gameWindow}>
             {/* Game */}
+            <RoomCall />
             <Phaser />
           </div>
-          {
-            fullScreen ?
-            <FullscreenExitIcon style={style} onClick={handleFullscreen} />
-            : <FullscreenIcon style={style} onClick={handleFullscreen} />
-          }
         </div>
-      </FullScreen>
+      }
     </>
   );
 }

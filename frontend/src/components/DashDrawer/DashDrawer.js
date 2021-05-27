@@ -75,24 +75,24 @@ export default function DashDrawer(props){
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const addWorld = theme.spacing.unit*2+100;
-  const definitions = theme.spacing.unit*2+50;
+  const addWorld = theme.spacing(2)+100;
+  const definitions = theme.spacing(2)+50;
   
   const handleDrawerOpen = () => {
     setOpen(true);
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(false);
+    if(location.pathname!=="/dashboard/search/public")
+      navigation("/dashboard/search/public");
   }
 
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard/search")
-      navigation("/dashboard/search");
     props.handler(true);
+    if(location.pathname!=="/dashboard/search/joined")
+      navigation("/dashboard/search/joined");
   }
 
   const logout = () => {
@@ -145,17 +145,19 @@ export default function DashDrawer(props){
         </div>
         <Divider />
         <List>
-          <ListItem button key='My Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
+          {st.guest_uuid ? <></> :
+          <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
               [classes.drawerOpen]: open,
               [classes.drawerClose]: !open,})}>
             <ListItemIcon>
               <Explore className={classes.iconDrawer}/>
             </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary='My Worlds' className={classes.toolbar}
+            <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
                   className={clsx(classes.menuButton, {
                       [classes.hide]: !open,
                   })}/>
           </ListItem>
+          }
           <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
           className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
             <ListItemIcon>
@@ -189,7 +191,7 @@ export default function DashDrawer(props){
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Leave" style={{position: "fixed", bottom: theme.spacing.unit * 2}}
+            button key="Leave" style={{position: "fixed", bottom: theme.spacing(2)}}
             onClick={() => logout()}
           >
           <ListItemIcon>

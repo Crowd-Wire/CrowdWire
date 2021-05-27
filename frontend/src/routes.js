@@ -4,6 +4,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 // layouts
 import MainLayout from "./layouts/MainLayout";
+import DrawerLayout from "layouts/DrawerLayout";
+import AdminLayout from "layouts/AdminLayout";
 
 // pages for this product
 import ComponentsPage from "views/ComponentsPage/ComponentsPage.js";
@@ -21,9 +23,12 @@ import AboutUs from "views/AboutUs/AboutUs.js";
 import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
-import DashWorldDetails from "views/DashWorldDetails/DashWorldDetails.js";
-import DashSearch from "views/DashSearch/DashSearch.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
+import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
+import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
+import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
+import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
+import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 
 /**
  * Public and protected routes list 
@@ -34,7 +39,7 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
  * @param       isAuth       a boolean to check if the user is authorized
  */
  
-const routes = (guestUser, registeredUser) => [
+const routes = (token, guest_uuid) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -49,7 +54,7 @@ const routes = (guestUser, registeredUser) => [
 	},
 	{
 		path: "/",
-		element: guestUser || registeredUser ? <Navigate to="/dashboard/search"/> : <Outlet/>,
+		element: token ? <Navigate to="/dashboard/search/public"/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },
@@ -57,35 +62,44 @@ const routes = (guestUser, registeredUser) => [
 	},
 	{
 		path:"/",
-		element:  registeredUser ? <Outlet/> : <Navigate to="/login"/>,
+		element:  token ? <Outlet/> : <Navigate to="/login"/>,
 		children: [
-			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/create-world", element: <CreateWorld/> },
 			{ path: "/join", element: <InviteJoinPage/>},
 		],
 	},
 	{ 
 		path: "/dashboard", 
-		element: registeredUser || guestUser  ? <Outlet/> : <Navigate to="/login"/>,
+		element: token  ? <DrawerLayout/> : <Navigate to="/login"/>,
 		children: [
-			{path: "/:id", element: <DashWorldDetails/>},
-			{path:"/search", element: <DashSearch/>}
+			{path: "/:id", element: <DashboardContent/>},
+			{path:"/search/:type", element: <SearchAllMaps/>}		
 		]
 	},
     {
 		path: "/user",
-		element: registeredUser || guestUser ? <Outlet /> : <Navigate to="/login" />,
+		element: token ? <Outlet /> : <Navigate to="/login" />,
 		children: [
-            { path: "/profile", element: registeredUser ? <ProfilePage /> : <Navigate to="/login"/> },
+            { path: "/profile", element: !guest_uuid ? <ProfilePage /> : <Navigate to="/login"/> },
             { path: "/settings", element: <UserSettings /> },
 		],
 	},
     {
 		path: "/world",
-		element: registeredUser || registeredUser  ? <Outlet /> : <Navigate to="/login" />,
+		element: token ? <Outlet /> : <Navigate to="/login" />,
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
             { path: "/:id/editor", element: <MapEditor /> },
+		],
+	},
+	{
+		path: "/admin",
+		element: token ? <AdminLayout /> : <Navigate to="/login" />,
+		children: [
+            { path: "/worlds/reports", element: <AdminWorldReports /> },
+			      { path: "/worlds", element: <AdminWorlds />},
+			      { path: "/statistics", element: <AdminStatistics/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

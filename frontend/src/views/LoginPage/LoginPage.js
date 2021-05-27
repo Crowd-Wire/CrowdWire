@@ -26,6 +26,7 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
+import GoogleLogin from 'react-google-login';
 
 class LoginPage extends React.Component {
 
@@ -92,15 +93,42 @@ class LoginPage extends React.Component {
     )    
   }
 
+  _handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      this.handleSubmit()
+    }
+  }
+
   handleGuestJoin = () => {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
+        console.log(res)
         if(res.access_token!==undefined){
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
         }
       })
+
+  }
+
+  handleGoogle = (response) => {
+    console.log(response.tokenId);
+    AuthenticationService.googleAuth(response.tokenId)
+    .then((res) => {
+      if(res.ok)
+        return res.json();
+    }).then((res)=>{
+      if(res.access_token!==undefined){
+        this.notify("Auth");
+        AuthenticationService.setToken(res, "AUTH");
+      }
+    })
+  }
+
+  handleGoogleFail = (response) =>{
+    console.log("fail")
+    // TODO: handle this case
 
   }
 
@@ -118,21 +146,17 @@ class LoginPage extends React.Component {
         >
           <div className={this.props.classes.container}>
             <GridContainer justify="center">
-              <GridItem xs={12} sm={12} md={4}>
+              <GridItem xs={12} sm={12} md={5}>
                 <Card className={this.props.classes[this.state.cardAnimaton]}>
                   <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                       <h4>Login</h4>
                       <div className={this.props.classes.socialLine}>
-                        <Button
-                          justIcon
-                          target="_blank"
-                          color="transparent"
-                          style={{ border: "1px solid #476385" }}
-                          onClick={e => e.preventDefault()}
-                        >
-                          <i className={"fab fa-google"} />
-                        </Button>
+                        <GoogleLogin
+                          clientId="251817047000-upjua2t776rni76i52grnpmbi2ju1i2c.apps.googleusercontent.com"
+                          onSuccess={this.handleGoogle}
+                          onFailure={this.handleGoogleFail}
+                        />                        
                       </div>
                     </CardHeader>
                     <p className={this.props.classes.divider}>Or Be Classical</p>
@@ -150,6 +174,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "email",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -166,6 +191,7 @@ class LoginPage extends React.Component {
                           fullWidth: true
                         }}
                         inputProps={{
+                          onKeyDown: this._handleKeyDown,
                           type: "password",
                           endAdornment: (
                             <InputAdornment position="end">
@@ -181,7 +207,7 @@ class LoginPage extends React.Component {
                     <CardFooter className={this.props.classes.cardFooter}>
                       <Col>
                         <Row>
-                          <Button 
+                          <Button
                             onClick={this.handleSubmit} 
                             style={{ 
                               backgroundColor: "#5BC0BE", marginLeft: "auto", 
@@ -194,14 +220,23 @@ class LoginPage extends React.Component {
                         </Row>
                         <br />
                         <Row>
-                          <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
-                            <Button onClick={() => {}}  simple color="primary" size="md">
-                              Register
-                            </Button>
-                          </Link>
-                          <span>OR</span> 
-                          {/* Change this pls */}
-                          <Button onClick={this.handleGuestJoin} size="md" simple color="primary"> Join as Guest</Button>
+                          <span style={{marginLeft:"auto", marginRight:"auto"}}>OR</span> 
+                        </Row>
+                        <Row style={{marginLeft: "auto", marginRight: "auto"}}>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Link to="/register" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                <Button onClick={() => {}}  simple color="primary" size="sm" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                                  Register
+                                </Button>
+                              </Link>
+                            </Row>
+                          </Col>
+                          <Col sm={6} md={6} lg={6}>
+                            <Row>
+                              <Button onClick={this.handleGuestJoin} style={{ marginLeft: "auto", marginRight: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
+                            </Row>
+                          </Col>
                         </Row>
                       </Col>
                     </CardFooter>

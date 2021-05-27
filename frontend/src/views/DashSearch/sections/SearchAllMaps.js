@@ -10,6 +10,22 @@ import Pagination from '@material-ui/lab/Pagination';
 import Typography from '@material-ui/core/Typography';
 import useAuthStore from "stores/useAuthStore";
 
+import { useParams } from "react-router-dom";
+
+export const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const params = useParams();
+    
+    return (
+      <Component
+	  	params={params}
+        {...props}
+        />
+    );
+  };
+  
+  return Wrapper;
+};
 
 const useStyles = theme => ({
 	root: {
@@ -44,25 +60,23 @@ class SearchAllMaps extends Component {
 
 	constructor(props){
 		super(props)
-	}
-	state = {
-		maps: [],
-		search: "",
-		tags: [],
-		page: 1
+		this.type = props.params.type;
+		this.joined = this.props.joined;
+		this.state = {
+			maps: [],
+			search: "",
+			tags: [],
+			page: 1
+		}
 	}
 
 	focusMap(id){
 		this.props.handler(id);
-		
 	}
 
-	joined = this.props.joined;
-
-
 	search_handler = () => {
-		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
-			.then((res) => { console.log(res);console.log(res.json());return res.json() })
+		WorldService.search(this.state.search, this.state.tags, this.type, null, null, null, null, null, null, this.state.page, 10)
+			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
 			.catch((err) => { useAuthStore.getState().leave() });
 	}
@@ -81,7 +95,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
-		WorldService.search("", [], this.props.joined, 1)
+		WorldService.search("", [], this.type,  null, null, null, null, null, null, 1, 10)
 			.then((res) => {
 				if(res.status == 200) 
 					return res.json()
@@ -92,10 +106,11 @@ class SearchAllMaps extends Component {
 			}).catch((error) => {useAuthStore.getState().leave()});
 	}
 	async componentDidUpdate(){
-		if(this.joined!=this.props.joined){
-			this.joined = this.props.joined;
+		// TODO: there might be a bug here because of the page variable when calling the service
+		if(this.type!=this.props.params.type){
+			this.type = this.props.params.type;
 			await this.setState({prevSearch: "", prevTags: []});
-			WorldService.search("", [], this.props.joined, this.state.page)
+			WorldService.search("", [], this.type, null, null, null, null, null, null, this.state.page, 10)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()
@@ -118,7 +133,7 @@ class SearchAllMaps extends Component {
 					<Row>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
 						this.state.maps.map((m, i) => {
-							return (<MapCard focusMap={this.focusMap} map={m} />)
+							return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
 						})
 						:
 						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
@@ -138,4 +153,4 @@ class SearchAllMaps extends Component {
 
 	}
 }
-export default withStyles(useStyles)(SearchAllMaps);
+export default withRouter(withStyles(useStyles)(SearchAllMaps));

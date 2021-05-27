@@ -47,7 +47,13 @@ export const sendMedia = async (roomId:string = null) => {
             track: media,
             appData: { mediaTag: "media" },
           })
-          .then((producer) => {set({mediaProducer: producer})})
+          .then((producer) => {
+            set({mediaProducer: producer});
+            producer.on("transportclose", () => {
+              producer.close();
+              set({media: null, mediaStream: null, mediaProducer: null});
+            })
+          })
           .catch((err) => console.log(err))
         }
       });

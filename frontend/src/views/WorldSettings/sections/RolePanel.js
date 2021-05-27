@@ -8,7 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 import RoleUserList from 'components/RoleUserList/RoleUserList.js';
 
 export default function RolePanel(props){
-	const { children, users, roles,value, index, setUsers , ...other } = props;
+	const { children, users, roles, value, index, setUsers , ...other } = props;
 	let rolekeys = [];
 
 	Object.keys(roles).forEach(function(key, index) {

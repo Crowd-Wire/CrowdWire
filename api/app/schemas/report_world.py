@@ -12,8 +12,12 @@ class ReportWorldBase(BaseModel):
 
 # does not need the id of the reporter because it is necessary a token
 class ReportWorldCreate(ReportWorldBase):
-    reported: int
     comment: str
+
+
+class ReportWorldUpdate(BaseModel):
+    reporter: int
+    reviewed: bool
 
 
 class ReportWorldInDB(ReportWorldBase):
@@ -21,6 +25,7 @@ class ReportWorldInDB(ReportWorldBase):
     reporter: int
     timestamp: datetime
     comment: str
+    reviewed: bool
 
     class Config:
         orm_mode = True
@@ -29,3 +34,4 @@ class ReportWorldInDB(ReportWorldBase):
 class ReportWorldInDBWithEmail(ReportWorldInDB):
     reporter_email: str
     world_name: str
+    banned: int
