@@ -18,20 +18,17 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        self.master = await aioredis.create_connection('redis://localhost/0')
+        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
-        await self.master.execute('flushall')
+        # await self.master.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
-            await redis_connector.hset('media_server_1', 'num_rooms', 6)
-            await redis_connector.hset('media_server_2', 'num_rooms', 5)
-            await redis_connector.hset('media_server_3', 'num_rooms', 2)
-        logger.info((await redis_connector.get_media_server()))
+            await redis_connector.hset('media_server_1', 'num_rooms', 0)
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -125,9 +122,11 @@ class RedisConnector:
     async def remove_room(self, group_id: str):
         """Associate new room with the media server that has the least rooms"""
         media_server = await self.get('room_' + group_id)
-        num_rooms = await self.hget(media_server, 'num_rooms')
-        await self.hset(media_server, 'num_rooms', num_rooms-1)
-        await self.delete('room_' + group_id)
+        if media_server:
+            media_server = media_server.decode()
+            num_rooms = int((await self.hget(media_server, 'num_rooms')).decode())
+            await self.hset(media_server, 'num_rooms', num_rooms-1)
+            await self.delete('room_' + group_id)
 
     async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
         """Determine if a given user is a member of a group"""
@@ -381,7 +380,6 @@ class RedisConnector:
 
         """Store in redis group associated to a media server"""
         if new_group_created:
-            logger.info("new group created")
             await self.add_room_to_media_server(group_id)
 
         """Add users to the normalized group"""

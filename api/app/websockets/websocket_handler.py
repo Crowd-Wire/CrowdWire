@@ -285,6 +285,7 @@ async def handle_actions(actions: dict):
     if 'close-room' in actions:
         close_rooms = actions['close-room']
         for close_action in close_rooms:
+            await redis_connector.remove_room(close_action['roomId'])
             await destroy_room(close_action['worldId'], close_action['roomId'])
     if 'rem-user-from-groups' in actions:
         rem_action = actions['rem-user-from-groups']
