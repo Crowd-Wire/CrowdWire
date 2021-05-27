@@ -77,10 +77,19 @@ class RabbitHandler:
         logger.warning("No Pool defined, cannot get a channel")
 
     async def publish(self, message: str) -> None:
+        queue_to_send = self.queue_to_send
+
+        # queues_to_send = set()
+        # if 'roomId' in message['d']:
+        #     queue_to_send = await redis_connector.get('room_' + message['d']['roomId'])
+        # elif 'roomIds' in message['d']:
+        #     for room in message['d']['roomIds']:
+        #         queues_to_send.add( await redis_connector.get('room_' + room))
+
         async with self.channel_pool.acquire() as channel:  # type: Channel
             await channel.default_exchange.publish(
                 Message(message.encode()),
-                self.queue_to_send,
+                queue_to_send,
             )
             logger.info("Published message to Channel %r" % channel)
 
