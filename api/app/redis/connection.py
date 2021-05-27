@@ -116,7 +116,7 @@ class RedisConnector:
     async def add_room_to_media_server(self, group_id: str):
         """Associate new room with the media server that has the least rooms"""
         media_server, num_rooms = await self.get_media_server()
-        await self.hset(media_server, 'num_rooms', num_rooms+1)
+        await self.hset(media_server, 'num_rooms', num_rooms + 1)
         await self.set('room_' + group_id, media_server)
 
     async def remove_room(self, group_id: str):
@@ -125,7 +125,7 @@ class RedisConnector:
         if media_server:
             media_server = media_server.decode()
             num_rooms = int((await self.hget(media_server, 'num_rooms')).decode())
-            await self.hset(media_server, 'num_rooms', num_rooms-1)
+            await self.hset(media_server, 'num_rooms', num_rooms - 1)
             await self.delete('room_' + group_id)
 
     async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
@@ -383,7 +383,7 @@ class RedisConnector:
                 mergeable_groups_id.add(mgid)
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
-        
+
         new_group_created = True
 
         for mgid in mergeable_groups_id:
