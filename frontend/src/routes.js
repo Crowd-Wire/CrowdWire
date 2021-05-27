@@ -62,10 +62,10 @@ const routes = (token, guest_uuid) => [
 	},
 	{
 		path:"/",
-		element:  token ? <Outlet/> : <Navigate to="/login"/>,
+		element:  token ? <Outlet /> : <Navigate to="/login"/>,
 		children: [
-			{ path: "/create-world", element: <CreateWorld/> },
-			{ path: "/join", element: <InviteJoinPage/>},
+			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage />},
 		],
 	},
 	{ 
@@ -98,8 +98,8 @@ const routes = (token, guest_uuid) => [
 		element: token ? <AdminLayout /> : <Navigate to="/login" />,
 		children: [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
-			      { path: "/worlds", element: <AdminWorlds />},
-			      { path: "/statistics", element: <AdminStatistics/>}
+			{ path: "/worlds", element: <AdminWorlds />},
+			{ path: "/statistics", element: <AdminStatistics/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

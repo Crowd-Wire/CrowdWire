@@ -66,3 +66,4 @@ class RabbitProtocol:
     NEW_PEER_DATA_PRODUCER = 'new-peer-data-producer'
     CLOSE_CONSUMER = 'close_consumer'
     ERROR = 'error'
+    CREATE_NEW_REPLICA = 'CREATE_NEW_REPLICA'
