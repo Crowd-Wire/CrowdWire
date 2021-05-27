@@ -26,6 +26,7 @@ class RedisConnector:
         # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
         # await self.master.execute('flushall')
+        # await self.add_users_to_world('2', '20')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
