@@ -2,7 +2,7 @@ from typing import Dict, Any
 
 from fastapi import WebSocket
 from loguru import logger
-
+import json
 from app.core.consts import WebsocketProtocol as protocol
 from app.redis.connection import redis_connector
 
@@ -77,8 +77,8 @@ class ConnectionManager:
         if send_to_replicas:
             # when a message is sent to a user in another replica
             payload = {'users': [user_id], 'message': message}
-            rabbit_handler.publish_replica(json.dumps(payload))
-
+            await rabbit_handler.publish_replica(json.dumps(payload))
+            return True
         logger.error(f"Unrecognized User {user_id}")
         return False
 
@@ -94,7 +94,7 @@ class ConnectionManager:
             if users_not_found:
                 # sends a list of users to the other replicas
                 payload = {'users': users_not_found, 'message': payload}
-                rabbit_handler.publish_replica(json.dumps(payload))
+                await rabbit_handler.publish_replica(json.dumps(payload))
         except KeyError:
             logger.error(f"Error when trying to broadcast to World {world_id}")
 
@@ -108,12 +108,12 @@ class ConnectionManager:
                 for user_id in user_ids:
                     if user_id != sender_id:
                         if not(await self.send_personal_message(payload, user_id, False)):
-                            users_not_found.append(uid)
+                            users_not_found.append(user_id)
 
             if users_not_found:
                 # sends a list of users to the other replicas
                 payload = {'users': users_not_found, 'message': payload}
-                rabbit_handler.publish_replica(json.dumps(payload))
+                await rabbit_handler.publish_replica(json.dumps(payload))
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast to World {world_id}, to User Rooms {sender_id}"
@@ -127,11 +127,11 @@ class ConnectionManager:
             for user_id in user_ids:
                 if (await redis_connector.can_manage_conferences(world_id=world_id, user_id=user_id)):
                     if not(await self.send_personal_message(payload, user_id, False)):
-                        users_not_found.append(uid)
+                        users_not_found.append(user_id)
             if users_not_found:
                 # sends a list of users to the other replicas
                 payload = {'users': users_not_found, 'message': payload}
-                rabbit_handler.publish_replica(json.dumps(payload))
+                await rabbit_handler.publish_replica(json.dumps(payload))
         except KeyError:
             logger.error(
                 f"Error when trying to broadcast conference managers of World {world_id}"

@@ -43,14 +43,18 @@ async def on_message(message: IncomingMessage) -> None:
         else:
             logger.error(f"Unknown topic \"{topic}\"")
 
+
 async def on_replica_message(message: IncomingMessage) -> None:
     async with message.process():
         msg = message.body.decode()
         msg = json.loads(msg)
         users = msg['users']
         logger.debug(users)
+        logger.debug("dentro da cena das replicas")
         for user_id in users:
+            logger.debug("user")
             await manager.send_personal_message(msg, user_id, False)
+
 
 class RabbitHandler:
     def __init__(self):
@@ -108,5 +112,6 @@ class RabbitHandler:
                 self.replicas_queue, durable=True
             )
             await queue.consume(on_replica_message)
+
 
 rabbit_handler = RabbitHandler()
