@@ -49,11 +49,11 @@ async def on_replica_message(message: IncomingMessage) -> None:
         msg = message.body.decode()
         msg = json.loads(msg)
         users = msg['users']
-        logger.debug(users)
-        logger.debug("dentro da cena das replicas")
+        logger.info(users)
+        logger.info(msg)
+        logger.info("dentro da cena das replicas")
         for user_id in users:
-            logger.debug("user")
-            await manager.send_personal_message(msg, user_id, False)
+            await manager.send_personal_message(msg['message'], user_id, False)
 
 
 class RabbitHandler:

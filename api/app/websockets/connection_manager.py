@@ -32,7 +32,7 @@ class ConnectionManager:
 
         # store user's corresponding websockets
         self.users_ws[user_id] = websocket
-
+        logger.info(self.users_ws)
         # send players snapshot
         players_snapshot = {}
         # send players information like username, avatars..
@@ -127,8 +127,8 @@ class ConnectionManager:
             users_not_found = []
             user_ids = await redis_connector.get_group_users(world_id, conference)
             for user_id in user_ids:
-                if (await redis_connector.can_manage_conferences(world_id=world_id, user_id=user_id)):
-                    if not(await self.send_personal_message(payload, user_id, False)):
+                if await redis_connector.can_manage_conferences(world_id=world_id, user_id=user_id):
+                    if not (await self.send_personal_message(payload, user_id, False)):
                         users_not_found.append(user_id)
             if users_not_found:
                 # sends a list of users to the other replicas

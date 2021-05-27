@@ -26,7 +26,7 @@ class RedisConnector:
         # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
         # await self.master.execute('flushall')
-        # await self.add_users_to_world('2', '20')
+        await self.add_users_to_world('1', '20')
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -118,10 +118,10 @@ class RedisConnector:
         """
         key = f"world:{world_id}:onlineusers"
         value = await self.get(key)
-        value = value.decode()
-        if not value or type(value) != str or not value.isdecimal():
-            value = 0
-        return int(value)
+
+        if not value or not value.decode().isdecimal():
+            return 0
+        return int(value.decode())
 
     async def update_online_users(self, world_id: int, offset: int) -> int:
         """
