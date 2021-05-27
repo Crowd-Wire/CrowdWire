@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.websockets.connection_manager import manager
 import json
 from app.core.consts import RabbitProtocol as protocol
+from app.redis.connection import redis_connector
 
 
 # Message Receiving format
@@ -29,6 +30,7 @@ async def on_message(message: IncomingMessage) -> None:
             user_id = msg['d']['peerId']
 
             await manager.send_personal_message(msg, user_id)
+
         elif topic == protocol.NEW_PEER_PRODUCER\
                 or topic == protocol.NEW_PEER_DATA_PRODUCER:
             # uid identifies to whom the message is suppost to be sent to
@@ -36,6 +38,13 @@ async def on_message(message: IncomingMessage) -> None:
             user_id = msg['uid']
 
             await manager.send_personal_message(msg, user_id)
+
+        elif topic == protocol.CREATE_NEW_REPLICA:
+            # TODO:
+            # handle concurrency here with other api replicas
+            # to avoid each one of them creating a media server
+            redis_connector.add_media_server()
+
         elif topic == protocol.CLOSE_CONSUMER:
             logger.info(msg)
         elif topic == protocol.ERROR:

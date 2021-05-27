@@ -47,13 +47,16 @@ async function main() {
     return w;
   };
 
-  const createRoom = () => {
+  const createRoom = (send: any) => {
     const { worker, router } = getNextWorker();
     num_rooms += 1;
     console.log(num_rooms * scalability_config.max_consumers_per_worker)
     console.log(scalability_config.max_consumers * 0.5)
     if (num_rooms * scalability_config.max_consumers_per_worker >= scalability_config.max_consumers * 0.5)
       console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
+      send({
+        'topic': 'CREATE_NEW_REPLICA'
+       });
     return { worker, router, state: {} };
   };
 
@@ -442,7 +445,7 @@ async function main() {
     },
     ["create-room"]: async ({ roomId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
       send({ topic: "room-created", d: { roomId }, uid });
     },
@@ -470,7 +473,7 @@ async function main() {
     },
     ["join-as-speaker"]: async ({ roomId, peerId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
 
       console.log("join-as-new-speaker", peerId);
@@ -507,7 +510,7 @@ async function main() {
     },
     ["join-as-new-peer"]: async ({ roomId, peerId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
       
       console.log("join-as-new-peer", peerId);

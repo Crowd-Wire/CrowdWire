@@ -101,17 +101,27 @@ class RedisConnector:
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
 
+    async def add_media_server(self):
+        media_servers = await self.scan_match_all('media_server_')
+        num_servers = str(len(media_servers) + 1)
+        logger.info(num_servers)
+        new_media_server = 'media_server_' + num_servers
+        logger.info(new_media_server)
+        if not (await redis_connector.key_exists(new_media_server)):
+            await redis_connector.hset(new_media_server, 'num_rooms', 0)
+
     async def get_media_server(self) -> str:
         """Get the media server that currently has the less amount of room calls associated"""
-        media_servers = await self.scan_match_all('media_server')
+        media_servers = await self.scan_match_all('media_server_')
         least_rooms_media_server = 'media_server_1'
         min_rooms = await self.hget('media_server_1', 'num_rooms')
         for media_server in media_servers:
+            media_server = media_server.decode()
             num_rooms = await self.hget(media_server, 'num_rooms')
             if num_rooms < min_rooms:
                 min_rooms = num_rooms
                 least_rooms_media_server = media_server
-        return least_rooms_media_server.decode(), int(min_rooms.decode())
+        return least_rooms_media_server, int(min_rooms.decode())
 
     async def add_room_to_media_server(self, group_id: str):
         """Associate new room with the media server that has the least rooms"""

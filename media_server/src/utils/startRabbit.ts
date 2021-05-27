@@ -13,6 +13,7 @@ import { TransportOptions } from "./createTransport";
 import { Consumer } from "./createConsumer";
 import { DataConsumer } from "./createDataConsumer";
 
+
 const retryInterval = 5000;
 export interface HandlerDataMap {
   "remove-speaker": { roomId: string; peerId: string };
@@ -167,6 +168,18 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 ) => {};
 
 export const startRabbit = async (handler: HandlerMap) => {
+
+  const k8s = require('@kubernetes/client-node');
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  
+  const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+  
+  k8sApi.listNamespacedPod('default').then((res: any) => {
+    console.log(res.body);
+  }).catch((err: any) => {console.log(err);});
+
   console.log(
     "trying to connect to: ",
     process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672"
