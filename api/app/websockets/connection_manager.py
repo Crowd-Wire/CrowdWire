@@ -64,6 +64,8 @@ class ConnectionManager:
                 {'topic': protocol.LEAVE_PLAYER, 'user_id': user_id},
                 user_id
             )
+            # decrease number of online users
+            await redis_connector.update_online_users(world_id=world_id, offset=-1)
         else:
             logger.error(
                 f"Unrecognized User {user_id}"

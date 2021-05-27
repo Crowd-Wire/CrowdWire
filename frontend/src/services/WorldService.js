@@ -3,11 +3,11 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, type = "all", page) {
+    search(search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) {
         /*
             search: string,
             tags: List[string]
-            type: boolean
+            visibility: boolean
             page: int
         */
 
@@ -20,11 +20,30 @@ class WorldService {
         if(tags.length !== 0)
             query.push('tags='+tags.join('&tags='));
         
-        // when joined searchs for the visited worlds
-        query.push('visibility=' + type);
+        if(visibility !== null)
+            query.push('visibility=' + visibility);
 
-        // pagination
+        if(banned !== null)
+            query.push('banned=' + banned);
+
+        if(deleted !== null)
+            query.push('deleted=' + deleted);
+
+        if(normal !== null)
+            query.push('normal=' + normal);
+
+        if(creator !== null)
+            query.push('creator=' + creator);
+
+        if(order_by !== null)
+            query.push('order_by=' + order_by); 
+        
+        if(order !== null)
+            query.push('order=' + order);
+   
         query.push('page=' + page);
+        query.push('limit=' + limit);
+
 
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
@@ -125,28 +144,28 @@ class WorldService {
         let url = 'worlds/reports/';
         let query = [];
     
-        if(world !== undefined && world !== '')
+        if(world !== null && world !== '')
             query.push('world=' + world);
 
-        if(reporter !== undefined && reporter !== '')
+        if(reporter !== null && reporter !== '')
             query.push('reporter=' + reporter);
 
-        if(reviewed !== undefined)
+        if(reviewed !== null)
             query.push("reviewed=" + reviewed);
         
-        if(banned !== undefined)
+        if(banned !== null)
             query.push("banned=" + banned);
         
-        if(order_by !== undefined)
+        if(order_by !== null)
             query.push("order_by=" + order_by);
         
-        if(order !== undefined)
+        if(order !== null)
             query.push("order=" + order);
         
-        if(page !== undefined)
+        if(page !== null)
             query.push("page=" + page);
 
-        if(limit !== undefined)
+        if(limit !== null)
             query.push("limit=" + limit);
 
         console.log(query);
