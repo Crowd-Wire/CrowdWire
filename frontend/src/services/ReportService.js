@@ -10,7 +10,7 @@ class ReportService{
             headers: {
                 "Authorization" : "Bearer "+ AuthenticationService.getToken()
             },
-            body: JSON.stringify({reported: world_id, comment: comment})
+            body: JSON.stringify({comment: comment})
         })
     }
 }
