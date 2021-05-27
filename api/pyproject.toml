@@ -51,6 +51,8 @@ uuid = "^1.30"
 bcrypt = "^3.2.0"
 coverage = "^5.5"
 aiofiles = "^0.7.0"
+kubernetes = "^17.17.0"
+google-api-python-client = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 

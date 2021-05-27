@@ -8,6 +8,7 @@ from app.core.strings import WORLD_NOT_FOUND
 from app.models import Tag, User, World_User
 from app.core import strings
 from app.schemas import GuestUser
+from datetime import datetime
 
 client = TestClient(app)
 
@@ -18,6 +19,10 @@ async def override_dependency_user(token: str = None):
 
 async def override_dependency_guest():
     return GuestUser(user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6")
+
+
+async def override_dependency_super_user():
+    return User(is_superuser=True)
 
 
 async def override_get_db():
@@ -105,7 +110,7 @@ class TestWorlds(TestCase):
             assert response.json()['detail'] == WORLD_NOT_FOUND
             assert mock_get.call_count == 1
 
-    def test_search_public_worlds_user(self):
+    def test_search_worlds_user(self):
         """
         Expects 200 Ok when user searches public worlds.
         """
@@ -114,7 +119,7 @@ class TestWorlds(TestCase):
 
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
                 '/worlds'
@@ -124,53 +129,26 @@ class TestWorlds(TestCase):
             assert len(response.json()) == 2
             assert mock_get.call_count == 1
 
-    def test_search_owned_worlds_user(self):
+    def test_search_worlds_superuser(self):
         """
-        Expects 200 Ok when user searches for owned worlds.
+        Expects 200 Ok when user searches public worlds.
         """
-        app.dependency_overrides[get_current_user] = override_dependency_user
+        app.dependency_overrides[get_current_user] = override_dependency_super_user
         with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
+
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
-                '/worlds?visibility=owned'
+                '/worlds'
             )
 
             assert response.status_code == 200
             assert len(response.json()) == 2
             assert mock_get.call_count == 1
 
-    def test_search_joined_worlds_user(self):
-        """
-        Expects 200 Ok when user searchs for joined worlds.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-            world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
-            world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds?visibility=joined'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert mock_get.call_count == 1
-
-    def test_search_invalid_worlds_visibility_user(self):
-        """
-        Expects 400 Bad Request when user provides wrong visibility parameter.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        response = client.get(
-            '/worlds?visibility=wrong'
-        )
-        assert response.status_code == 400
-
-    def test_search_public_worlds_guest(self):
+    def test_search_worlds_guest(self):
         """
         Expects 200 Ok when a guest searches public worlds.
         """
@@ -178,82 +156,13 @@ class TestWorlds(TestCase):
         with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
             world1 = models.World(world_id=1, world_map=bytes(), creator=1, max_users=1)
             world2 = models.World(world_id=2, world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
+            mock_get.return_value = [world1, world2], ""
 
             response = client.get(
                 '/worlds'
             )
             assert response.status_code == 200
             assert len(response.json()) == 2
-            assert mock_get.call_count == 1
-
-    def test_search_invalid_worlds_visibility_guest(self):
-        """
-        Expects 400 Bad Request when a guest provides invalid visibility parameter.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-        response = client.get(
-            '/worlds?visibility=wrong'
-        )
-        assert response.status_code == 400
-
-    def test_search_worlds_by_name_or_description(self):
-        """
-        Expects 200 Ok when user tries to search world by name or description.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_user
-
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-            world1 = models.World(world_id=1, name="test", world_map=bytes(), creator=1, max_users=1)
-            world2 = models.World(world_id=2, name="", description="test", world_map=bytes(), creator=1, max_users=1)
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds/?search=test'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert "test" in response.json()[0]['name'] or "test" in response.json()[0]["description"]
-            assert "test" in response.json()[1]['name'] or "test" in response.json()[1]["description"]
-            assert mock_get.call_count == 1
-
-    def test_search_worlds_by_tags(self):
-        """
-        Expects 200 Ok when guest tries to search world by tags.
-        """
-        app.dependency_overrides[get_current_user] = override_dependency_guest
-
-        with patch("app.crud.crud_worlds.CRUDWorld.filter") as mock_get:
-
-            world1 = models.World(
-                world_id=1,
-                name="test",
-                world_map=bytes(),
-                creator=1,
-                max_users=1,
-                tags=[Tag(name="string")]
-            )
-
-            world2 = models.World(
-                world_id=2,
-                name="",
-                description="test",
-                world_map=bytes(),
-                creator=1,
-                max_users=1,
-                tags=[Tag(name="test")]
-            )
-            mock_get.return_value = [world1, world2]
-
-            response = client.get(
-                '/worlds/?tags=test&tags=string'
-            )
-
-            assert response.status_code == 200
-            assert len(response.json()) == 2
-            assert any([tag['name'] == "string" or tag['name'] == "test" for tag in response.json()[0]['tags']])
-            assert any([tag['name'] == "string" or tag['name'] == "test" for tag in response.json()[1]['tags']])
             assert mock_get.call_count == 1
 
     def test_create_world_correct_data_user(self):
@@ -386,46 +295,70 @@ class TestWorlds(TestCase):
             assert response.status_code == 400
             assert mock_delete.call_count == 1
 
-    def test_update_world_user_info_not_joined_user(self):
+    def test_update_world_user_info_change_others_guest(self):
         """
-        Expects 400 Bad Request when user tries to update its info in a not joined world.
+        Expects 400 Bad Request when guest tries to change another user info.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+
+        response = client.put(
+            "/worlds/1/users/1",
+            json={}
+        )
+        assert response.status_code == 400
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_update_world_user_info_cannot_report_guest(self):
+        """
+        Expects 400 Bad Request when someone tries to report a guest.
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
-            mock_get.return_value = None
 
-            response = client.put(
-                "/worlds/1/users",
-                json={}
-            )
-            assert response.status_code == 400
-            assert mock_get.call_count == 1
+        response = client.put(
+            "/worlds/1/users/ccca8d8c-ee65-433e-af45-d5d9ded235a6",
+            json={'status': 1}
+        )
 
-    def test_update_world_user_info_joined_user(self):
+        assert response.status_code == 400
+        assert response.json()['detail'] == strings.USER_IS_NOT_BANNABLE
+
+    def test_update_world_user_info_only_guests_can_update(self):
         """
-        Expects 200 Ok when a user tries to update its info in a joined world.
+        Expects 400 Bad Request when someone that is not the guest itself tries to update its info.
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_world_users.CRUDWorld_User.get_user_joined") as mock_get:
-            with patch("app.crud.crud_world_users.CRUDWorld_User.update") as mock_update:
-                mock_get.return_value = World_User(role_id=1, avatar="avatar_1", username="name")
-                mock_update.return_value = World_User(
-                    role_id=1, avatar="avatar_1", username="new_username", world_id=1
+
+        response = client.put(
+            "/worlds/1/users/ccca8d8c-ee65-433e-af45-d5d9ded235a6",
+            json={}
+        )
+
+        assert response.status_code == 400
+        assert response.json()['detail'] == strings.CHANGE_USER_INFO_FORBIDDEN
+
+    def test_update_world_user_info_update_success_guest(self):
+        """
+        Expects 200 Ok when a guest tries to update its own profile.
+        """
+
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
+            with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_put:
+                role = models.Role(role_id=1, world_id=1)
+
+                mock_get.return_value = schemas.World_UserWithRoleInDB(
+                    role_id=1, avatar='avatar_1', username='name', role=role, world_id=1
                 )
 
                 response = client.put(
-                    "/worlds/1/users",
-                    json={
-                        'username': 'new_username'
-                    }
+                    "/worlds/1/users/ccca8d8c-ee65-433e-af45-d5d9ded235a6",
+                    json={'username': 'new_name'}
                 )
-
                 assert response.status_code == 200
-                assert response.json()['username'] == "new_username"
+                assert response.json()['username'] == 'new_name'
                 assert response.json()['avatar'] == 'avatar_1'
-                assert response.json()['world_id'] == 1
                 assert mock_get.call_count == 1
-                assert mock_update.call_count == 1
+                assert mock_put.call_count == 1
 
     def test_update_world_user_info_not_joined_guest(self):
         """
@@ -436,7 +369,7 @@ class TestWorlds(TestCase):
             mock_get.return_value = None
 
             response = client.put(
-                "/worlds/1/users",
+                "/worlds/1/users/ccca8d8c-ee65-433e-af45-d5d9ded235a6",
                 json={
                     'username': 'new_username'
                 }
@@ -444,38 +377,49 @@ class TestWorlds(TestCase):
             assert response.status_code == 400
             assert mock_get.call_count == 1
 
-    def test_update_world_user_info_joined_guest(self):
+    def test_update_world_user_info_not_joined_user(self):
         """
-        Expects 200 Ok when a guest updates tries to update its info in a joined world.
+        Expects 400 Bad Request when user tries to update its info in a not joined world.
         """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_world_users.CRUDWorld_User.update_world_user_info") as mock_put:
+            mock_put.return_value = None , ""
 
-        app.dependency_overrides[get_current_user] = override_dependency_guest
-        with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
-            with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_post:
-                role = {'role_id': 1, 'world_id': 1}
+            response = client.put(
+                "/worlds/1/users/1",
+                json={}
+            )
+            assert response.status_code == 400
+            assert mock_put.call_count == 1
 
-                mock_get.return_value = schemas.World_UserWithRoleInDB(
-                    world_id=1,
-                    user_id="ccca8d8c-ee65-433e-af45-d5d9ded235a6",
-                    avatar='avatar_2',
-                    username='name',
-                    role=schemas.RoleInDB(**role)
-                )
+    def test_update_world_user_info_access_user(self):
+        """
+        Expects 200 Ok when a user tries to update its info in a joined world.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_world_users.CRUDWorld_User.update_world_user_info") as db_update:
+            with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
+                with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_put:
+                    role = models.Role(role_id=1, world_id=1)
 
-                response = client.put(
-                    "/worlds/1/users",
-                    json={
-                        'username': 'new_username',
-                        'avatar': 'avatar_1'
-                    }
-                )
+                    db_update.return_value = World_User(role_id=1, avatar="avatar_1", username="name"), ""
+                    mock_get.return_value = schemas.World_UserWithRoleInDB(
+                        role_id=1, avatar='avatar_1', username='name', role=role, world_id=1
+                    )
 
-                assert response.status_code == 200
-                assert response.json()['world_id'] == 1
-                assert response.json()['username'] == 'new_username'
-                assert response.json()['avatar'] == 'avatar_1'
-                assert mock_get.call_count == 1
-                assert mock_post.call_count == 1
+                    response = client.put(
+                        "/worlds/1/users/1",
+                        json={
+                            'username': 'new_username'
+                        }
+                    )
+
+                    assert response.status_code == 200
+                    assert response.json()['username'] == "new_username"
+                    assert response.json()['avatar'] == 'avatar_1'
+                    assert db_update.call_count == 1
+                    assert mock_get.call_count == 1
+                    assert mock_put.call_count == 1
 
     def test_update_world_guest(self):
         """
@@ -551,7 +495,7 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             access.return_value = None, ""
-            response = client.get(
+            response = client.post(
                 "/worlds/1/users"
             )
             assert response.status_code == 400
@@ -569,7 +513,7 @@ class TestWorlds(TestCase):
                 cache.return_value = schemas.World_UserWithRoleAndMap(
                     map="".encode(), role=role, role_id=1, world_id=1
                 )
-                response = client.get(
+                response = client.post(
                     "/worlds/1/users"
                 )
                 assert response.status_code == 200
@@ -591,7 +535,7 @@ class TestWorlds(TestCase):
                     join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
                                          models.Role(role_id=1, world_id=1))
 
-                    response = client.get(
+                    response = client.post(
                         "/worlds/1/users"
                     )
                     assert response.status_code == 200
@@ -608,7 +552,7 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_guest
         with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
             access.return_value = None, ""
-            response = client.get(
+            response = client.post(
                 "/worlds/1/users"
             )
             assert response.status_code == 400
@@ -626,7 +570,7 @@ class TestWorlds(TestCase):
                 cache.return_value = schemas.World_UserWithRoleAndMap(
                     map="".encode(), role=role, role_id=1, world_id=1
                 )
-                response = client.get(
+                response = client.post(
                     "/worlds/1/users"
                 )
                 assert response.status_code == 200
@@ -652,8 +596,8 @@ class TestWorlds(TestCase):
                         join.return_value = schemas.World_UserWithRoleInDB(
                             role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
                         )
-                        response = client.get(
-                            "/worlds/1/users"
+                        response = client.post(
+                            "/worlds/1/users",
                         )
                         assert response.status_code == 200
                         assert response.json()['role']['role_id'] == 1
@@ -675,7 +619,7 @@ class TestWorlds(TestCase):
                 map="".encode(), role=role, role_id=1, world_id=1
             )
 
-            response = client.get(
+            response = client.post(
                 "/worlds/invite/correct"
             )
 
@@ -696,7 +640,7 @@ class TestWorlds(TestCase):
                 join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
                                      models.Role(role_id=1, world_id=1))
 
-                response = client.get(
+                response = client.post(
                     "/worlds/invite/correct"
                 )
 
@@ -719,7 +663,7 @@ class TestWorlds(TestCase):
                 map="".encode(), role=role, role_id=1, world_id=1
             )
 
-            response = client.get(
+            response = client.post(
                 "/worlds/invite/correct"
             )
 
@@ -744,7 +688,7 @@ class TestWorlds(TestCase):
                     join.return_value = schemas.World_UserWithRoleInDB(
                         role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
                     )
-                    response = client.get(
+                    response = client.post(
                         "/worlds/invite/correct"
                     )
 
@@ -754,3 +698,105 @@ class TestWorlds(TestCase):
                     assert cache.call_count == 1
                     assert default_role.call_count == 1
                     assert join.call_count == 1
+
+    def test_get_all_users_from_world_guest(self):
+        """
+        Expects 403 Forbidden when a guest tries to retrieve all users from world.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+
+        response = client.get(
+            "/worlds/1/users"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_get_all_users_from_world_no_access_user(self):
+        """
+        Expects 400 Bad Request when user tries to access all users from world without permission.
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as access:
+            access.return_value = None, ""
+
+            response = client.get(
+                "/worlds/1/users"
+            )
+
+            assert response.status_code == 400
+            assert access.call_count == 1
+
+    def test_get_all_users_from_world_with_access_user(self):
+        app.dependency_overrides[get_current_user] = override_dependency_user
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as access:
+            with patch("app.crud.crud_world_users.CRUDWorld_User.get_all_registered_users") as get_users:
+
+                access.return_value = models.Role(), ""
+                get_users.return_value = [
+                    models.World_User(world_id=1, role_id=1, user_id=1),
+                    models.World_User(world_id=1, role_id=1, user_id=2)
+                ]
+
+                response = client.get(
+                    "/worlds/1/users"
+                )
+
+                assert response.status_code == 200
+                assert len(response.json()) == 2
+                assert response.json()[0]['user_id'] == 1
+                assert response.json()[1]['user_id'] == 2
+                assert access.call_count == 1
+                assert get_users.call_count == 1
+
+    def test_get_worlds_reports_guest(self):
+        """
+        Expects 403 Forbidden when guest tries to access world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_guest
+
+        response = client.get(
+            "/worlds/reports/"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.ACCESS_FORBIDDEN
+
+    def test_get_worlds_reports_not_super_user(self):
+        """
+        Expects 403 Forbidden when a user that is not super user tries to access the world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_user
+
+        response = client.get(
+            "/worlds/reports/"
+        )
+
+        assert response.status_code == 403
+        assert response.json()['detail'] == strings.WORLD_REPORT_ACCESS_FORBIDDEN
+
+    def test_get_worlds_reports_is_superuser(self):
+        """
+        Expects 200 Ok when a super user tries to access the world reports
+        """
+        app.dependency_overrides[get_current_user] = override_dependency_super_user
+
+        with patch("app.crud.crud_world_reports.CRUDReport_World.get_all_world_reports") as mock_get:
+            mock_get.return_value = [{'reported': 1, 'reporter': 1, 'comment': 'test',
+                                      'timestamp': datetime.now(), 'reviewed': True, 'banned': False,
+                                      'world_name': 'test', 'reporter_email': 'test@test.com'}], ""
+
+            response = client.get(
+                "/worlds/reports/"
+            )
+
+            assert response.status_code == 200
+            assert len(response.json()) == 1
+            assert response.json()[0]['comment'] == 'test'
+            assert response.json()[0]['reported'] == 1
+            assert response.json()[0]['reporter'] == 1
+            assert response.json()[0]['reviewed']
+            assert not response.json()[0]['banned']
+            assert response.json()[0]['world_name'] == 'test'
+            assert response.json()[0]['reporter_email'] == 'test@test.com'
+            assert mock_get.call_count == 1

@@ -7,7 +7,6 @@ from app.core.logging import init_logging
 from fastapi.middleware.cors import CORSMiddleware
 from app.rabbitmq import rabbit_handler
 from app.redis import redis_connector
-from starlette.middleware.sessions import SessionMiddleware
 from app.core.config import settings
 
 
@@ -26,10 +25,6 @@ def get_application() -> FastAPI:
         allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
-    )
-    app.add_middleware(
-        SessionMiddleware,
-        secret_key="!secret"
     )
     db = SessionLocal()
     init_db(db)

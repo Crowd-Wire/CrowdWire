@@ -4,6 +4,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 
 // layouts
 import MainLayout from "./layouts/MainLayout";
+import DrawerLayout from "layouts/DrawerLayout";
+import AdminLayout from "layouts/AdminLayout";
 
 // pages for this product
 import ComponentsPage from "views/ComponentsPage/ComponentsPage.js";
@@ -22,10 +24,11 @@ import NotFound from "views/NotFound/NotFound";
 import Communications from "views/Communications/Communications";
 import CreateWorld from "views/CreateWorld/CreateWorld.js";
 import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
-import DrawerLayout from "layouts/DrawerLayout";
 import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
-
+import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
+import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
+import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 
 /**
  * Public and protected routes list 
@@ -87,6 +90,15 @@ const routes = (token, guest_uuid) => [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
             { path: "/:id/editor", element: <MapEditor /> },
+		],
+	},
+	{
+		path: "/admin",
+		element: token ? <AdminLayout /> : <Navigate to="/login" />,
+		children: [
+            { path: "/worlds/reports", element: <AdminWorldReports /> },
+			      { path: "/worlds", element: <AdminWorlds />},
+			      { path: "/statistics", element: <AdminStatistics/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

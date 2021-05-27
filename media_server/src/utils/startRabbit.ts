@@ -5,10 +5,13 @@ import {
   MediaKind,
   RtpCapabilities,
   RtpParameters,
+  SctpStreamParameters,
+  SctpParameters,
 } from "mediasoup/lib/types";
 import { MediaSendDirection } from "src/types";
 import { TransportOptions } from "./createTransport";
 import { Consumer } from "./createConsumer";
+import { DataConsumer } from "./createDataConsumer";
 
 const retryInterval = 5000;
 export interface HandlerDataMap {
@@ -34,9 +37,18 @@ export interface HandlerDataMap {
     rtpCapabilities: RtpCapabilities;
     appData: any;
   };
+  "@send-file": {
+    roomId: string;
+    peerId: string;
+    transportId: string;
+    direction: MediaSendDirection;
+    sctpStreamParameters: SctpStreamParameters;
+    appData: any;
+  };
   "@connect-transport": {
     roomId: string;
     dtlsParameters: DtlsParameters;
+    sctpParameters: SctpParameters;
     peerId: string;
     direction: MediaSendDirection;
   };
@@ -69,6 +81,7 @@ export type HandlerMap = {
 };
 
 type SendTrackDoneOperationName = `@send-track-${MediaSendDirection}-done`;
+type SendFileDoneOperationName = `@send-file-${MediaSendDirection}-done`;
 type ConnectTransportDoneOperationName = `@connect-transport-${MediaSendDirection}-done`;
 
 type OutgoingMessageDataMap = {
@@ -97,6 +110,10 @@ type OutgoingMessageDataMap = {
     peerId: string;
     kind: string;
   } & Consumer;
+  "new-peer-data-producer": {
+    roomId: string;
+    peerId: string;
+  } & DataConsumer;
   you_left_room: {
     roomId: string;
     kicked: boolean;
@@ -120,8 +137,14 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId?: string;
   };
-} &
-  {
+} & {
+  [Key in SendFileDoneOperationName]: {
+    error?: string;
+    id?: string;
+    roomId: string;
+    peerId?: string;
+  };
+} & {
     [Key in ConnectTransportDoneOperationName]: {
       error?: string;
       roomId: string;

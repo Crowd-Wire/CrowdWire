@@ -26,6 +26,7 @@ import { withStyles } from "@material-ui/core/styles";
 import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
+import GoogleLogin from 'react-google-login';
 
 class LoginPage extends React.Component {
 
@@ -111,6 +112,26 @@ class LoginPage extends React.Component {
 
   }
 
+  handleGoogle = (response) => {
+    console.log(response.tokenId);
+    AuthenticationService.googleAuth(response.tokenId)
+    .then((res) => {
+      if(res.ok)
+        return res.json();
+    }).then((res)=>{
+      if(res.access_token!==undefined){
+        this.notify("Auth");
+        AuthenticationService.setToken(res, "AUTH");
+      }
+    })
+  }
+
+  handleGoogleFail = (response) =>{
+    console.log("fail")
+    // TODO: handle this case
+
+  }
+
 
   render() {
     return (
@@ -125,21 +146,17 @@ class LoginPage extends React.Component {
         >
           <div className={this.props.classes.container}>
             <GridContainer justify="center">
-              <GridItem xs={12} sm={12} md={4}>
+              <GridItem xs={12} sm={12} md={5}>
                 <Card className={this.props.classes[this.state.cardAnimaton]}>
                   <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                       <h4>Login</h4>
                       <div className={this.props.classes.socialLine}>
-                        <Button
-                          justIcon
-                          target="_blank"
-                          color="transparent"
-                          style={{ border: "1px solid #476385" }}
-                          onClick={e => e.preventDefault()}
-                        >
-                          <i className={"fab fa-google"} />
-                        </Button>
+                        <GoogleLogin
+                          clientId="251817047000-upjua2t776rni76i52grnpmbi2ju1i2c.apps.googleusercontent.com"
+                          onSuccess={this.handleGoogle}
+                          onFailure={this.handleGoogleFail}
+                        />                        
                       </div>
                     </CardHeader>
                     <p className={this.props.classes.divider}>Or Be Classical</p>
@@ -217,7 +234,7 @@ class LoginPage extends React.Component {
                           </Col>
                           <Col sm={6} md={6} lg={6}>
                             <Row>
-                              <Button onClick={this.handleGuestJoin} style={{ margin: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
+                              <Button onClick={this.handleGuestJoin} style={{ marginLeft: "auto", marginRight: "auto"}} size="sm" simple color="primary"> Join as Guest</Button>
                             </Row>
                           </Col>
                         </Row>

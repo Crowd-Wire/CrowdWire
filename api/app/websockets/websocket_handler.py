@@ -3,7 +3,7 @@ import json
 from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector
-from app.websocket.connection_manager import manager
+from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 
@@ -12,11 +12,12 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     position = payload['position']
     # store position on redis
     await redis_connector.set_user_position(world_id, user_id, position)
-
+    user = await redis_connector.get_world_user_data_dict(world_id=world_id, user_id=user_id)
+    user['user_id'] = user_id
     # broadcast join player
     await manager.broadcast(
         world_id,
-        {'topic': protocol.JOIN_PLAYER, 'user_id': user_id, 'position': position},
+        {'topic': protocol.JOIN_PLAYER, 'user': user, 'position': position},
         user_id
     )
     await send_groups_snapshot(world_id)  # TODO: remove after tests
@@ -25,8 +26,6 @@ async def join_player(world_id: str, user_id: str, payload: dict):
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
     velocity = payload['velocity']
     position = payload['position']
-    # store position on redis
-    await redis_connector.set_user_position(world_id, user_id, position)
 
     await manager.broadcast(
         world_id,
@@ -35,9 +34,14 @@ async def send_player_movement(world_id: str, user_id: str, payload: dict):
     )
 
 
+async def set_user_position(world_id: str, user_id: str, payload: dict):
+    # store position on redis
+    await redis_connector.set_user_position(world_id, user_id, payload['position'])
+
+
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
-    payload['from'] = f"User{user_id}"
+    payload['from'] = user_id
     await manager.broadcast(world_id, payload)
 
 
@@ -179,6 +183,68 @@ async def send_to_conf_listener(world_id: str, user_id: str, payload: dict):
         user_requested)
 
 
+async def add_user_files(world_id: str, user_id: str, payload: dict):
+    if (await redis_connector.get_user_files_len(world_id, user_id)) <= 3:
+        files = payload['files']
+        for file_data in files:
+            await redis_connector.add_user_file(world_id, user_id, file_data)
+
+        await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.ADD_USER_FILES, 'd': {'files': files}}, user_id)
+        await manager.send_personal_message({'topic': protocol.ADD_USER_FILES, 'd': {'files': files}}, user_id)
+
+
+async def remove_user_file(world_id: str, user_id: str, payload: dict):
+    file_data = payload['file']
+    await redis_connector.remove_user_file(world_id, user_id, file_data)
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_USER_FILE, 'd': {'file': file_data}}, user_id)
+
+
+async def remove_all_user_files(world_id: str, user_id: str):
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
+    await redis_connector.remove_all_user_files(world_id, user_id)
+
+
+async def get_room_users_files(world_id: str, user_id: str):
+    users_ids = await redis_connector.get_user_users(world_id, user_id)
+    list_of_files = []
+    for uid in users_ids:
+        list_of_files.extend(await redis_connector.get_user_files(world_id, uid))
+
+    await manager.send_personal_message(
+        {'topic': protocol.GET_ROOM_USERS_FILES, 'd': {'files': list_of_files}},
+        user_id)
+
+
+async def download_request(world_id: str, user_id: str, payload: dict):
+    file_data = payload['file']
+    await manager.send_personal_message(
+        {'topic': protocol.DOWNLOAD_REQUEST, 'd': {'file': file_data, 'user_id': user_id}},
+        str(file_data['owner']))
+
+
+async def deny_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    reason = payload['d']['reason']
+    await manager.send_personal_message(
+        {'topic': protocol.DENY_DOWNLOAD_REQUEST, 'd': {'user_id': user_id, 'reason': reason}},
+        str(user_id))
+
+
+async def accept_download_request(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    file_data = payload['d']['file']
+    await manager.send_personal_message(
+        {'topic': protocol.ACCEPT_DOWNLOAD_REQUEST, 'd': {'file': file_data}},
+        str(user_id))
+
+
+async def start_download(world_id: str, payload: dict):
+    user_id = payload['d']['user_id']
+    await manager.send_personal_message(
+        {'topic': protocol.START_DOWNLOAD},
+        str(user_id))
+
+
 async def leave_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload["conference_id"]
 
@@ -200,6 +266,9 @@ async def leave_conference(world_id: str, user_id: str, payload: dict):
 
 
 async def disconnect_user(world_id: str, user_id: str):
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
+    await redis_connector.remove_all_user_files(world_id, user_id)
+
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
     if group_ids:

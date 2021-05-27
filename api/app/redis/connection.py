@@ -8,6 +8,7 @@ from app.utils import generate_guest_username, choose_avatar
 from app import schemas, models
 from uuid import uuid4
 from loguru import logger
+from app.core import strings
 
 
 class RedisConnector:
@@ -64,6 +65,22 @@ class RedisConnector:
     async def sadd(self, key: str, member: str, *members):
         """Adds one or more members to a set"""
         return await self.master.execute('sadd', key, member, *members)
+
+    async def lrange(self, key: str, start: int, finish: int):
+        """Gets the items of a list from indexes start to finish"""
+        return await self.master.execute('lrange', key, start, finish)
+
+    async def lpush(self, key: str, item: any):
+        """Adds one item to a list"""
+        return await self.master.execute('lpush', key, item)
+
+    async def llen(self, key: str):
+        """Checks the length of the list"""
+        return await self.master.execute('llen', key)
+
+    async def lrem(self, key: str, occurences: str, item: any):
+        """Removes the number of occurences that match an item"""
+        return await self.master.execute('lrem', key, occurences, item)
 
     async def scard(self, key: str):
         """Get the number of members in a set"""
@@ -147,6 +164,56 @@ class RedisConnector:
             )
 
         return None
+
+    async def get_world_user_data_dict(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[dict]:
+        """
+        Checks World_User Data if present
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        # TODO: maybe check encoding instead of converting to string
+        user_id = str(user_id)
+        world_id = str(world_id)
+        username = await self.hget(
+            f"world:{world_id}:{user_id}", 'username')
+        avatar = await self.hget(
+            f"world:{world_id}:{user_id}", 'avatar')
+        role = await self.hget(
+            f"world:{world_id}:{user_id}", 'role'
+        )
+
+        if username and avatar and role:
+            role = pickle.loads(role).__dict__
+            return {
+                'username': pickle.loads(username),
+                'avatar': pickle.loads(avatar),
+                'role': {'role_id': role['role_id'], 'name': role['name']},
+            }
+
+        return None
+
+    async def assign_role_to_user(self, world_id: int, role: models.Role, user_id: int, is_guest: bool):
+
+        # updates the cache for the user and guest
+        world_user_data = await self.get_world_user_data(world_id=world_id, user_id=user_id)
+        if world_user_data is None:
+            # if there is no information about the guest in cache then it has not joined this world
+            if is_guest:
+                return None, strings.USER_NOT_IN_WORLD
+        else:
+            if world_user_data.role.role_id == role.role_id:
+                # if the role is not going to change, it is better to return it already
+                return world_user_data, ""
+
+            await self.save_world_user_data(
+                world_id=world_id,
+                user_id=user_id,
+                data={'role': role}
+            )
+            world_user_data.role = role
+            return world_user_data, ""
+
+        return None, ""
 
     async def can_talk_conference(self, world_id: int, user_id: Union[int, uuid4]) \
             -> bool:
@@ -351,6 +418,27 @@ class RedisConnector:
         for gid in groups_id:
             actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
         return actions
+
+    async def get_user_files(self, world_id: str, user_id: str) -> List[dict]:
+        """Get a list of files associated to a user"""
+        file_list = await self.lrange(f"world:{str(world_id)}:user:{str(user_id)}:files", 0, 2)
+        return [pickle.loads(x) for x in file_list]
+
+    async def add_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Add a file to the user list of files"""
+        return await self.lpush(f"world:{str(world_id)}:user:{str(user_id)}:files", pickle.dumps(file_data))
+
+    async def remove_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Remove a file from the user list of files"""
+        return await self.lrem(f"world:{str(world_id)}:user:{str(user_id)}:files", 1, pickle.dumps(file_data))
+
+    async def remove_all_user_files(self, world_id: str, user_id: str) -> any:
+        """Remove a file from the user list of files"""
+        return await self.delete(f"world:{str(world_id)}:user:{str(user_id)}:files")
+
+    async def get_user_files_len(self, world_id: str, user_id: str) -> int:
+        """Get the length of the user list of file"""
+        return await self.llen(f"world:{str(world_id)}:user:{str(user_id)}:files")
 
 
 redis_connector = RedisConnector()

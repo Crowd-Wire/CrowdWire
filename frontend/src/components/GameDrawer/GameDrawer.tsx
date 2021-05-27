@@ -24,6 +24,7 @@ import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
 import useMessageStore from 'stores/useMessageStore';
+import usePlayerStore from 'stores/usePlayerStore';
 
 
 const drawerWidth = 360;
@@ -91,6 +92,7 @@ const GameDrawer = () => {
   const [page, setPage] = React.useState(null);
   const [hasScroll, setHasScroll] = React.useState(false);
   const [numMessagesSeen, setNumMessagesSeen] = React.useState(0);
+  const requestsToSpeak = usePlayerStore(state => state.requestsToSpeak);
   let numMessages = useMessageStore(state => state.messages.length);
   let textChat = document.getElementById('text-chat');;
   
@@ -211,7 +213,7 @@ const GameDrawer = () => {
               setNumMessagesSeen(numMessages)}}
           >
             <Badge 
-              badgeContent={!hasScroll || numMessagesSeen > numMessages ? 
+              badgeContent={(!hasScroll && drawer && drawer.type === 'Chat') || numMessagesSeen > numMessages ? 
                             0 : numMessages - numMessagesSeen} 
               color="secondary"
             >
@@ -222,7 +224,7 @@ const GameDrawer = () => {
             aria-label="open drawer"
             onClick={() => handleDrawerOpen(<UserList />)}
           >
-            <Badge badgeContent={-1} color="secondary">
+            <Badge badgeContent={requestsToSpeak} color="secondary">
               <PeopleAltIcon style={iconsStyle} />
             </Badge>
           </IconButton>

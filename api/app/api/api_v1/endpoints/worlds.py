@@ -8,6 +8,8 @@ from loguru import logger
 from app.redis import redis_connector
 from app.utils import is_guest_user
 from app.core import strings
+from pydantic import UUID4
+from app.core import consts
 
 router = APIRouter()
 
@@ -32,7 +34,7 @@ async def get_world(
     return db_world
 
 
-@router.get("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/invite/{invite_token}", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world_by_link(
         invite_token: str = None,
         *,
@@ -62,7 +64,7 @@ async def join_world_by_link(
     return world_user
 
 
-@router.get("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
+@router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
@@ -137,13 +139,21 @@ async def update_world(
     """
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     # first checking if this user can edit the world(creator only)
     world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
-    if not world_obj:
+
+    # admins can also change the status of the world whenever they want
+    if not world_obj and not user.is_superuser:
         raise HTTPException(
             status_code=400,
             detail=message,
         )
+
+    # creator cannot change the world if it is banned
+    if world_obj.status == consts.WORLD_BANNED_STATUS and not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
     # afterwards update data and clear cache
     world_obj_updated, message = await crud.crud_world.update(db=db, db_obj=world_obj, obj_in=world_in)
     if not world_obj_updated:
@@ -154,10 +164,11 @@ async def update_world(
     return world_obj_updated
 
 
-@router.put("/{world_id}/users",
+@router.put("/{world_id}/users/{user_id}",
             response_model=schemas.World_UserInDB)
 async def update_world_user_info(
         world_id: int,
+        user_id: Union[int, UUID4],
         user_data: schemas.World_UserUpdate,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
@@ -165,38 +176,53 @@ async def update_world_user_info(
     """
     Update User info for a given world: username and avatar name usually
     """
+
+    # if the user_id is not an int then it is a guest
+    is_guest = type(user_id) != int
+
+    # guests can only change its info
+    if is_guest_user(user) and user_id != user.user_id:
+        raise HTTPException(status_code=400, detail=strings.ACCESS_FORBIDDEN)
+
+    # guest users cannot be reported
+    if is_guest and user_data.status:
+        raise HTTPException(status_code=400, detail=strings.USER_IS_NOT_BANNABLE)
+
+    # only guests can change their info
+    if is_guest and user_id != user.user_id:
+        raise HTTPException(status_code=400, detail=strings.CHANGE_USER_INFO_FORBIDDEN)
+
     # registered user
-    if not is_guest_user(user):
-        world_user_obj = crud.crud_world_user.get_user_joined(db, world_id, user.user_id)
-        if not world_user_obj:
-            raise HTTPException(status_code=400, detail=strings.USER_NOT_IN_WORLD)
-        # no need to return error, override user_id
-        user_data.user_id = user.user_id
-        world_user = crud.crud_world_user.update(
-            db=db,
-            db_obj=world_user_obj,
-            obj_in=user_data
+    if not is_guest:
+        world_user, msg = await crud.crud_world_user.update_world_user_info(
+            db=db, world_id=world_id, request_user=user, user_to_change=user_id, world_user_data=user_data
         )
-    else:
-        # for guest users retrieve data from redis
-        # no need to verify the privacy of the world, since it already done when a user
-        # joins the world for the first time
-        world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
-        if not world_user_obj:
-            raise HTTPException(
-                status_code=400,
-                detail=strings.USER_NOT_IN_WORLD
-            )
-        data = {'username': user_data.username, 'avatar': user_data.avatar}
-        # updates the data present
-        await redis_connector.save_world_user_data(
-            world_id=world_id,
-            user_id=user.user_id,
-            data=data
+        if world_user is None:
+            raise HTTPException(status_code=400, detail=msg)
+
+    # change user info in cache
+    world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+    if not world_user_obj:
+        raise HTTPException(
+            status_code=400,
+            detail=strings.USER_NOT_IN_WORLD
         )
-        world_user = {'world_id': world_id, 'user_id': user.user_id, 'role_id': world_user_obj.role.role_id}
-        world_user.update(data)
-        logger.debug(world_user)
+
+    data = {k: v for k, v in dict(user_data).items() if v is not None}
+    # updates the data present
+    await redis_connector.save_world_user_data(
+        world_id=world_id,
+        user_id=user_id,
+        data=data
+    )
+    world_user = {
+        'world_id': world_id,
+        'user_id': user.user_id,
+        'role_id': world_user_obj.role.role_id,
+        'avatar': world_user_obj.avatar,
+        'username': world_user_obj.username
+    }
+    world_user.update(data)
     return world_user
 
 
@@ -225,22 +251,38 @@ def create_world(
 def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
-        visibility: Optional[str] = "public",
+        visibility: Optional[str] = None,
+        banned: Optional[bool] = False,
+        deleted: Optional[bool] = False,
+        normal: Optional[bool] = False,
+        creator: Optional[int] = None,
+        order_by: Optional[str] = "timestamp",
+        order: Optional[str] = "desc",
         page: Optional[int] = 1,
+        limit: Optional[int] = 10,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
 
-    if visibility not in ["public", "owned", "joined"]:
-        raise HTTPException(status_code=400, detail=strings.INVALID_WORLD_VISIBILITY_FILTER)
-
     if not is_guest_user(user):
-        list_world_objs = crud.crud_world.filter(
-            db=db, search=search, tags=tags, visibility=visibility, page=page, user_id=user.user_id
-        )
+        if user.is_superuser:
+            # admins
+            list_world_objs, msg = crud.crud_world.filter(
+                db=db, search=search, tags=tags, is_superuser=True, page=page, limit=limit, creator=creator,
+                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
+        else:
+            # registered users
+            list_world_objs, msg = crud.crud_world.filter(
+                db=db, search=search, tags=tags, visibility=visibility, page=page, requester_id=user.user_id,
+                limit=limit, order_by=order_by, order=order)
     else:
-        # guest cannot access visited worlds
-        list_world_objs = crud.crud_world.filter(db=db, search=search, tags=tags, is_guest=True, page=page)
+        # guests
+        list_world_objs, msg = crud.crud_world.filter(
+            db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility,
+            order_by=order_by, order=order)
+
+    if list_world_objs is None:
+        raise HTTPException(status_code=400, detail=msg)
     return list_world_objs
 
 
@@ -263,3 +305,46 @@ async def delete_world(
             detail=message
         )
     return world_obj
+
+
+@router.get("/{world_id}/users", response_model=List[schemas.World_UserInDB])
+async def get_all_users_from_world(
+        world_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Optional[models.User] = Depends(deps.get_current_user),
+) -> Any:
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    role, msg = await crud.crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
+    if role is None:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return crud.crud_world_user.get_all_registered_users(db=db, world_id=world_id)
+
+
+@router.get("/reports/", response_model=List[schemas.ReportWorldInDBWithEmail])
+async def get_worlds_reports(
+        world: Optional[int] = None,
+        reporter: Optional[int] = None,
+        reviewed: Optional[bool] = False,
+        banned: Optional[bool] = False,
+        order_by: Optional[str] = "timestamp",
+        order: Optional[str] = "desc",
+        page: Optional[int] = 1,
+        limit: Optional[int] = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    if not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.WORLD_REPORT_ACCESS_FORBIDDEN)
+
+    reports, msg = crud.crud_report_world.get_all_world_reports(
+        db=db, page=page, limit=limit, world=world, user=reporter,
+        reviewed=reviewed, banned=banned, order_by=order_by, order=order)
+
+    return reports

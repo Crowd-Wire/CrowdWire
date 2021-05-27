@@ -1,8 +1,10 @@
 from typing import Any, Optional, Union
 
-from app.websocket.connection_manager import manager
-from app.websocket import websocket_handler as wh
+from app.utils import is_guest_user
+from app.websockets.connection_manager import manager
+from app.websockets import websocket_handler as wh
 from app.api import dependencies as deps
+from app.crud.crud_events import crud_event
 from fastapi import WebSocket, WebSocketDisconnect, APIRouter, Query, Depends
 from app.core.consts import WebsocketProtocol as protocol
 from loguru import logger
@@ -29,7 +31,8 @@ async def world_websocket(
     # overwrites user_id given by token TODO: remove after tests
     # user_id = manager.get_next_user_id()
     user_id = str(user.user_id)
-
+    world_id = str(world_id)
+    logger.info(user_id)
     await manager.connect(world_id, websocket, user_id)
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
@@ -39,6 +42,8 @@ async def world_websocket(
 
             if topic == protocol.PING:
                 await websocket.send_text(protocol.PONG)
+                # store position on redis
+                await wh.set_user_position(world_id, user_id, payload)
                 continue
 
             if topic == protocol.PLAYER_MOVEMENT:
@@ -49,7 +54,7 @@ async def world_websocket(
 
             if topic in (
                 protocol.CONNECT_TRANSPORT, protocol.GET_RECV_TRACKS,
-                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK
+                protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK, protocol.SEND_FILE
             ):
                 await wh.handle_transport_or_track(world_id, user_id, payload)
 
@@ -64,12 +69,27 @@ async def world_websocket(
 
             elif topic == protocol.JOIN_PLAYER:
                 await wh.join_player(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_PLAYER)
 
             elif topic == protocol.JOIN_CONFERENCE:
                 await wh.join_conference(world_id=world_id, user_id=user_id, payload=payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.JOIN_CONFERENCE)
 
             elif topic == protocol.LEAVE_CONFERENCE:
                 await wh.leave_conference(world_id, user_id, payload)
+                if not is_guest_user(user):
+                    crud_event.create(db=db,
+                                      user_id=user.user_id,
+                                      world_id=world_id,
+                                      event_type=protocol.LEAVE_CONFERENCE)
 
             elif topic == protocol.CLOSE_MEDIA:
                 await wh.close_media(world_id, user_id, payload)
@@ -86,15 +106,39 @@ async def world_websocket(
                 # warn the user who has been accepted or denied
                 await wh.send_to_conf_listener(world_id=world_id, user_id=user_id, payload=payload)
 
+            elif topic == protocol.GET_ROOM_USERS_FILES:
+                await wh.get_room_users_files(world_id=world_id, user_id=user_id)
+
+            elif topic == protocol.REMOVE_ALL_USER_FILES:
+                await wh.remove_all_user_files(world_id=world_id, user_id=user_id)
+
+            elif topic == protocol.ADD_USER_FILES:
+                await wh.add_user_files(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.REMOVE_USER_FILE:
+                await wh.remove_user_file(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.DOWNLOAD_REQUEST:
+                await wh.download_request(world_id=world_id, user_id=user_id, payload=payload)
+
+            elif topic == protocol.DENY_DOWNLOAD_REQUEST:
+                await wh.deny_download_request(world_id=world_id, payload=payload)
+
+            elif topic == protocol.ACCEPT_DOWNLOAD_REQUEST:
+                await wh.accept_download_request(world_id=world_id, payload=payload)
+
+            elif topic == protocol.START_DOWNLOAD:
+                await wh.start_download(world_id=world_id, payload=payload)
+
             elif topic == protocol.SPEAKING_CHANGE:
                 await wh.speaking_change(world_id, user_id, payload)
-
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
         logger.info("disconnected ")
+        await manager.disconnect(world_id, user_id)
+        await wh.disconnect_user(world_id, user_id)
+        if not is_guest_user(user):
+            crud_event.create(db=db, user_id=user.user_id, world_id=world_id, event_type=protocol.LEAVE_PLAYER)
     # except BaseException:
     #     logger.info("base exc")
-
-    await manager.disconnect(world_id, user_id)
-    await wh.disconnect_user(world_id, user_id)

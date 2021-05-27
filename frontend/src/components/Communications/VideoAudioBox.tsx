@@ -158,7 +158,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
             fontWeight: 500,
             backgroundColor: 'rgba(0,0,0, 0.2)'}}>
             <Row>
-              <Col sm={5}>
+              <Col sm={6}>
                 { videoTrack && !videoToggle ?
                     videoState ? 
                       (<VideocamIcon style={{'cursor': 'pointer', color: 'white'}} onClick={() => toggleVideo()}/>)
@@ -173,7 +173,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
                 }
               </Col>
 
-              <Col sm={7} style={{textAlign: 'right', maxHeight: 30}}>
+              <Col sm={6} style={{textAlign: 'right', maxHeight: 30}}>
                 <UserVolumeSlider volColor={'white'} userId={id} />
               </Col>
             </Row>

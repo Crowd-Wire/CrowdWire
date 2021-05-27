@@ -66,7 +66,7 @@ class GameScene extends Phaser.Scene {
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
-        this.ws.joinRoom({ x: 50, y: 50 });
+        this.ws.joinPlayer({x: 50, y: 50});
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
@@ -406,8 +406,11 @@ class RemotePlayer extends Player {
     constructor(scene, x, y, id) {
         super(scene, x, y);
         this.id = id;
+        this.username = id;
+        if (id in useWorldUserStore.getState().users_info)
+            this.username = useWorldUserStore.getState().users_info[id].username
         this.getText().setText([
-            `User ${this.id}`,
+            `${this.username}`,
             'G???',
         ]);
 

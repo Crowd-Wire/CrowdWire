@@ -3,16 +3,17 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, type = "all", page) {
+    search(search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) {
         /*
             search: string,
             tags: List[string]
-            joined: boolean
+            visibility: boolean
             page: int
         */
 
         let url = 'worlds/';
         let query = [];
+<<<<<<< HEAD
 
         if (search !== "")
             query.push('search=' + search);
@@ -22,9 +23,39 @@ class WorldService {
 
         // when joined searchs for the visited worlds
         query.push('visibility=' + type);
+=======
+    
+        if(search !== "")
+            query.push('search='+search);
+        
+        if(tags.length !== 0)
+            query.push('tags='+tags.join('&tags='));
+        
+        if(visibility !== null)
+            query.push('visibility=' + visibility);
+>>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 
-        // pagination
+        if(banned !== null)
+            query.push('banned=' + banned);
+
+        if(deleted !== null)
+            query.push('deleted=' + deleted);
+
+        if(normal !== null)
+            query.push('normal=' + normal);
+
+        if(creator !== null)
+            query.push('creator=' + creator);
+
+        if(order_by !== null)
+            query.push('order_by=' + order_by); 
+        
+        if(order !== null)
+            query.push('order=' + order);
+   
         query.push('page=' + page);
+        query.push('limit=' + limit);
+
 
         if (query.length !== 0)
             url = url.concat('?' + query.join('&'));
@@ -120,7 +151,7 @@ class WorldService {
     inviteJoin(inviteToken) {
         // change url
         return fetch(API_BASE + 'worlds/invite/' + inviteToken, {
-            method: 'GET',
+            method: 'POST',
             mode: 'cors',
             headers: {
                 "Authorization": "Bearer " + AuthenticationService.getToken()
@@ -137,13 +168,24 @@ class WorldService {
                 "Authorization": "Bearer " + AuthenticationService.getToken()
             }
         })
+<<<<<<< HEAD
 
     }
+=======
+        
+    }
+
+    join_world(world_id){
+>>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 
     joinWorld(world_id) {
 
+<<<<<<< HEAD
         return fetch(API_BASE + 'worlds/' + world_id + '/users', {
             method: 'GET',
+=======
+            method: 'POST',
+>>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
             mode: 'cors',
             headers: {
                 "Authorization": "Bearer " + AuthenticationService.getToken()
@@ -151,6 +193,79 @@ class WorldService {
         })
 
     }
+<<<<<<< HEAD
+=======
+
+    getAllReports(world, reporter, reviewed, banned, order_by, order, page, limit){
+
+        let url = 'worlds/reports/';
+        let query = [];
+    
+        if(world !== null && world !== '')
+            query.push('world=' + world);
+
+        if(reporter !== null && reporter !== '')
+            query.push('reporter=' + reporter);
+
+        if(reviewed !== null)
+            query.push("reviewed=" + reviewed);
+        
+        if(banned !== null)
+            query.push("banned=" + banned);
+        
+        if(order_by !== null)
+            query.push("order_by=" + order_by);
+        
+        if(order !== null)
+            query.push("order=" + order);
+        
+        if(page !== null)
+            query.push("page=" + page);
+
+        if(limit !== null)
+            query.push("limit=" + limit);
+
+        console.log(query);
+        if(query.length !== 0)
+            url = url.concat('?'+query.join('&'));
+
+        console.log(url);
+
+        return fetch(API_BASE + url , {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            }
+        })
+    }
+
+    reviewWorldReport(world_id, reporter, reviewed){
+
+        return fetch(API_BASE + "worlds/" + world_id + "/reports", { 
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({reporter: reporter, reviewed: reviewed})
+        }) 
+    }
+
+    banWorld(world_id, status){
+
+        // 0: normal, 1: banned, 2: deleted
+        return fetch(API_BASE + 'worlds/' + world_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({status: status})
+        })
+    }
+
+>>>>>>> 865a8700f2632791b68022e5a81c81b34d5989f4
 }
 
 export default new WorldService();
