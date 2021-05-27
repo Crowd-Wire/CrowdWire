@@ -1,4 +1,4 @@
-import * as Phaser from 'phaser';
+import Phaser, { Math } from 'phaser';
 
 import { getSocket } from "services/socket";
 
@@ -28,6 +28,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+
         const mapManager = this.registry.get('mapManager');
 
         console.log(mapManager);
@@ -87,12 +88,24 @@ class GameScene extends Phaser.Scene {
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
 
-        this.sprite = Phaser.Utils.Objects.Clone(this.collisionGroup.getChildren()[0]);
-
+        this.sprite = this.add.sprite(0, 0, '26');
         this.add.existing(this.sprite);
         this.physics.add.existing(this.sprite);
         this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
+        this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
+        
+        
+        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World', 
+            { fontFamily: '"Lucida Console", Courier, monospace', fontSize: '16px', color: '#28FE14', backgroundColor: "#000" });
+        this.debugText.setScrollFactor(0).setDepth(1001).setOrigin(0.5);
+    }
 
+    log() {
+        let text = '';
+        for (let i = 0; i < arguments.length; i++) {
+            text += arguments[i] + ' ';
+        }
+        this.debugText.setText(text);
     }
 
     // TODO: remove after tests
@@ -211,7 +224,10 @@ class GameScene extends Phaser.Scene {
 
         if (!globalVar) {
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-            this.sprite.setPosition(worldPoint.x, worldPoint.y);
+            this.sprite.setPosition(Math.Snap.To(worldPoint.x, 16), Math.Snap.To(worldPoint.y, 16));
+            this.sprite.setDepth(this.sprite.body.y);
+            this.sprite.body.debugBodyColor = 0xadfefe;
+            this.log(this.sprite.body.x, this.sprite.body.y, this.sprite.body.height, this.sprite.width, this.sprite.depth)
         }
 
         // // Convert the mouse position to world position within the camera

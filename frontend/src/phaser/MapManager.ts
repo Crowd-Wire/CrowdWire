@@ -122,9 +122,8 @@ class MapManager {
                     // has custom collider
                     const {x, y, width, height} = this.objectProps[obj.texture.key];
                     const body = obj.body as Phaser.Physics.Arcade.Body;
-                    body.setOffset(x, y);
-                    body.setSize(width, height, false);
-                    obj.depth = obj.y;
+                    body.setOffset(x, y).setSize(width, height, false);
+                    obj.setDepth(body.y);
                 }
             })
         return collisionObjectsGroup;
