@@ -604,19 +604,21 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-                role = schemas.RoleInDB(role_id=1, world_id=1)
-                access.return_value = models.World(world_map="".encode()), ""
-                cache.return_value = schemas.World_UserWithRoleAndMap(
-                    map="".encode(), role=role, role_id=1, world_id=1
-                )
-                response = client.post(
-                    "/worlds/1/users"
-                )
-                assert response.status_code == 200
-                assert response.json()['role']['role_id'] == 1
-                assert response.json()['world_id'] == 1
-                assert access.call_count == 1
-                assert cache.call_count == 1
+                with patch("app.crud.crud_world.update_online_users") as online_users:
+                    role = schemas.RoleInDB(role_id=1, world_id=1)
+                    access.return_value = models.World(world_map="".encode()), ""
+                    online_users.return_value = access.return_value
+                    cache.return_value = schemas.World_UserWithRoleAndMap(
+                        map="".encode(), role=role, role_id=1, world_id=1
+                    )
+                    response = client.post(
+                        "/worlds/1/users"
+                    )
+                    assert response.status_code == 200
+                    assert response.json()['role']['role_id'] == 1
+                    assert response.json()['world_id'] == 1
+                    assert access.call_count == 1
+                    assert cache.call_count == 1
 
     def test_join_world_no_cache_user(self):
         """
@@ -626,20 +628,23 @@ class TestWorlds(TestCase):
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
                 with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
-                    access.return_value = models.World(world_map="".encode()), ""
-                    cache.return_value = None
-                    join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
-                                         models.Role(role_id=1, world_id=1))
+                    with patch("app.crud.crud_world.update_online_users") as online_users:
+                        # TODO: Change later
+                        access.return_value = models.World(world_map="".encode()), ""
+                        online_users.return_value = access.return_value
+                        cache.return_value = None
+                        join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
+                                             models.Role(role_id=1, world_id=1))
 
-                    response = client.post(
-                        "/worlds/1/users"
-                    )
-                    assert response.status_code == 200
-                    assert response.json()['world_id'] == 1
-                    assert response.json()['role']['role_id'] == 1
-                    assert access.call_count == 1
-                    assert cache.call_count == 1
-                    assert join.call_count == 1
+                        response = client.post(
+                            "/worlds/1/users"
+                        )
+                        assert response.status_code == 200
+                        assert response.json()['world_id'] == 1
+                        assert response.json()['role']['role_id'] == 1
+                        assert access.call_count == 1
+                        assert cache.call_count == 1
+                        assert join.call_count == 1
 
     def test_join_world_no_access_guest(self):
         """
