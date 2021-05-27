@@ -28,7 +28,7 @@ def cache(model: str):
             logger.info(args)
             logger.info(kwargs)
             key_data = {
-                'model': f"{function_name}-Entity",
+                'model': f"{model}-Entity",
                 'function_name': function_name,
                 'args': args,
                 'kwargs': copy_kwargs
@@ -89,7 +89,9 @@ async def clear_cache_by_model(model_name: str, *args, **kwargs):
     keys = await redis_connector.scan_match(model_name)
     for key in keys[1]:
         deserialized_value = pickle.loads(key)
+        logger.debug(deserialized_value)
         saved_kwargs = deserialized_value['kwargs']
+        logger.debug(kwargs)
         intersect_kwargs = intersect(saved_kwargs, kwargs)
         if bool(intersect_kwargs):
             logger.debug("Deleted from cache")

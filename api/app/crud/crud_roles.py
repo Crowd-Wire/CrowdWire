@@ -8,7 +8,7 @@ from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
-
+from loguru import logger
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
 
@@ -163,7 +163,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if obj_in.is_default:
             return None, strings.ROLE_DEFAULT_ALREADY_EXISTS
 
-        await clear_cache_by_model(model_name="Role", world_id=obj_in.world_id)
+        await clear_cache_by_model("Role", world_id=obj_in.world_id)
         role_obj = super().create(db=db, obj_in=obj_in)
         return role_obj, ""
 
@@ -194,7 +194,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         # Worth is return a error here?
         if 'is_default' in update_data and update_data['is_default']:
             update_data['is_default'] = False
-        await clear_cache_by_model('Role', world_id=Role.role_id)
+        await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
 
@@ -215,6 +215,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                 role_to_change_id=default_role.role_id,
                 role_changed_id=role_id)
             role_obj = super().remove(db=db, id=role_id)
+            await clear_cache_by_model('Role', world_id=world_id)
             return role_obj, strings.ROLE_DELETED_SUCCESS
         return None, ""
 
