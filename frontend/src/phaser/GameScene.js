@@ -111,7 +111,6 @@ class GameScene extends Phaser.Scene {
 
         // main player
         this.player = new Player(this, 50, 50);
-
         // connect to room
         this.ws.joinPlayer({x: 50, y: 50});
 
