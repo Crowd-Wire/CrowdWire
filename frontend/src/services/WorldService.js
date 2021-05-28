@@ -1,4 +1,4 @@
-import { API_BASE, URL_BASE } from "config";
+import { API_BASE } from "config";
 import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
@@ -91,7 +91,7 @@ class WorldService {
     }
 
     create(wName, accessibility, guests, maxUsers, tag_array, desc) {
-        return fetch(`${URL_BASE}maps/default_map.json`)
+        return fetch(API_BASE + "static/maps/default_map.json")
             .then((res) => res.json())
             .then((worldMap) => 
                 fetch(API_BASE + 'worlds/', {

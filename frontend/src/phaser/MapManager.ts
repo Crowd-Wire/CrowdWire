@@ -1,4 +1,5 @@
 import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
+import { API_BASE } from "config";
 
 import useWorldUserStore from "stores/useWorldUserStore";
 
@@ -38,9 +39,7 @@ class MapManager {
                 // object layer
                 tileset.tiles.forEach((tile) => {
                     const imageId = tileset.firstgid + tile.id;
-                    // let req = require();
-                    // console.log(req);
-                    scene.load.image(imageId.toString(), `${process.env.PUBLIC_URL}/maps/` + tile.image);
+                    scene.load.image(imageId.toString(), API_BASE + "static/maps/" + tile.image);
                     this.objectKeys.push(imageId);
                     if ('objectgroup' in tile) {
                         // custom object collider
@@ -51,7 +50,7 @@ class MapManager {
             } else {
                 // tile layer
                 const imageId = tileset.name;
-                scene.load.image(imageId, `${process.env.PUBLIC_URL}/maps/` + tileset.image);
+                scene.load.image(imageId, API_BASE + "static/maps/" + tileset.image);
                 this.tileKeys.push(imageId);
             }
         })

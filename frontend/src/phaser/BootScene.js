@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
-
-import useWorldUserStore from "stores/useWorldUserStore";
+import { API_BASE } from "config";
 
 import MapManager from "./MapManager.ts";
 
@@ -89,7 +88,7 @@ class BootScene extends Phaser.Scene {
         // mapManager.fetchMap().then(() => mapManager.loadMap(this));
         mapManager.loadMap(this)
 
-        this.load.spritesheet('player', `${process.env.PUBLIC_URL}/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet('player', API_BASE + "static/characters/RPG_assets.png", { frameWidth: 16, frameHeight: 16 });
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/fonts/bitmap/gem.xml`);
     }
 }

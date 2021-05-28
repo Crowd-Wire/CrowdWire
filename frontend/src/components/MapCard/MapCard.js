@@ -56,7 +56,7 @@ export default function MapCard(props){
                             <Typography gutterBottom variant="h5" component="h2">
                             {   map.name}
                             </Typography>
-                            <Typography variant="body2" color="textSecondary" component="p">
+                            <Typography variant="body2" noWrap color="textSecondary" component="p">
                                 {map.description}
                             </Typography>
                         </CardContent>

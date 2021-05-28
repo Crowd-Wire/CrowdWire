@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@kubernetes/client-node": "^0.14.3",
     "@sentry/node": "^6.2.5",
     "@sentry/tracing": "^6.2.5",
     "amqplib": "^0.6.0",

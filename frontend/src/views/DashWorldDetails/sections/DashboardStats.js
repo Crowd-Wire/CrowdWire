@@ -16,6 +16,7 @@ import WorldService from "services/WorldService";
 import DeleteIcon from '@material-ui/icons/Delete';
 import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
 import TextField from '@material-ui/core/TextField';
+import ReportWorldCard from '../../../components/ReportWorldCard/ReportWorldCard.js'
 class DashboardStats extends Component{
     
     constructor(props){
@@ -82,10 +83,12 @@ class DashboardStats extends Component{
                         <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
                             <Row>
 
+
+                                  
                                     <Button variant="success" className={this.actionButtons} style={{color:"black"}}>Enter Map</Button>
                                     <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{marginLeft:"3%"}}>Edit Map</Button>
                                     <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{marginLeft:"3%"}}>Manage Map</Button>
-
+                                    <ReportWorldCard />
                             </Row>
                             <Row style={{marginTop:"50px"}}>
                                 <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>

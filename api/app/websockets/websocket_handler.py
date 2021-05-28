@@ -13,14 +13,15 @@ async def join_player(world_id: str, user_id: str, payload: dict):
     # store position on redis
     await redis_connector.set_user_position(world_id, user_id, position)
     user = await redis_connector.get_world_user_data_dict(world_id=world_id, user_id=user_id)
-    user['user_id'] = user_id
-    # broadcast join player
-    await manager.broadcast(
-        world_id,
-        {'topic': protocol.JOIN_PLAYER, 'user': user, 'position': position},
-        user_id
-    )
-    await send_groups_snapshot(world_id)  # TODO: remove after tests
+    if user:
+        user['user_id'] = user_id
+        # broadcast join player
+        await manager.broadcast(
+            world_id,
+            {'topic': protocol.JOIN_PLAYER, 'user': user, 'position': position},
+            user_id
+        )
+        await send_groups_snapshot(world_id)  # TODO: remove after tests
 
 
 async def send_player_movement(world_id: str, user_id: str, payload: dict):
@@ -285,6 +286,7 @@ async def handle_actions(actions: dict):
     if 'close-room' in actions:
         close_rooms = actions['close-room']
         for close_action in close_rooms:
+            await redis_connector.remove_room(close_action['roomId'])
             await destroy_room(close_action['worldId'], close_action['roomId'])
     if 'rem-user-from-groups' in actions:
         rem_action = actions['rem-user-from-groups']

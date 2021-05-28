@@ -11,6 +11,7 @@ import Badge from '@material-ui/core/Badge';
 import TextsmsIcon from '@material-ui/icons/Textsms';
 import SettingsIcon from '@material-ui/icons/Settings';
 import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
+import ReportIcon from '@material-ui/icons/Report';
 import Chat from './Sections/Chat';
 import UserList from './Sections/UserList.js';
 import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
@@ -25,7 +26,6 @@ import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
 import useMessageStore from 'stores/useMessageStore';
 import usePlayerStore from 'stores/usePlayerStore';
-
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -248,6 +248,12 @@ const GameDrawer = () => {
             onClick={() => handleOpen(<WSettingsContent />)}
           >
             <SettingsIcon style={iconsStyle} />
+          </IconButton>
+          <IconButton
+            aria-label="open drawer"
+            onClick={() => handleOpen(<WSettingsContent />)}
+          >
+            <ReportIcon style={iconsStyle} />
           </IconButton>
           <IconButton
             onClick={() => {}}
