@@ -77,11 +77,6 @@ const UserList = (props) => {
     marginLeft: "0.5rem"
   }
 
-  const handleClick = (event) => {
-  
-    console.log(event.target)
-  }
-
   return (
     <div className={classes.root}>
     {

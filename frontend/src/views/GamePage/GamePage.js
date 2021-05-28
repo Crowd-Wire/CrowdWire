@@ -39,7 +39,6 @@ const GamePage = (props) => {
       navigation("/dashboard/search");
     }).then(
       (res) => {
-        console.log(res)
         if (res.detail){
           toast.dark(
             <span>

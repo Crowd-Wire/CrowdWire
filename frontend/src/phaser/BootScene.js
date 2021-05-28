@@ -78,23 +78,19 @@ class BootScene extends Phaser.Scene {
                 loadingText.destroy();
                 percentText.destroy();
                 assetText.destroy();
-                console.log(this.registry.get('scene'))
-                this.scene.start(this.registry.get('scene'));
+                this.scene.start('GameScene');
             }, 500);
         }, this);
         
-        // TODO: maybe change these lines
-        const worldUser = useWorldUserStore.getState().world_user;
-        const worldId = (worldUser && worldUser.world_id) || window.location.pathname.split('/')[2]
-        
-        const mapManager = new MapManager(worldId);
+
+        const mapManager = new MapManager();
         this.registry.set('mapManager', mapManager);
         
-        mapManager.fetchMap().then(() => mapManager.loadMap(this));
+        // mapManager.fetchMap().then(() => mapManager.loadMap(this));
+        mapManager.loadMap(this)
 
-        this.load.spritesheet('player', `${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
-
-        this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/assets/fonts/bitmap/gem.xml`);
+        this.load.spritesheet('player', `${process.env.PUBLIC_URL}/characters/RPG_assets.png`, { frameWidth: 16, frameHeight: 16 });
+        this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/fonts/bitmap/gem.xml`);
     }
 }
 

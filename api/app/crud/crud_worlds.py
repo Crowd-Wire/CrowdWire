@@ -102,7 +102,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             name=obj_in.name,
             description=obj_in.description,
             allow_guests=obj_in.allow_guests,
-            world_map=bytes(open("static/default_map.json", 'r').read().encode()),
+            world_map=obj_in.world_map,
             max_users=obj_in.max_users,
             public=obj_in.public,
             creation_date=creation_date,
