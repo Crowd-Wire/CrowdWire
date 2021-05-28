@@ -7,6 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import WorldService from '../../services/WorldService.js';
+import {useNavigate} from 'react-router-dom';
 
 const useStyles = makeStyles({
     root: {
@@ -21,14 +22,7 @@ export default function WorldReportCard(props) {
 
     const [report, setReport] = React.useState(props.report);
     const classes = useStyles();
-
-    const handleBan = () => {
-        WorldService.banWorld(report.reported, report.banned == 0 ? 1 : 0 )
-        .then((res) => {
-            if(res.ok)
-                props.reset();
-        })
-    }
+    const navigate = useNavigate();
 
     const handleReview = () => {
         WorldService.reviewWorldReport(report.reported, report.reporter, !report.reviewed)
@@ -43,9 +37,14 @@ export default function WorldReportCard(props) {
         })
     }
 
+    const goToDetails = () => {
+        // repor.reported = world_id
+        navigate("/admin/worlds/" + report.reported);
+    }
+
     return (
         <Card className={classes.root}>
-            <CardActionArea>
+            <CardActionArea onClick={goToDetails}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
                         {report.world_name}
@@ -59,9 +58,6 @@ export default function WorldReportCard(props) {
                 </CardContent>
             </CardActionArea>
             <CardActions>
-                <Button onClick={handleBan} size="small" color={report.banned ? "primary" : "secondary"}>
-                    {report.banned ? "Remove Ban" : "Ban"}
-                </Button>
                 <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "secondary" : "primary"}>
                     {report.reviewed ? "Remove Review" : "Review"}
                 </Button>

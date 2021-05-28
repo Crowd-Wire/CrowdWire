@@ -50,6 +50,14 @@ class AdminWorldDetails extends Component {
             })
     }
 
+    handleBan = () => {
+        WorldService.banWorld(this.state.world.world_id, this.state.world.status == 0 ? 1 : 0)
+        .then((res) => { return res.json(); })
+        .then((res) => {
+            console.log(res);
+            this.setState({world: {...this.state.world, status: res.status}});
+        })
+    }
 
     render() {
         return (
@@ -72,9 +80,10 @@ class AdminWorldDetails extends Component {
                                     </Typography>
                                 </CardContent>
                                 <CardActions>
-                                    <Button size="small" color="primary">
+                                    <Button onClick={this.handleBan} size="small" variant="contained" color={this.state.world.status == 0 ? "primary" : 'secondary'}>
                                         {this.state.world.status == 0 ? "Ban" : "Unban" }
                                     </Button>
+                                    <Button size="small" variant="contained" color="primary">View statistics</Button>
                                 </CardActions>
                             </Card>
                         }
