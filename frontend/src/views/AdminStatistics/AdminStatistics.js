@@ -42,7 +42,7 @@ class AdminStatistics extends Component {
     }
 
     componentDidMount(){
-        WorldService.search("", [], null, null, null, true, null, null, null, 1, 10)
+        WorldService.searchAdmin("", [], null, null, true, null, null, null, 1, 10)
         .then((res) => {
             if(res.status == 200) 
                 return res.json();

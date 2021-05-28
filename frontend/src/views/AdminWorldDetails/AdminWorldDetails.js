@@ -27,7 +27,6 @@ class AdminWorldDetails extends Component {
     componentDidMount() {
         // returns the world_id based on the url
         let world_id = window.location.pathname.split('/').pop();
-        console.log(world_id);
 
         // retrieves the world details
         WorldService.getWorldDetails(world_id)
@@ -37,7 +36,6 @@ class AdminWorldDetails extends Component {
             .then((res) => {
                 // TODO: handle errors
                 this.setState({ world: res });
-                console.log(res);
             }).then(() => {
                 // retrieves the most recent reports
                 if (this.state.world.status !== 2)
