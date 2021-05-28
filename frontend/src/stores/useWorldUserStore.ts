@@ -24,6 +24,7 @@ interface WorldUser {
     username: string;
     in_conference: string;
     color?: string;
+    map?: string;
 }
 
 const colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
@@ -83,7 +84,6 @@ const useWorldUserStore = create(
                     for (var key in users_data) {
                         users_data[key].color = colorArray[randomIntFromInterval(20)]
                     }
-                    console.log(users_data)
                     return {
                         users_info: users_data,
                     }

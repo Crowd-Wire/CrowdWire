@@ -12,10 +12,8 @@ class ReportUserBase(BaseModel):
 
 
 class ReportUserCreate(ReportUserBase):
-    reported: int
     world_id: int
     comment: Optional[str]
-    timestamp: datetime
 
 
 class ReportUserInDB(ReportUserBase):

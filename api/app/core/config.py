@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
+    FRONTEND_URL = "https://crowdwire.duckdns.org/" if PRODUCTION else "http://localhost:3000/"
+
     # TODO: Change this
     # testing
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
