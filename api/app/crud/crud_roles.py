@@ -23,7 +23,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.role_manage.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -37,7 +37,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.ban.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ACCESS_FORBIDDEN
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -51,7 +51,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.conference_manage.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -65,7 +65,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.talk_conference.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     async def can_assign_new_role_to_user(
@@ -152,7 +152,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         # Verify if user has permission to edit roles in this world
         role, msg = await self.can_access_world_roles(db=db, world_id=obj_in.world_id, user_id=request_user.user_id)
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, msg
         # verify if there's already a role with this name
         role, msg = self.get_by_name(db=db, world_id=obj_in.world_id, name=obj_in.name)
         if not role:
@@ -206,7 +206,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if world_id and role_id:
             role, msg = await crud_role.get_by_role_id(db=db, role_id=role_id)
             if not role:
-                return None, strings.ROLES_NOT_FOUND
+                return None, msg
             if role.is_default:
                 return None, strings.ROLE_DEFAULT_DELETE_FORBIDDEN
             default_role = self.get_world_default(db=db, world_id=world_id)
