@@ -109,7 +109,7 @@ class DashboardStats extends Component{
                                 </Button>
                                 <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"3%"}}>Delete World</Button>
                                 <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
-                                world_name={this.props.details.name} world_id={this.props.details.world_id} />
+                                    world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                             </Row>
                         </Col>
                     </Row>

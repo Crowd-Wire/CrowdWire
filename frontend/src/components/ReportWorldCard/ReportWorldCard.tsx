@@ -116,8 +116,14 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
       //@ts-ignore
       let comment = document.getElementById("report-world-comment").value;
       console.log(comment);
+      let worldToReport;
+      if (world_id == "") {
+        worldToReport = useWorldUserStore.getState().world_user.world_id;
+      } else {
+        worldToReport = world_id;
+      }
       if (comment != "") {
-        ReportService.sendWorldReport(useWorldUserStore.getState().world_user.world_id, comment)
+        ReportService.sendWorldReport(worldToReport, comment)
           .then((res) => {
             if(res.ok){
               toast.success("Report Sent", {
@@ -216,65 +222,6 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
     </>
   )
 
-  const reportUsersTab = (
-      <>
-        <DialogTitle id="form-dialog-title">Report Users</DialogTitle>
-        <DialogContent>
-
-        <FormControl required className={classes2.formControl}>
-            <InputLabel htmlFor="user_id-native-required">User</InputLabel>
-            <Select
-              native
-              value={userToReport}
-              onChange={handleChange2}
-              name="user_id"
-              inputProps={{
-                id: 'user_id-native-required',
-              }}
-              >
-              <option aria-label="None" value="" />
-              {users && Object.keys(users).map((user_id, index) => (
-                <option key={index} value={user_id}>{useWorldUserStore.getState().users_info[user_id].username}</option>
-              ))}
-            </Select>
-            <FormHelperText>Required</FormHelperText>
-          </FormControl>
-
-        <DialogContentText>
-          Please give some feedback on why you want to report this user
-        </DialogContentText>
-        
-        <TextField
-          id="report-user-comment"
-          label="Comment"
-          style={{ margin: 8 }}
-          placeholder="Report Reason..."
-          fullWidth
-          multiline={true}
-          rows={3}
-          margin="normal"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant="filled"
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={closeModal} color="secondary">
-          Cancel
-        </Button>
-        <Button
-            variant="contained"
-            className="primary"
-            onClick={reportUser}
-            style={{color: 'white'}}
-        >
-            Send
-        </Button>
-      </DialogActions>
-    </>
-  )
-
 
     return (
       <div>
@@ -292,7 +239,7 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
                   variant="fullWidth"
                   aria-label="full width tabs example"
                 >
-                  <Tab label="Report Users" {...a11yProps(0)} />
+                  <Tab label="Report a User" {...a11yProps(0)} />
                   <Tab label="Report World" {...a11yProps(1)} />
                 </Tabs>
               </AppBar>
@@ -302,7 +249,62 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
                 onChangeIndex={handleChangeIndex}
               >
                 <TabPanel value={value} index={0} dir={theme2.direction}>
-                  {reportUsersTab}
+                  
+                <DialogTitle id="form-dialog-title">Report a User</DialogTitle>
+                <DialogContent>
+
+                  <FormControl required className={classes2.formControl}>
+                      <InputLabel htmlFor="user_id-native-required">User</InputLabel>
+                      <Select
+                        native
+                        value={userToReport}
+                        onChange={handleChange2}
+                        name="user_id"
+                        inputProps={{
+                          id: 'user_id-native-required',
+                        }}
+                        >
+                        <option aria-label="None" value="" />
+                        {users && Object.keys(users).map((user_id, index) => (
+                          <option key={index} value={user_id}>{useWorldUserStore.getState().users_info[user_id].username}</option>
+                        ))}
+                      </Select>
+                      <FormHelperText>Required</FormHelperText>
+                    </FormControl>
+
+                  <DialogContentText>
+                    Please give some feedback on why you want to report this user
+                  </DialogContentText>
+                  
+                  <TextField
+                    id="report-user-comment"
+                    label="Comment"
+                    style={{ margin: 8 }}
+                    placeholder="Report Reason..."
+                    fullWidth
+                    multiline={true}
+                    rows={3}
+                    margin="normal"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    variant="filled"
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={closeModal} color="secondary">
+                    Cancel
+                  </Button>
+                  <Button
+                      variant="contained"
+                      className="primary"
+                      onClick={reportUser}
+                      style={{color: 'white'}}
+                  >
+                      Send
+                  </Button>
+                </DialogActions>
+
                 </TabPanel>
                 <TabPanel value={value} index={1} dir={theme2.direction}>
                   {reportWorldTab}
@@ -310,7 +312,42 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
               </SwipeableViews>
             </div>
           :
-            {reportWorldTab}
+            <>
+              <DialogTitle id="form-dialog-title">Report World</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Please give some feedback on why you want to report this world.
+                </DialogContentText>
+        
+                <TextField
+                  id="report-world-comment"
+                  label="Comment"
+                  style={{ margin: 8 }}
+                  placeholder="Report Reason..."
+                  fullWidth
+                  multiline={true}
+                  rows={3}
+                  margin="normal"
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  variant="filled"
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={closeModal} color="secondary">
+                  Cancel
+                </Button>
+                <Button
+                    variant="contained"
+                    className="primary"
+                    onClick={reportWorld}
+                    style={{color: 'white'}}
+                >
+                    Send
+                </Button>
+              </DialogActions>
+            </>
         }
         </Dialog>
         </ThemeProvider>
