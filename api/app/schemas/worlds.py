@@ -26,8 +26,8 @@ class WorldCreate(BaseWorld):
     name: str
     public: bool
     allow_guests: bool
-    world_map: bytes
     tags: List[str]
+    world_map: bytes
 
 
 class WorldUpdate(BaseWorld):
