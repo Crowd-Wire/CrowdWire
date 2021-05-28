@@ -3,11 +3,11 @@ export let API_BASE = null;
 export let URL_BASE = null;
 console.log(window.REACT_APP_RUNNING_MODE);
 if (window.REACT_APP_RUNNING_MODE != null && window.REACT_APP_RUNNING_MODE == 'production'){
-    let HOST = "crowdwire.duckdns.org"
+    let HOST = "192.168.49.2"
     console.log("host " + HOST)
-    WS_BASE = `wss://${HOST}/api/v1`
-    API_BASE = `https://${HOST}/api/v1/`
-    URL_BASE = `https://${HOST}/`
+    WS_BASE = `ws://${HOST}/api/v1`
+    API_BASE = `http://${HOST}/api/v1/`
+    URL_BASE = `http://${HOST}/`
 }
 else {
     WS_BASE = "ws://localhost:8000";
