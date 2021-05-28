@@ -5,9 +5,10 @@ from sqlalchemy import or_
 from app.models import Role, World_User, User, World
 from .base import CRUDBase
 from app.schemas import RoleCreate, RoleUpdate
-from ..core import strings
+from ..core import strings, consts
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
+from loguru import logger
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
@@ -192,9 +193,30 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        # Worth is return a error here?
-        if 'is_default' in update_data and update_data['is_default']:
-            update_data['is_default'] = False
+
+        # cannot change default role without setting a new one
+        if 'is_default' in update_data and not update_data['is_default']:
+            return None, "cannot remove default role"
+
+        # this is required because when converting a sqlalchemy model to dict it returns another attribute
+        # sa_instance
+        row2dict = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
+        new_data = row2dict(db_obj)
+        new_data.update(update_data)
+
+        # when trying to change the default role there cannot be some permissions in this role
+        if update_data['is_default'] or db_obj.is_default:
+            # the new object in the database cannot have some permissions
+            for k, v in new_data.items():
+                if v is True and k not in consts.role_default_permissions + ['is_default']:
+                    return None, "cannot give this permissions to default role"
+
+            # change old default role to not default
+            default_role = self.get_world_default(db=db, world_id=db_obj.world_id)
+            default_role.is_default = False
+            db.add(default_role)
+            db.commit()
+
         await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS

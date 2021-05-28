@@ -57,11 +57,16 @@ async def edit_role_in_world(
     role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
+
     role, msg = await crud_role.get_by_role_id_and_world_id(db=db, role_id=role_id, world_id=world_id)
     if not role:
         raise HTTPException(status_code=400, detail=msg)
+
     role_in.world_id = world_id
-    role_obj_upd, _ = await crud_role.update(db=db, db_obj=role, obj_in=role_in)
+
+    role_obj_upd, msg= await crud_role.update(db=db, db_obj=role, obj_in=role_in)
+    if role_obj_upd is None:
+        raise HTTPException(status_code=400, detail=msg)
     return role_obj_upd
 
 

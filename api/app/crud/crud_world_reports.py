@@ -73,7 +73,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
 
         reports = query.offset(page_size * (page - 1)).limit(page_size).all()
 
-        # the results are not inside a dict so it is hard to conver to json
+        # the results are not inside a dict so it is hard to convert to json
         return [r._asdict() for r in reports], ""
 
     def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
