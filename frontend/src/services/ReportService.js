@@ -15,7 +15,6 @@ class ReportService{
     }
 
     sendUserReport(reported_id, world_id, comment){
-        console.log({world_id: world_id, comment: comment})
         return fetch(API_BASE + 'users/' + reported_id  + "/reports-received/", {
             method: 'POST',
             mode: 'cors',

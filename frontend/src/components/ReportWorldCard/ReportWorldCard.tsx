@@ -115,7 +115,6 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
     const reportWorld = () => {
       //@ts-ignore
       let comment = document.getElementById("report-world-comment").value;
-      console.log(comment);
       let worldToReport;
       if (world_id == "") {
         worldToReport = useWorldUserStore.getState().world_user.world_id;
@@ -150,8 +149,6 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
     const reportUser = () => {
       //@ts-ignore
       let comment = document.getElementById("report-user-comment").value;
-      console.log(comment);
-      console.log(userToReport)
       if (userToReport == "") {
         toast.error("Please specify a user to report!", {
           position: toast.POSITION.BOTTOM_RIGHT
