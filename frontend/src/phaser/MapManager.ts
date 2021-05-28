@@ -1,11 +1,9 @@
-import WorldService from "services/WorldService.js";
-
-import { API_BASE } from "config";
 import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
+
+import useWorldUserStore from "stores/useWorldUserStore";
 
 
 enum MapManagerState {
-    FETCHED = "FETCHED",
     LOADED = "LOADED",
     BUILT = "BUILT",
 }
@@ -16,33 +14,20 @@ class MapManager {
     private map: Tilemaps.Tilemap;
     private mapJson: any;
     private state: MapManagerState;
-    private worldId: string;
+    private worldId: number;
 
     private tileKeys: number[];
     private objectKeys: number[];
 
     private objectProps: any;
 
-    constructor(worldId: string) {
-        this.worldId = worldId;
-    }
-
-    async fetchMap(): Promise<void> {
-        await WorldService.getWorldDetails(this.worldId)
-            .then((res) => {
-                return res.json();
-            }).then((res) => {
-                this.mapJson = JSON.parse(res.world_map);
-                this.state = MapManagerState.FETCHED;
-            })
+    constructor() {
+        const worldUser = useWorldUserStore.getState().world_user;
+        this.worldId = worldUser.world_id;
+        this.mapJson = JSON.parse(worldUser.map);
     }
 
     loadMap(scene: Scene): void {
-        if (this.state !== MapManagerState.FETCHED)
-            throw Error(`Illegal call to function with the current state ${this.state}`);
-
-        // map in json format
-        // scene.load.tilemapTiledJSON('map', API_BASE + "static/default_map.json");
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
         this.tileKeys = [];
@@ -53,7 +38,9 @@ class MapManager {
                 // object layer
                 tileset.tiles.forEach((tile) => {
                     const imageId = tileset.firstgid + tile.id;
-                    scene.load.image(imageId.toString(), API_BASE + "static/" + tile.image);
+                    // let req = require();
+                    // console.log(req);
+                    scene.load.image(imageId.toString(), `${process.env.PUBLIC_URL}/maps/` + tile.image);
                     this.objectKeys.push(imageId);
                     if ('objectgroup' in tile) {
                         // custom object collider
@@ -64,7 +51,7 @@ class MapManager {
             } else {
                 // tile layer
                 const imageId = tileset.name;
-                scene.load.image(imageId, API_BASE + "static/" + tileset.image);
+                scene.load.image(imageId, `${process.env.PUBLIC_URL}/maps/` + tileset.image);
                 this.tileKeys.push(imageId);
             }
         })

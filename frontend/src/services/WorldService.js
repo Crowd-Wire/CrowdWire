@@ -1,4 +1,4 @@
-import { API_BASE } from "config";
+import { API_BASE, URL_BASE } from "config";
 import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
@@ -91,23 +91,28 @@ class WorldService {
     }
 
     create(wName, accessibility, guests, maxUsers, tag_array, desc) {
-        return fetch(API_BASE + 'worlds/', {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                "Authorization": "Bearer " + AuthenticationService.getToken(),
-                'Content-Type': 'application/json',
-            },
-            // TODO: change hashed_password to password after backend update
-            body: JSON.stringify({
-                name: wName,
-                public: accessibility,
-                allow_guests: guests,
-                max_users: maxUsers,
-                tags: tag_array,
-                description: desc
-            })
-        })
+        return fetch(`${URL_BASE}maps/default_map.json`)
+            .then((res) => res.json())
+            .then((worldMap) => 
+                fetch(API_BASE + 'worlds/', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        "Authorization": "Bearer " + AuthenticationService.getToken(),
+                        'Content-Type': 'application/json',
+                    },
+                    // TODO: change hashed_password to password after backend update
+                    body: JSON.stringify({
+                        name: wName,
+                        public: accessibility,
+                        allow_guests: guests,
+                        max_users: maxUsers,
+                        tags: tag_array,
+                        description: desc,
+                        world_map: JSON.stringify(worldMap),
+                    })
+                })
+            )
     }
 
     /**
@@ -200,11 +205,8 @@ class WorldService {
         if(limit !== null)
             query.push("limit=" + limit);
 
-        console.log(query);
         if(query.length !== 0)
             url = url.concat('?'+query.join('&'));
-
-        console.log(url);
 
         return fetch(API_BASE + url , {
             method: 'GET',
