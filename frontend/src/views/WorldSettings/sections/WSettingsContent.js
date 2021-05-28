@@ -90,7 +90,7 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} /*setUsers={this.setUsers}*/>CHEFAO</RolePanel>
 						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>

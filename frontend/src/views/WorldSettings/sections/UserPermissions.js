@@ -78,7 +78,7 @@ export default function UserPermissions(props) {
   return (
     <FormGroup style={{height:"100%"}}>
       <Row style={{paddingLeft:"30px", paddingRight:"30px"}}>
-      <Typography onClick={()=>setDialog(true)} variant="h4" style={{paddingTop:"10px", paddingBottom:"10px"}}>
+      <Typography onClick={()=>setDialog(true)} variant="h4" style={{cursor:"pointer", paddingTop:"10px", paddingBottom:"10px"}}>
         {newState.name}
       </Typography>
       <Typography variant="caption" style={{marginTop:"auto", marginBottom:"auto", marginLeft:"15px"}}>
@@ -198,6 +198,21 @@ export default function UserPermissions(props) {
             />
           </Row>
           <Row>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={newState.write}
+                  onChange={handleChange}
+                  name="chat"
+                  color="primary"
+                />
+              }
+              label="Write in Chat"
+              labelPlacement="end"
+              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
+            />
+          </Row>
+          <Row>
           <FormControlLabel
             control={
               <Checkbox
@@ -225,21 +240,6 @@ export default function UserPermissions(props) {
                 />
               }
               label="Role Manage"
-              labelPlacement="end"
-              style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
-            />
-          </Row>
-          <Row>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={newState.write}
-                  onChange={handleChange}
-                  name="chat"
-                  color="primary"
-                />
-              }
-              label="Write in Chat"
               labelPlacement="end"
               style={{color:"black", float:"left", marginLeft:"10px", minWidth:"110px"}}
             />
