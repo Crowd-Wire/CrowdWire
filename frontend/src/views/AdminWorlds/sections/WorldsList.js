@@ -77,8 +77,8 @@ export default function WorldsList() {
         setOrder(event.target.value);
     }
 
-    const request = (search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) => {
-        WorldService.search(search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit)
+    const request = (search, tags, banned, deleted, normal, creator, order_by, order, page, limit) => {
+        WorldService.searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit)
             .then((res) => {
                 return res.json();
             })
@@ -89,7 +89,7 @@ export default function WorldsList() {
 
 
     React.useEffect(() => {
-        request("", [], null, null, null, true, null, null, null, 1, 10);
+        request("", [], null, null, true, null, null, null, 1, 10);
         TagService.getAll()
             .then((res) => {
                 if (res.status == 200)

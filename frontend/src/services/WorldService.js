@@ -57,6 +57,17 @@ class WorldService {
         })
     }
 
+    searchUsers(search, tags, visibility, order_by, order, page, limit){
+        // makes it easier to call the function
+        return search(search, tags, visibility, null, null, null, null, order_by, order, page, limit);
+    }
+
+    searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit){
+        // makes it easier to call the function
+        return search(search, tags, null, banned, deleted, normal, creator, order_by, order, page, limit);
+    }
+
+
     getWorldDetails(path) {
 
         /*
@@ -64,7 +75,6 @@ class WorldService {
         */
 
         let url = 'worlds/' + path;
-        let query = [];
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',

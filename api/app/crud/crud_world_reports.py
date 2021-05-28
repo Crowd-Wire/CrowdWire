@@ -22,8 +22,6 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         """
         Returns every report for that world.
         """
-        # TODO: change this value later
-        page_size = 10
 
         # this query gets all reports for a world and gets the email and name the of the world
         query = db.query(
@@ -71,7 +69,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_World.timestamp))
 
-        reports = query.offset(page_size * (page - 1)).limit(page_size).all()
+        reports = query.offset(limit * (page - 1)).limit(limit).all()
 
         # the results are not inside a dict so it is hard to conver to json
         return [r._asdict() for r in reports], ""
