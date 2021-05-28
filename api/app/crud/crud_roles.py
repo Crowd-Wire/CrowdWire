@@ -8,7 +8,7 @@ from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings, consts
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
-from loguru import logger
+from app.utils import row2dict
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
@@ -201,11 +201,9 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
 
         # this is required because when converting a sqlalchemy model to dict it returns another attribute
         # sa_instance
-        row2dict = lambda r: {c.name: str(getattr(r, c.name)) for c in r.__table__.columns}
         new_data = row2dict(db_obj)
         new_data.update(update_data)
 
-        logger.debug(new_data)
         # when trying to change the default role there cannot be some permissions in this role
         if new_data.get('is_default'):
             # the new object in the database cannot have some permissions
