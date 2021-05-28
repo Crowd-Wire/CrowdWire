@@ -38,7 +38,6 @@ import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
- 
 const routes = (token, guest_uuid) => [
 	{
 		path: "/",

@@ -11,8 +11,6 @@ interface Vector {
 interface Player {
     position: Vector;
     velocity: Vector;
-    //name
-    //avatar
 }
 
 interface Player2 {
