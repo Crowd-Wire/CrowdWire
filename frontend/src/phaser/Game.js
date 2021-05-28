@@ -25,7 +25,8 @@ const gameConfig = {
       // autoCenter: Phaser.DOM.CENTER_BOTH,
 
       //mode: Phaser.Scale.FIT,
-      mode: Phaser.Scale.RESIZE,
+      // mode: Phaser.Scale.RESIZE,
+      // mode: Phaser.Scale.NONE,
 
       //mode: Phaser.DOM.FIT,
       // autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
@@ -54,13 +55,19 @@ const gameConfig = {
   backgroundColor: '#434366',
 };
 
-const scenes = {
-  GameScene, 
-  WorldEditorScene,
+const sceneConfig = {
+  GameScene: {
+    mode: Phaser.Scale.RESIZE,
+    scene: [BootScene, GameScene],
+  },
+  WorldEditorScene: {
+    mode: Phaser.Scale.NONE,
+    scene: [BootScene, WorldEditorScene],
+  }
 }
 
 export function setupGame(scene) {
-  const game = new Phaser.Game({...gameConfig, scene: [BootScene, scenes[scene]]});
+  const game = new Phaser.Game({...gameConfig, ...sceneConfig[scene]});
   game.registry.set('scene', scene);
   return game;
 }
