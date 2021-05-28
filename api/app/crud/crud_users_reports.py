@@ -6,6 +6,7 @@ from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
 from typing import List, Optional, Tuple
+from datetime import datetime
 
 
 class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
@@ -85,25 +86,29 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
 
         return report
 
-    def create(self, db: Session, user_id: int, report: ReportUserCreate) -> Tuple[Optional[Report_User], str]:
+    def create(self, db: Session, reporter_id: int, reported_id: int, report: ReportUserCreate) -> Tuple[Optional[Report_User], str]:
         """
         Creates a User Report.
         """
 
-        reported = report.reported
         world_id = report.world_id
 
+        if reporter_id == reported_id:
+            return None, strings.CANT_DO_SELF_REPORT
+
         # check if both users have been in this world
-        if not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user_id) \
-                or not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=reported):
+        if not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=reporter_id) \
+                or not crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=reported_id):
 
             return None, strings.USERS_NOT_IN_SAME_WORLD
 
         # check if the user has already reported the other in this world
-        if self.get_user1_report_user2_world(db=db, reporter=user_id, reported=reported, world_id=world_id):
+        if self.get_user1_report_user2_world(db=db, reporter=reporter_id, reported=reported_id, world_id=world_id):
             return None, strings.USER_ALREADY_REPORTED_IN_THIS_WORLD
 
-        report.reporter = user_id
+        report.reporter = reporter_id
+        report.reported = reported_id
+        report.timestamp = datetime.now()
 
         report = super().create(db=db, obj_in=report)
         return report, ""

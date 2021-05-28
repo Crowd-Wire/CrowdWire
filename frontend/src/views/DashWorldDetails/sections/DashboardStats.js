@@ -16,22 +16,26 @@ import WorldService from "services/WorldService";
 import DeleteIcon from '@material-ui/icons/Delete';
 import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
 import TextField from '@material-ui/core/TextField';
-import ReportWorldCard from '../../../components/ReportWorldCard/ReportWorldCard.js'
+import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
+import ReportIcon from '@material-ui/icons/Report';
+
+
 class DashboardStats extends Component{
     
     constructor(props){
         super(props);
         this.state = {
             show: false,
-            dialog:false,
-            nav:false
+            dialog: false,
+            nav: false,
+            open: false
         }
     }
     
     transition = React.forwardRef(function Transition(props, ref) {
         return <Slide direction="up" ref={ref} {...props} />;
     });
-
+    
     actionButtons = {
         marginRight:"10px",
     };
@@ -39,9 +43,17 @@ class DashboardStats extends Component{
         marginLeft:"5%",
         color:"white",
     };
-
+    
     titleText = {
         marginLeft:"5%"
+    };
+
+    handleClickOpen = () => {
+        this.setState({open: true});        
+    };
+    
+    handleClose = () => {
+        this.setState({open: false});        
     };
     
     hideModal = () => {
@@ -82,13 +94,9 @@ class DashboardStats extends Component{
                     <Row style={{width:"100%",height:"90%", marginLeft:"auto", marginRight:"auto"}}>
                         <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
                             <Row>
-
-
-                                  
                                     <Button variant="success" className={this.actionButtons} style={{color:"black"}}>Enter Map</Button>
                                     <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{marginLeft:"3%"}}>Edit Map</Button>
                                     <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{marginLeft:"3%"}}>Manage Map</Button>
-                                    <ReportWorldCard />
                             </Row>
                             <Row style={{marginTop:"50px"}}>
                                 <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
@@ -96,7 +104,12 @@ class DashboardStats extends Component{
                         </Col>
                         <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>
                             <Row>
-                                <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"auto"}}>Delete World</Button>
+                                <Button variant="danger" onClick={() => {this.handleClickOpen()}} style={{marginLeft:"auto"}}>
+                                    Report World<ReportIcon/>
+                                </Button>
+                                <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"3%"}}>Delete World</Button>
+                                <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
+                                    world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                             </Row>
                         </Col>
                     </Row>

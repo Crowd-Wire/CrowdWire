@@ -15,6 +15,7 @@ import ReportIcon from '@material-ui/icons/Report';
 import Chat from './Sections/Chat';
 import UserList from './Sections/UserList.js';
 import WSettingsContent from "views/WorldSettings/sections/WSettingsContent.js";
+import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -87,6 +88,7 @@ const GameDrawer = () => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
+  const [openReport, setOpenReport] = React.useState(false);
   const [fullScreen, setFullScreen] = React.useState(false);
   const [drawer, setDrawer] = React.useState(null);
   const [page, setPage] = React.useState(null);
@@ -95,7 +97,7 @@ const GameDrawer = () => {
   const requestsToSpeak = usePlayerStore(state => state.requestsToSpeak);
   let numMessages = useMessageStore(state => state.messages.length);
   let textChat = document.getElementById('text-chat');;
-  
+
   useEffect(() => {
     if (!textChat) {
       textChat = document.getElementById('text-chat');
@@ -109,6 +111,14 @@ const GameDrawer = () => {
         textChat.removeEventListener('scroll', handleScroll);
     }
   })
+
+  const handleOpenReport = () => {
+    setOpenReport(true);
+  };
+
+  const handleCloseReport = () => {
+    setOpenReport(false);
+  };
 
   /**
    * Remove notifications when scroll to bottom
@@ -250,8 +260,8 @@ const GameDrawer = () => {
             <SettingsIcon style={iconsStyle} />
           </IconButton>
           <IconButton
-            aria-label="open drawer"
-            onClick={() => handleOpen(<WSettingsContent />)}
+            aria-label="open report modal"
+            onClick={() => handleOpenReport()}
           >
             <ReportIcon style={iconsStyle} />
           </IconButton>
@@ -292,6 +302,7 @@ const GameDrawer = () => {
         {page}
       </div> : null
     }
+    <ReportWorldCard open={openReport} closeModal={handleCloseReport} inside_world={true} />
     </>
   );
 }
