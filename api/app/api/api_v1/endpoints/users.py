@@ -62,7 +62,7 @@ async def get_all_user_reports_sent(
     return reports
 
 
-@router.post("/{id}/reports-sent", response_model=ReportUserInDB)
+@router.post("/{id}/reports-received/", response_model=ReportUserInDB)
 async def report_user(
         id: int,
         report: ReportUserCreate,
@@ -72,13 +72,10 @@ async def report_user(
     """
     Creates a User Report.
     """
-    if id != user.user_id:
-        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
-
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    report, msg = crud_report_user.create(db=db, report=report, user_id=id)
+    report, msg = crud_report_user.create(db=db, report=report, reporter_id=user.user_id, reported_id=id)
     if not report:
         raise HTTPException(status_code=400, detail=msg)
 

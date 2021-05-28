@@ -16,7 +16,7 @@ import WorldService from "services/WorldService";
 import DeleteIcon from '@material-ui/icons/Delete';
 import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
 import TextField from '@material-ui/core/TextField';
-import { ReportWorldCard } from '../../../components/ReportWorldCard/ReportWorldCard'
+import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';
 
 
@@ -105,7 +105,7 @@ class DashboardStats extends Component{
                         <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>
                             <Row>
                                 <Button variant="danger" onClick={() => {this.handleClickOpen()}} style={{marginLeft:"auto"}}>
-                                    Report <ReportIcon/>
+                                    Report World<ReportIcon/>
                                 </Button>
                                 <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"3%"}}>Delete World</Button>
                                 <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
