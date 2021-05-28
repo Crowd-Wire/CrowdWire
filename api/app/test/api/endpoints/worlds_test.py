@@ -508,19 +508,21 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-                role = schemas.RoleInDB(role_id=1, world_id=1)
-                access.return_value = models.World(world_map="".encode()), ""
-                cache.return_value = schemas.World_UserWithRoleAndMap(
-                    map="".encode(), role=role, role_id=1, world_id=1
-                )
-                response = client.post(
-                    "/worlds/1/users"
-                )
-                assert response.status_code == 200
-                assert response.json()['role']['role_id'] == 1
-                assert response.json()['world_id'] == 1
-                assert access.call_count == 1
-                assert cache.call_count == 1
+                with patch("app.crud.crud_world.update_online_users") as online_users:
+                    role = schemas.RoleInDB(role_id=1, world_id=1)
+                    access.return_value = models.World(world_map="".encode()), ""
+                    online_users.return_value = access.return_value
+                    cache.return_value = schemas.World_UserWithRoleAndMap(
+                        map="".encode(), role=role, role_id=1, world_id=1
+                    )
+                    response = client.post(
+                        "/worlds/1/users"
+                    )
+                    assert response.status_code == 200
+                    assert response.json()['role']['role_id'] == 1
+                    assert response.json()['world_id'] == 1
+                    assert access.call_count == 1
+                    assert cache.call_count == 1
 
     def test_join_world_no_cache_user(self):
         """
@@ -530,20 +532,23 @@ class TestWorlds(TestCase):
         with patch("app.crud.crud_worlds.CRUDWorld.get_available") as access:
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
                 with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
-                    access.return_value = models.World(world_map="".encode()), ""
-                    cache.return_value = None
-                    join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
-                                         models.Role(role_id=1, world_id=1))
+                    with patch("app.crud.crud_world.update_online_users") as online_users:
+                        # TODO: Change later
+                        access.return_value = models.World(world_map="".encode()), ""
+                        online_users.return_value = access.return_value
+                        cache.return_value = None
+                        join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
+                                             models.Role(role_id=1, world_id=1))
 
-                    response = client.post(
-                        "/worlds/1/users"
-                    )
-                    assert response.status_code == 200
-                    assert response.json()['world_id'] == 1
-                    assert response.json()['role']['role_id'] == 1
-                    assert access.call_count == 1
-                    assert cache.call_count == 1
-                    assert join.call_count == 1
+                        response = client.post(
+                            "/worlds/1/users"
+                        )
+                        assert response.status_code == 200
+                        assert response.json()['world_id'] == 1
+                        assert response.json()['role']['role_id'] == 1
+                        assert access.call_count == 1
+                        assert cache.call_count == 1
+                        assert join.call_count == 1
 
     def test_join_world_no_access_guest(self):
         """
@@ -565,19 +570,21 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user] = override_dependency_guest
         with patch("app.crud.crud_worlds.CRUDWorld.get_available_for_guests") as access:
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-                role = schemas.RoleInDB(role_id=1, world_id=1)
-                access.return_value = models.World(world_map="".encode()), ""
-                cache.return_value = schemas.World_UserWithRoleAndMap(
-                    map="".encode(), role=role, role_id=1, world_id=1
-                )
-                response = client.post(
-                    "/worlds/1/users"
-                )
-                assert response.status_code == 200
-                assert response.json()['role']['role_id'] == 1
-                assert response.json()['world_id'] == 1
-                assert access.call_count == 1
-                assert cache.call_count == 1
+                with patch("app.crud.crud_world.update_online_users") as online_users:
+                    online_users.return_value = models.World(world_map="".encode()), ""
+                    role = schemas.RoleInDB(role_id=1, world_id=1)
+                    access.return_value = models.World(world_map="".encode()), ""
+                    cache.return_value = schemas.World_UserWithRoleAndMap(
+                        map="".encode(), role=role, role_id=1, world_id=1
+                    )
+                    response = client.post(
+                        "/worlds/1/users"
+                    )
+                    assert response.status_code == 200
+                    assert response.json()['role']['role_id'] == 1
+                    assert response.json()['world_id'] == 1
+                    assert access.call_count == 1
+                    assert cache.call_count == 1
 
     def test_join_world_no_cache_guest(self):
         """
@@ -588,24 +595,25 @@ class TestWorlds(TestCase):
             with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
                 with patch("app.crud.crud_roles.CRUDRole.get_world_default") as default_role:
                     with patch("app.redis.connection.RedisConnector.join_new_guest_user") as join:
-                        role = schemas.RoleInDB(role_id=1, world_id=1)
-
-                        access.return_value = models.World(world_map="".encode()), ""
-                        cache.return_value = None
-                        default_role.return_value = models.Role(role_id=1, world_id=1)
-                        join.return_value = schemas.World_UserWithRoleInDB(
-                            role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
-                        )
-                        response = client.post(
-                            "/worlds/1/users",
-                        )
-                        assert response.status_code == 200
-                        assert response.json()['role']['role_id'] == 1
-                        assert response.json()['world_id'] == 1
-                        assert access.call_count == 1
-                        assert cache.call_count == 1
-                        assert default_role.call_count == 1
-                        assert join.call_count == 1
+                        with patch("app.crud.crud_world.update_online_users") as online_users:
+                            role = schemas.RoleInDB(role_id=1, world_id=1)
+                            access.return_value = models.World(world_map="".encode()), ""
+                            online_users.return_value = access.return_value
+                            cache.return_value = None
+                            default_role.return_value = models.Role(role_id=1, world_id=1)
+                            join.return_value = schemas.World_UserWithRoleInDB(
+                                role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
+                            )
+                            response = client.post(
+                                "/worlds/1/users",
+                            )
+                            assert response.status_code == 200
+                            assert response.json()['role']['role_id'] == 1
+                            assert response.json()['world_id'] == 1
+                            assert access.call_count == 1
+                            assert cache.call_count == 1
+                            assert default_role.call_count == 1
+                            assert join.call_count == 1
 
     def test_join_world_by_invite_in_cache_user(self):
         """
@@ -613,32 +621,12 @@ class TestWorlds(TestCase):
         """
         app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_user
         with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-            role = schemas.RoleInDB(role_id=1, world_id=1)
-
-            cache.return_value = schemas.World_UserWithRoleAndMap(
-                map="".encode(), role=role, role_id=1, world_id=1
-            )
-
-            response = client.post(
-                "/worlds/invite/correct"
-            )
-
-            assert response.status_code == 200
-            assert response.json()['world_id'] == 1
-            assert response.json()['role']['role_id'] == 1
-            assert cache.call_count == 1
-
-    def test_join_world_by_invite_no_cache_user(self):
-        """
-        Expects 200 Ok when a user tries to join a world that has not joined yet.
-        """
-        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_user
-        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-            with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
-
-                cache.return_value = None
-                join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
-                                     models.Role(role_id=1, world_id=1))
+            with patch("app.crud.crud_world.update_online_users") as online_users:
+                online_users.return_value = models.World(world_map="".encode()), ""
+                role = schemas.RoleInDB(role_id=1, world_id=1)
+                cache.return_value = schemas.World_UserWithRoleAndMap(
+                    map="".encode(), role=role, role_id=1, world_id=1
+                )
 
                 response = client.post(
                     "/worlds/invite/correct"
@@ -648,7 +636,29 @@ class TestWorlds(TestCase):
                 assert response.json()['world_id'] == 1
                 assert response.json()['role']['role_id'] == 1
                 assert cache.call_count == 1
-                assert join.call_count == 1
+
+    def test_join_world_by_invite_no_cache_user(self):
+        """
+        Expects 200 Ok when a user tries to join a world that has not joined yet.
+        """
+        app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_user
+        with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
+            with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
+                with patch("app.crud.crud_world.update_online_users") as online_users:
+                    online_users.return_value = models.World(world_map="".encode()), ""
+                    cache.return_value = None
+                    join.return_value = (models.World_User(user_id=1, role_id=1, world_id=1),
+                                         models.Role(role_id=1, world_id=1))
+
+                    response = client.post(
+                        "/worlds/invite/correct"
+                    )
+
+                    assert response.status_code == 200
+                    assert response.json()['world_id'] == 1
+                    assert response.json()['role']['role_id'] == 1
+                    assert cache.call_count == 1
+                    assert join.call_count == 1
 
     def test_join_world_by_invite_in_cache_guest(self):
         """
@@ -657,20 +667,22 @@ class TestWorlds(TestCase):
         app.dependency_overrides[get_current_user_for_invite] = override_get_current_user_for_invite_guest
 
         with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
-            role = schemas.RoleInDB(role_id=1, world_id=1)
+            with patch("app.crud.crud_world.update_online_users") as online_users:
+                online_users.return_value = models.World(world_map="".encode()), ""
+                role = schemas.RoleInDB(role_id=1, world_id=1)
 
-            cache.return_value = schemas.World_UserWithRoleAndMap(
-                map="".encode(), role=role, role_id=1, world_id=1
-            )
+                cache.return_value = schemas.World_UserWithRoleAndMap(
+                    map="".encode(), role=role, role_id=1, world_id=1
+                )
 
-            response = client.post(
-                "/worlds/invite/correct"
-            )
+                response = client.post(
+                    "/worlds/invite/correct"
+                )
 
-            assert response.status_code == 200
-            assert response.json()['world_id'] == 1
-            assert response.json()['role']['role_id'] == 1
-            assert cache.call_count == 1
+                assert response.status_code == 200
+                assert response.json()['world_id'] == 1
+                assert response.json()['role']['role_id'] == 1
+                assert cache.call_count == 1
 
     def test_join_world_by_invite_no_cache_guest(self):
         """
@@ -681,23 +693,25 @@ class TestWorlds(TestCase):
         with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
             with patch("app.crud.crud_roles.CRUDRole.get_world_default") as default_role:
                 with patch("app.redis.connection.RedisConnector.join_new_guest_user") as join:
-                    role = schemas.RoleInDB(role_id=1, world_id=1)
+                    with patch("app.crud.crud_world.update_online_users") as online_users:
+                        online_users.return_value = models.World(world_map="".encode()), ""
+                        role = schemas.RoleInDB(role_id=1, world_id=1)
 
-                    cache.return_value = None
-                    default_role.return_value = models.Role(role_id=1, world_id=1)
-                    join.return_value = schemas.World_UserWithRoleInDB(
-                        role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
-                    )
-                    response = client.post(
-                        "/worlds/invite/correct"
-                    )
+                        cache.return_value = None
+                        default_role.return_value = models.Role(role_id=1, world_id=1)
+                        join.return_value = schemas.World_UserWithRoleInDB(
+                            role=role, avatar='avatar_1', username='name', role_id=1, world_id=1
+                        )
+                        response = client.post(
+                            "/worlds/invite/correct"
+                        )
 
-                    assert response.status_code == 200
-                    assert response.json()['world_id'] == 1
-                    assert response.json()['role']['role_id'] == 1
-                    assert cache.call_count == 1
-                    assert default_role.call_count == 1
-                    assert join.call_count == 1
+                        assert response.status_code == 200
+                        assert response.json()['world_id'] == 1
+                        assert response.json()['role']['role_id'] == 1
+                        assert cache.call_count == 1
+                        assert default_role.call_count == 1
+                        assert join.call_count == 1
 
     def test_get_all_users_from_world_guest(self):
         """

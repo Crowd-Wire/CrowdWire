@@ -45,7 +45,7 @@ const DrawerLayout = (props) => {
   }
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root}  style={{paddingTop: 70}}>
       <CssBaseline />
       <DashDrawer handler={sidebar_handler} changeAuth={props.changeAuth} />
       <Outlet joined={joined}/>
