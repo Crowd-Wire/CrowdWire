@@ -1,5 +1,5 @@
-import { API_BASE } from "config";
 import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
+import { API_BASE } from "config";
 
 import useWorldUserStore from "stores/useWorldUserStore";
 

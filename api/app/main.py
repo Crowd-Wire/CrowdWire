@@ -9,6 +9,7 @@ from app.rabbitmq import rabbit_handler
 from app.redis import redis_connector
 from app.core.config import settings
 
+
 def get_application() -> FastAPI:
     if settings.PRODUCTION:
         app = FastAPI(root_path=settings.API_V1_STR)

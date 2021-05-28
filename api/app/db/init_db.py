@@ -1,4 +1,3 @@
-import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy import event
