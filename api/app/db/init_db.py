@@ -1,3 +1,4 @@
+import requests
 from sqlalchemy.orm import Session
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy import event
@@ -38,10 +39,12 @@ def insert_users(target, connection, **kwargs):
 
 @event.listens_for(World.__table__, "after_create")
 def insert_worlds(target, connection, **kwargs):
+    map_url = settings.FRONTEND_URL + "maps/default_map.json"
+    map_json = requests.get(map_url).content
     # WORLD CREATION
     connection.execute(World.__table__.insert().values(
         creator=1, name="Test", creation_date=datetime.now(), max_users=10, public=True, allow_guests=True,
-        world_map=bytes(open("static/default_map.json", 'r').read().encode()), status=0
+        world_map=map_json, status=0
     ))
 
 
