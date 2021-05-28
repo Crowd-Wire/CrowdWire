@@ -63,8 +63,7 @@ class WorldService {
             id:int
         */
 
-        let url = 'worlds/'+path;
-        let query = [];
+        let url = 'worlds/' + path;
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
