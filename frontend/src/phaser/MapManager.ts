@@ -3,8 +3,10 @@ import { API_BASE } from "config";
 
 import useWorldUserStore from "stores/useWorldUserStore";
 
+import WorldService from "services/WorldService.js";
 
 enum MapManagerState {
+    FETCHED = "FETCHED",
     LOADED = "LOADED",
     BUILT = "BUILT",
 }
@@ -22,13 +24,29 @@ class MapManager {
 
     private objectProps: any;
 
-    constructor() {
+
+    async fetchMap(): Promise<void> {
         const worldUser = useWorldUserStore.getState().world_user;
-        this.worldId = worldUser.world_id;
-        this.mapJson = JSON.parse(worldUser.map);
+        if (worldUser) {
+            this.worldId = worldUser.world_id;
+            this.mapJson = JSON.parse(worldUser.world_map);
+            this.state = MapManagerState.FETCHED;
+        } else {
+            await WorldService.getWorldDetails(window.location.pathname.split('/')[2])
+                .then((res) => {
+                    return res.json();
+                }).then((res) => {
+                    this.worldId = res.world_id;
+                    this.mapJson = JSON.parse(res.world_map);
+                    this.state = MapManagerState.FETCHED;
+                })
+        }
     }
 
     loadMap(scene: Scene): void {
+        if (this.state !== MapManagerState.FETCHED)
+            throw Error(`Illegal call to function with the current state ${this.state}`);
+
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
         this.tileKeys = [];

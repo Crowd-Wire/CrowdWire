@@ -67,7 +67,8 @@ class GameScene extends Phaser.Scene {
         this.ws.joinPlayer({x: 50, y: 50});
 
         // make camera follow player
-        this.cameras.main.startFollow(this.player)
+        this.cameras.main
+            .startFollow(this.player)
             .setBackgroundColor("#0C1117")//'#080C10');
             .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)

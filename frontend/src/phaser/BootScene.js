@@ -77,7 +77,7 @@ class BootScene extends Phaser.Scene {
                 loadingText.destroy();
                 percentText.destroy();
                 assetText.destroy();
-                this.scene.start('GameScene');
+                this.scene.start(this.registry.get('scene'));
             }, 500);
         }, this);
         
@@ -85,8 +85,7 @@ class BootScene extends Phaser.Scene {
         const mapManager = new MapManager();
         this.registry.set('mapManager', mapManager);
         
-        // mapManager.fetchMap().then(() => mapManager.loadMap(this));
-        mapManager.loadMap(this)
+        mapManager.fetchMap().then(() => mapManager.loadMap(this));
 
         this.load.spritesheet('player', API_BASE + "static/characters/RPG_assets.png", { frameWidth: 16, frameHeight: 16 });
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/fonts/bitmap/gem.xml`);

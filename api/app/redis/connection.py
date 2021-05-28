@@ -25,7 +25,7 @@ class RedisConnector:
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
         # self.master = await aioredis.create_connection('redis://localhost/0')
-        # await self.master.execute('flushall')
+        await self.master.execute('flushall')
         await self.add_users_to_world('1', '20')
 
         if not (await redis_connector.key_exists('media_server_1')):
