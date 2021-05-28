@@ -128,14 +128,12 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
     async def get_world_roles(
             self,
             db: Session,
-            world_id: int,
-            page: int = 1,
-            limit: int = 10) -> Tuple[List[Optional[Role]], str]:
+            world_id: int
+    ) -> Tuple[List[Optional[Role]], str]:
         """
         Returns the Roles created for a given world
         """
-        return db.query(Role).filter(Role.world_id == world_id).offset(
-            limit * (page - 1)).limit(limit).all(), ""
+        return db.query(Role).filter(Role.world_id == world_id).all(), ""
 
     def get_world_default(self, db: Session, world_id: int) -> Role:
         """
@@ -171,14 +169,17 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         """
         Create default roles when a world is created
         """
-        default_roles = [Role(world_id=world_id, name="default", is_default=True, invite=True, role_manage=True),
-                         Role(world_id=world_id, name="speaker"),
-                         Role(world_id=world_id, name="moderator")]
-        db.add_all(
-            default_roles
+        default_role = Role(
+            world_id=world_id,
+            name="default",
+            is_default=True,
+            walk=True,
+            talk=True,
+            chat=True
         )
+        db.add(default_role)
         db.commit()
-        return default_roles
+        return default_role
 
     async def update(
             self,
