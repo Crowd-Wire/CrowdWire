@@ -1,5 +1,5 @@
 import React from 'react';
-import WorldReportCard from './WorldReportCard.js';
+import WorldReportCard from '../../../components/WorldReportCard/WorldReportCard.js';
 import WorldService from '../../../services/WorldService.js';
 import { Checkbox } from '@material-ui/core';
 import FormGroup from '@material-ui/core/FormGroup';
