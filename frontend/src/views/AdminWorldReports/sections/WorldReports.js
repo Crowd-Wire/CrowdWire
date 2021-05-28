@@ -183,7 +183,7 @@ export default function WorldReports(props) {
                 {reports.map((r, i) => {
                     console.log(JSON.stringify(r));
                     return (<Row key={r.reported + '_' + r.reporter} className="my-3"><Col></Col>
-                        <Col><WorldReportCard  report={r} reset={() => handleSubmit()}/> </Col>
+                        <Col><WorldReportCard  report={r} /> </Col>
                         <Col></Col>
                         </Row>)
                 })}
