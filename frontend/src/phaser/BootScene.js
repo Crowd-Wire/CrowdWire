@@ -83,7 +83,6 @@ class BootScene extends Phaser.Scene {
         
 
         const mapManager = new MapManager();
-        this.registry.set('mapManager', mapManager);
         
         // mapManager.fetchMap().then(() => mapManager.loadMap(this));
         mapManager.loadMap(this);

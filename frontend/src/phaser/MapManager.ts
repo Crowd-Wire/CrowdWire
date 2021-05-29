@@ -12,6 +12,8 @@ enum MapManagerState {
 
 
 class MapManager {
+    static _instance: MapManager;
+
     // private layers: Layers;
     private map: Tilemaps.Tilemap;
     private mapJson: any;
@@ -23,10 +25,15 @@ class MapManager {
 
     private objectProps: any;
 
+
     constructor() {
-        const worldUser = useWorldUserStore.getState().world_user;
-        this.worldId = worldUser.world_id;
-        this.mapJson = JSON.parse(worldUser.world_map);
+        if (!MapManager._instance) {
+            const worldUser = useWorldUserStore.getState().world_user;
+            this.worldId = worldUser.world_id;
+            this.mapJson = JSON.parse(worldUser.world_map);
+            MapManager._instance = this;
+        }
+        return MapManager._instance;
     }
 
     loadMap(scene: Scene): void {
