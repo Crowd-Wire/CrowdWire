@@ -88,7 +88,7 @@ class GameScene extends Phaser.Scene {
         // TODO: remove after testing
         this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
 
-        this.sprite = this.add.sprite(0, 0, '26');
+        this.sprite = this.add.sprite(0, 0, 'tilesets/objects/movel.png');
         this.add.existing(this.sprite);
         this.physics.add.existing(this.sprite);
         this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
