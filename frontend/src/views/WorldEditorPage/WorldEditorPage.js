@@ -43,17 +43,18 @@ class WorldEditorPage extends React.Component {
     super(props);
     this.navigate = props.navigate;
     this.state = {
+      loading: true,
       grid: [
-        {
-          size: 50,
-          grid: [
-            { size: 30, tabs: [1, 2, 3] },
-            { size: 20, tabs: [0] },
-            { size: 50, tabs: [3] },
-          ]
-        },
-        { size: 25, tabs: [5] },
-        { size: 25, tabs: [4, 2] }
+        // {
+        //   size: 50,
+        //   grid: [
+        //     { size: 30, tabs: [1, 2, 3] },
+        //     { size: 20, tabs: [0] },
+        //     { size: 50, tabs: [3] },
+        //   ]
+        // },
+        { size: 50, tabs: [5] },
+        { size: 50, tabs: [4, 2] }
       ]
     }
   }
@@ -124,8 +125,9 @@ class WorldEditorPage extends React.Component {
             }
             <div
               key={index}
-              data-path={path.concat(index).join('-')}
+              data-path={path.concat(index)}
               data-size={item.size}
+              data-tabs={item.tabs}
               style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
               className={wrapper}
             >
@@ -151,6 +153,34 @@ class WorldEditorPage extends React.Component {
 
 
   componentDidMount = () => {
+    this.setState({loading: true});
+
+    WorldService.getWorldDetails(window.location.pathname.split('/')[2])
+      .then((res) => {
+        if (res.ok) return res.json();
+        this.navigate("/dashboard/search");
+      }).then(
+        (res) => {
+          console.log(res);
+          if (res.detail){
+            toast.dark(
+              <span>
+                <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+                {res.detail}
+              </span>
+            ,toast_props);
+            this.navigate("/dashboard/search/public");
+          }
+          else {
+            useWorldUserStore.getState().joinWorld(res);
+            this.setState({loading: false});
+          }
+        }
+      ).catch(() => 
+        this.navigate("/dashboard/search")
+      )
+
+
     let handlers = document.querySelectorAll('.handler');
     var dragginHandler;
 
@@ -177,7 +207,7 @@ class WorldEditorPage extends React.Component {
 
       if (document.defaultView.getComputedStyle(dragginHandler).cursor == 'ns-resize') {
         const totalHeight = parseFloat(boxA.getAttribute('data-size')) + parseFloat(boxB.getAttribute('data-size'));
-        const boxAPath = boxA.getAttribute('data-path').split('-').map((p) => parseInt(p, 10));
+        const boxAPath = boxA.getAttribute('data-path').split(',').map((p) => parseInt(p, 10));
         const totalHeightPx = boxA.offsetHeight + boxB.offsetHeight;
         const newHeightPx = e.clientY - boxA.offsetTop;
 
@@ -206,7 +236,7 @@ class WorldEditorPage extends React.Component {
 
       } else {
         const totalWidth = parseFloat(boxA.getAttribute('data-size')) + parseFloat(boxB.getAttribute('data-size'));
-        const boxAPath = boxA.getAttribute('data-path').split('-').map((p) => parseInt(p, 10));
+        const boxAPath = boxA.getAttribute('data-path').split(',').map((p) => parseInt(p, 10));
         const totalWidthPx = boxA.offsetWidth + boxB.offsetWidth;
         const newWidthPx = e.clientX - boxA.offsetLeft;
 
@@ -233,36 +263,16 @@ class WorldEditorPage extends React.Component {
           return { grid };
         })
       }
+
+      const tabsA = boxA.getAttribute('data-tabs').split(',');
+      const tabsB = boxB.getAttribute('data-tabs').split(',');
+      if (tabsA.includes('5') || tabsB.includes('5'))
+        console.log('phaser')
     })
 
     document.addEventListener('mouseup', (e) => {
       dragginHandler = null;
     });
-
-    WorldService.getWorldDetails(window.location.pathname.split('/')[2])
-      .then((res) => {
-        if (res.ok) return res.json();
-        this.navigate("/dashboard/search");
-      }).then(
-        (res) => {
-          console.log(res);
-          if (res.detail){
-            toast.dark(
-              <span>
-                <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-                {res.detail}
-              </span>
-            ,toast_props);
-            this.navigate("/dashboard/search/public");
-          }
-          else {
-            useWorldUserStore.getState().joinWorld(res);
-            console.log('JOIN WORLD', useWorldUserStore.getState().world_user)
-          }
-        }
-      ).catch(() => 
-        this.navigate("/dashboard/search")
-      )
   }
   
   componentWillUnmount = () => {
@@ -274,6 +284,7 @@ class WorldEditorPage extends React.Component {
 
   render() {
     const {classes} = this.props;
+
     this.gameWindows = {
       0: {
         tabName: 'Tiles',
@@ -297,10 +308,9 @@ class WorldEditorPage extends React.Component {
       },
       5: {
         tabName: 'Game',
-        tabContent: <Phaser scene="WorldEditorScene" />,
+        tabContent: this.state.loading ? null : <Phaser scene="WorldEditorScene" />,
       },
     }
-  
 
     return (
       <>

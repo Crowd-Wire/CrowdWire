@@ -13,6 +13,11 @@ class Phaser extends React.Component {
     document.oninput = () => {this.disablePhaser()}
     document.onclick = () => {this.enablePhaser()}
     this.game = Game.setupGame(this.scene);
+
+    window.lixo = (w, h) => {
+      this.game.scale.resize(w, h);
+      // this.game.scale.setGameSize(w, h);
+    }
   }
 
   enablePhaser = () => {
