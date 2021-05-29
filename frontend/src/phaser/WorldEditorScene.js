@@ -25,7 +25,7 @@ class WorldEditorScene extends Scene {
         this.cameras.main
             .setBounds(-100, -100, this.map.widthInPixels + 200, this.map.heightInPixels + 200, true)
             .setBackgroundColor("#0C1117")
-            .setZoom(1.5);
+            .setZoom(1.5);//.centerToBounds();
 
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 

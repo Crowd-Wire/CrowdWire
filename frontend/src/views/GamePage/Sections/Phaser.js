@@ -15,13 +15,13 @@ class Phaser extends React.Component {
     this.game = Game.setupGame(this.scene);
 
     window.lixo = (w, h) => {
-      this.game.scale.resize(w, h);
-      // this.game.scale.setGameSize(w, h);
+      this.game.scale.setParentSize(w, h);
+      // this.game.scale.resize(w, h);
     }
   }
 
   resizePhaser = (width, height) => {
-    this.game.scale.resize(width, height);
+    this.game.scale.setParentSize(width, height);
   }
 
   enablePhaser = () => {

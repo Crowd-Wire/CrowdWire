@@ -11,6 +11,17 @@ const gameConfig = {
   // prevent the blur of the textures when scaled
   pixelArt: true, 
 
+  scale: {
+    parent: "game-container",
+    mode: Phaser.Scale.RESIZE,
+    width: '100%',
+    height: '100%',
+    // max: {
+    //   width: window.innerWidth,
+    //   height: window.innerHeight
+    // }
+  },
+
   // autoResize: true,//n faz nasda
   physics: {
     default: 'arcade',
@@ -26,24 +37,10 @@ const gameConfig = {
 const sceneConfig = {
   GameScene: {
     zoom: 2,
-    scale: {
-      parent: "game-container",
-      mode: Phaser.Scale.RESIZE,
-      width: '100%',
-      height: '100%',
-      max: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
-    },
     scene: [BootScene, GameScene],
   },
   WorldEditorScene: {
     zoom: 1,
-    scale: {
-      parent: "game-container",
-      mode: Phaser.Scale.NONE
-    },
     scene: [BootScene, WorldEditorScene],
   }
 }

@@ -264,11 +264,6 @@ class WorldEditorPage extends React.Component {
           return { grid };
         })
       }
-
-      const tabsA = boxA.getAttribute('data-tabs').split(',');
-      const tabsB = boxB.getAttribute('data-tabs').split(',');
-      if (tabsA.includes('5') || tabsB.includes('5'))
-        this.phaserRef.current.resizePhaser(boxA.offsetWidth, boxA.offsetHeight);
     })
 
     document.addEventListener('mouseup', (e) => {
@@ -309,8 +304,13 @@ class WorldEditorPage extends React.Component {
       },
       5: {
         tabName: 'Game',
-        tabContent: this.state.loading ? null : <Phaser ref={this.phaserRef} scene="WorldEditorScene"  />,
+        tabContent: this.state.loading ? null : <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
       },
+    }
+
+    if (this.phaserRef.current) {
+      const parent = document.getElementById("game-container").parentNode;
+      this.phaserRef.current.resizePhaser(parent.offsetWidth, parent.offsetHeight);
     }
 
     return (
@@ -334,6 +334,4 @@ class WorldEditorPage extends React.Component {
   }
 }
 
-
 export default withRouter(withStyles(style)(WorldEditorPage));
-
