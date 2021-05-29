@@ -146,3 +146,30 @@ async def delete_report_to_user_in_world(
         raise HTTPException(status_code=400, detail=msg)
 
     return report
+
+
+@router.get("/reports/")
+async def filter_user_reports(
+        world_id: int = None,
+        reporter_id: int = None,
+        reported_id: int = None,
+        order_by: str = "timestamp",
+        order: str = "desc",
+        page: int = 1,
+        limit: int = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Filters user reports for the world mods and platform admins.
+    """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    reports, msg = await crud_report_user.filter(
+        db=db, user=user, world_id=world_id, reporter_id=reporter_id, reported_id=reported_id, order_by=order_by,
+        order=order, page=page, limit=limit
+        )
+    if reports is None:
+        raise HTTPException(status_code=400, detail=msg)
+    return reports

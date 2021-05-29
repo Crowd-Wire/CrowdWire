@@ -1,15 +1,61 @@
 from .base import CRUDBase
 from sqlalchemy.orm import Session
 from app.schemas import ReportUserCreate
-from app.models import Report_User, User
+from app.models import Report_User, User, World
 from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
 from typing import List, Optional, Tuple
 from datetime import datetime
+from sqlalchemy import desc, asc
+
 
 
 class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
+
+    async def filter(
+            self,
+            db: Session,
+            user: User,
+            reporter_id: int,
+            reported_id: int,
+            order_by: str,
+            order: str,
+            world_id: int = None,
+            page: int = 1,
+            limit: int = 10
+    ):
+
+        # only superusers can search without passing the world_id
+        if not world_id and not user.is_superuser:
+            # TODO: change this
+            return None, strings.ROLE_INVALID_PERMISSIONS
+
+        # check if the user has access to the world provided
+        if world_id and not user.is_superuser:
+            if not (await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=user.user_id))[0]:
+                return None, strings.ROLE_INVALID_PERMISSIONS
+
+        query = db.query(Report_User)
+
+        if world_id:
+            query = query.join(World).filter(Report_User.world_id == World.world_id)
+
+        if reported_id:
+            query = query.filter(Report_User.reported == reported_id)
+
+        if reporter_id:
+            query = query.filter(Report_User.reporter == reporter_id)
+
+        if order == 'desc':
+            ord = desc
+        else:
+            ord = asc
+
+        if order_by == 'timestamp':
+            query = query.order_by(ord(Report_User.timestamp))
+
+        return query.offset(limit * (page - 1)).limit(limit).all(), ""
 
     def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int)\
             -> Tuple[List[Report_User], str]:
