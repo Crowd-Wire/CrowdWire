@@ -169,7 +169,7 @@ async def filter_user_reports(
     reports, msg = await crud_report_user.filter(
         db=db, user=user, world_id=world_id, reporter_id=reporter_id, reported_id=reported_id, order_by=order_by,
         order=order, page=page, limit=limit
-        )
+    )
     if reports is None:
         raise HTTPException(status_code=400, detail=msg)
     return reports

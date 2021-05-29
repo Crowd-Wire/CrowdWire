@@ -1,14 +1,13 @@
 from .base import CRUDBase
 from sqlalchemy.orm import Session
 from app.schemas import ReportUserCreate
-from app.models import Report_User, User, World
+from app.models import Report_User, User
 from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
 from typing import List, Optional, Tuple
 from datetime import datetime
 from sqlalchemy import desc, asc
-
 
 
 class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
@@ -39,7 +38,7 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         query = db.query(Report_User)
 
         if world_id:
-            query = query.join(World).filter(Report_User.world_id == World.world_id)
+            query = query.filter(Report_User.world_id == world_id)
 
         if reported_id:
             query = query.filter(Report_User.reported == reported_id)

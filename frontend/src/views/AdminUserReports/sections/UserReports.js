@@ -12,6 +12,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
 import ReportService from 'services/ReportService';
+import UserReportCard from 'components/UserReportCard/UserReportCard';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -68,12 +69,16 @@ export default function UserReports() {
     }
 
     const request = (world_id, reporter_id, reported_id, order_by, order, page, limit) => {
+        console.log(world_id)
+        console.log(reporter_id)
+        console.log(reported_id)
         ReportService.getReports(world_id, reporter_id, reported_id, order_by, order, page, limit)
         .then((res) => {
             return res.json();
         })
         .then((res) => {
             console.log(res);
+            setReports(res);
         })
     }
 
@@ -131,7 +136,7 @@ export default function UserReports() {
             </FormControl>
             <Button onClick={handleSubmit}>Search</Button>
             {reports && reports.length !== 0 ? reports.map((r,i) =>{
-                return(<></>)
+                return(<UserReportCard report={r} />)
 
             }) : <h1>No reports found for this search...</h1>}
 
