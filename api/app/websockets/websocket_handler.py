@@ -43,8 +43,14 @@ async def set_user_position(world_id: str, user_id: str, payload: dict):
 async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
     payload['from'] = user_id
-    await manager.broadcast(world_id, payload)
-
+    send_to = payload['to']
+    logger.info(send_to)
+    if send_to == 'all':
+        await manager.broadcast(world_id, payload)
+    elif send_to == 'nearby':
+        logger.info('aqui')
+        await manager.broadcast_to_user_rooms(world_id, payload, user_id)
+        await manager.send_personal_message(payload, user_id)
 
 # TODO: remove after tests
 async def send_groups_snapshot(world_id: str):
