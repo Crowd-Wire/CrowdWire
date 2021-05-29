@@ -13,7 +13,6 @@ enum MapManagerState {
 class MapManager {
     static _instance: MapManager;
 
-    // private layers: Layers;
     private map: Tilemaps.Tilemap;
     private mapJson: any;
     private state: MapManagerState;

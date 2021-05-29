@@ -46,16 +46,16 @@ class WorldEditorPage extends React.Component {
     this.state = {
       loading: true,
       grid: [
-        // {
-        //   size: 50,
-        //   grid: [
-        //     { size: 30, tabs: [1, 2, 3] },
-        //     { size: 20, tabs: [0] },
-        //     { size: 50, tabs: [3] },
-        //   ]
-        // },
+        {
+          size: 50,
+          grid: [
+            { size: 30, tabs: [1, 2, 3] },
+            { size: 20, tabs: [0] },
+            { size: 50, tabs: [3] },
+          ]
+        },
         { size: 50, tabs: [5] },
-        { size: 50, tabs: [4, 2] }
+        // { size: 50, tabs: [4, 2] }
       ]
     }
   }
@@ -283,7 +283,7 @@ class WorldEditorPage extends React.Component {
     this.gameWindows = {
       0: {
         tabName: 'Tiles',
-        tabContent: <TilesTab />
+        tabContent: !this.state.loading && <TilesTab />
       },
       1: {
         tabName: 'Blue',
@@ -303,7 +303,7 @@ class WorldEditorPage extends React.Component {
       },
       5: {
         tabName: 'Game',
-        tabContent: this.state.loading ? null : <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
+        tabContent: !this.state.loading && <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
       },
     }
 
