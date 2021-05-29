@@ -11,6 +11,7 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
+import ReportService from 'services/ReportService';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -63,8 +64,22 @@ export default function UserReports() {
 
     const handleSubmit = () => {
         console.log("submit");
+        request(world, reporter, reported, orderBy, order, page, 10);
     }
 
+    const request = (world_id, reporter_id, reported_id, order_by, order, page, limit) => {
+        ReportService.getReports(world_id, reporter_id, reported_id, order_by, order, page, limit)
+        .then((res) => {
+            return res.json();
+        })
+        .then((res) => {
+            console.log(res);
+        })
+    }
+
+    React.useEffect(() => {
+        request(null, null, null, null, null, 1, 10);
+    }, []);
 
     return (
         <div style={{ marginTop: '100px' }}>
@@ -115,7 +130,10 @@ export default function UserReports() {
                 </Select>
             </FormControl>
             <Button onClick={handleSubmit}>Search</Button>
+            {reports && reports.length !== 0 ? reports.map((r,i) =>{
+                return(<></>)
 
+            }) : <h1>No reports found for this search...</h1>}
 
         </div>
     )

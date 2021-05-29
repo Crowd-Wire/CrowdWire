@@ -24,6 +24,42 @@ class ReportService{
             body: JSON.stringify({world_id: world_id, comment: comment})
         })
     }
+
+    getReports(world_id, reporter_id, reported_id, order_by, order, page, limit){
+        let url = 'users/reports/';
+        let query = [];
+    
+        if(world_id)
+            query.push('world_id=' + world_id);
+        
+        if(reporter_id)
+            query.push('reporter_id=' + reporter_id);
+        
+        if(reported_id)
+            query.push('reported_id=' + reported_id);
+        
+
+        if(order_by !== null)
+            query.push('order_by=' + order_by); 
+        
+        if(order !== null)
+            query.push('order=' + order);
+   
+        query.push('page=' + page);
+        query.push('limit=' + limit);
+
+
+        if (query.length !== 0)
+            url = url.concat('?' + query.join('&'));
+
+        return fetch(API_BASE + url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization": "Bearer " + AuthenticationService.getToken()
+            }
+        })
+    }
 }
 
 export default new ReportService();
