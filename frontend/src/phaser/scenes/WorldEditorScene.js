@@ -1,5 +1,6 @@
 import Phaser, { Scene } from 'phaser';
-import MapManager from "./MapManager.ts";
+
+import MapManager from "../MapManager.ts";
 
 const sceneConfig = {
     active: false,

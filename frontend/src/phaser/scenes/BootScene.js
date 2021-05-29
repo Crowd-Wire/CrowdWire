@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import { API_BASE } from "config";
 
-import MapManager from "./MapManager.ts";
+import MapManager from "../MapManager.ts";
 
 
 const sceneConfig = {

@@ -4,8 +4,9 @@ import { getSocket } from "services/socket";
 
 import usePlayerStore from "stores/usePlayerStore.ts";
 
-import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
-import useWorldUserStore from "../stores/useWorldUserStore";
+import { useConsumerStore } from "webrtc/stores/useConsumerStore";
+import useWorldUserStore from "stores/useWorldUserStore";
+import MapManager from '../MapManager';
 
 
 const sceneConfig = {
@@ -29,7 +30,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
 
-        const mapManager = this.registry.get('mapManager');
+        const mapManager = new MapManager;
 
         this.map = mapManager.buildMap(this);
 

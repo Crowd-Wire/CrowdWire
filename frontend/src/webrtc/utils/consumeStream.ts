@@ -1,5 +1,5 @@
 import { Transport } from "mediasoup-client/lib/Transport";
-import GameScene from "phaser/GameScene";
+import GameScene from "phaser/scenes/GameScene.js";
 import { useConsumerStore } from "../stores/useConsumerStore";
 import { useRoomStore } from "../stores/useRoomStore";
 import useWorldUserStore from "../../stores/useWorldUserStore";

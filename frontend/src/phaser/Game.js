@@ -1,7 +1,9 @@
 import * as Phaser from 'phaser';
-import BootScene from './BootScene';
-import GameScene from './GameScene';
-import WorldEditorScene from './WorldEditorScene';
+
+import BootScene from './scenes/BootScene.js';
+import GameScene from './scenes/GameScene.js';
+import WorldEditorScene from './scenes/WorldEditorScene.js';
+
 
 const gameConfig = {
   title: 'Sample',

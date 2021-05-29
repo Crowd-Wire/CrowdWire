@@ -3,7 +3,6 @@ import { API_BASE } from "config";
 
 import useWorldUserStore from "stores/useWorldUserStore";
 
-import WorldService from "services/WorldService.js";
 
 enum MapManagerState {
     LOADED = "LOADED",
