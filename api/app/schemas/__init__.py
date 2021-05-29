@@ -7,5 +7,5 @@ from .world_users import World_UserBase, World_UserCreate, World_UserInDB, World
     World_UserUpdate, World_UserWithRoleInDB, World_UserWithRoleAndMap
 from .report_world import ReportWorldBase, ReportWorldCreate, ReportWorldInDBWithEmail, ReportWorldInDB,\
     ReportWorldUpdate
-from .report_user import ReportUserBase, ReportUserCreate, ReportUserInDB, ReportUserInDBDetailed
+from .report_user import ReportUserBase, ReportUserCreate, ReportUserInDB, ReportUserInDBDetailed, ReportUserUpdate
 from .events import EventBase, EventInDB, EventUpdate, EventCreate

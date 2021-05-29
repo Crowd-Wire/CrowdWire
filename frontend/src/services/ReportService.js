@@ -62,6 +62,18 @@ class ReportService{
             }
         })
     }
+
+    reviewUserReport(world_id, reporter_id, reported_id, reviewed){
+        return fetch(API_BASE + 'users/' + reporter_id  + '/reports-sent/' + world_id + '/' + reported_id + '/', {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({reviewed: reviewed})
+        })
+    }
+
 }
 
 export default new ReportService();

@@ -8,6 +8,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { useNavigate } from 'react-router-dom';
+import ReportService from 'services/ReportService';
 
 const useStyles = makeStyles({
     root: {
@@ -30,7 +31,12 @@ export default function UserReportCard(props) {
     }
 
     const handleReview = () => {
-        console.log("inside review");
+        console.log(report.world_id, report.reporter, report.reported, !report.reviewed);
+        ReportService.reviewUserReport(report.world_id, report.reporter, report.reported, !report.reviewed)
+        .then((res) => {
+            if(res.ok)
+                setVisible(false);
+        })
     }
 
     return (

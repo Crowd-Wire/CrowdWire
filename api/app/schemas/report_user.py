@@ -16,6 +16,10 @@ class ReportUserCreate(ReportUserBase):
     comment: Optional[str]
 
 
+class ReportUserUpdate(BaseModel):
+    reviewed: bool
+
+
 class ReportUserInDB(ReportUserBase):
     reporter: int
     reported: int

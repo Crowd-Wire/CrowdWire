@@ -148,7 +148,7 @@ export default function UserReports() {
             </FormControl>
             <Button onClick={handleSubmit}>Search</Button>
             {reports && reports.length !== 0 ? reports.map((r, i) => {
-                return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id}
+                return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id + '_' + r.reviewed}
                     report={r} />)
 
             }) : <h1>No reports found for this search...</h1>}

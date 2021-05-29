@@ -1,6 +1,6 @@
 from .base import CRUDBase
 from sqlalchemy.orm import Session, aliased
-from app.schemas import ReportUserCreate
+from app.schemas import ReportUserCreate, ReportUserUpdate
 from app.models import Report_User, User, World, World_User
 from app.core import strings
 from .crud_world_users import crud_world_user
@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy import desc, asc
 
 
-class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
+class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate]):
 
     async def filter(
             self,
@@ -182,6 +182,22 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         report.timestamp = datetime.now()
 
         report = super().create(db=db, obj_in=report)
+        return report, ""
+
+    def update(self, db: Session, reporter: int, reported: int, world: int, update: ReportUserUpdate):
+
+        report = self.get_user1_report_user2_world(db=db, reported=reported, reporter=reporter, world_id=world)
+        if not report:
+            return None, strings.USER_REPORT_NOT_FOUND
+
+        # instead of returning an error just return the existing object
+        if report.reviewed == update.reviewed:
+            return report, ""
+
+        report.reviewed = update.reviewed
+        db.add(report)
+        db.commit()
+
         return report, ""
 
     async def remove(self, db: Session, reporter: int, reported: int, world_id: int, request_user: User)\
