@@ -13,6 +13,7 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import Iframe from 'react-iframe'
 
 import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
@@ -51,12 +52,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showModalFile, setShowModalFile] = useState(false);
+  const [showIframe, setShowIframe] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
   const in_conference = useWorldUserStore(state => state.world_user.in_conference);
   const [allowed_to_speak, setAllowedToSpeak] = useState(useWorldUserStore.getState().world_user.role.talk_conference);
-
+  
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
     autoClose: 5000,
@@ -168,6 +170,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
   }
 
+  function toggleExternalService() {
+    setShowIframe(!showIframe)
+  }
+
   const handleFullscreen = () => {
     if (!fullscreen) {
       handle.enter()
@@ -272,6 +278,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         
       <Button variant='contained'  color="primary" onClick={() => toggleModalFile()}>
         File Sharing
+      </Button>
+
+      <Button variant='contained'  color="primary" onClick={() => toggleExternalService()}>
+        Iframe
       </Button>
 
       <FullScreen handle={handle}>
@@ -379,6 +389,28 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         : ''}
         { showModalFile ? 
           <FileSharing closeModal={toggleModalFile}/>
+        : ''}
+        { showIframe ? 
+          <>
+            <div style={{position: 'fixed', top: 0, left: 80, width: '100%', height: 60, textAlign: 'center', background: 'white'}}>
+              <Button onClick={() => toggleExternalService()} variant="contained" color="primary" style={{top: 10}}>
+                Close External Service
+              </Button>
+            </div>
+            {/* urls: 
+             https://downforacross.com/  
+             https://www.gameflare.com/embed/mini-survival/
+             https://www.chesshotel.com/pt/"
+             https://www.notebookcast.com/
+            */}
+            <div style={{position: 'fixed', top: 60, left: 80, width: 'calc(100% - 80px)', height: 'calc(100% - 60px)', background: 'white'}}>
+              <Iframe url="https://www.notebookcast.com/"
+              position="absolute"
+              width="100%"
+              id="myIframe"
+              height="100%" />
+            </div>
+          </>
         : ''}
       </FullScreen>
     </div>
