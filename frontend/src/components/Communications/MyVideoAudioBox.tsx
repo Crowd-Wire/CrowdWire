@@ -401,10 +401,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
              https://downforacross.com/  
              https://www.gameflare.com/embed/mini-survival/
              https://www.chesshotel.com/pt/"
-             https://www.notebookcast.com/
+             https://r7.whiteboardfox.com/
             */}
             <div style={{position: 'fixed', top: 60, left: 80, width: 'calc(100% - 80px)', height: 'calc(100% - 60px)', background: 'white'}}>
-              <Iframe url="https://www.notebookcast.com/"
+              <Iframe url="https://r7.whiteboardfox.com/"
               position="absolute"
               width="100%"
               id="myIframe"
