@@ -14,6 +14,9 @@ AVATAR_3 = "avatar_3"
 
 AVATARS_LIST = [AVATAR_1, AVATAR_2, AVATAR_3]
 
+# Role default permissions
+role_default_permissions = ['talk', 'walk', 'chat']
+
 
 class WebsocketProtocol:
     PING = 'PING'
@@ -66,3 +69,4 @@ class RabbitProtocol:
     NEW_PEER_DATA_PRODUCER = 'new-peer-data-producer'
     CLOSE_CONSUMER = 'close_consumer'
     ERROR = 'error'
+    CREATE_NEW_REPLICA = 'CREATE_NEW_REPLICA'

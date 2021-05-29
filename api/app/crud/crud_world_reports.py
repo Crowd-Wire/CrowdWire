@@ -6,6 +6,7 @@ from app.models import World, User, Report_World
 from app.core import strings, consts
 from app.schemas import ReportWorldCreate, ReportWorldInDBWithEmail, ReportWorldUpdate, ReportWorldInDB
 from .crud_world_users import crud_world_user
+from datetime import datetime
 
 
 class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpdate]):
@@ -21,8 +22,6 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         """
         Returns every report for that world.
         """
-        # TODO: change this value later
-        page_size = 10
 
         # this query gets all reports for a world and gets the email and name the of the world
         query = db.query(
@@ -70,9 +69,9 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_World.timestamp))
 
-        reports = query.offset(page_size * (page - 1)).limit(page_size).all()
+        reports = query.offset(limit * (page - 1)).limit(limit).all()
 
-        # the results are not inside a dict so it is hard to conver to json
+        # the results are not inside a dict so it is hard to convert to json
         return [r._asdict() for r in reports], ""
 
     def get_world_report_for_user(self, db: Session, world_id: int, user_id: int):
@@ -107,6 +106,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
             return None, strings.WORLD_ALREADY_REPORTED_BY_USER
 
         obj_in.reporter = request_user.user_id
+        obj_in.timestamp = datetime.now()
 
         report = super().create(db=db, obj_in=obj_in)
         return report, ""

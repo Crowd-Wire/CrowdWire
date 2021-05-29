@@ -16,7 +16,7 @@ class Phaser extends React.Component {
   }
 
   disablePhaser = () => {
-    this.game.input.events.emit("pause");
+    this.game.input.events.emit("reset");
     this.game.input.enabled = false;
     this.game.input.keyboard.enabled = false;
   }

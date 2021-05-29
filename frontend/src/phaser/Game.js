@@ -54,7 +54,6 @@ const gameConfig = {
   scene: [
     BootScene,
     GameScene,
-    FillTilesScene
   ],
   backgroundColor: '#434366',
 };

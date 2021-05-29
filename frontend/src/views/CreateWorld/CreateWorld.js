@@ -16,6 +16,7 @@ const useStyles = theme => ({
     display: 'flex',
     backgroundImage: `url(${img})`,
     backgroundSize:"cover",
+    paddingTop: 70,
     height:'100%',width:'100%', overflow:"auto"
   },
 });

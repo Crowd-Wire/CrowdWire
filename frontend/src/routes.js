@@ -29,6 +29,7 @@ import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
 import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
 import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
+import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 
 /**
  * Public and protected routes list 
@@ -38,7 +39,6 @@ import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
- 
 const routes = (token, guest_uuid) => [
 	{
 		path: "/",
@@ -62,10 +62,10 @@ const routes = (token, guest_uuid) => [
 	},
 	{
 		path:"/",
-		element:  token ? <Outlet/> : <Navigate to="/login"/>,
+		element:  token ? <Outlet /> : <Navigate to="/login"/>,
 		children: [
-			{ path: "/create-world", element: <CreateWorld/> },
-			{ path: "/join", element: <InviteJoinPage/>},
+			{ path: "/create-world", element: <CreateWorld /> },
+			{ path: "/join", element: <InviteJoinPage />},
 		],
 	},
 	{ 
@@ -98,8 +98,9 @@ const routes = (token, guest_uuid) => [
 		element: token ? <AdminLayout /> : <Navigate to="/login" />,
 		children: [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
-			      { path: "/worlds", element: <AdminWorlds />},
-			      { path: "/statistics", element: <AdminStatistics/>}
+			{ path: "/worlds", element: <AdminWorlds />},
+			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
+			{ path: "/statistics", element: <AdminStatistics/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

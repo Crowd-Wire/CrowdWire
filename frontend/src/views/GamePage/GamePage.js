@@ -33,13 +33,12 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
-    WorldService.join_world(window.location.pathname.split('/')[2])
+    WorldService.joinWorld(window.location.pathname.split('/')[2])
     .then((res) => {
       if (res.ok) return res.json()
-      navigation("/dashboard/search");
+      navigation("/dashboard/search/public");
     }).then(
       (res) => {
-        console.log(res)
         if (res.detail){
           toast.dark(
             <span>
@@ -55,7 +54,7 @@ const GamePage = (props) => {
         }
       }
     ).catch(() => 
-      navigation("/dashboard/search")
+      navigation("/dashboard/search/public")
     )
   }, [])
 

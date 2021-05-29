@@ -1,4 +1,4 @@
-from typing import Union, Optional, List
+from typing import Union, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import schemas, models
@@ -16,16 +16,14 @@ router = APIRouter()
 async def get_all_world_roles(
         world_id: int,
         db: Session = Depends(deps.get_db),
-        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
-        page: Optional[int] = 1,
-        limit: Optional[int] = 10
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ):
     if is_guest_user(user):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
     role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
-    roles, msg = await crud_role.get_world_roles(db=db, world_id=1, page=page, limit=limit)
+    roles, msg = await crud_role.get_world_roles(db=db, world_id=world_id)
     return roles
 
 
@@ -59,11 +57,14 @@ async def edit_role_in_world(
     role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user.user_id)
     if not role:
         raise HTTPException(status_code=403, detail=msg)
+
     role, msg = await crud_role.get_by_role_id_and_world_id(db=db, role_id=role_id, world_id=world_id)
     if not role:
         raise HTTPException(status_code=400, detail=msg)
-    role_in.world_id = world_id
-    role_obj_upd, _ = await crud_role.update(db=db, db_obj=role, obj_in=role_in)
+
+    role_obj_upd, msg = await crud_role.update(db=db, db_obj=role, obj_in=role_in, world_id=world_id)
+    if role_obj_upd is None:
+        raise HTTPException(status_code=400, detail=msg)
     return role_obj_upd
 
 

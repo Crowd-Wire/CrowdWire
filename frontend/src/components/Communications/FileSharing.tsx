@@ -117,6 +117,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
             </span>
             , toast_props
           );
+          setReceivingFile(null);
         }
       })
 

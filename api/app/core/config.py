@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
+    FRONTEND_URL = "https://crowdwire.duckdns.org/" if PRODUCTION else "http://localhost:3000/"
+
     # TODO: Change this
     # testing
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
@@ -44,6 +46,7 @@ class Settings(BaseSettings):
 
     RABBITMQ_SENDING_QUEUE: str = "media_server_queue"
     RABBITMQ_RECEIVING_QUEUE: str = "rest_api_queue"
+    RABBITMQ_REPLICA_QUEUE: str = "replica_queue"
     REDIS_SENTINEL_HOST: str = os.getenv('REDIS_SENTINEL_HOST', 'localhost')
     REDIS_SENTINEL_PORT: int = 26379
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
