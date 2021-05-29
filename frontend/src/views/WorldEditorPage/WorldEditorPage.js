@@ -128,7 +128,6 @@ class WorldEditorPage extends React.Component {
               key={index}
               data-path={path.concat(index)}
               data-size={item.size}
-              data-tabs={item.tabs}
               style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
               className={wrapper}
             >

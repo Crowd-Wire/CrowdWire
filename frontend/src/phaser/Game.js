@@ -14,6 +14,7 @@ const gameConfig = {
   scale: {
     parent: "game-container",
     mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     width: '100%',
     height: '100%',
     // max: {
