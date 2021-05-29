@@ -106,7 +106,7 @@ export default function WorldReports(props) {
                     id="reporter_search" label="Reporter Id" type="search" variant="outlined" type="number"
                     />
                 */}
-                    <Input style={{size:"small"}} className="mx-3"
+                    <Input className="mx-3"
                         type="number"
                         id="world_search"
                         placeholder="World Id"
