@@ -34,6 +34,7 @@ export default function UserReports() {
     const [world, setWorld] = React.useState(null);
     const [reporter, setReporter] = React.useState(null);
     const [reported, setReported] = React.useState(null);
+    const [reviewed, setReviewed] = React.useState(false);
 
     const numberRegex = /[0-9]+|^/;
 
@@ -46,44 +47,43 @@ export default function UserReports() {
         setOrder(event.target.value);
     }
 
-    const handleWorld = (event) =>{
+    const handleWorld = (event) => {
         let input = event.target.value;
-        if(numberRegex.test(input))      
+        if (numberRegex.test(input))
             setWorld(event.target.value);
     }
 
     const handleReporter = (event) => {
         let input = event.target.value;
-        if(numberRegex.test(input))      
+        if (numberRegex.test(input))
             setReporter(input);
     }
     const handleReported = (event) => {
         let input = event.target.value;
-        if(numberRegex.test(input))      
+        if (numberRegex.test(input))
             setReported(input);
     }
 
-    const handleSubmit = () => {
-        console.log("submit");
-        request(world, reporter, reported, orderBy, order, page, 10);
+    const handleReviewed = () => {
+        setReviewed(!reviewed);
     }
 
-    const request = (world_id, reporter_id, reported_id, order_by, order, page, limit) => {
-        console.log(world_id)
-        console.log(reporter_id)
-        console.log(reported_id)
-        ReportService.getReports(world_id, reporter_id, reported_id, order_by, order, page, limit)
-        .then((res) => {
-            return res.json();
-        })
-        .then((res) => {
-            console.log(res);
-            setReports(res);
-        })
+    const handleSubmit = () => {
+        request(world, reporter, reported, reviewed, orderBy, order, page, 10);
+    }
+
+    const request = (world_id, reporter_id, reported_id, reviewed, order_by, order, page, limit) => {
+        ReportService.getReports(world_id, reporter_id, reported_id, reviewed, order_by, order, page, limit)
+            .then((res) => {
+                return res.json();
+            })
+            .then((res) => {
+                setReports(res);
+            })
     }
 
     React.useEffect(() => {
-        request(null, null, null, null, null, 1, 10);
+        request(null, null, null, false, null, null, 1, 10);
     }, []);
 
     return (
@@ -106,6 +106,18 @@ export default function UserReports() {
                 id="reported_id"
                 placeholder="Reported Id"
                 onChange={handleReported}
+            />
+
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        checked={reviewed}
+                        onChange={handleReviewed}
+                        name="reviewed"
+                        color="primary"
+                    />
+                }
+                label="Show Reviewed"
             />
 
             <FormControl className={classes.formControl}>
@@ -135,8 +147,9 @@ export default function UserReports() {
                 </Select>
             </FormControl>
             <Button onClick={handleSubmit}>Search</Button>
-            {reports && reports.length !== 0 ? reports.map((r,i) =>{
-                return(<UserReportCard report={r} />)
+            {reports && reports.length !== 0 ? reports.map((r, i) => {
+                return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id}
+                    report={r} />)
 
             }) : <h1>No reports found for this search...</h1>}
 

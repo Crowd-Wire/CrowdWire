@@ -29,26 +29,33 @@ export default function UserReportCard(props) {
 
     }
 
+    const handleReview = () => {
+        console.log("inside review");
+    }
+
     return (
-        <Card>
-            <CardActionArea onClick={goToDetails}>
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                        ahsahsah
-                    </Typography>
-                    <Typography variant="subtitle1">
-                        aaaaaa
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" component="p">
-                        aaaa
-                    </Typography>
-                </CardContent>
-            </CardActionArea>
-            <CardActions>
-                <Button size="small" variant="contained" color="primary">
-                    lixo
-                </Button>
-            </CardActions>
-        </Card>
+        <>
+        { visible ? 
+            <Card>
+                <CardActionArea onClick={goToDetails}>
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                            {report.reporter_email}
+                        </Typography>
+                        <Typography variant="subtitle1">
+                            {report.reported_email}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" component="p">
+                            {report.world_name}
+                        </Typography>
+                    </CardContent>
+                </CardActionArea>
+                <CardActions>
+                    <Button onClick={handleReview} size="small" variant="contained" color={ report.reviewed == true ? "secondary" : "primary"}>
+                        {report.reviewed ? "Remove Review" : "Review"}
+                    </Button>
+                </CardActions>
+            </Card>
+        : <></>}</>
     )
 }

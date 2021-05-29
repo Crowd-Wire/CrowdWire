@@ -25,7 +25,7 @@ class ReportService{
         })
     }
 
-    getReports(world_id, reporter_id, reported_id, order_by, order, page, limit){
+    getReports(world_id, reporter_id, reported_id, reviewed, order_by, order, page, limit){
         let url = 'users/reports/';
         let query = [];
     
@@ -38,6 +38,8 @@ class ReportService{
         if(reported_id)
             query.push('reported_id=' + reported_id);
         
+        if(reviewed !== null)
+            query.push('reviewed=' + reviewed);
 
         if(order_by !== null)
             query.push('order_by=' + order_by); 

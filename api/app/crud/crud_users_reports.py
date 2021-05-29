@@ -1,7 +1,7 @@
 from .base import CRUDBase
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from app.schemas import ReportUserCreate
-from app.models import Report_User, User
+from app.models import Report_User, User, World, World_User
 from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
@@ -21,6 +21,7 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
             order_by: str,
             order: str,
             world_id: int = None,
+            reviewed: bool = False,
             page: int = 1,
             limit: int = 10
     ):
@@ -35,7 +36,29 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
             if not (await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=user.user_id))[0]:
                 return None, strings.ROLE_INVALID_PERMISSIONS
 
-        query = db.query(Report_User)
+        reported_user = aliased(User)
+        reporter_user = aliased(User)
+        reported = aliased(World_User)
+        reporter = aliased(World_User)
+        query = db.query(
+            Report_User.reported,
+            Report_User.reporter,
+            Report_User.world_id,
+            Report_User.timestamp,
+            Report_User.comment,
+            Report_User.reviewed,
+            World.name.label('world_name'),
+            reporter_user.email.label('reporter_email'),
+            reported_user.email.label('reported_email'),
+            reporter.username.label('reporter_name'),
+            reported.username.label('reported_name')
+        ).filter(
+            Report_User.reported == reported.user_id,
+            Report_User.reported == reported_user.user_id,
+            Report_User.reporter == reporter.user_id,
+            Report_User.reporter == reporter_user.user_id,
+            World.world_id == Report_User.world_id,
+        )
 
         if world_id:
             query = query.filter(Report_User.world_id == world_id)
@@ -46,6 +69,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         if reporter_id:
             query = query.filter(Report_User.reporter == reporter_id)
 
+        query = query.filter(Report_User.reviewed.is_(reviewed))
+
         if order == 'desc':
             ord = desc
         else:
@@ -54,7 +79,8 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_User.timestamp))
 
-        return query.offset(limit * (page - 1)).limit(limit).all(), ""
+        reports = query.offset(limit * (page - 1)).limit(limit).all()
+        return [r._asdict() for r in reports], ""
 
     def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int)\
             -> Tuple[List[Report_User], str]:

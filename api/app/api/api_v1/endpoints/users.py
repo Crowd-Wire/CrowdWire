@@ -6,7 +6,7 @@ from app import schemas, models
 from app.core import strings
 from app.crud import crud_user, crud_report_user
 from app.utils import is_guest_user
-from app.schemas import ReportUserInDB, ReportUserCreate
+from app.schemas import ReportUserInDB, ReportUserCreate, ReportUserInDBDetailed
 
 router = APIRouter()
 
@@ -148,13 +148,14 @@ async def delete_report_to_user_in_world(
     return report
 
 
-@router.get("/reports/")
+@router.get("/reports/", response_model=List[ReportUserInDBDetailed])
 async def filter_user_reports(
         world_id: int = None,
         reporter_id: int = None,
         reported_id: int = None,
         order_by: str = "timestamp",
         order: str = "desc",
+        reviewed: bool = False,
         page: int = 1,
         limit: int = 10,
         db: Session = Depends(deps.get_db),
@@ -168,7 +169,7 @@ async def filter_user_reports(
 
     reports, msg = await crud_report_user.filter(
         db=db, user=user, world_id=world_id, reporter_id=reporter_id, reported_id=reported_id, order_by=order_by,
-        order=order, page=page, limit=limit
+        order=order, page=page, limit=limit, reviewed=reviewed
     )
     if reports is None:
         raise HTTPException(status_code=400, detail=msg)
