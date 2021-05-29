@@ -31,66 +31,47 @@ export default function RolePanel(props){
 	};
 
 	const setUsers = (item, rId) => {
-
-		
-		setUsersInRole(prevUsersInRole => {
-			const usersInRole = {...prevUsersInRole};
-			const userId = item.id;
-
-			for (let [key, value] of Object.entries(usersInRole)) {
-				if (value.user_id == userId) {
-					value.role_id = Number(rId);
-					break;
-				}
-			}
-
-			let temp = [];
-
-			console.log("UsersInRole Values", Object.values(usersInRole))
-			Object.keys(roles).forEach((key) => {
-				console.log("For role", key, ":")
-				let roleUsers = [];
-				for(let user of Object.values(usersInRole)){
-					if(user.role_id===parseInt(key)){
-						roleUsers.push(user);
+		RoleService.assignRoleToUser(props.world,rId,item.id)
+		.then((res)=>{
+			return res.json();
+		})
+		.then((res)=>{
+			setUsersInRole(prevUsersInRole => {
+				const usersInRole = {...prevUsersInRole};
+				const userId = item.id;
+	
+				for (let [key, value] of Object.entries(usersInRole)) {
+					console.log(key)
+					if (value.user_id == userId) {
+						value.role_id = Number(rId);
+						break;
 					}
 				}
-				console.log("roleUsers", roleUsers)
-
-				temp.push(
-					<div id={key} key={key} index={key}>
-						<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
-					</div>
-				);
-			});
-			setRolekeys(temp);
-
-			return usersInRole;
+	
+				let temp = [];
+	
+				console.log("UsersInRole Values", Object.values(usersInRole))
+				Object.keys(roles).forEach((key) => {
+					console.log("For role", key, ":")
+					let roleUsers = [];
+					for(let user of Object.values(usersInRole)){
+						if(user.role_id===parseInt(key)){
+							roleUsers.push(user);
+						}
+					}
+					console.log("roleUsers", roleUsers)
+	
+					temp.push(
+						<div id={key} key={key} index={key}>
+							<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
+						</div>
+					);
+				});
+				setRolekeys(temp);
+	
+				return usersInRole;
+			})
 		})
-
-		
-
-		// setRoles(prevRoles => {
-
-		// 	const roles = {...prevRoles};
-		// 	let flag = false;
-		// 	for (let [key, role] of Object.entries(roles)) {
-		// 		console.log(role)
-		// 		let users = usersInRole.map((user) => {});//value.users;	
-		// 		for (let i=0; i < users.length; i++) {
-		// 			if (users[i]['id'] == item.id) {
-		// 				users.splice(i, 1);
-		// 				flag = true;
-		// 				break;
-						
-		// 			}
-		// 		}
-		// 		if (flag) break;
-		// 	}
-		// 	roles[rId].users.splice(0, 0, item);
-
-		// 	return { roles };
-		// })
 	}
 
 	const confirm = () => {
