@@ -42,6 +42,7 @@ class WorldEditorPage extends React.Component {
   constructor(props) {
     super(props);
     this.navigate = props.navigate;
+    this.phaserRef = React.createRef();
     this.state = {
       loading: true,
       grid: [
@@ -267,7 +268,7 @@ class WorldEditorPage extends React.Component {
       const tabsA = boxA.getAttribute('data-tabs').split(',');
       const tabsB = boxB.getAttribute('data-tabs').split(',');
       if (tabsA.includes('5') || tabsB.includes('5'))
-        console.log('phaser')
+        this.phaserRef.current.resizePhaser(boxA.offsetWidth, boxA.offsetHeight);
     })
 
     document.addEventListener('mouseup', (e) => {
@@ -308,7 +309,7 @@ class WorldEditorPage extends React.Component {
       },
       5: {
         tabName: 'Game',
-        tabContent: this.state.loading ? null : <Phaser scene="WorldEditorScene" />,
+        tabContent: this.state.loading ? null : <Phaser ref={this.phaserRef} scene="WorldEditorScene"  />,
       },
     }
 

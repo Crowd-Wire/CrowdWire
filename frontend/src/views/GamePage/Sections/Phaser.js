@@ -20,6 +20,10 @@ class Phaser extends React.Component {
     }
   }
 
+  resizePhaser = (width, height) => {
+    this.game.scale.resize(width, height);
+  }
+
   enablePhaser = () => {
     this.game.input.enabled = true;
     this.game.input.keyboard.enabled = true;
