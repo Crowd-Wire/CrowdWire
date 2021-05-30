@@ -1,15 +1,86 @@
 from .base import CRUDBase
-from sqlalchemy.orm import Session
-from app.schemas import ReportUserCreate
-from app.models import Report_User, User
+from sqlalchemy.orm import Session, aliased
+from app.schemas import ReportUserCreate, ReportUserUpdate
+from app.models import Report_User, User, World, World_User
 from app.core import strings
 from .crud_world_users import crud_world_user
 from .crud_roles import crud_role
 from typing import List, Optional, Tuple
 from datetime import datetime
+from sqlalchemy import desc, asc
 
 
-class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
+class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate]):
+
+    async def filter(
+            self,
+            db: Session,
+            user: User,
+            reporter_id: int,
+            reported_id: int,
+            order_by: str,
+            order: str,
+            world_id: int = None,
+            reviewed: bool = False,
+            page: int = 1,
+            limit: int = 10
+    ):
+
+        # only superusers can search without passing the world_id
+        if not world_id and not user.is_superuser:
+            # TODO: change this
+            return None, strings.ROLE_INVALID_PERMISSIONS
+
+        # check if the user has access to the world provided
+        if world_id and not user.is_superuser:
+            if not (await crud_role.can_access_world_ban(db=db, world_id=world_id, user_id=user.user_id))[0]:
+                return None, strings.ROLE_INVALID_PERMISSIONS
+
+        reported_user = aliased(User)
+        reporter_user = aliased(User)
+        reported = aliased(World_User)
+        reporter = aliased(World_User)
+        query = db.query(
+            Report_User.reported,
+            Report_User.reporter,
+            Report_User.world_id,
+            Report_User.timestamp,
+            Report_User.comment,
+            Report_User.reviewed,
+            World.name.label('world_name'),
+            reporter_user.email.label('reporter_email'),
+            reported_user.email.label('reported_email'),
+            reporter.username.label('reporter_name'),
+            reported.username.label('reported_name')
+        ).filter(
+            Report_User.reported == reported.user_id,
+            Report_User.reported == reported_user.user_id,
+            Report_User.reporter == reporter.user_id,
+            Report_User.reporter == reporter_user.user_id,
+            World.world_id == Report_User.world_id,
+        )
+
+        if world_id:
+            query = query.filter(Report_User.world_id == world_id)
+
+        if reported_id:
+            query = query.filter(Report_User.reported == reported_id)
+
+        if reporter_id:
+            query = query.filter(Report_User.reporter == reporter_id)
+
+        query = query.filter(Report_User.reviewed.is_(reviewed))
+
+        if order == 'desc':
+            ord = desc
+        else:
+            ord = asc
+
+        if order_by == 'timestamp':
+            query = query.order_by(ord(Report_User.timestamp))
+
+        reports = query.offset(limit * (page - 1)).limit(limit).all()
+        return [r._asdict() for r in reports], ""
 
     def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int)\
             -> Tuple[List[Report_User], str]:
@@ -111,6 +182,22 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, None]):
         report.timestamp = datetime.now()
 
         report = super().create(db=db, obj_in=report)
+        return report, ""
+
+    def update(self, db: Session, reporter: int, reported: int, world: int, update: ReportUserUpdate):
+
+        report = self.get_user1_report_user2_world(db=db, reported=reported, reporter=reporter, world_id=world)
+        if not report:
+            return None, strings.USER_REPORT_NOT_FOUND
+
+        # instead of returning an error just return the existing object
+        if report.reviewed == update.reviewed:
+            return report, ""
+
+        report.reviewed = update.reviewed
+        db.add(report)
+        db.commit()
+
         return report, ""
 
     async def remove(self, db: Session, reporter: int, reported: int, world_id: int, request_user: User)\

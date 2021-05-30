@@ -6,8 +6,9 @@ from app import schemas, models
 from app.core import strings
 from app.crud import crud_user, crud_report_user
 from app.utils import is_guest_user
-from app.schemas import ReportUserInDB, ReportUserCreate
 from loguru import logger
+from app.schemas import ReportUserInDB, ReportUserCreate, ReportUserInDBDetailed, ReportUserUpdate
+
 router = APIRouter()
 
 
@@ -146,4 +147,52 @@ async def delete_report_to_user_in_world(
     if report is None:
         raise HTTPException(status_code=400, detail=msg)
 
+    return report
+
+
+@router.get("/reports/", response_model=List[ReportUserInDBDetailed])
+async def filter_user_reports(
+        world_id: int = None,
+        reporter_id: int = None,
+        reported_id: int = None,
+        order_by: str = "timestamp",
+        order: str = "desc",
+        reviewed: bool = False,
+        page: int = 1,
+        limit: int = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+    """
+    Filters user reports for the world mods and platform admins.
+    """
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    reports, msg = await crud_report_user.filter(
+        db=db, user=user, world_id=world_id, reporter_id=reporter_id, reported_id=reported_id, order_by=order_by,
+        order=order, page=page, limit=limit, reviewed=reviewed
+    )
+    if reports is None:
+        raise HTTPException(status_code=400, detail=msg)
+    return reports
+
+
+@router.put("/{reporter}/reports-sent/{world}/{reported}/", response_model=ReportUserInDB)
+def update_user_report(
+        reporter: int,
+        reported: int,
+        world: int,
+        report: ReportUserUpdate,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+) -> Any:
+
+    # only admins can change a report
+    if is_guest_user(user) or not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    report, msg = crud_report_user.update(db=db, reported=reported, reporter=reporter, world=world, update=report)
+    if report is None:
+        raise HTTPException(status_code=400, detail=msg)
     return report
