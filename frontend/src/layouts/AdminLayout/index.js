@@ -7,7 +7,7 @@ import Header from "components/Header/Header";
 const AdminLayout = (props) => {
   const {...rest} = props;
   return (
-      <div>
+      <div style={{height:"100%"}}>
           <Header
             absolute
             color="transparent"

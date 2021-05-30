@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 const useStyles = makeStyles({
     root: {
         maxWidth: 345,
+        marginLeft:"auto",
+        marginRight:"auto"
     },
     media: {
         height: 140,
@@ -60,7 +62,7 @@ export default function WorldReportCard(props) {
                     </CardContent>
                 </CardActionArea>
                 <CardActions>
-                    <Button onClick={handleReview} size="small" variant="contained" color={report.reviewed ? "secondary" : "primary"}>
+                    <Button onClick={handleReview} size="small" variant="contained" style={{marginLeft:"auto", marginRght:"30px"}} color={report.reviewed ? "secondary" : "primary"}>
                         {report.reviewed ? "Remove Review" : "Review"}
                     </Button>
                 </CardActions>

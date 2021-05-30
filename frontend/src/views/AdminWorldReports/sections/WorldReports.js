@@ -96,16 +96,7 @@ export default function WorldReports(props) {
     return (
         <div style={{ marginTop: '100px' }}>
             <Row>
-                <Col>
-                {/*
-                    <TextField className="mx-2"
-                    id="world_search" label="World Id" type="search" variant="outlined" type="number"
-                    />
-
-                    <TextField
-                    id="reporter_search" label="Reporter Id" type="search" variant="outlined" type="number"
-                    />
-                */}
+                <Col md={4}>
                     <Input className="mx-3"
                         type="number"
                         id="world_search"
@@ -120,7 +111,7 @@ export default function WorldReports(props) {
                     />
 
                 </Col>
-                <Col>
+                <Col md={4}>
                     <FormControlLabel
                         control={
                             <Checkbox
@@ -144,7 +135,8 @@ export default function WorldReports(props) {
                         }
                         label="Show Banned"
                     />
-
+                </Col>
+                <Col>
                     <FormControl className={classes.formControl}>
                         <InputLabel id="orderBy-label">Order by</InputLabel>
                         <Select
@@ -182,9 +174,8 @@ export default function WorldReports(props) {
             <div className="">
                 {reports.map((r, i) => {
                     console.log(JSON.stringify(r));
-                    return (<Row key={r.reported + '_' + r.reporter + '_' + r.reviewed} className="my-3"><Col></Col>
-                        <Col><WorldReportCard  report={r} /> </Col>
-                        <Col></Col>
+                    return (<Row key={r.reported + '_' + r.reporter + '_' + r.reviewed} className="my-3">
+                        <Col md={4} sm={6}><WorldReportCard  report={r} /> </Col>
                         </Row>)
                 })}
             </div>
