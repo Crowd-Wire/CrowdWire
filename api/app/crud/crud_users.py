@@ -23,7 +23,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db.query(User).filter(User.user_id == id).first()
 
     def filter(
-            self, db: Session, email: str, banned: bool, normal: bool, order_by: str, order: str, page:int, limit: int
+            self, db: Session, email: str, banned: bool, normal: bool, order_by: str, order: str, page: int, limit: int
     ):
         """
         Filters the users of the platform. This endpoint can only be used by the admin.
