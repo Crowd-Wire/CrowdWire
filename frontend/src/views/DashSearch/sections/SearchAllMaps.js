@@ -137,7 +137,7 @@ class SearchAllMaps extends Component {
 					</Row>
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
-					<Row>
+					<Row style={{marginTop: 50, marginBottom: 50}}>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
 						this.state.maps.map((m, i) => {
 							return (<MapCard key={i} focusMap={this.focusMap} map={m} />)

@@ -91,7 +91,7 @@ class DashboardStats extends Component{
                     <Row sm={12}>
                         <Col xs={6} sm={6} md={6}>
                             <Row>
-                                <Button color="success" size="lg">
+                                <Button color="success" size="lg" round>
                                     <span style={{fontWeight: 600, fontSize: '1rem'}}>Enter Map</span>
                                 </Button>
                                 <div style={{paddingLeft: 20}}>
