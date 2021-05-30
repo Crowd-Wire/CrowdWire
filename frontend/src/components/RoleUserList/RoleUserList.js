@@ -11,22 +11,25 @@ import { useDrop } from 'react-dnd';
 
 export default function RoleUserList(props){
 
-    const {roleName, value, setUsers, allRoles, ...other} = props;
+    const {roleName, roleId, value, setUsers, allRoles, ...other} = props;
+
+    
 
     const [, drop] = useDrop({
         accept: "ACCEPT",
-        drop: () => ({name: roleName}),
+        drop: () => ({name: roleId}),
     });
 
     const moveCard = useCallback((dragArray, hoverArray) => {
         const dragCard = value.users[dragArray[1]];
         setUsers(dragArray, hoverArray, dragCard);
     });
+    
     return(
         <div style={{marginTop:"10px", marginBottom:"10px"}}>
-            <Row style={{backgroundColor:"#58B6B8"}}>
+            <Row style={{backgroundColor:"#58B6B8"}} onClick={()=>{props.selectRole(props.roleId)}}>
                 <Col sm={10} md={10}>
-                    <Typography variant="h5">{roleName}</Typography>
+                    <Typography variant="body1">{roleName}</Typography>
                 </Col>
                 <Col sm={2} md={2} style={{display:"flex",alignItems:"center"}}>
                         <ExpandMoreIcon/>
@@ -34,8 +37,8 @@ export default function RoleUserList(props){
             </Row>
             <Row>
                 <Col id="droppable" ref={drop} style={{width:"100%", minHeight:"20px", border:"1px solid #58B6B8", borderRadius:"10px"}}>
-                    {value.users.map((user, index) => {
-                        return <UserRow key={index} user={user["Nome"]} index={[roleName, index]} id={user["id"]} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
+                    {value.map((user, index) => {
+                        return <UserRow key={index} user={user.username} index={[roleId, index]} id={user.user_id} allRoles={allRoles} setUsers={setUsers} moveCard={moveCard}></UserRow>
                     })
                     }
                 </Col>
