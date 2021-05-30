@@ -47,6 +47,9 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         display: 'flex',
         height: 224,
+        zIndex: "2",
+        position: "relative",
+        marginLeft: "25px"
     },
     tabs: {
         borderRight: `1px solid ${theme.palette.divider}`,
@@ -73,8 +76,8 @@ export default function UserSettings () {
         backgroundPosition: "top center"
         }}
     >
-    <GridContainer justify="center">
         <div className={classes.root}>
+        <GridContainer justify="center">
         <Tabs
             orientation="vertical"
             variant="scrollable"
@@ -83,8 +86,8 @@ export default function UserSettings () {
             aria-label="Vertical tabs example"
             className={classes.tabs}
         >
-            <Tab label="Item One" {...a11yProps(0)} />
-            <Tab label="Item Two" {...a11yProps(1)} />
+            <Tab label="Edit Account Info" {...a11yProps(0)} />
+            <Tab label="Change Password" {...a11yProps(1)} />
             </Tabs>
             <TabPanel value={value} index={0}>
             <UserProfile/>
@@ -92,8 +95,9 @@ export default function UserSettings () {
             <TabPanel value={value} index={1}>
             <UserProfile/>
             </TabPanel>
+            </GridContainer>
         </div>
-    </GridContainer>
+
     </div>
     
     </>

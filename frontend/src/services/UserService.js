@@ -23,7 +23,7 @@ class UserService {
             json_body['name'] = name
         
         if(birthdate)
-            json_body['birthdate'] = birthdate
+            json_body['birth'] = birthdate
         
         return fetch(API_BASE + 'users/' + user_id, {
             method: 'PUT',

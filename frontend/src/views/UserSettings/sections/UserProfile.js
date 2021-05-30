@@ -40,10 +40,17 @@ class UserProfile extends React.Component {
         nameHelperText: "",
         passHelperText: "",
         birthdayHelperText: "",
-        user: null
+        user: null,
+        email_val: "",
+        name_val: "",
+        bdate_val: "",
     }
 }
-
+    notify = () => {
+        toast.success("Successfully Updated Account! 🎉", {
+        position: toast.POSITION.TOP_CENTER
+        });
+    };
     componentDidMount() {
         this.setState({ cardAnimaton: "cardHidden" })
         UserService.getUserInfo()
@@ -52,10 +59,15 @@ class UserProfile extends React.Component {
                 return res.json();
         })
         .then( (res) => {
-            if (res)
+            if (res){
                 this.setState({
-                    user: res
+                    user: res,
+                    email_val: res.email,
+                    name_val: res.name,
+                    bdate_val: res.birth,
+
                 });
+            }
             console.log(res)
         }).catch((error) => {useAuthStore.getState().leave()});
     }
@@ -65,14 +77,70 @@ class UserProfile extends React.Component {
     }, 700
 
     );
-    
+
+    handleSubmit = () => {
+        let email = document.getElementById("email").value
+        let name = document.getElementById("name").value;
+        let bdate = document.getElementById("date").value;
+        let dDate = new Date(bdate);
+        let passed = true;
+
+        if(email.length == 0){
+            this.setState({emailHelperText:"Email needs to have at least 1 character."});
+            passed = false;
+        }
+            this.setState({emailHelperText:""});
+        if(name.length == 0){
+            this.setState({nameHelperText:"Name needs to have at least 1 character."});
+            passed = false;
+        }
+        else
+            this.setState({nameHelperText:""});
+
+        if(dDate > new Date()){
+            console.log("date must be past")
+            this.setState({birthdayHelperText:"Birthdays are in the past."});
+            passed = false;
+        }
+        else
+            this.setState({birthdayHelperText:""});
+
+        if(passed){
+            UserService.updateUserInfo(
+            this.state.user.user_id,
+            email,
+            name,
+            bdate
+            )
+            .then(
+            (res) => {
+                console.log(res.status);
+                return res.json();
+            }
+            )
+            .then(
+            (res) => {
+                this.setState({email_val: res.email, name_val: res.name, bdate_val: res.birth})
+                this.notify()
+            }
+        )
+        .catch(
+            (error) => {
+            console.log(error);
+
+            // TODO: change state to show error;
+            }
+        );
+
+        }
+    }
     render() {
         return (
         <div>
-            <div className={this.props.classes.container}>
+            <div>
             { this.state.user == null ? "" : 
-            <GridContainer justify="center">
-                <GridItem xs={12} sm={12} md={12}>
+            <GridContainer style={{marginTop: 25}} justify="center">
+                <GridItem xs={12} sm={12} md={12} lg={12}>
                 <Card className={this.props.classes[this.state.cardAnimaton]}>
                     <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
@@ -89,7 +157,7 @@ class UserProfile extends React.Component {
                         }}
                         inputProps={{
                             type: "email",
-                            value: this.state.user.email,
+                            defaultValue: this.state.user.email,
                             endAdornment: (
                             <InputAdornment position="end">
                                 <Email className={this.props.classes.inputIconsColor} />
@@ -112,7 +180,7 @@ class UserProfile extends React.Component {
                         
                         inputProps={{
                             type: "text",
-                            value: this.state.user.name,
+                            defaultValue: this.state.user.name,
                             endAdornment: (
                             <InputAdornment position="end">
                                 <Email className={this.props.classes.inputIconsColor} />
@@ -125,49 +193,6 @@ class UserProfile extends React.Component {
                         :
                         <></>
                         }
-                        <CustomInput
-                        helperText={this.state.passHelperText}
-                        labelText="Password"
-                        id="pass"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                        inputProps={{
-                            type: "password",
-                            endAdornment: (
-                            <InputAdornment position="end">
-                                <Icon className={this.props.classes.inputIconsColor}>
-                                lock_outline
-                                </Icon>
-                            </InputAdornment>
-                            ),
-                            autoComplete: "off"
-                        }}
-                        />
-                        {this.state.passHelperText!==""?
-                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.passHelperText}</Typography>
-                        :
-                        <></>
-                        }
-                        <CustomInput
-                        helperText={this.state.cPassHelperText}
-                        labelText="Confirm Password"
-                        id="cpass"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                        inputProps={{
-                            type: "password",
-                            endAdornment: (
-                            <InputAdornment position="end">
-                                <Icon className={this.props.classes.inputIconsColor}>
-                                lock_outline
-                                </Icon>
-                            </InputAdornment>
-                            ),
-                            autoComplete: "off"
-                        }}
-                        />
                         {this.state.cPassHelperText!==""?
                         <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.cPassHelperText}</Typography>
                         :
@@ -191,7 +216,7 @@ class UserProfile extends React.Component {
                         <Button     
                         onClick={this.handleSubmit} 
                         >
-                        Submit
+                        Submit Changes
                         </Button>
                     </CardFooter>
                     </form>
