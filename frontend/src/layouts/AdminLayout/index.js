@@ -13,7 +13,6 @@ const AdminLayout = (props) => {
             color="transparent"
             brand=""
             size="sm"
-            // rightLinks={<HeaderLinks />}
             {...rest}
           />
           <Outlet />

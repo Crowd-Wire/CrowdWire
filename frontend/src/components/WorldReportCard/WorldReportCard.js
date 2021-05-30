@@ -13,7 +13,8 @@ const useStyles = makeStyles({
     root: {
         maxWidth: 345,
         marginLeft:"auto",
-        marginRight:"auto"
+        marginRight:"auto",
+        marginBottom:"15px"
     },
     media: {
         height: 140,
@@ -53,10 +54,11 @@ export default function WorldReportCard(props) {
                         <Typography gutterBottom variant="h5" component="h2">
                             {report.world_name}
                         </Typography>
+                        <hr/>
                         <Typography variant="subtitle1">
                             {report.reporter_email} {report.timestamp}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary" component="p">
+                        <Typography variant="body2" color="textSecondary" noWrap component="p">
                             {report.comment}
                         </Typography>
                     </CardContent>

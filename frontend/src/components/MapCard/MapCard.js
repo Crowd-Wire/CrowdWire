@@ -43,34 +43,32 @@ export default function MapCard(props){
 
     const classes = useStyles();
     return(
-        <>
-            <Col xs={12} sm={6} md={4}>
-                <Card className={classes.root}>
-                    <CardActionArea onClick={routeChange}>
-                        <CardMedia
-                            className={classes.media}
-                            image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
-                            title={map.name}
-                        />
-                        <CardContent>
-                            <Typography gutterBottom variant="h5" component="h2">
-                            {   map.name}
-                            </Typography>
-                            <Typography variant="body2" noWrap color="textSecondary" component="p">
-                                {map.description}
-                            </Typography>
-                        </CardContent>
-                    </CardActionArea>
-                    <CardActions>
-                        <Button  to="/App" size="small" color="primary" onClick={routeChange}>
-                            Enter
-                        </Button>
-                        <Button onClick={() => goToDetails()} size="small" color="primary">
-                            More Details
-                        </Button>
-                    </CardActions>
-                </Card>
-            </Col>
-        </>
+        <Col xs={12} sm={6} md={4}>
+            <Card className={classes.root}>
+                <CardActionArea onClick={routeChange}>
+                    <CardMedia
+                        className={classes.media}
+                        image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
+                        title={map.name}
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="h2">
+                        {   map.name}
+                        </Typography>
+                        <Typography variant="body2" noWrap color="textSecondary" component="p">
+                            {map.description}
+                        </Typography>
+                    </CardContent>
+                </CardActionArea>
+                <CardActions>
+                    <Button  to="/App" size="small" color="primary" onClick={routeChange}>
+                        Enter
+                    </Button>
+                    <Button onClick={() => goToDetails()} size="small" color="primary">
+                        More Details
+                    </Button>
+                </CardActions>
+            </Card>
+        </Col>
     );
 }

@@ -16,7 +16,7 @@ const useStyles = theme => ({
         maxWidth: 345,
     },
     media: {
-        height: 140,
+        paddingTop: "30%",
     },
 });
 
@@ -67,23 +67,23 @@ class AdminWorldDetails extends Component {
         return (
             <>
                 {!this.state.world ? <h1>Loading</h1> :
-                    <div className="px-3" style={{ paddingTop: "100px", height:"100%", backgroundColor:"black"}}>
+                    <div className="px-3" style={{ paddingTop: "100px", height:"100%"}}>
                         <Row style={{height:"100%"}}>
-                            <Col md={8}>
-                                <Row style={{height:"100%"}}>
+                            <Col sm={12} md={8} style={{marginBottom:"50px"}}>
+                                <Row style={{height:"70%"}}>
                                     <Col>
                                         <h3>World Details</h3>
-                                        <Card style={{height:"100%"}}>
+                                        <Card style={{height:"93%"}}>
                                             {this.state.world.status == 2
                                                 ? <h1>This world has been deleted by the user</h1> :
                                                 <>
                                                     <CardContent>
                                                         <CardMedia
                                                             className={classes.media}
-                                                            image="/static/images/cards/contemplative-reptile.jpg"
+                                                            image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
                                                             title="Contemplative Reptile"
                                                         />
-                                                        <Typography gutterBottom variant="h5" component="h2">
+                                                        <Typography gutterBottom variant="h4" component="h2" style={{marginTop:"15px"}}>
                                                             {this.state.world.name}
                                                         </Typography>
                                                         <Typography variant="body2" component="p">
@@ -105,15 +105,21 @@ class AdminWorldDetails extends Component {
                                     </Col>
                                 </Row>
                             </Col>
-                            <Col md="4">
-                                <h3> Last World Reports </h3>
-                                {this.state.reports && this.state.reports.length !== 0 ? this.state.reports.map((r, i) => {
+                            <Col sm={12} md={4}>
+                                <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    <h3 style={{marginLeft:"auto", marginRight:"auto"}}> Last World Reports </h3>
+                                </Row>
+                                <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    {this.state.reports && this.state.reports.length !== 0 ? this.state.reports.map((r, i) => {
 
-                                    return (<div className="mb-3" key={r.reporter}>
-                                        <WorldReportCard report={r} />
-                                    </div>)
+                                        return (
+                                        <div className="md-3" key={r.reporter} style={{overflowY:"auto", marginLeft:"auto", marginRight:"auto"}}>
+                                            <WorldReportCard report={r} />
+                                        </div>)
 
-                                }) : <h2>No reports found...</h2>}
+                                    }) : <h2>No reports found...</h2>}
+                                </Row>
+                                
                             </Col>
                         </Row>
                     </div>
