@@ -9,7 +9,7 @@ import classNames from 'classnames';
 // Settings
 
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
-import TilesTab from "./sections/TilesTab";
+import TilesTab from "./sections/TilesTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
 
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
