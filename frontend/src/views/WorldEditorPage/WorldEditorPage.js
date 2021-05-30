@@ -10,6 +10,9 @@ import classNames from 'classnames';
 
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
+import ObjectsTab from "./sections/ObjectsTab.tsx";
+import ToolsTab from "./sections/ToolsTab.tsx";
+import LayersTab from "./sections/TilesTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
 
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
@@ -287,15 +290,15 @@ class WorldEditorPage extends React.Component {
       },
       1: {
         tabName: 'Objects',
-        tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'blue', fontSize: '2rem' }}>1</div>,
+        tabContent: <ObjectsTab />,
       },
       2: {
         tabName: 'Layers',
-        tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'green', fontSize: '2rem' }}>2</div>,
+        tabContent: <LayersTab />,
       },
       3: {
         tabName: 'Tools',
-        tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'yellow', fontSize: '2rem' }}>3</div>,
+        tabContent: <ToolsTab />,
       },
       4: {
         tabName: 'World',

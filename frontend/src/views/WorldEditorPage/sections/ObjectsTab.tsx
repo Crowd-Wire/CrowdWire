@@ -12,6 +12,9 @@ interface ObjectsTabState {
 
 
 class ObjectsTab extends Component<{}, ObjectsTabState> {
+    render() {
+        return null;
+    }
 }
 
 export default ObjectsTab;

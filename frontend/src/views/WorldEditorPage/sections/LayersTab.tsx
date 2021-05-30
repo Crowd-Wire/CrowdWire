@@ -12,6 +12,9 @@ interface LayersTabState {
 
 
 class LayersTab extends Component<{}, LayersTabState> {
+    render() {
+        return null;
+    }
 }
 
 export default LayersTab;

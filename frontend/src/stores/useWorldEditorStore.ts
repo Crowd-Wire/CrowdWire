@@ -9,13 +9,21 @@ enum PaintToolType {
     ERASE = "ERASE",
 }
 
+
+export interface Tile {
+    id: number;
+    height: number;
+    width: number;
+    imageURL: string;
+}
+
 interface Layer {
     visible: boolean;
 }
 
 interface PaintTool {
     type?: PaintToolType;
-    tileId?: number;
+    tile?: Tile;
 }
 
 const useWorldEditorStore = create(
