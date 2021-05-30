@@ -43,6 +43,11 @@ class TilesTab extends Component<{}, TilesTabState> {
     this.setState({ filterType: event.target.value });
   }
 
+  handleClick = (event) => {
+    const tileId = event.target.getAttribute("data-gid");
+    useWorldEditorStore.getState().setPaintTool({tileId})
+  }
+
   render() {
     console.log('render')
     const { filterType } = this.state;
@@ -83,6 +88,7 @@ class TilesTab extends Component<{}, TilesTabState> {
                   for (let j = 0; j < columns; j++) {
                     tiles.push(
                       <div
+                        onClick={this.handleClick}
                         data-gid={firstgid + i * rows + j}
                         style={{
                           width: tileHeight,

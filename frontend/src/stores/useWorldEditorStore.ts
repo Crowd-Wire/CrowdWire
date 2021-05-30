@@ -14,7 +14,8 @@ interface Layer {
 }
 
 interface PaintTool {
-    type: PaintToolType;
+    type?: PaintToolType;
+    tileId?: number;
 }
 
 const useWorldEditorStore = create(
