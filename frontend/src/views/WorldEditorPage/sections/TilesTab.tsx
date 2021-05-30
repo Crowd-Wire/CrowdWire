@@ -34,14 +34,18 @@ class TilesTab extends Component<{}, TilesTabState> {
 
   constructor(props) {
     super(props);
-    this.mapManager = new MapManager();
 
     this.unsubscribe = useWorldEditorStore.subscribe(
-      () => this.forceUpdate(), state => state.ready);
+      this.handleReady, state => state.ready);
   }
 
   componentWillUnmount() {
     this.unsubscribe();
+  }
+
+  handleReady = () => {
+    this.mapManager = new MapManager();
+    this.forceUpdate()
   }
 
   handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
@@ -69,7 +73,7 @@ class TilesTab extends Component<{}, TilesTabState> {
           >
             <option aria-label="None" value="" />
             {
-              this.mapManager.map && this.mapManager.map.tilesets.map((tileset, index) => (
+              this.mapManager && this.mapManager.map.tilesets.map((tileset, index) => (
                 tileset.total != 0 && <option key={index} value={tileset.name}>{tileset.name}</option>
               ))
             }
@@ -78,7 +82,7 @@ class TilesTab extends Component<{}, TilesTabState> {
         <hr />
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {
-            this.mapManager.map && this.mapManager.map.tilesets.map((tileset) => {
+            this.mapManager && this.mapManager.map.tilesets.map((tileset) => {
               if (tileset.total != 0) {
                 const tiles = [];
                 // not an object

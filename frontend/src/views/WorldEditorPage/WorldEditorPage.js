@@ -286,7 +286,7 @@ class WorldEditorPage extends React.Component {
     this.gameWindows = {
       0: {
         tabName: 'Tiles',
-        tabContent: !this.state.loading && <TilesTab />
+        tabContent: <TilesTab />
       },
       1: {
         tabName: 'Objects',
