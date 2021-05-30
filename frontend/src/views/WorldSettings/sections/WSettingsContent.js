@@ -84,12 +84,12 @@ class WSettingsContent extends Component {
 						<Typography variant="h5" style={{color:"white"}}>Map: {this.state.worldName} </Typography>
 					</Row>
 					<Row style={{borderTopRightRadius:"10px",borderTopLeftRadius:"10px"}}>
-						<Tabs value={this.state.value} onChange={this.changeTab} style={{fontColor:"white", borderTopRightRadius:"10px",borderTopLeftRadius:"10px", border:"solid 1px black", backgroundColor:"black"}} aria-label="simple tabs example">
+						<Tabs value={this.state.value} onChange={this.changeTab} style={{fontColor:"white", borderTopRightRadius:"10px",borderTopLeftRadius:"10px", border:"solid 1px black"}} aria-label="simple tabs example">
 							<Tab label="Role" style={{color:"white"}} {...this.a11yProps(0)} />
 							<Tab label="Kicks/Bans" style={{color:"white"}} {...this.a11yProps(1)} />
 						</Tabs>
 					</Row>
-					<div style={{height:"400px", backgroundColor:"red"}}>
+					<div style={{height:"400px"}}>
 						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} /*setUsers={this.setUsers}*/>CHEFAO</RolePanel>
 						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>

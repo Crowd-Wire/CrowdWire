@@ -67,7 +67,8 @@ class AdminWorldDetails extends Component {
         return (
             <>
                 {!this.state.world ? <h1>Loading</h1> :
-                    <div className="px-3" style={{ paddingTop: "100px", height:"100%"}}>
+                    <div className="px-3" style={{ paddingTop: "100px", height:"100%", backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'
+                }}>
                         <Row style={{height:"100%"}}>
                             <Col sm={12} md={8} style={{marginBottom:"50px"}}>
                                 <Row style={{height:"70%"}}>

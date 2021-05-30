@@ -9,7 +9,6 @@ import { withStyles } from '@material-ui/core/styles';
 const useStyles = theme => ({
   root: {
     display: 'flex',
-    backgroundColor: '#5BC0BE',
     height:'100%',width:'100%', overflow:"auto"
   },
 });
