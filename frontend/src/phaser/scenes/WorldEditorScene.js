@@ -1,6 +1,7 @@
 import Phaser, { Scene } from 'phaser';
 
 import MapManager from "../MapManager.ts";
+import useWorldEditorStore from "stores/useWorldEditorStore.ts";
 
 const sceneConfig = {
     active: false,
@@ -16,8 +17,12 @@ class WorldEditorScene extends Scene {
     }
 
     create() {
-        const mapManager = new MapManager();;
+        const mapManager = new MapManager();
         this.map = mapManager.buildMap(this);
+        mapManager.buildObjects(this);
+
+        // emit READY to dependent components
+        useWorldEditorStore.getState().setReady();
 
         const width = this.map.widthInPixels,
               height = this.map.heightInPixels,
