@@ -31,6 +31,7 @@ import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
 import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
+import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 
 /**
  * Public and protected routes list 
@@ -102,7 +103,8 @@ const routes = (token, guest_uuid) => [
 			{ path: "/worlds", element: <AdminWorlds />},
 			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
 			{ path: "/statistics", element: <AdminStatistics/>},
-			{ path: "/users/reports", element: <AdminUserReports/>}
+			{ path: "/users/reports", element: <AdminUserReports/>},
+			{ path: "/users/:id", element: <AdminUserDetails/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

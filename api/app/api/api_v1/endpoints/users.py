@@ -22,6 +22,23 @@ async def user_in_request(
     return current_user
 
 
+@router.get("/{user_id}/", response_model=schemas.UserInDB)
+async def get_user_info(
+        user_id: int,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+) -> Any:
+    """
+    Gets the user info, only admins can access this endpoint
+    """
+    if is_guest_user(user) or not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    user_info = crud_user.get(db=db, id=user_id)
+    if not user_info:
+        raise HTTPException(status_code=400, detail="User not found")
+    return user_info
+
 @router.put("/{user_id}", response_model=schemas.UserInDB)
 async def edit_user(
         user_id: Union[int],
