@@ -240,7 +240,7 @@ async def update_world_user_info(
 
 
 @router.post("/", response_model=schemas.WorldMapInDB)
-def create_world(
+async def create_world(
         *,
         world_in: schemas.WorldCreate,
         db: Session = Depends(deps.get_db),
@@ -250,7 +250,7 @@ def create_world(
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
     world_in.creator = user
-    obj, message = crud.crud_world.create(db=db, obj_in=world_in, user=user)
+    obj, message = await crud.crud_world.create(db=db, obj_in=world_in, user=user)
     if not obj:
         raise HTTPException(
             status_code=400,

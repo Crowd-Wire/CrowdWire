@@ -29,6 +29,8 @@ import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
 import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
 import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
+import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
+import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 
 /**
  * Public and protected routes list 
@@ -98,7 +100,9 @@ const routes = (token, guest_uuid) => [
 		children: [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
 			{ path: "/worlds", element: <AdminWorlds />},
-			{ path: "/statistics", element: <AdminStatistics/>}
+			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
+			{ path: "/statistics", element: <AdminStatistics/>},
+			{ path: "/users/reports", element: <AdminUserReports/>}
 		],
 	},
     { path: "*", element: <NotFound /> },

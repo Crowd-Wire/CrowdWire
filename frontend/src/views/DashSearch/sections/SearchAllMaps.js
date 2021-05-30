@@ -75,7 +75,7 @@ class SearchAllMaps extends Component {
 	}
 
 	search_handler = () => {
-		WorldService.search(this.state.search, this.state.tags, this.type, null, null, null, null, null, null, this.state.page, 10)
+		WorldService.searchUsers(this.state.search, this.state.tags, this.type, null, null, this.state.page, 10)
 			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
 			.catch((err) => { useAuthStore.getState().leave() });
@@ -95,7 +95,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
-		WorldService.search("", [], this.type,  null, null, null, null, null, null, 1, 10)
+		WorldService.searchUsers("", [], this.type, null, null, 1, 10)
 			.then((res) => {
 				if(res.status == 200) 
 					return res.json()
@@ -107,10 +107,11 @@ class SearchAllMaps extends Component {
 	}
 	async componentDidUpdate(){
 		// TODO: there might be a bug here because of the page variable when calling the service
+		// TODO: add the order_by filters
 		if(this.type!=this.props.params.type){
 			this.type = this.props.params.type;
 			await this.setState({prevSearch: "", prevTags: []});
-			WorldService.search("", [], this.type, null, null, null, null, null, null, this.state.page, 10)
+			WorldService.searchUsers("", [], this.type, null, null, this.state.page, 10)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()

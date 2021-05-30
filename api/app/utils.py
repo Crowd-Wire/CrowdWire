@@ -30,6 +30,10 @@ def generate_guest_username(user_id: uuid4) -> str:
     return f'Guest_{sub_uuid}'
 
 
+def row2dict(model) -> dict:
+    return {c.name: str(getattr(model, c.name)) for c in model.__table__.columns}
+
+
 """
 def send_email(
     email_to: str,

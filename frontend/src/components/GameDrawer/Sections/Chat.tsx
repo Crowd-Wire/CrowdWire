@@ -1,6 +1,11 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
-import { withStyles } from '@material-ui/core/styles';
+import { withStyles, createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import NativeSelect from '@material-ui/core/NativeSelect';
 
 import { getSocket } from 'services/socket';
 import useMessageStore from 'stores/useMessageStore';
@@ -9,12 +14,30 @@ import useWorldUserStore from "stores/useWorldUserStore";
 import style from "assets/jss/my-kit-react/components/GameDrawer/chatStyle.js";
 
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    formControl: {
+      margin: theme.spacing(1),
+      minWidth: 120,
+    },
+    selectEmpty: {
+      marginTop: theme.spacing(2),
+    },
+  }),
+);
+
 const Chat = (props) => {
   const { classes, handleMessage } = props;
   const [text, setText] = React.useState("");
   const ws = getSocket(useWorldUserStore.getState().world_user.world_id);
   const messages = useMessageStore(state => state.messages);
   const chat = React.useRef();
+  const classes2 = useStyles();
+  const [sendTo, setSendTo] = React.useState('all');
+
+  const handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
+    setSendTo(event.target.value)
+  };
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -24,7 +47,7 @@ const Chat = (props) => {
     if (event.key === 'Enter' && text) {
       setText('');
       handleMessage();
-      ws.sendMessage(text, 'nearby');
+      ws.sendMessage(text, sendTo);
     }
   }
 
@@ -56,6 +79,23 @@ const Chat = (props) => {
             })
           }
         </div>
+      </div>
+      <div className={classes.sendToInput}>
+        <FormControl className={classes.formControl}>
+          <InputLabel htmlFor="age-native-simple" style={{color: 'white'}}>Send To:</InputLabel>
+          <Select
+            native
+            value={sendTo}
+            onChange={handleSelectChange}
+            inputProps={{
+              id: 'age-native-simple',
+            }}
+            style={{color: 'white'}}
+          >
+            <option value="all">All</option>
+            <option value="nearby">Nearby</option>
+          </Select>
+        </FormControl>
       </div>
       <div className={classes.chatInput}>
         <TextField
