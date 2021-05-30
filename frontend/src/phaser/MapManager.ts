@@ -17,8 +17,9 @@ class MapManager {
     private state: MapManagerState;
     private worldId: number;
     
-    public tileKeys: string[];
+    public tilesetKeys: string[];
     public objectKeys: string[];
+    public tilesetURL: Record<string, string>;
     public objectBody: Record<string, Geom.Rectangle>;
     public map: Tilemaps.Tilemap;
 
@@ -35,8 +36,9 @@ class MapManager {
     loadMap(scene: Scene): void {
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
-        this.tileKeys = [];
+        this.tilesetKeys = [];
         this.objectKeys = [];
+        this.tilesetURL = {};
         this.objectBody = {};
         this.mapJson.tilesets.forEach((tileset) => {
             if ('grid' in tileset) {
@@ -55,7 +57,8 @@ class MapManager {
                 // tile layer
                 const tilesetName = tileset.name;
                 scene.load.image(tilesetName, API_BASE + "static/maps/" + tileset.image);
-                this.tileKeys.push(tilesetName);
+                this.tilesetKeys.push(tilesetName);
+                this.tilesetURL[tilesetName] = tileset.image;
             }
         })
         this.state = MapManagerState.LOADED;
@@ -69,9 +72,8 @@ class MapManager {
 
         // add tileset images
         const tilesets: Tilemaps.Tileset[] = []
-        this.tileKeys.forEach((key) => {
+        this.tilesetKeys.forEach((key) => {
             tilesets.push( this.map.addTilesetImage(key) );
-            scene.cache.addCustom(key);
         })
         this.objectKeys.forEach((key) => {
             this.map.addTilesetImage(key);
