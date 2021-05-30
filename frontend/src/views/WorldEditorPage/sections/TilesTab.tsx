@@ -29,23 +29,27 @@ class TilesTab extends Component<{}, TilesTabState> {
     tilesets: [],
     filterType: '',
   }
-
   mapManager: MapManager;
+  unsubscribe: any;
 
   constructor(props) {
     super(props);
     this.mapManager = new MapManager();
 
-    useWorldEditorStore.subscribe(() => this.forceUpdate(), state => state.ready);
+    this.unsubscribe = useWorldEditorStore.subscribe(
+      () => this.forceUpdate(), state => state.ready);
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
   }
 
   handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
     this.setState({ filterType: event.target.value });
   }
 
-  handleClick = (event) => {
-    const tileId = event.target.getAttribute("data-gid");
-    useWorldEditorStore.getState().setPaintTool({tileId})
+  handleClick = (id: number, width: number, height: number, imageURL: string) => {
+    useWorldEditorStore.getState().setPaintTool({ tile: { id, width, height, imageURL } });
   }
 
   render() {
@@ -54,7 +58,7 @@ class TilesTab extends Component<{}, TilesTabState> {
     return (
 
       <>
-        <FormControl style={{marginLeft: 15, marginTop: 15}}>
+        <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
           <InputLabel htmlFor="select-tileset">Tileset:</InputLabel>
           <Select
             native
@@ -66,8 +70,8 @@ class TilesTab extends Component<{}, TilesTabState> {
           >
             <option aria-label="None" value="" />
             {
-              this.mapManager.map && this.mapManager.map.tilesets.map((tileset) => (
-                tileset.total != 0 && <option value={tileset.name}>{tileset.name}</option>
+              this.mapManager.map && this.mapManager.map.tilesets.map((tileset, index) => (
+                tileset.total != 0 && <option key={index} value={tileset.name}>{tileset.name}</option>
               ))
             }
           </Select>
@@ -81,19 +85,21 @@ class TilesTab extends Component<{}, TilesTabState> {
                 // not an object
 
                 const tilesetURL = this.mapManager.tilesetURL[tileset.name];
-                const { name, firstgid, tileWidth, tileHeight, rows, columns } = tileset;
-                console.log(tileset.name)
+                const { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
 
                 for (let i = 0; i < rows; i++)
                   for (let j = 0; j < columns; j++) {
+                    const id = firstgid + i * columns + j;
+                    const imageURL = API_BASE + "static/maps/" + tilesetURL;
                     tiles.push(
                       <div
-                        onClick={this.handleClick}
-                        data-gid={firstgid + i * rows + j}
+                        key={id}
+                        id={`tile-${id}`}
+                        onClick={() => this.handleClick(id, tileWidth, tileHeight, imageURL)}
                         style={{
-                          width: tileHeight,
-                          height: tileWidth,
-                          backgroundImage: `url(${API_BASE + "static/maps/" + tilesetURL})`,
+                          width: tileWidth,
+                          height: tileHeight,
+                          backgroundImage: `url(${imageURL})`,
                           backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
                           ...tileStyle
                         }}
