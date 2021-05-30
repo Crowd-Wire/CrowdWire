@@ -29,7 +29,7 @@ class DashboardContent extends Component{
 	};
 
 	navigate(){
-«		this.setState({navigate:true});
+		this.setState({navigate:true});
 	}
 
 	componentDidMount(){
