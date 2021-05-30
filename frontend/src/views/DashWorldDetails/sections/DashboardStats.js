@@ -35,11 +35,6 @@ class DashboardStats extends Component{
     transition = React.forwardRef(function Transition(props, ref) {
         return <Slide direction="up" ref={ref} {...props} />;
     });
-
-    descText = {
-        marginLeft:"5%",
-        color:"black",
-    };
     
     titleText = {
         marginLeft:"5%"
@@ -119,9 +114,6 @@ class DashboardStats extends Component{
                                     world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                             </Row>
                         </Col>
-                    </Row>
-                    <Row style={{marginTop:"50px"}} xs={12} sm={12} md={12}>
-                        <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
                     </Row>
                 </div>
                 <Dialog

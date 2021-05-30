@@ -81,9 +81,9 @@ class DashboardContent extends Component{
 			return(<Navigate to="../search/public"></Navigate>);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%", marginRight:"5%", width:"100%"}}>    
-				<Row style={{ width:"100%", height:"50%", marginTop:"5%", minWidth:"450px"}}>
+				<Row style={{ width:"100%", minHeight:"50%", marginTop:"5%", minWidth:"450px", overflow: 'hidden'}}>
 					<Col xs={12} sm={12} md={12} style={{backgroundSize:"cover", borderRadius:"15px", backgroundRepeat:"no-repeat",backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")'}}>
-						<div style={{ paddingTop: 15, position: 'absolute', bottom: 0, left: 0, borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", height:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
+						<div style={{ paddingTop: 15, position: 'absolute', bottom: 0, left: 0, overflow: 'hidden', borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", minHeight:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
 							<Typography noWrap variant="h3" style={this.cardTextStyles} >
 								{this.state.worldInfo.name}
 							</Typography>
@@ -103,6 +103,13 @@ class DashboardContent extends Component{
 								</Col>
 								<Col xs={4} sm={4} md={4} style={{textAlign: "right"}}>
 									<Typography style={{marginLeft:"auto", color:"white", marginTop:"10px"}}>Max Online Users: {this.state.worldInfo.max_users}</Typography>
+								</Col>
+							</Row>
+							<Row style={{width:"90%", marginRight:"auto", marginLeft:"30px", marginTop:"20px"}}>
+								<Col sm={12}>
+									<Typography style={{ overflowWrap: 'break-word'}} gutterBottom variant="body1">
+										{this.state.worldInfo.description ? this.state.worldInfo.description : "No description available for this world"}
+									</Typography>
 								</Col>
 							</Row>
 						</div>

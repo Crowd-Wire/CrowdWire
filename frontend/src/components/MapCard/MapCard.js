@@ -54,7 +54,7 @@ export default function MapCard(props){
                             image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
                             title={map.name}
                         />
-                        <CardContent>
+                        <CardContent style={{height: 80}}>
                             <Typography gutterBottom variant="h5" component="h2">
                             {   map.name}
                             </Typography>
