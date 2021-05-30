@@ -13,7 +13,7 @@ interface ObjectsTabState {
 
 class ObjectsTab extends Component<{}, ObjectsTabState> {
     render() {
-        return null;
+        return 'ObjectsTab';
     }
 }
 

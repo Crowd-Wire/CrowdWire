@@ -13,7 +13,7 @@ interface LayersTabState {
 
 class LayersTab extends Component<{}, LayersTabState> {
     render() {
-        return null;
+        return 'LayersTab';
     }
 }
 

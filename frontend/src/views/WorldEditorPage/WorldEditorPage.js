@@ -12,7 +12,7 @@ import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
 import ObjectsTab from "./sections/ObjectsTab.tsx";
 import ToolsTab from "./sections/ToolsTab.tsx";
-import LayersTab from "./sections/TilesTab.tsx";
+import LayersTab from "./sections/LayersTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
 
 import style from "assets/jss/my-kit-react/views/mapEditorStyle";
@@ -52,9 +52,9 @@ class WorldEditorPage extends React.Component {
         {
           size: 50,
           grid: [
-            { size: 30, tabs: [1, 2, 3] },
-            { size: 20, tabs: [0] },
-            { size: 50, tabs: [3] },
+            { size: 25, tabs: [3] },
+            { size: 50, tabs: [0, 1] },
+            { size: 25, tabs: [2] },
           ]
         },
         { size: 50, tabs: [4] },
