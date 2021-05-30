@@ -57,15 +57,12 @@ export default function UserPermissions(props) {
   }
 
   const saveInfo = () => {
-    console.log(newState)
     if(props.world_id.length===1)
       RoleService.editRole(props.world_id,newState,props.roleId)
       .then((res)=>{
-        console.log(res.status)
         return res.json();
       })
       .then((res)=>{
-        console.log(res);
         props.setRoles([]);
       });
   }

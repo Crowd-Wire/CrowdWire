@@ -29,8 +29,7 @@ class DashboardContent extends Component{
 	};
 
 	navigate(){
-		console.log("setState")
-		this.setState({navigate:true});
+«		this.setState({navigate:true});
 	}
 
 	componentDidMount(){
@@ -41,7 +40,6 @@ class DashboardContent extends Component{
 			  return res.json()
 		  })
 		  .then((res) => {
-			  console.log(res)
 			if (res)
 			  this.setState({worldInfo:res})
 		  }).catch((error) => { useAuthStore.getState().leave() });

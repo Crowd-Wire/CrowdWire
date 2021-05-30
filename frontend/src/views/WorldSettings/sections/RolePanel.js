@@ -41,7 +41,6 @@ export default function RolePanel(props){
 				const userId = item.id;
 	
 				for (let [key, value] of Object.entries(usersInRole)) {
-					console.log(key)
 					if (value.user_id == userId) {
 						value.role_id = Number(rId);
 						break;
@@ -50,16 +49,13 @@ export default function RolePanel(props){
 	
 				let temp = [];
 	
-				console.log("UsersInRole Values", Object.values(usersInRole))
 				Object.keys(roles).forEach((key) => {
-					console.log("For role", key, ":")
 					let roleUsers = [];
 					for(let user of Object.values(usersInRole)){
 						if(user.role_id===parseInt(key)){
 							roleUsers.push(user);
 						}
 					}
-					console.log("roleUsers", roleUsers)
 	
 					temp.push(
 						<div id={key} key={key} index={key}>
@@ -154,7 +150,6 @@ export default function RolePanel(props){
 						i++;
 					}
 				}
-				console.log(roleUsers);
 				temp.push(
 					<div id={key} key={key}>
 						<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
@@ -164,7 +159,6 @@ export default function RolePanel(props){
 			})
 			setRoleAmount(0)
 		}
-		console.log(usersInRole, 'nofim')
 	},[roles, props.world, usersInRole])
 
 
