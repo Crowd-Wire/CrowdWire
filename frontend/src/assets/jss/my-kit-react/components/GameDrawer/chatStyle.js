@@ -6,7 +6,7 @@ const chatStyle = {
         height: '100%',
     },
     chatBox: {
-        height: "calc(100vh - 64px - 64px - 1px)",
+        height: "calc(100vh - 64px - 64px - 64px - 1px)",
         "box-sizing": "border-box",
         display: 'flex',
         padding: '10px 10px',
@@ -15,6 +15,12 @@ const chatStyle = {
         height: "64px",
         display: 'flex',
         justifyContent: 'center',
+        padding: '0 10px',
+    },
+    sendToInput: {
+        height: "64px",
+        display: 'flex',
+        justifyContent: 'right',
         padding: '0 10px',
     },
     chat: {

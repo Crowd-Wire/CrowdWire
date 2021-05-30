@@ -94,7 +94,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-    def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Tuple[Optional[World], str]:
+    async def create(self, db: Session, obj_in: WorldCreate, *args, **kwargs) -> Tuple[Optional[World], str]:
         """
          Create a World
         """
@@ -133,10 +133,12 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         db.commit()
 
         # Create Default Roles for a World
-        default_roles = crud_role.create_default(db=db, world_id=db_world.world_id)
-        logger.debug(default_roles)
-        # TODO: check this
-        # _ = crud_world_user.join_world(db=db, _world=db_world, _user=user)
+        default_role = crud_role.create_default(db=db, world_id=db_world.world_id)
+
+        world_user, msg = await crud_world_user.join_world(db=db, _world=db_world, _user=user)
+        if world_user is None:
+            return None, msg
+        logger.debug(default_role)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
 
@@ -183,7 +185,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                page: int = 1,
                limit: int = 10,
                requester_id: int = None,
-               ) -> List[World]:
+               ):
 
         if not tags:
             tags = []

@@ -22,6 +22,7 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import CancelIcon from '@material-ui/icons/Cancel';
 import LinkIcon from '@material-ui/icons/Link';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
+import { useNavigate } from "react-router-dom";
 
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
@@ -97,6 +98,7 @@ const GameDrawer = () => {
   const requestsToSpeak = usePlayerStore(state => state.requestsToSpeak);
   let numMessages = useMessageStore(state => state.messages.length);
   let textChat = document.getElementById('text-chat');;
+  const navigation = useNavigate();
 
   useEffect(() => {
     if (!textChat) {
@@ -111,6 +113,10 @@ const GameDrawer = () => {
         textChat.removeEventListener('scroll', handleScroll);
     }
   })
+
+  const leaveWorld = () => {
+    navigation("/dashboard/search/public");
+  }
 
   const handleOpenReport = () => {
     setOpenReport(true);
@@ -266,7 +272,7 @@ const GameDrawer = () => {
             <ReportIcon style={iconsStyle} />
           </IconButton>
           <IconButton
-            onClick={() => {}}
+            onClick={() => leaveWorld()}
           >
             <MeetingRoomIcon style={iconsStyle} />
           </IconButton>

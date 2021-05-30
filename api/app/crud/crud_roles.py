@@ -5,9 +5,10 @@ from sqlalchemy import or_
 from app.models import Role, World_User, User, World
 from .base import CRUDBase
 from app.schemas import RoleCreate, RoleUpdate
-from ..core import strings
+from ..core import strings, consts
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
+from app.utils import row2dict
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
@@ -23,7 +24,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.role_manage.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -37,7 +38,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.ban.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ACCESS_FORBIDDEN
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -51,7 +52,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.conference_manage.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     @cache(model="Role")
@@ -65,7 +66,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             Role.world_id == world_id,
             or_(Role.talk_conference.is_(True), World.creator == user_id)).first()
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, strings.ROLE_INVALID_PERMISSIONS
         return role, ""
 
     async def can_assign_new_role_to_user(
@@ -128,14 +129,12 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
     async def get_world_roles(
             self,
             db: Session,
-            world_id: int,
-            page: int = 1,
-            limit: int = 10) -> Tuple[List[Optional[Role]], str]:
+            world_id: int
+    ) -> Tuple[List[Optional[Role]], str]:
         """
         Returns the Roles created for a given world
         """
-        return db.query(Role).filter(Role.world_id == world_id).offset(
-            limit * (page - 1)).limit(limit).all(), ""
+        return db.query(Role).filter(Role.world_id == world_id).all(), ""
 
     def get_world_default(self, db: Session, world_id: int) -> Role:
         """
@@ -154,7 +153,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         # Verify if user has permission to edit roles in this world
         role, msg = await self.can_access_world_roles(db=db, world_id=obj_in.world_id, user_id=request_user.user_id)
         if not role:
-            return None, strings.ROLES_NOT_FOUND
+            return None, msg
         # verify if there's already a role with this name
         role, msg = self.get_by_name(db=db, world_id=obj_in.world_id, name=obj_in.name)
         if not role:
@@ -171,14 +170,17 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         """
         Create default roles when a world is created
         """
-        default_roles = [Role(world_id=world_id, name="default", is_default=True, invite=True, role_manage=True),
-                         Role(world_id=world_id, name="speaker"),
-                         Role(world_id=world_id, name="moderator")]
-        db.add_all(
-            default_roles
+        default_role = Role(
+            world_id=world_id,
+            name="default",
+            is_default=True,
+            walk=True,
+            talk=True,
+            chat=True
         )
+        db.add(default_role)
         db.commit()
-        return default_roles
+        return default_role
 
     async def update(
             self,
@@ -186,14 +188,36 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             *,
             db_obj: Role,
             obj_in: Union[RoleUpdate, Dict[str, Any]],
+            world_id: int
     ) -> Tuple[Optional[Role], str]:
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
-        # Worth is return a error here?
-        if 'is_default' in update_data and update_data['is_default']:
-            update_data['is_default'] = False
+
+        # cannot change default role without setting a new one
+        if 'is_default' in update_data and not update_data['is_default']:
+            return None, "cannot remove default role"
+
+        # this is required because when converting a sqlalchemy model to dict it returns another attribute
+        # sa_instance
+        new_data = row2dict(db_obj)
+        new_data.update(update_data)
+
+        # when trying to change the default role there cannot be some permissions in this role
+        if new_data.get('is_default'):
+            # the new object in the database cannot have some permissions
+            for k, v in new_data.items():
+                if v is True and k not in consts.role_default_permissions + ['is_default']:
+                    return None, "cannot give this permissions to default role"
+
+            # change old default role to not default
+            default_role = self.get_world_default(db=db, world_id=world_id)
+            if default_role.role_id != db_obj.role_id:
+                default_role.is_default = False
+                db.add(default_role)
+                db.commit()
+
         await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
@@ -205,7 +229,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         if world_id and role_id:
             role, msg = await crud_role.get_by_role_id(db=db, role_id=role_id)
             if not role:
-                return None, strings.ROLES_NOT_FOUND
+                return None, msg
             if role.is_default:
                 return None, strings.ROLE_DEFAULT_DELETE_FORBIDDEN
             default_role = self.get_world_default(db=db, world_id=world_id)
