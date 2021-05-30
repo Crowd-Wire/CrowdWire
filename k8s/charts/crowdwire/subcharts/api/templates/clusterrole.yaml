@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pod-reader2
+rules:
+- apiGroups: ["apps","extensions",""]
+  resources: ["pods","deployments"]
+  verbs: ["get", "watch", "list","patch","update","delete"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: pod-reader2
+subjects:
+- kind: ServiceAccount
+  name: crowdwire-api
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: pod-reader2
+  apiGroup: rbac.authorization.k8s.io
