@@ -4,7 +4,6 @@ import MapManager from "phaser/MapManager";
 import useWorldEditorStore from "stores/useWorldEditorStore";
 
 import {API_BASE} from "config";
-import { TimelapseTwoTone } from "@material-ui/icons";
 
 
 interface TilesTabState {
