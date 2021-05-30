@@ -193,7 +193,7 @@ export const startRabbit = async (handler: HandlerMap) => {
   
   const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
   let mediaserver_counter = 0;
-  k8sApi.listNamespacedPod('default').then(async function(res: any)  {
+  await k8sApi.listNamespacedPod('default').then(async function(res: any)  {
   //console.log(typeof(res.body));
   //console.log(payload)
  //console.log(payload.get('V1PodList'))
@@ -205,57 +205,57 @@ export const startRabbit = async (handler: HandlerMap) => {
       }
     }
     
-      const channel = await conn.createChannel();
-      const sendQueue = "rest_api_queue";
-      const receiveQueue = "media_server_" + String(mediaserver_counter);
-      console.log(receiveQueue)
-      await Promise.all([
-        channel.assertQueue(receiveQueue),
-        channel.assertQueue(sendQueue),
-      ]);
-      send = <Key extends keyof OutgoingMessageDataMap>(
-        obj: OutgoingMessage<Key>
-      ) => {
-        channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(obj)));
-      };
-      await channel.purgeQueue(receiveQueue);
-      await channel.consume(
-        receiveQueue,
-        async (e) => {
-          const m = e?.content.toString();
-          if (m) {
-            let data: IncomingChannelMessageData<any> | undefined;
-            try {
-              data = JSON.parse(m);
-            } catch {console.log('error parsing json')}
-            // console.log(data.topic);
-            if (data && data.topic && data.topic in handler) {
-              const { d: handlerData, topic: operation, uid } = data;
-              try {
-                console.log(operation);
-                
-                await handler[operation as keyof HandlerMap](
-                  handlerData,
-                  uid,
-                  send,
-                  () => {
-                    console.log(operation);
-                    send({
-                      topic: "error",
-                      d:
-                        "The voice server is probably redeploying, it should reconnect in a few seconds. If not, try refreshing.",
-                      uid: uid,
-                    });
-                  }
-                );
-              } catch (err) {
-                console.log(operation, err);
-                Sentry.captureException(err, { extra: { topic: operation } });
-              }
-            }
-          }
-        },
-        { noAck: true }
-      );
   }).catch((err: any) => {console.log(err);});
+  const channel = await conn.createChannel();
+  const sendQueue = "rest_api_queue";
+  const receiveQueue = "media_server_" + String(mediaserver_counter);
+  console.log(receiveQueue)
+  await Promise.all([
+    channel.assertQueue(receiveQueue),
+    channel.assertQueue(sendQueue),
+  ]);
+  send = <Key extends keyof OutgoingMessageDataMap>(
+    obj: OutgoingMessage<Key>
+  ) => {
+    channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(obj)));
+  };
+  await channel.purgeQueue(receiveQueue);
+  await channel.consume(
+    receiveQueue,
+    async (e) => {
+      const m = e?.content.toString();
+      if (m) {
+        let data: IncomingChannelMessageData<any> | undefined;
+        try {
+          data = JSON.parse(m);
+        } catch {console.log('error parsing json')}
+        // console.log(data.topic);
+        if (data && data.topic && data.topic in handler) {
+          const { d: handlerData, topic: operation, uid } = data;
+          try {
+            console.log(operation);
+            
+            await handler[operation as keyof HandlerMap](
+              handlerData,
+              uid,
+              send,
+              () => {
+                console.log(operation);
+                send({
+                  topic: "error",
+                  d:
+                    "The voice server is probably redeploying, it should reconnect in a few seconds. If not, try refreshing.",
+                  uid: uid,
+                });
+              }
+            );
+          } catch (err) {
+            console.log(operation, err);
+            Sentry.captureException(err, { extra: { topic: operation } });
+          }
+        }
+      }
+    },
+    { noAck: true }
+  );
 };

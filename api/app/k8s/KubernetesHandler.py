@@ -5,6 +5,7 @@ from kubernetes.client import ApiException
 from kubernetes.config import ConfigException
 from loguru import logger
 from app.core import strings
+from app.core.config import settings
 
 
 class KubernetesHandler:
@@ -18,12 +19,13 @@ class KubernetesHandler:
             config.load_incluster_config()
             self.client = client.CoreV1Api()
             self.apps = client.AppsV1Api()
-        except ConfigException as e :
-            logger.info(e)
+        except ConfigException:
             logger.info(strings.K8S_CLUSTER_NOT_FOUND)
 
     def get_all_pods(self):
         return self.client.list_pod_for_all_namespaces(watch=False).items
+
+
 
     def get_mediaserver_pods_names(self):
         pods_list = self.get_all_pods()

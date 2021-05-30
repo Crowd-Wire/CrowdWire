@@ -1,6 +1,6 @@
 from typing import Any
 
-from aio_pika import connect_robust, Channel, IncomingMessage, Message
+from aio_pika import connect_robust, Channel, IncomingMessage, Message, ExchangeType
 from aio_pika.pool import Pool
 from loguru import logger
 from app.core.config import settings
@@ -32,7 +32,7 @@ async def on_message(message: IncomingMessage) -> None:
                 return
             user_id = msg['d']['peerId']
 
-            await manager.send_personal_message(msg, user_id, False)
+            await manager.send_personal_message(msg, user_id)
 
         elif topic == protocol.NEW_PEER_PRODUCER \
                 or topic == protocol.NEW_PEER_DATA_PRODUCER:
@@ -40,10 +40,11 @@ async def on_message(message: IncomingMessage) -> None:
             # peerId identifies the new peerId that joined
             user_id = msg['uid']
 
-            await manager.send_personal_message(msg, user_id, False)
+            await manager.send_personal_message(msg, user_id)
 
         elif topic == protocol.CREATE_NEW_REPLICA:
             # TODO:
+            logger.info("Received Request to scale replicas..")
             logger.info("Scaling Replicas")
             k8s_handler.scale_mediaserver_replicas()
             # handle concurrency here with other api replicas
@@ -95,6 +96,7 @@ class RabbitHandler:
                 return await connection.channel()
         logger.warning("No Pool defined, cannot get a channel")
 
+
     async def publish(self, message: dict, queue: str = "") -> None:
         queues_to_send = set()
         if queue != "":
@@ -116,7 +118,7 @@ class RabbitHandler:
 
     async def consume(self) -> None:
         async with self.channel_pool.acquire() as channel:  # type: Channel
-            await channel.set_qos(10)
+            await channel.set_qos(0)
             queue = await channel.declare_queue(
                 self.queue_to_receive, durable=True
             )
@@ -124,18 +126,26 @@ class RabbitHandler:
 
     async def publish_replica(self, message: str) -> None:
         async with self.channel_pool.acquire() as channel:  # type: Channel
-            await channel.default_exchange.publish(
+            replicas_exchange = await channel.declare_exchange(
+                self.replicas_queue, ExchangeType.FANOUT
+            )
+            await replicas_exchange.publish(
                 Message(message.encode()),
-                self.replicas_queue,
+                routing_key=self.replicas_queue,
+
             )
             logger.info("Published message to Channel %r" % channel)
 
     async def consume_replica(self) -> None:
         async with self.channel_pool.acquire() as channel:
-            await channel.set_qos(10)
-            queue = await channel.declare_queue(
-                self.replicas_queue, durable=True
+            await channel.set_qos(0)
+            replicas_exchange = await channel.declare_exchange(
+                self.replicas_queue, ExchangeType.FANOUT
             )
+            queue = await channel.declare_queue(
+               exclusive=True
+            )
+            await queue.bind(replicas_exchange)
             await queue.consume(on_replica_message)
 
 
