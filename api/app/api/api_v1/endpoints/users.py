@@ -6,6 +6,7 @@ from app import schemas, models
 from app.core import strings
 from app.crud import crud_user, crud_report_user
 from app.utils import is_guest_user
+from loguru import logger
 from app.schemas import ReportUserInDB, ReportUserCreate, ReportUserInDBDetailed, ReportUserUpdate
 
 router = APIRouter()
@@ -19,6 +20,7 @@ async def user_in_request(
     """
         Returns Registered User Account Information
     """
+    logger.info("user_in_request")
     return current_user
 
 

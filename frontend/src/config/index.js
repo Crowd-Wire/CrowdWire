@@ -7,7 +7,7 @@ if (window.REACT_APP_RUNNING_MODE != null && window.REACT_APP_RUNNING_MODE == 'p
     console.log("host " + HOST)
     WS_BASE = `wss://${HOST}/api/v1`
     API_BASE = `https://${HOST}/api/v1/`
-    URL_BASE = `https://${HOST}/`
+    URL_BASE = `https//${HOST}/`
 }
 else {
     WS_BASE = "ws://localhost:8000";

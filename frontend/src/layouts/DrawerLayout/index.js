@@ -12,8 +12,11 @@ import { useLocation } from 'react-router-dom';
 const useStyles = theme => ({
   root: {
     display: 'flex',
-    backgroundColor: '#5BC0BE',
-    height:'100%',width:'100%', overflow:"auto"
+    height:'100%',
+    width:'100%',
+    overflow:"auto",
+    backgroundColor: '#2B9BFD',
+    backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'
   },
 });
 

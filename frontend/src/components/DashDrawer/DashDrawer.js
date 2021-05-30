@@ -33,7 +33,10 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerOpen: {
     overflowX: 'hidden',
-    background: "#3A506B",
+    background: "rgba(11, 19, 43, 1)",
+    // backgroundImage: "url('https://img.freepik.com/free-photo/abstract-grunge-decorative-relief-navy-blue-stucco-wall-texture-wide-angle-rough-colored-background_1258-28311.jpg?size=626&ext=jpg&ga=GA1.2.1448789384.1622332800')",
+    // backgroundSize: 'cover',
+    // backgroundRepeat: 'repeat-y',
     width: drawerWidth,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -41,7 +44,10 @@ const useStyles = makeStyles((theme) => ({
     }),
   },
   drawerClose: {
-    background: "#3A506B",
+    background: "rgba(11, 19, 43, 1)",
+    // backgroundImage: "url('https://img.freepik.com/free-photo/abstract-grunge-decorative-relief-navy-blue-stucco-wall-texture-wide-angle-rough-colored-background_1258-28311.jpg?size=626&ext=jpg&ga=GA1.2.1448789384.1622332800')",
+    // backgroundSize: 'cover',
+    // backgroundRepeat: 'repeat-y',
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -83,14 +89,12 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    props.handler(false);
     if(location.pathname!=="/dashboard/search/public")
       navigation("/dashboard/search/public");
   }
 
 
   const onClickJoinedWorlds = () => {
-    props.handler(true);
     if(location.pathname!=="/dashboard/search/joined")
       navigation("/dashboard/search/joined");
   }
