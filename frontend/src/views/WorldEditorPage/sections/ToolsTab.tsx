@@ -38,12 +38,21 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     this.unsubscribe();
   }
 
-  handleTileChange = (painTool) => {
-    const tileElem: any = document.getElementById(`tile-${painTool.tileId}`).cloneNode(true);
+  handleTileChange = (paintTool) => {
+    if (!paintTool.tileId)
+      return;
+
+    const tileElem: any = document.getElementById(`tile-${paintTool.tileId}`).cloneNode(true);
     tileElem.removeAttribute('id');
     tileElem.style["transform"] = "scale(2.5)"
     const tileContainer = document.getElementById("tile-container");
     tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
+  }
+
+  handlePaintToolChange = (type: PaintToolType) => {
+    const toolType = this.state.toolType === type ? PaintToolType.NONE : type;
+    this.setState({toolType});
+    useWorldEditorStore.getState().setPaintTool({type: toolType});
   }
 
   render() {
@@ -70,7 +79,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
               ].map(({type, Icon}) => {
                 return <Button 
                   color={toolType === type ? 'primary' : null} 
-                  onClick={() => this.setState({toolType: toolType === type ? '' : type})}
+                  onClick={() => this.handlePaintToolChange(type)}
                 >
                   <Icon style={{fontSize: '1.5rem'}} />
                 </Button>

@@ -3,6 +3,7 @@ import { combine } from "zustand/middleware";
 
 
 export enum PaintToolType {
+    NONE = "",
     DRAW = "DRAW",
     FILL = "FILL",
     SELECT = "SELECT",
@@ -15,7 +16,7 @@ interface Layer {
     visible: boolean;
 }
 
-interface PaintTool {
+export interface PaintTool {
     type?: PaintToolType;
     tileId?: number;
 }
