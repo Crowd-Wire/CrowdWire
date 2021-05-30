@@ -58,36 +58,6 @@ class TilesTab extends Component<{}, TilesTabState> {
 
       <>
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {console.log(
-
-this.mapManager.map && this.mapManager.map.tilesets.map((tileset) => {
-  if (tileset.total != 0) {
-    const tiles = [];
-    // not an object
-
-    const tilesetURL = this.mapManager.tilesetURL[tileset.name];
-    const {name, firstgid, tileWidth, tileHeight, rows, columns} = tileset;
-    console.log(tileset.name)
-
-    for (let i = 0; i < rows; i++)
-      for (let j = 0; j < columns; j++) {
-        tiles.push(
-          <div
-            data-gid={firstgid + i*rows + j}
-            style={{
-              width: tileHeight,
-              height: tileWidth,
-              backgroundImage: `url(${API_BASE + "static/maps/" + tilesetURL})`,
-              backgroundPosition: `${tileWidth * (rows-1-i)}px ${tileHeight * (columns-1-j)}px`,
-              ...tileStyle
-            }}
-          ></div>
-        );
-      }
-    return tiles;
-  }
-})
-          )}
           {
             this.mapManager.map && this.mapManager.map.tilesets.map((tileset) => {
               if (tileset.total != 0) {

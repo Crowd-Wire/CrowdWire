@@ -54,8 +54,8 @@ class WorldEditorPage extends React.Component {
             { size: 50, tabs: [3] },
           ]
         },
-        { size: 50, tabs: [5] },
-        // { size: 50, tabs: [4, 2] }
+        { size: 50, tabs: [4] },
+        // { size: 50, tabs: [1, 2] }
       ]
     }
   }
@@ -286,23 +286,19 @@ class WorldEditorPage extends React.Component {
         tabContent: !this.state.loading && <TilesTab />
       },
       1: {
-        tabName: 'Blue',
+        tabName: 'Objects',
         tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'blue', fontSize: '2rem' }}>1</div>,
       },
       2: {
-        tabName: 'Green',
+        tabName: 'Layers',
         tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'green', fontSize: '2rem' }}>2</div>,
       },
       3: {
-        tabName: 'Yellow',
+        tabName: 'Tools',
         tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'yellow', fontSize: '2rem' }}>3</div>,
       },
       4: {
-        tabName: 'Orange',
-        tabContent: <div style={{ width: '400px', height: '300px', backgroundColor: 'orange', fontSize: '2rem' }}>4</div>,
-      },
-      5: {
-        tabName: 'Game',
+        tabName: 'World',
         tabContent: !this.state.loading && <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
       },
     }
