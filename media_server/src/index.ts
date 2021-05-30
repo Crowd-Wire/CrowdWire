@@ -32,6 +32,7 @@ async function main() {
     router: Router;
   } [];
   let num_rooms: number = 0;
+  let already_requested: boolean = false;
   try {
     workers = await startMediasoup();
   } catch (err) {
@@ -47,16 +48,20 @@ async function main() {
     return w;
   };
 
+
+
   const createRoom = (send: any) => {
     const { worker, router } = getNextWorker();
     num_rooms += 1;
     console.log(num_rooms * scalability_config.max_consumers_per_worker)
     console.log(scalability_config.max_consumers * 0.5)
-    if (num_rooms * scalability_config.max_consumers_per_worker >= scalability_config.max_consumers * 0.5)
+    if (!already_requested && num_rooms * scalability_config.max_consumers_per_worker >= scalability_config.max_consumers * 0.1){
       console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
+      already_requested = true;
       send({
         'topic': 'CREATE_NEW_REPLICA'
-       });
+      });
+      }
     return { worker, router, state: {} };
   };
 

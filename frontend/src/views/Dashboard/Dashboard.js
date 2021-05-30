@@ -25,12 +25,6 @@ class Dashboard extends Component {
   }
 
 
-  handler = (focused) => {
-    this.setState({
-      focus: focused,
-      fMap: null
-    });
-  }
 
   // handler to change the state of the SearchAllMaps component based on the sidebar
   sidebar_handler = (joined) => {
@@ -46,9 +40,9 @@ class Dashboard extends Component {
         <CssBaseline />
         <DashDrawer handler={this.sidebar_handler}/>
         {this.state.focus ? 
-          <DashboardContent handler = {this.handler} />
+          <DashboardContent />
           :
-          <SearchAllMaps handler = {this.handler} joined={this.state.joined} />
+          <SearchAllMaps joined={this.state.joined} />
         }
       </div>
     );

@@ -7,6 +7,7 @@ class RoleBase(BaseModel):
     world_id: Optional[int] = None
     name: Optional[str] = None
     is_default: Optional[bool]
+    interact: Optional[bool]
     walk: Optional[bool]
     talk: Optional[bool]
     talk_conference: Optional[bool]
