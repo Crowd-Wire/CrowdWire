@@ -2,11 +2,12 @@ import create from "zustand";
 import { combine } from "zustand/middleware";
 
 
-enum PaintToolType {
-    STAMP = "STAMP",
+export enum PaintToolType {
+    DRAW = "DRAW",
     FILL = "FILL",
-    SHAPE = "SHAPE",
+    SELECT = "SELECT",
     ERASE = "ERASE",
+    PICK = "PICK",
 }
 
 

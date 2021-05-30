@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { PaintToolType } from "stores/useWorldEditorStore";
 
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -16,6 +16,7 @@ import {
 
 
 interface ToolsTabState {
+  toolType: string;
 }
 
 
@@ -26,7 +27,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     super(props);
 
     this.state = {
-      tile: null
+      toolType: null,
     }
 
     this.unsubscribe = useWorldEditorStore.subscribe(
@@ -47,6 +48,8 @@ class ToolsTab extends Component<{}, ToolsTabState> {
 
   render() {
 
+    const {toolType} = this.state;
+
     return (
       <>
         <div id="tile-container" style={{ display: 'flex', justifyContent: 'center', margin: '25px 0' }}>
@@ -57,11 +60,22 @@ class ToolsTab extends Component<{}, ToolsTabState> {
 
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <ButtonGroup variant="contained" color="default" aria-label="contained primary button group">
-            <Button><FaPencilAlt style={{ fontSize: "1.5rem" }} /></Button>
-            <Button><FaEraser style={{ fontSize: "1.5rem" }} /></Button>
-            <Button><FaFill style={{ fontSize: "1.5rem" }} /></Button>
-            <Button><FaRegSquare style={{ fontSize: "1.5rem" }} /></Button>
-            <Button><FaEyeDropper style={{ fontSize: "1.5rem" }} /></Button>
+            {
+              [
+                {type: PaintToolType.DRAW, Icon: FaPencilAlt}, 
+                {type: PaintToolType.ERASE, Icon: FaEraser},
+                {type: PaintToolType.FILL, Icon: FaFill},
+                {type: PaintToolType.SELECT, Icon: FaRegSquare},
+                {type: PaintToolType.PICK, Icon: FaEyeDropper},
+              ].map(({type, Icon}) => {
+                return <Button 
+                  color={toolType === type ? 'primary' : null} 
+                  onClick={() => this.setState({toolType: toolType === type ? '' : type})}
+                >
+                  <Icon style={{fontSize: '1.5rem'}} />
+                </Button>
+              })
+            }
           </ButtonGroup>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
