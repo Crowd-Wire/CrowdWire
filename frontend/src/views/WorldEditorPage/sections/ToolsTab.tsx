@@ -10,8 +10,6 @@ import {
   FaFill,
   FaPencilAlt,
   FaRegSquare,
-  FaUndo,
-  FaRedo
 } from 'react-icons/fa';
 
 
@@ -21,21 +19,22 @@ interface ToolsTabState {
 
 
 class ToolsTab extends Component<{}, ToolsTabState> {
-  unsubscribe: any;
+  subscriptions: any[];
 
   constructor(props) {
     super(props);
+    this.subscriptions = [];
 
     this.state = {
       toolType: null,
     }
 
-    this.unsubscribe = useWorldEditorStore.subscribe(
-      this.handleTileChange, state => state.paintTool)
+    this.subscriptions.push(useWorldEditorStore.subscribe(
+      this.handleTileChange, state => state.paintTool));
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.subscriptions.forEach((unsub) => unsub());
   }
 
   handleTileChange = (paintTool) => {

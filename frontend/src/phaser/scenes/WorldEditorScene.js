@@ -19,7 +19,14 @@ class WorldEditorScene extends Scene {
 
     create() {
         const mapManager = new MapManager();
+
         this.map = mapManager.buildMap(this);
+
+        this.map.layers.forEach((layer) => {
+            if (layer.name.startsWith("Float"))
+                layer.tilemapLayer.setDepth(1000);
+        })
+
         mapManager.buildObjects(this);
 
         // emit READY to dependent components
@@ -31,20 +38,24 @@ class WorldEditorScene extends Scene {
             paddingX = (window.screen.width - width - 2 * margin) / 4,
             paddingY = (window.screen.height - height - 2 * margin) / 4;
 
-        console.log(width, height, paddingX, paddingY)
-        console.log(-margin - paddingX, -margin - paddingY, width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY)
         this.cameras.main
-            .setBounds(-margin - paddingX, -margin - paddingY, width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
+            .setBounds(
+                -margin - paddingX, -margin - paddingY,
+                width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
             .setBackgroundColor("#0C1117")
             .setZoom(1.5).centerToBounds();
 
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
-
+        
         this.cursors = this.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
+            up: Phaser.Input.Keyboard.KeyCodes.W, 
+            up2: Phaser.Input.Keyboard.KeyCodes.UP,
             down: Phaser.Input.Keyboard.KeyCodes.S,
+            down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
             left: Phaser.Input.Keyboard.KeyCodes.A,
+            left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
             right: Phaser.Input.Keyboard.KeyCodes.D,
+            right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
             in: Phaser.Input.Keyboard.KeyCodes.Q,
             out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
@@ -96,16 +107,16 @@ class WorldEditorScene extends Scene {
             y = this.cameras.main.scrollY,
             z = this.cameras.main.zoom;
 
-        if (this.cursors.up.isDown) {
+        if (this.cursors.up.isDown || this.cursors.up2.isDown) {
             y -= 5;
         }
-        if (this.cursors.down.isDown) {
+        if (this.cursors.down.isDown || this.cursors.down2.isDown) {
             y += 5;
         }
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown || this.cursors.left2.isDown) {
             x -= 5;
         }
-        if (this.cursors.right.isDown) {
+        if (this.cursors.right.isDown || this.cursors.right2.isDown) {
             x += 5;
         }
         if (this.cursors.in.isDown) {

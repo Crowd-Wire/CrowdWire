@@ -30,17 +30,20 @@ class TilesTab extends Component<{}, TilesTabState> {
     filterType: '',
   }
   mapManager: MapManager;
-  unsubscribe: any;
+  subscriptions: any[] = [];
 
   constructor(props) {
     super(props);
 
-    this.unsubscribe = useWorldEditorStore.subscribe(
-      this.handleReady, state => state.ready);
+    if (useWorldEditorStore.getState().ready)
+      this.handleReady();
+    else
+      this.subscriptions.push(useWorldEditorStore.subscribe(
+        this.handleReady, state => state.ready));
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
+    this.subscriptions.forEach((unsub) => unsub());
   }
 
   handleReady = () => {

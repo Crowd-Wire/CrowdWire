@@ -12,6 +12,28 @@ interface ObjectsTabState {
 
 
 class ObjectsTab extends Component<{}, ObjectsTabState> {
+    subscriptions: any[];
+    mapManager: MapManager;
+
+    constructor(props) {
+        super(props);
+
+        if (useWorldEditorStore.getState().ready)
+            this.handleReady();
+        else
+            this.subscriptions.push(useWorldEditorStore.subscribe(
+                this.handleReady, state => state.ready));
+    }
+
+    componentWillUnmount() {
+      this.subscriptions.forEach((unsub) => unsub());
+    }
+
+    handleReady = () => {
+      this.mapManager = new MapManager();
+      this.forceUpdate();
+    }
+
     render() {
         return 'ObjectsTab';
     }
