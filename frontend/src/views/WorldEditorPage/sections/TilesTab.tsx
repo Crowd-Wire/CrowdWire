@@ -53,10 +53,9 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   render() {
-    console.log('render')
     const { filterType } = this.state;
-    return (
 
+    return (
       <>
         <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
           <InputLabel htmlFor="select-tileset">Tileset:</InputLabel>
@@ -80,7 +79,7 @@ class TilesTab extends Component<{}, TilesTabState> {
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {
             this.mapManager.map && this.mapManager.map.tilesets.map((tileset) => {
-              if (tileset.total != 0 && tileset.name.startsWith(filterType)) {
+              if (tileset.total != 0) {
                 const tiles = [];
                 // not an object
 
@@ -97,6 +96,7 @@ class TilesTab extends Component<{}, TilesTabState> {
                         id={`tile-${id}`}
                         onClick={() => this.handleClick(id)}
                         style={{
+                          display: tileset.name.startsWith(filterType) ? '' : 'none',
                           width: tileWidth,
                           height: tileHeight,
                           backgroundImage: `url(${imageURL})`,

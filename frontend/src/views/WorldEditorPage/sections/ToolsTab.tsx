@@ -44,7 +44,8 @@ class ToolsTab extends Component<{}, ToolsTabState> {
 
     const tileElem: any = document.getElementById(`tile-${paintTool.tileId}`).cloneNode(true);
     tileElem.removeAttribute('id');
-    tileElem.style["transform"] = "scale(2.5)"
+    tileElem.style["transform"] = "scale(2.5)";
+    tileElem.style["display"] = "";
     const tileContainer = document.getElementById("tile-container");
     tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
   }
@@ -56,7 +57,6 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   render() {
-
     const {toolType} = this.state;
 
     return (
@@ -87,13 +87,6 @@ class ToolsTab extends Component<{}, ToolsTabState> {
             }
           </ButtonGroup>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-          <ButtonGroup variant="contained" color="default" aria-label="contained primary button group">
-            <Button><FaUndo style={{ fontSize: "1.5rem" }} /></Button>
-            <Button><FaRedo style={{ fontSize: "1.5rem" }} /></Button>
-          </ButtonGroup>
-        </div>
-
       </>
     );
   }
