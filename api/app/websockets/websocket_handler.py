@@ -1,5 +1,3 @@
-import json
-
 from app.core.consts import WebsocketProtocol as protocol
 from app.rabbitmq import rabbit_handler
 from app.redis.connection import redis_connector

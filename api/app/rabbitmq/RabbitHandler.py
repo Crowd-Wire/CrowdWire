@@ -1,5 +1,3 @@
-from typing import Any
-
 from aio_pika import connect_robust, Channel, IncomingMessage, Message, ExchangeType
 from aio_pika.pool import Pool
 from loguru import logger
@@ -96,7 +94,6 @@ class RabbitHandler:
                 return await connection.channel()
         logger.warning("No Pool defined, cannot get a channel")
 
-
     async def publish(self, message: dict, queue: str = "") -> None:
         queues_to_send = set()
         if queue != "":
@@ -143,7 +140,7 @@ class RabbitHandler:
                 self.replicas_queue, ExchangeType.FANOUT
             )
             queue = await channel.declare_queue(
-               exclusive=True
+                exclusive=True
             )
             await queue.bind(replicas_exchange)
             await queue.consume(on_replica_message)
