@@ -29,7 +29,8 @@ const useLayerStyles = makeStyles({
     boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
     margin: 2,
     borderRadius: 5,
-    display: 'flex'
+    display: 'flex',
+    cursor: 'pointer',
   },
   name: {
     flexGrow: 1,
@@ -38,7 +39,6 @@ const useLayerStyles = makeStyles({
   },
   buttons: {
     display: 'flex',
-    cursor: 'pointer',
   },
   button: {
     fontSize: '1.125rem',
@@ -52,16 +52,16 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
   const classes = useLayerStyles();
 
   return (
-    <div className={classes.root} style={{backgroundColor: selected ? "#3f51b5": 'lightgray'}}>
+    <div className={classes.root} style={{ backgroundColor: selected ? "#3f51b5" : 'lightgray' }}>
       {object ? <CategoryIcon color="secondary" /> : <GridOnIcon color="secondary" />}
       <div className={classes.name}>
         {name}
       </div>
       <div className={classes.buttons}>
-        <div onClick={() => setVisible(visible => !visible)}>
+        <div onClick={(e) => {e.stopPropagation(); setVisible(visible => !visible)}}>
           {visible ? <VisibilityIcon className={classes.button} /> : <VisibilityOffIcon className={classes.button} />}
         </div>
-        <div onClick={() => setBlocked(blocked => !blocked)}>
+        <div onClick={(e) => {e.stopPropagation(); setBlocked(blocked => !blocked)}}>
           {blocked ? <LockIcon className={classes.button} /> : <LockOpenIcon className={classes.button} />}
         </div>
       </div>
@@ -80,20 +80,21 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
 
   return (
     <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        border: '1px solid lightgray',
-        margin: 6, 
-        borderRadius: 5,
-      }}
+      display: 'flex',
+      flexDirection: 'column',
+      border: '1px solid lightgray',
+      margin: 6,
+      borderRadius: 5,
+      padding: 5
+    }}
     >
-      <div style={{display: 'flex', fontSize: '1.125rem', margin: 3}}>
+      <div style={{ display: 'flex', fontSize: '1.125rem', margin: 3 }}>
         {name}
         <Tooltip
           title={info}
           placement="bottom"
         >
-          <InfoIcon style={{fontSize: '1rem', marginLeft: 5}} />
+          <InfoIcon style={{ fontSize: '1rem', marginLeft: 5 }} />
         </Tooltip>
       </div>
       {children}
@@ -102,7 +103,11 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
 }
 
 
-class LayersTab extends Component<{}, {}> {
+interface LayersTabState {
+  activeLayer: string;
+}
+
+class LayersTab extends Component<{}, LayersTabState> {
   subscriptions: any;
   mapManager: MapManager;
 
@@ -133,20 +138,22 @@ class LayersTab extends Component<{}, {}> {
 
   handleActiveLayer = (activeLayer) => {
     useWorldEditorStore.getState().setActiveLayer(activeLayer);
-    this.setState({activeLayer})
+    this.setState({ activeLayer });
   }
 
   render() {
+    const { activeLayer } = this.state;
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        
+
         <LayerGroup name="Collision Layers" info="Every tile/object on these layers are collidable">
           {
             this.mapManager && this.mapManager.map.layers.map((layer) => {
               if (layer.name.includes("Collision")) {
                 return (
                   <div onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={false} />
+                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
                   </div>
                 );
               }
@@ -157,7 +164,7 @@ class LayersTab extends Component<{}, {}> {
               if (layer.name.includes("Collision")) {
                 return (
                   <div onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={true} selected={false} />
+                    <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
                   </div>
                 );
               }
@@ -168,16 +175,20 @@ class LayersTab extends Component<{}, {}> {
           {
             this.mapManager && this.mapManager.map.layers.map((layer) => {
               if (layer.name.includes("Ground")) {
-                return <Layer name={layer.name} object={false} selected={false} />
+                return (
+                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  </div>
+                );
               }
             })
           }
           {
             this.mapManager && this.mapManager.map.objects.map((layer) => {
-              if (layer.name.includes("Collision")) {
+              if (!layer.name.includes("Collision")) {
                 return (
                   <div onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={true} selected={false} />
+                    <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
                   </div>
                 );
               }

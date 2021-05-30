@@ -17,7 +17,8 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
 
     constructor(props) {
         super(props);
-
+        this.subscriptions = [];
+        
         if (useWorldEditorStore.getState().ready)
             this.handleReady();
         else
