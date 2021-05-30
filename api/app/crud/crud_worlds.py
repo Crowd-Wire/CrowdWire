@@ -185,7 +185,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                page: int = 1,
                limit: int = 10,
                requester_id: int = None,
-               ) -> List[World]:
+               ):
 
         if not tags:
             tags = []

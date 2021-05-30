@@ -106,7 +106,7 @@ export default function WorldReports(props) {
                     id="reporter_search" label="Reporter Id" type="search" variant="outlined" type="number"
                     />
                 */}
-                    <Input style={{size:"small"}} className="mx-3"
+                    <Input className="mx-3"
                         type="number"
                         id="world_search"
                         placeholder="World Id"
@@ -182,7 +182,7 @@ export default function WorldReports(props) {
             <div className="">
                 {reports.map((r, i) => {
                     console.log(JSON.stringify(r));
-                    return (<Row key={r.reported + '_' + r.reporter} className="my-3"><Col></Col>
+                    return (<Row key={r.reported + '_' + r.reporter + '_' + r.reviewed} className="my-3"><Col></Col>
                         <Col><WorldReportCard  report={r} /> </Col>
                         <Col></Col>
                         </Row>)
