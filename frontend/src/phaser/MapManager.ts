@@ -1,8 +1,7 @@
-import { GameObjects, Scene, Tilemaps, Physics } from "phaser";
+import { GameObjects, Scene, Tilemaps, Physics, Geom } from "phaser";
 import { API_BASE } from "config";
 
 import useWorldUserStore from "stores/useWorldUserStore";
-import { Collections } from "@material-ui/icons";
 
 
 enum MapManagerState {
@@ -14,16 +13,14 @@ enum MapManagerState {
 class MapManager {
     static _instance: MapManager;
 
-    private map: Tilemaps.Tilemap;
     private mapJson: any;
     private state: MapManagerState;
     private worldId: number;
-
-    private tileKeys: number[];
-    private objectKeys: number[];
-
-    private objectProps: any;
-
+    
+    public tileKeys: string[];
+    public objectKeys: string[];
+    public objectBody: Record<string, Geom.Rectangle>;
+    public map: Tilemaps.Tilemap;
 
     constructor() {
         if (!MapManager._instance) {
@@ -40,18 +37,18 @@ class MapManager {
 
         this.tileKeys = [];
         this.objectKeys = [];
-        this.objectProps = {};
+        this.objectBody = {};
         this.mapJson.tilesets.forEach((tileset) => {
             if ('grid' in tileset) {
                 // object layer
                 tileset.tiles.forEach((tile) => {
                     const tilesetName = tile.image;
-                    scene.load.image(tilesetName.toString(), API_BASE + "static/maps/" + tile.image);
-                    this.objectKeys.push(tilesetName);
+                    scene.load.image(tilesetName, API_BASE + "static/maps/" + tile.image);
+                    this.objectKeys.push(tilesetName);//tileset.name
                     if ('objectgroup' in tile) {
                         // custom object collider
                         const {x, y, width, height} = tile.objectgroup.objects[0];
-                        this.objectProps[tilesetName] = {x, y, width, height} as Phaser.Geom.Rectangle;
+                        this.objectBody[tilesetName] = {x, y, width, height} as Geom.Rectangle;
                     }
                 })
             } else {
@@ -73,10 +70,11 @@ class MapManager {
         // add tileset images
         const tilesets: Tilemaps.Tileset[] = []
         this.tileKeys.forEach((key) => {
-            tilesets.push( this.map.addTilesetImage(key.toString()) );
+            tilesets.push( this.map.addTilesetImage(key) );
+            scene.cache.addCustom(key);
         })
         this.objectKeys.forEach((key) => {
-            this.map.addTilesetImage(key.toString());
+            this.map.addTilesetImage(key);
         });
 
         // create tile layers with tileset images
@@ -95,15 +93,9 @@ class MapManager {
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
         const images = this.map.imageCollections.map((c) => {
-                return c.images.map((i) => {
-                    let image = {...i};
-                    delete Object.assign(image, {key: image.image }).image;
-                    return image;
-                })
+                return c.images.map((i) => ({gid: i.gid, key: i.image}));
             })
             .reduce((acc, val) => acc.concat(val), []);
-
-        console.log(images, this.map.imageCollections)
 
         const collisionObjects = this.map.createFromObjects('ObjectCollision', images)
         const objects = this.map.createFromObjects('Object', images);
@@ -120,9 +112,9 @@ class MapManager {
 
         (<GameObjects.Sprite[]> collisionObjectsGroup.getChildren().concat(objectsGroup.getChildren()))
             .forEach((obj) => {
-                if (obj.texture.key in this.objectProps) {
+                if (obj.texture.key in this.objectBody) {
                     // has custom collider
-                    const {x, y, width, height} = this.objectProps[obj.texture.key];
+                    const {x, y, width, height} = this.objectBody[obj.texture.key];
                     const body = obj.body as Phaser.Physics.Arcade.Body;
                     body.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(body.y);
