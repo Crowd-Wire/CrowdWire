@@ -89,25 +89,25 @@ class DashboardStats extends Component{
         }
         return(
             <>    
-                <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
+                <div style={{width: "100%"}}>
                     <br/>
-                    <Row style={{width:"100%",height:"90%", marginLeft:"auto", marginRight:"auto"}}>
-                        <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
+                    <Row sm={12}>
+                        <Col xs={12} sm={12} md={6}>
                             <Row>
                                     <Button variant="success" className={this.actionButtons} style={{color:"black"}}>Enter Map</Button>
-                                    <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{marginLeft:"3%"}}>Edit Map</Button>
-                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{marginLeft:"3%"}}>Manage Map</Button>
+                                    <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{paddingLeft:"10"}}>Edit Map</Button>
+                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{paddingLeft:"10"}}>Manage Map</Button>
                             </Row>
                             <Row style={{marginTop:"50px"}}>
                                 <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
                             </Row>
                         </Col>
-                        <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>
+                        <Col xs={12} sm={12} md={4} style={{float: "right"}}>
                             <Row>
-                                <Button variant="danger" onClick={() => {this.handleClickOpen()}} style={{marginLeft:"auto"}}>
+                                <Button variant="danger" onClick={() => {this.handleClickOpen()}}>
                                     Report World<ReportIcon/>
                                 </Button>
-                                <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"3%"}}>Delete World</Button>
+                                <Button variant="danger" onClick={() => {this.showModal()}} style={{paddingLeft:"10"}}>Delete World</Button>
                                 <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
                                     world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                             </Row>
