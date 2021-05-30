@@ -39,6 +39,34 @@ async def get_user_info(
         raise HTTPException(status_code=400, detail="User not found")
     return user_info
 
+
+@router.get("/", response_model=List[schemas.UserInDB])
+async def filter_users(
+        email: str = None,
+        banned: bool = False,
+        normal: bool = True,
+        order_by: str = "register_date",
+        order: str = "desc",
+        page: int = 1,
+        limit: int = 10,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    """
+    Filters the users based on multiple parameters. This endpoint can only be accessed by an admin.
+    """
+
+    if is_guest_user(user) or not user.is_superuser:
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+
+    users, msg = crud_user.filter(
+        db=db, email=email, banned=banned, normal=normal, order_by=order_by, order=order, page=page, limit=limit)
+    if users is None:
+        raise HTTPException(status_code=400, detail=msg)
+
+    return users
+
+
 @router.put("/{user_id}", response_model=schemas.UserInDB)
 async def edit_user(
         user_id: Union[int],
