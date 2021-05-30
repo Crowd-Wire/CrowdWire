@@ -9,13 +9,13 @@ from app.core import strings
 
 class KubernetesHandler:
     def __init__(self):
-        self.load_config()
         self.client = None
         self.apps = None
+        self.load_config()
 
     def load_config(self):
         try:
-            config.load_kube_config()
+            config.load_incluster_config()
             self.client = client.CoreV1Api()
             self.apps = client.AppsV1Api()
         except ConfigException:

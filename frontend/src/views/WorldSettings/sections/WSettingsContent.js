@@ -6,19 +6,16 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
 import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
-import WorldService from 'services/WorldService.js'
-
+import WorldService from 'services/WorldService.js';
 class WSettingsContent extends Component {
 
-	state = 
+
+		
+	constructor(props){
+		super(props);
+		this.state = 
 		{
 			value: 0,
-			roles: {
-				'Admin':{'permissions':[0,1,2,3,4,5,6,7],'users':[{'id':1,'Nome':'João'}, {'id':2,'Nome':'Maria'},{'id':3, 'Nome':'António'}]},
-				'Ac':{'permissions':[0,1,2,4,5,7],'users':[{'id':4,'Nome':'Carlos'}, {'id':5,'Nome':'Sofia'}, {'id':6,'Nome':'meunicklegal'}]},
-				'Member':{'persmissions':[0,1,2,7],'users':[{'id':7,'Nome':'meunickilegal'},{'id':8,'Nome':'xXnoobM4sterXx'}]},
-				'Atrasados':{'permissions':[], 'users':[{'id':9,'Nome':'Wilson'}]}
-			},
 			users: ['Silvia','Marco','Teixeira'],
 			reports: [
 				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
@@ -26,13 +23,11 @@ class WSettingsContent extends Component {
 				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
 			],
 			path: window.location.pathname,
-			details: null
+			details: null,
+			mapName:""
 		};
-		
-	constructor(props){
-		super(props);
 	}
-	
+
 	setUsers = (item, rName) => {
 		this.setState(state => {
 
@@ -73,8 +68,11 @@ class WSettingsContent extends Component {
 		const world_id=page;
 		this.setState({path:world_id});
 		WorldService.getWorldDetails(world_id).then((res) => {
-			console.log(res.json());
+			return res.json();
 		})
+		.then((res)=>{
+			this.setState({worldName: res.name});
+		});
 	}
 
 
@@ -83,7 +81,7 @@ class WSettingsContent extends Component {
 		return(
 			<div style={{width:"75%", minWidth:"650px", marginLeft:"5%", marginTop:"5%"}}>
 					<Row style={{height:"10%"}}>
-						<Typography variant="h5" style={{color:"white"}}>Map: Jungle</Typography>
+						<Typography variant="h5" style={{color:"white"}}>Map: {this.state.worldName} </Typography>
 					</Row>
 					<Row style={{borderTopRightRadius:"10px",borderTopLeftRadius:"10px"}}>
 						<Tabs value={this.state.value} onChange={this.changeTab} style={{fontColor:"white", borderTopRightRadius:"10px",borderTopLeftRadius:"10px", border:"solid 1px black", backgroundColor:"black"}} aria-label="simple tabs example">
@@ -92,7 +90,7 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px", backgroundColor:"red"}}>
-						<RolePanel roles={this.state.roles} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} setUsers={this.setUsers}>CHEFAO</RolePanel>
+						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} /*setUsers={this.setUsers}*/>CHEFAO</RolePanel>
 						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>

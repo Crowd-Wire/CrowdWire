@@ -83,14 +83,12 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    props.handler(false);
     if(location.pathname!=="/dashboard/search/public")
       navigation("/dashboard/search/public");
   }
 
 
   const onClickJoinedWorlds = () => {
-    props.handler(true);
     if(location.pathname!=="/dashboard/search/joined")
       navigation("/dashboard/search/joined");
   }

@@ -26,7 +26,7 @@ class RedisConnector:
         # uncomment this to reset redis everytime
         # self.master = await aioredis.create_connection('redis://localhost/0')
         await self.master.execute('flushall')
-        await self.add_users_to_world('1', '20')
+        # await self.add_users_to_world('1', '20')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -111,7 +111,7 @@ class RedisConnector:
         if not (await redis_connector.key_exists(new_media_server)):
             await redis_connector.hset(new_media_server, 'num_rooms', 0)
 
-    async def get_media_server(self) -> str:
+    async def get_media_server(self):
         """Get the media server that currently has the less amount of room calls associated"""
         media_servers = await self.scan_match_all('media_server_')
         least_rooms_media_server = 'media_server_1'
@@ -133,11 +133,16 @@ class RedisConnector:
     async def remove_room(self, group_id: str):
         """Remove room from redis and decrease number of rooms of media server"""
         media_server = await self.get('room_' + group_id)
+        logger.info(media_server)
         if media_server:
+            logger.info("Entered If condition")
             media_server = media_server.decode()
-            num_rooms = int((await self.hget(media_server, 'num_rooms')).decode())
-            await self.hset(media_server, 'num_rooms', num_rooms - 1)
+            num_rooms = int((await self.hget(media_server, 'num_rooms')).decode()) - 1
+            if num_rooms <= 0:
+                num_rooms = 0
+            await self.hset(media_server, 'num_rooms', num_rooms)
             await self.delete('room_' + group_id)
+        return media_server
 
     async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
         """Determine if a given user is a member of a group"""

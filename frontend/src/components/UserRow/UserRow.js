@@ -13,19 +13,20 @@ export default function UserRow(props){
     const changeItemColumn = (currentItem, columnName) => {
         setUsers(currentItem, columnName);
     };
+
     const [{ isDragging }, drag] = useDrag({
         type: "ACCEPT",
         item: {
             id:id,
-            Nome: user
+            Nome: user,
         },
         end: (item, monitor) => {
             const dropResult = monitor.getDropResult();
             if (!dropResult)
-                return;
-            allRoles.forEach(rName => {
-                if (dropResult && dropResult.name === rName){
-                    changeItemColumn(item, rName);
+            return;
+            allRoles.forEach(rId => {
+                if (dropResult && dropResult.name === rId){
+                    changeItemColumn(item, rId);
                 }
             });
         },
