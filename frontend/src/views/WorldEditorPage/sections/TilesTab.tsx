@@ -48,8 +48,8 @@ class TilesTab extends Component<{}, TilesTabState> {
     this.setState({ filterType: event.target.value });
   }
 
-  handleClick = (id: number, width: number, height: number, imageURL: string) => {
-    useWorldEditorStore.getState().setPaintTool({ tile: { id, width, height, imageURL } });
+  handleClick = (tileId: number) => {
+    useWorldEditorStore.getState().setPaintTool({ tileId });
   }
 
   render() {
@@ -95,7 +95,7 @@ class TilesTab extends Component<{}, TilesTabState> {
                       <div
                         key={id}
                         id={`tile-${id}`}
-                        onClick={() => this.handleClick(id, tileWidth, tileHeight, imageURL)}
+                        onClick={() => this.handleClick(id)}
                         style={{
                           width: tileWidth,
                           height: tileHeight,

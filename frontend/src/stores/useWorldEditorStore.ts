@@ -10,20 +10,13 @@ enum PaintToolType {
 }
 
 
-export interface Tile {
-    id: number;
-    height: number;
-    width: number;
-    imageURL: string;
-}
-
 interface Layer {
     visible: boolean;
 }
 
 interface PaintTool {
     type?: PaintToolType;
-    tile?: Tile;
+    tileId?: number;
 }
 
 const useWorldEditorStore = create(

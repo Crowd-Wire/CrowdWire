@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore, { Tile } from "stores/useWorldEditorStore";
+import useWorldEditorStore from "stores/useWorldEditorStore";
 
 import { API_BASE } from "config";
 
@@ -9,13 +9,6 @@ import PhotoSizeSelectSmallIcon from '@material-ui/icons/PhotoSizeSelectSmall';
 
 
 interface ToolsTabState {
-  tile: Tile,
-}
-
-const tileStyle = {
-  transform: "scale(2)",
-  boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-  backgroundRepeat: "no-repeat",
 }
 
 
@@ -38,34 +31,23 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   handleTileChange = (painTool) => {
-    // this.setState({ tile: painTool.tile })
+    const tileElem: any = document.getElementById(`tile-${painTool.tileId}`).cloneNode(true);
+    tileElem.removeAttribute('id');
+    tileElem.style["transform"]  = "scale(2.5)"
+    const tileContainer = document.getElementById("tile-container");
+    tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
   }
 
   render() {
-    const tile = this.state.tile;
-    let elem, newElem;
-
-    if (tile) {
-      elem = document.getElementById(`tile-${tile.id}`); 
-      console.log( elem)
-      // newElem = elem.cloneNode(true); 
-      // newElem.setAttribute('id', 'tools-tile');
-    }
 
     return (
 
 
       <>
-        {tile }
-        {/* <div
-          style={tile ? tileStyle : {
-            ...tileStyle,
-            width: tile.width,
-            height: tile.height,
-            backgroundImage: `url(${tile.imageURL})`,
-            backgroundPosition: `${-tile.height * tile.id}px ${-tile.width * i}px`,
-          }}
-        ></div> */}
+        <div id="tile-container" style={{display: 'flex', justifyContent: 'center', margin: '25px 0'}}>
+          <div></div>
+        </div>
+       
         <hr />
         <PhotoSizeSelectSmallIcon />
       </>
