@@ -1,3 +1,5 @@
+from typing import Any
+
 from aio_pika import connect_robust, Channel, IncomingMessage, Message
 from aio_pika.pool import Pool
 from loguru import logger
@@ -6,6 +8,7 @@ from app.websockets.connection_manager import manager
 import json
 from app.core.consts import RabbitProtocol as protocol
 from app.redis.connection import redis_connector
+from app.k8s import k8s_handler
 
 
 # Message Receiving format
@@ -16,34 +19,36 @@ async def on_message(message: IncomingMessage) -> None:
         topic = msg['topic']
         # logger.info(" [x] Received message for topic  %r" % topic)
 
-        if topic == protocol.GET_RECV_TRACKS_DONE\
-                or topic == protocol.SEND_TRACK_SEND_DONE\
-                or topic == protocol.SEND_FILE_SEND_DONE\
-                or topic == protocol.CONNECT_TRANSPORT_RECV_DONE\
-                or topic == protocol.CONNECT_TRANSPORT_SEND_DONE\
-                or topic == protocol.YOU_JOINED_AS_PEER\
-                or topic == protocol.YOU_JOINED_AS_SPEAKER\
+        if topic == protocol.GET_RECV_TRACKS_DONE \
+                or topic == protocol.SEND_TRACK_SEND_DONE \
+                or topic == protocol.SEND_FILE_SEND_DONE \
+                or topic == protocol.CONNECT_TRANSPORT_RECV_DONE \
+                or topic == protocol.CONNECT_TRANSPORT_SEND_DONE \
+                or topic == protocol.YOU_JOINED_AS_PEER \
+                or topic == protocol.YOU_JOINED_AS_SPEAKER \
                 or topic == protocol.YOU_ARE_NOW_A_SPEAKER:
 
             if 'error' in msg['d']:
                 return
             user_id = msg['d']['peerId']
 
-            await manager.send_personal_message(msg, user_id)
+            await manager.send_personal_message(msg, user_id, False)
 
-        elif topic == protocol.NEW_PEER_PRODUCER\
+        elif topic == protocol.NEW_PEER_PRODUCER \
                 or topic == protocol.NEW_PEER_DATA_PRODUCER:
             # uid identifies to whom the message is suppost to be sent to
             # peerId identifies the new peerId that joined
             user_id = msg['uid']
 
-            await manager.send_personal_message(msg, user_id)
+            await manager.send_personal_message(msg, user_id, False)
 
         elif topic == protocol.CREATE_NEW_REPLICA:
             # TODO:
+            logger.info("Scaling Replicas")
+            k8s_handler.scale_mediaserver_replicas()
             # handle concurrency here with other api replicas
             # to avoid each one of them creating a media server
-            redis_connector.add_media_server()
+            await redis_connector.add_media_server()
 
         elif topic == protocol.CLOSE_CONSUMER:
             logger.info(msg)
@@ -90,22 +95,24 @@ class RabbitHandler:
                 return await connection.channel()
         logger.warning("No Pool defined, cannot get a channel")
 
-    async def publish(self, message: str) -> None:
-        queue_to_send = self.queue_to_send
-
-        # queues_to_send = set()
-        # if 'roomId' in message['d']:
-        #     queue_to_send = await redis_connector.get('room_' + message['d']['roomId'])
-        # elif 'roomIds' in message['d']:
-        #     for room in message['d']['roomIds']:
-        #         queues_to_send.add( await redis_connector.get('room_' + room))
-
+    async def publish(self, message: dict, queue: str = "") -> None:
+        queues_to_send = set()
+        if queue != "":
+            queues_to_send.add(queue)
+        elif 'roomIds' in message['d']:
+            for room in message['d']['roomIds']:
+                queues_to_send.add(await redis_connector.get('room_' + room))
+        elif 'roomId' in message['d']:
+            logger.info(message['d']['roomId'])
+            queues_to_send.add(await redis_connector.get('room_' + message['d']['roomId']))
+        message = (json.dumps(message)).encode()
         async with self.channel_pool.acquire() as channel:  # type: Channel
-            await channel.default_exchange.publish(
-                Message(message.encode()),
-                queue_to_send,
-            )
-            logger.info("Published message to Channel %r" % channel)
+            for queue in queues_to_send:
+                logger.info("Published message to Queue %r" % queue)
+                await channel.default_exchange.publish(
+                    Message(message),
+                    queue,
+                )
 
     async def consume(self) -> None:
         async with self.channel_pool.acquire() as channel:  # type: Channel

@@ -286,8 +286,9 @@ async def handle_actions(actions: dict):
     if 'close-room' in actions:
         close_rooms = actions['close-room']
         for close_action in close_rooms:
-            await redis_connector.remove_room(close_action['roomId'])
-            await destroy_room(close_action['worldId'], close_action['roomId'])
+            media_server = await redis_connector.remove_room(close_action['roomId'])
+            if media_server:
+                await destroy_room(close_action['worldId'], close_action['roomId'], media_server)
     if 'rem-user-from-groups' in actions:
         rem_action = actions['rem-user-from-groups']
         await remove_user(rem_action['worldId'], rem_action['groupIds'], rem_action['peerId'])
@@ -297,7 +298,7 @@ async def remove_user(word_id: str, room_ids: list, user_id: str):
     payload = {'topic': "remove-user-from-groups",
                'd': {'roomIds': list(room_ids), 'peerId': user_id}}
 
-    await rabbit_handler.publish(json.dumps(payload))
+    await rabbit_handler.publish(payload)
 
 
 async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, permission: bool = True):
@@ -315,7 +316,7 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, 
         payload = {'topic': protocol.JOIN_AS_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
     else:
         payload = {'topic': protocol.JOIN_AS_NEW_PEER, 'd': {'roomId': room_id, 'peerId': user_id}}
-    await rabbit_handler.publish(json.dumps(payload))
+    await rabbit_handler.publish(payload)
 
 
 async def add_speaker(word_id: str, room_id: str, user_id: str):
@@ -325,20 +326,20 @@ async def add_speaker(word_id: str, room_id: str, user_id: str):
         receiving data streams to start sending audio and video
     """
     payload = {'topic': protocol.ADD_SPEAKER, 'd': {'roomId': room_id, 'peerId': user_id}}
-    await rabbit_handler.publish(json.dumps(payload))
+    await rabbit_handler.publish(payload)
 
 
-async def destroy_room(word_id: str, room_id: str):
+async def destroy_room(word_id: str, room_id: str, media_server: str):
     payload = {'topic': "destroy-room", 'd': {'roomId': room_id}}
-
-    await rabbit_handler.publish(json.dumps(payload))
+    logger.info(media_server)
+    await rabbit_handler.publish(payload, media_server)
 
 
 async def handle_transport_or_track(world_id: str, user_id: str, payload: dict):
     payload['d']['peerId'] = user_id
     room_id = payload['d']['roomId']
     if (await redis_connector.user_in_group(world_id, user_id, room_id)):
-        await rabbit_handler.publish(json.dumps(payload))
+        await rabbit_handler.publish(payload)
 
 
 async def close_media(world_id: str, user_id: str, payload: dict):
@@ -349,7 +350,7 @@ async def close_media(world_id: str, user_id: str, payload: dict):
     for roomId in groupIds:
         payload['d']['roomId'] = roomId
         # close in media server producer
-        await rabbit_handler.publish(json.dumps(payload))
+        await rabbit_handler.publish(payload)
 
     # broadcast for peers to close this stream
     await manager.broadcast_to_user_rooms(
@@ -369,7 +370,7 @@ async def toggle_producer(world_id: str, user_id: str, payload: dict):
     for roomId in groupIds:
         payload['d']['roomId'] = roomId
         # pause in media server producer
-        await rabbit_handler.publish(json.dumps(payload))
+        await rabbit_handler.publish(payload)
 
     # broadcast for peers to update UI toggle buttons
     await manager.broadcast_to_user_rooms(

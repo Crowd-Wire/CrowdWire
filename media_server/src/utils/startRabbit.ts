@@ -168,18 +168,6 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 ) => {};
 
 export const startRabbit = async (handler: HandlerMap) => {
-
-  // const k8s = require('@kubernetes/client-node');
-
-  // const kc = new k8s.KubeConfig();
-  // kc.loadFromDefault();
-  
-  // const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
-  
-  // k8sApi.listNamespacedPod('default').then((res: any) => {
-  //   console.log(res.body);
-  // }).catch((err: any) => {console.log(err);});
-
   console.log(
     "trying to connect to: ",
     process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672"
@@ -197,55 +185,77 @@ export const startRabbit = async (handler: HandlerMap) => {
     console.error("Rabbit connection closed with error: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
   });
-  const channel = await conn.createChannel();
-  const sendQueue = "rest_api_queue";
-  const receiveQueue = "media_server_queue";
-  await Promise.all([
-    channel.assertQueue(receiveQueue),
-    channel.assertQueue(sendQueue),
-  ]);
-  send = <Key extends keyof OutgoingMessageDataMap>(
-    obj: OutgoingMessage<Key>
-  ) => {
-    channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(obj)));
-  };
-  await channel.purgeQueue(receiveQueue);
-  await channel.consume(
-    receiveQueue,
-    async (e) => {
-      const m = e?.content.toString();
-      if (m) {
-        let data: IncomingChannelMessageData<any> | undefined;
-        try {
-          data = JSON.parse(m);
-        } catch {console.log('error parsing json')}
-        // console.log(data.topic);
-        if (data && data.topic && data.topic in handler) {
-          const { d: handlerData, topic: operation, uid } = data;
-          try {
-            console.log(operation);
-            
-            await handler[operation as keyof HandlerMap](
-              handlerData,
-              uid,
-              send,
-              () => {
-                console.log(operation);
-                send({
-                  topic: "error",
-                  d:
-                    "The voice server is probably redeploying, it should reconnect in a few seconds. If not, try refreshing.",
-                  uid: uid,
-                });
-              }
-            );
-          } catch (err) {
-            console.log(operation, err);
-            Sentry.captureException(err, { extra: { topic: operation } });
-          }
-        }
+
+  const k8s = require('@kubernetes/client-node');
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  
+  const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+  let mediaserver_counter = 0;
+  k8sApi.listNamespacedPod('default').then(async function(res: any)  {
+  //console.log(typeof(res.body));
+  //console.log(payload)
+ //console.log(payload.get('V1PodList'))
+  for(let i =0; i< res.body.items.length; i ++){
+      let pod = res.body.items[i];
+      if (pod.metadata.name.includes('crowdwire-mediaserver')){
+        mediaserver_counter++;
+        console.log("Found pod")
       }
-    },
-    { noAck: true }
-  );
+    }
+    
+      const channel = await conn.createChannel();
+      const sendQueue = "rest_api_queue";
+      const receiveQueue = "media_server_" + String(mediaserver_counter);
+      console.log(receiveQueue)
+      await Promise.all([
+        channel.assertQueue(receiveQueue),
+        channel.assertQueue(sendQueue),
+      ]);
+      send = <Key extends keyof OutgoingMessageDataMap>(
+        obj: OutgoingMessage<Key>
+      ) => {
+        channel.sendToQueue(sendQueue, Buffer.from(JSON.stringify(obj)));
+      };
+      await channel.purgeQueue(receiveQueue);
+      await channel.consume(
+        receiveQueue,
+        async (e) => {
+          const m = e?.content.toString();
+          if (m) {
+            let data: IncomingChannelMessageData<any> | undefined;
+            try {
+              data = JSON.parse(m);
+            } catch {console.log('error parsing json')}
+            // console.log(data.topic);
+            if (data && data.topic && data.topic in handler) {
+              const { d: handlerData, topic: operation, uid } = data;
+              try {
+                console.log(operation);
+                
+                await handler[operation as keyof HandlerMap](
+                  handlerData,
+                  uid,
+                  send,
+                  () => {
+                    console.log(operation);
+                    send({
+                      topic: "error",
+                      d:
+                        "The voice server is probably redeploying, it should reconnect in a few seconds. If not, try refreshing.",
+                      uid: uid,
+                    });
+                  }
+                );
+              } catch (err) {
+                console.log(operation, err);
+                Sentry.captureException(err, { extra: { topic: operation } });
+              }
+            }
+          }
+        },
+        { noAck: true }
+      );
+  }).catch((err: any) => {console.log(err);});
 };
