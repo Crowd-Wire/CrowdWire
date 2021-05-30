@@ -34,7 +34,7 @@ const useLayerStyles = makeStyles({
   name: {
     flexGrow: 1,
     paddingLeft: 10,
-    fontSize: '1.125rem'
+    fontSize: '1rem'
   },
   buttons: {
     display: 'flex',
@@ -87,7 +87,7 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
         borderRadius: 5,
       }}
     >
-      <div style={{display: 'flex', fontSize: '1rem', margin: 3}}>
+      <div style={{display: 'flex', fontSize: '1.125rem', margin: 3}}>
         {name}
         <Tooltip
           title={info}
@@ -140,44 +140,44 @@ class LayersTab extends Component<{}, {}> {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         
-        <LayerGroup name="Collision Layers" info="Every tile on these layers are collidable">
+        <LayerGroup name="Collision Layers" info="Every tile/object on these layers are collidable">
           {
-            this.mapManager && this.mapManager.map.tilesets.map((tileset) => {
-              if (tileset.total != 0 && tileset.name.includes("Collision")) {
+            this.mapManager && this.mapManager.map.layers.map((layer) => {
+              if (layer.name.includes("Collision")) {
                 return (
-                  <div onClick={() => this.handleActiveLayer(tileset.name)}>
-                    <Layer name={tileset.name} object={false} selected={false} />
+                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={false} selected={false} />
                   </div>
                 );
               }
             })
           }
           {
-            this.mapManager && this.mapManager.map.imageCollections.map((collection) => {
-              if (collection.name.includes("Collision")) {
+            this.mapManager && this.mapManager.map.objects.map((layer) => {
+              if (layer.name.includes("Collision")) {
                 return (
-                  <div onClick={() => this.handleActiveLayer(collection.name)}>
-                    <Layer name={collection.name} object={true} selected={false} />
+                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={true} selected={false} />
                   </div>
                 );
               }
             })
           }
         </LayerGroup>
-        <LayerGroup name="Ground Layers" info="Every tile on these layers are collidable">
+        <LayerGroup name="Ground Layers" info="Non collidable">
           {
-            this.mapManager && this.mapManager.map.tilesets.map((tileset) => {
-              if (tileset.total != 0 && tileset.name.includes("Ground")) {
-                return <Layer name="Layer1" object={true} selected={true} />
+            this.mapManager && this.mapManager.map.layers.map((layer) => {
+              if (layer.name.includes("Ground")) {
+                return <Layer name={layer.name} object={false} selected={false} />
               }
             })
           }
           {
-            this.mapManager && this.mapManager.map.imageCollections.map((collection) => {
-              if (collection.name.includes("Collision")) {
+            this.mapManager && this.mapManager.map.objects.map((layer) => {
+              if (layer.name.includes("Collision")) {
                 return (
-                  <div onClick={() => this.handleActiveLayer(collection.name)}>
-                    <Layer name={collection.name} object={true} selected={false} />
+                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={true} selected={false} />
                   </div>
                 );
               }
