@@ -27,6 +27,7 @@ const useWorldEditorStore = create(
     combine(
         {   
             ready: false,
+            highlight: false,
             activeLayer: null,
             layers: {} as Record<string, Layer>,
             paintTool: {} as PaintTool,
@@ -47,10 +48,24 @@ const useWorldEditorStore = create(
                     return { activeLayer };
                 });
             },
+            addLayers: (layers: Record<string, Layer>) => {
+                return set(() => {
+                    return { layers };
+                });
+            },
             setLayer: (name: string, settings: Layer) => {
                 return set((s) => {
                     const layers = {...s.layers};
                     layers[name] = {...layers[name], ...settings};
+                    return { layers };
+                });
+            },
+            setLayers: (settings: Layer) => {
+                return set((s) => {
+                    const layers = {...s.layers};
+                    Object.values(layers).map((layer) => {
+                        layer = {...layer, ...settings}
+                    })
                     return { layers };
                 });
             },

@@ -14,7 +14,6 @@ import LockOpenIcon from '@material-ui/icons/LockOpen';
 import GridOnIcon from '@material-ui/icons/GridOn';
 import CategoryIcon from '@material-ui/icons/Category';
 import InfoIcon from '@material-ui/icons/Info';
-import { FaBullseye } from "react-icons/fa";
 
 
 
@@ -47,9 +46,23 @@ const useLayerStyles = makeStyles({
 });
 
 const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
-  const [visible, setVisible] = useState(true);
-  const [blocked, setBlocked] = useState(false);
   const classes = useLayerStyles();
+  let visible = useWorldEditorStore(state => state.layers[name].visible);
+  let blocked = useWorldEditorStore(state => state.layers[name].blocked);
+  
+  const handleVisible = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers[name].visible = !visible;
+    });
+  }
+
+  const handleBlocked = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers[name].blocked = !blocked;
+    });
+  }
 
   return (
     <div className={classes.root} style={{ backgroundColor: selected ? "#3f51b5" : 'white' }}>
@@ -58,10 +71,10 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
         {name}
       </div>
       <div className={classes.buttons}>
-        <div onClick={(e) => {e.stopPropagation(); setVisible(visible => !visible)}}>
+        <div onClick={handleVisible}>
           {visible ? <VisibilityIcon className={classes.button} /> : <VisibilityOffIcon className={classes.button} />}
         </div>
-        <div onClick={(e) => {e.stopPropagation(); setBlocked(blocked => !blocked)}}>
+        <div onClick={handleBlocked}>
           {blocked ? <LockIcon className={classes.button} /> : <LockOpenIcon className={classes.button} />}
         </div>
       </div>
@@ -80,8 +93,8 @@ const useLayerGroupStyles = makeStyles({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    border: '1px solid black',
-    backgroundColor: 'rgba(11, 19, 43, 1)',
+    border: '2px solid rgb(11, 19, 43)',
+    backgroundColor: 'rgba(11, 19, 43, 0.8)',
     margin: 6,
     borderRadius: 5,
     padding: 5,
@@ -122,7 +135,7 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
 
 
 interface LayersTabState {
-  activeLayer: string;
+  activeLayers: Set<string>;
 }
 
 class LayersTab extends Component<{}, LayersTabState> {
@@ -134,7 +147,7 @@ class LayersTab extends Component<{}, LayersTabState> {
     this.subscriptions = [];
 
     this.state = {
-      activeLayer: 'Ground',
+      activeLayers: new Set(),
     }
   }
 
@@ -155,24 +168,45 @@ class LayersTab extends Component<{}, LayersTabState> {
     this.forceUpdate()
   }
 
-  handleActiveLayer = (activeLayer) => {
+  handleActiveLayer = (event, activeLayer) => {
+    event.stopPropagation();
     useWorldEditorStore.getState().setActiveLayer(activeLayer);
-    this.setState({ activeLayer });
+    
+    if (useWorldEditorStore.getState().highlight) {
+      if (event.ctrlKey) {
+        useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
+      } else {
+        useWorldEditorStore.getState().setLayers({ highlighted: false });
+        useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
+      }
+    }
+    if (event.ctrlKey) {
+      this.setState(state => {
+        const activeLayers = state.activeLayers;
+        if (activeLayers.has(activeLayer))
+          activeLayers.delete(activeLayer);
+        else
+          activeLayers.add(activeLayer);
+        return { activeLayers };
+      });
+    } else {
+      this.setState({ activeLayers: new Set([activeLayer]) });
+    }
   }
 
   render() {
-    const { activeLayer } = this.state;
+    const { activeLayers } = this.state;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }} onClick={() => this.setState({ activeLayers: new Set() })}>
 
         <LayerGroup name="Collision Layers" info="Every tile and object on these layers is collidable">
           {
             this.mapManager && this.mapManager.map.objects.map((layer, index) => {
               if (layer.name.includes("Collision")) {
                 return (
-                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
                   </div>
                 );
               }
@@ -182,8 +216,8 @@ class LayersTab extends Component<{}, LayersTabState> {
             this.mapManager && this.mapManager.map.layers.map((layer, index) => {
               if (layer.name.includes("Collision")) {
                 return (
-                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
                   </div>
                 );
               }
@@ -195,8 +229,8 @@ class LayersTab extends Component<{}, LayersTabState> {
             this.mapManager && this.mapManager.map.objects.map((layer, index) => {
               if (!layer.name.includes("Collision")) {
                 return (
-                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
                   </div>
                 );
               }
@@ -206,8 +240,8 @@ class LayersTab extends Component<{}, LayersTabState> {
             this.mapManager && this.mapManager.map.layers.map((layer, index) => {
               if (layer.name.includes("Ground")) {
                 return (
-                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
                   </div>
                 );
               }
@@ -219,8 +253,8 @@ class LayersTab extends Component<{}, LayersTabState> {
             this.mapManager && this.mapManager.map.layers.map((layer, index) => {
               if (layer.name === "Room") {
                 return (
-                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
                   </div>
                 );
               }

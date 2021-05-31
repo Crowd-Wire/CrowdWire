@@ -28,11 +28,15 @@ class WorldEditorScene extends Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        this.map.setLayer('Room');
-
         mapManager.buildObjects(this);
 
-        // emit READY to dependent components
+        // Initialize layers on store
+        const layers = {};
+        this.map.objects.concat(this.map.layers).forEach((layer) => 
+            layers[layer.name] = { visible: true, blocked: false, highlighted: false })
+        useWorldEditorStore.getState().addLayers(layers);
+
+        // Emit READY to dependent components
         useWorldEditorStore.getState().setReady();
 
         const width = this.map.widthInPixels,
@@ -49,9 +53,9 @@ class WorldEditorScene extends Scene {
             .setZoom(1.5).centerToBounds();
 
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
-        
+
         this.cursors = this.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W, 
+            up: Phaser.Input.Keyboard.KeyCodes.W,
             up2: Phaser.Input.Keyboard.KeyCodes.UP,
             down: Phaser.Input.Keyboard.KeyCodes.S,
             down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
@@ -97,7 +101,7 @@ class WorldEditorScene extends Scene {
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
             const activeLayerData = this.map.getLayer(useWorldEditorStore.getState().activeLayer);
-            
+
             if (activeLayerData) {
                 const activeLayer = activeLayerData.tilemapLayer;
 
@@ -109,7 +113,7 @@ class WorldEditorScene extends Scene {
                 }
                 else if (this.paintTool.type === PaintToolType.PICK) {
                     const tile = activeLayer.getTileAt(tileX, tileY);
-                    tile && useWorldEditorStore.getState().setPaintTool({tileId: tile.index})
+                    tile && useWorldEditorStore.getState().setPaintTool({ tileId: tile.index })
                 }
             }
         }
@@ -121,7 +125,7 @@ class WorldEditorScene extends Scene {
             .toUpperCase();
         return "00000".substring(0, 6 - c.length) + c;
     }
-    
+
 
     updateCamera = () => {
         let x = this.cameras.main.scrollX,

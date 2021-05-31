@@ -10,6 +10,7 @@ import classNames from 'classnames';
 
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
+import WallsTab from "./sections/WallsTab.tsx";
 import ObjectsTab from "./sections/ObjectsTab.tsx";
 import ToolsTab from "./sections/ToolsTab.tsx";
 import LayersTab from "./sections/LayersTab.tsx";
@@ -52,12 +53,12 @@ class WorldEditorPage extends React.Component {
         {
           size: 50,
           grid: [
-            { size: 25, tabs: [3] },
-            { size: 50, tabs: [0, 1] },
-            { size: 25, tabs: [2] },
+            { size: 25, tabs: [5] },
+            { size: 50, tabs: [1, 2, 3] },
+            { size: 25, tabs: [4] },
           ]
         },
-        { size: 50, tabs: [4] },
+        { size: 50, tabs: [0] },
         // { size: 50, tabs: [1, 2] }
       ]
     }
@@ -280,24 +281,28 @@ class WorldEditorPage extends React.Component {
 
     this.gameWindows = {
       0: {
+        tabName: 'World',
+        tabContent: !this.state.loading && <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
+      },
+      1: {
         tabName: 'Tiles',
         tabContent: <TilesTab />
       },
-      1: {
+      2: {
+        tabName: 'Walls',
+        tabContent: <WallsTab />
+      },
+      3: {
         tabName: 'Objects',
         tabContent: <ObjectsTab />,
       },
-      2: {
+      4: {
         tabName: 'Layers',
         tabContent: <LayersTab />,
       },
-      3: {
+      5: {
         tabName: 'Tools',
         tabContent: <ToolsTab />,
-      },
-      4: {
-        tabName: 'World',
-        tabContent: !this.state.loading && <Phaser ref={this.phaserRef} scene="WorldEditorScene" />,
       },
     }
 
