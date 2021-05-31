@@ -45,9 +45,13 @@ class UserUpdate(UserBase):
 
 
 # retrieve User from DB to client via API
-class UserInDB(UserBase):
-    user_id: Optional[int] = None
+class UserInDB(BaseModel):
+    user_id: int
     register_date: datetime.datetime
+    name: str
+    email: str
+    birth: Optional[datetime.datetime]
+    status: int
 
     class Config:
         orm_mode = True
