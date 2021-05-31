@@ -1,6 +1,6 @@
 import os
 
-from pydantic import BaseSettings, PostgresDsn
+from pydantic import BaseSettings, PostgresDsn, EmailStr
 from typing import Optional
 import secrets
 
@@ -21,10 +21,11 @@ class Settings(BaseSettings):
     HOSTNAME = os.getenv('HOSTNAME', '')
 
     # TODO: Change this
-    # testing
+    # Auth
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
     ACCESS_GUEST_TOKEN_EXPIRE_HOURS: int = 12  # 12 hours For Guests
 
+    # PostgreSQL Db
     SCHEMA_NAME: str = "fastapi"
     POSTGRES_SERVICE_NAME: str = os.getenv('POSTGRES_SERVICE_NAME', 'localhost')
     POSTGRES_USER: str = os.getenv('POSTGRES_USER', "postgres")
@@ -35,10 +36,10 @@ class Settings(BaseSettings):
     ] = f"postgresql://{POSTGRES_USER}" \
         f":{POSTGRES_PASSWORD}@{POSTGRES_SERVICE_NAME}" \
         f":5432/{POSTGRES_DB}"
-
     DB_ADMIN_EMAIL: str = "user@example.com"
     DB_ADMIN_PASSWORD: str = "string"
 
+    # RabbitMQ
     RABBITMQ_USERNAME: str = os.getenv('RABBITMQ_USERNAME', 'user')
     RABBITMQ_PASSWORD: str = "bitnami"
     RABBITMQ_SERVICE_NAME: str = os.getenv('RABBITMQ_SERVICE_NAME', "localhost")
@@ -54,10 +55,19 @@ class Settings(BaseSettings):
     REDIS_SENTINEL_PASSWORD: str = os.getenv('REDIS_SENTINEL_PASSWORD', 'password')
     REDIS_MASTER: str = 'mymaster'
 
+    # email
+    SMTP_TLS: bool = True
+    SMTP_PORT: Optional[int] = None
+    SMTP_HOST: Optional[str] = None
+    EMAIL_USER: Optional[str] = None
+    EMAIL_PASSWORD: Optional[str] = None
+    EMAIL_FROM: Optional[EmailStr] = None
+    EMAIL_TEMPLATES_DIR: str = "/app/email-templates/build"
+
+    # Google Auth
     CLIENT_ID: str = ""
     CLIENT_SECRET: str = ""
 
-    # searches this file to find the variables
     class Config:
         env_file = ".env"
 

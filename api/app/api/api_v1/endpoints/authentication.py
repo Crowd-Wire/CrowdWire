@@ -11,17 +11,14 @@ from google.auth.transport import requests
 from app.core.config import settings
 from app.utils import is_guest_user
 # from app.core.security import get_password_hash
-# from app.utils import (
-# generate_password_reset_token,
-# send_reset_password_email,
-# verify_password_reset_token,
-# )
+from app.utils import send_email
+
 
 router = APIRouter()
 
 
 @router.post("/register", response_model=schemas.Token)
-def register(
+async def register(
         user_data: schemas.UserCreate,
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
@@ -34,6 +31,7 @@ def register(
     if not user:
         raise HTTPException(status_code=400, detail=message)
 
+    await send_email('brunosb@ua.pt')
     access_token, expires = security.create_access_token(user.user_id)
 
     return {
@@ -165,7 +163,6 @@ async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.ge
     except Exception:
         return {"error": "Invalid Authentication"}
 
-    print(user)
     user_db, msg = crud.crud_user.google_auth(db=db, user=user)
 
     if not user_db:
@@ -178,53 +175,3 @@ async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.ge
         "token_type": "bearer",
         "expire_date": str(expires)
     }
-
-    return "token"
-
-"""
-@router.post("/password-recovery/{email}", response_model=schemas.Msg)
-def recover_password(email: str, db: Session = Depends(dependencies.get_db)) -> Any:
-    """
-# Password Recovery
-"""
-    user = crud.user.get_by_email(db, email=email)
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system.",
-        )
-    password_reset_token = generate_password_reset_token(email=email)
-    #send_reset_password_email(
-    #    email_to=user.email, email=email, token=password_reset_token
-    #)
-    return {"msg": "Password recovery email sent"}
-
-"""
-"""
-@router.post("/reset-password/", response_model=schemas.Msg)
-def reset_password(
-    token: str = Body(...),
-    new_password: str = Body(...),
-    db: Session = Depends(dependencies.get_db),
-) -> Any:
-    """
-# Reset password
-"""
-    email = verify_password_reset_token(token)
-    if not email:
-        raise HTTPException(status_code=400, detail="Invalid token")
-    user = crud.user.get_by_email(db, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system.",
-        )
-    elif not crud.user.is_active(user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    hashed_password = get_password_hash(new_password)
-    user.hashed_password = hashed_password
-    db.add(user)
-    db.commit()
-    return {"msg": "Password updated successfully"}
-"""
