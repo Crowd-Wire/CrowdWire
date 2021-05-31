@@ -123,11 +123,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             obj = self.get_by_email(db=db, email=update_data['email'])
             if obj and obj.email != db_obj.email:
                 return None, strings.EMAIl_ALREADY_IN_USE
-        # verify password
-        if 'password' in update_data:
-            hashed_password = get_password_hash(update_data["password"])
-            del update_data["password"]
-            update_data["hashed_password"] = hashed_password
+
         # no need to return any error here
         # only superusers may update the status of the user
         if not request_user.is_superuser:
@@ -137,6 +133,26 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
                 del update_data['is_guest_user']
         updated_obj = super().update(db, db_obj=db_obj, obj_in=update_data)
         return updated_obj, strings.USER_EDITED_SUCCESS
+
+    def update_password(self, db: Session, db_obj: User,
+                        obj_in: Union[UserUpdate, Dict[str, Any]]) -> Tuple[Optional[User], str]:
+
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+        if 'old_password' in update_data and 'new_password' in update_data:
+            # first verify if the old password is right
+            if not verify_password(update_data['old_password'], db_obj.hashed_password):
+                return None, strings.INVALID_PASSWORD
+            # update the data_passed in order to store only the hash of the password in the database
+            hashed_password = get_password_hash(update_data["new_password"])
+            del update_data["new_password"]
+            del update_data["old_password"]
+            update_data["hashed_password"] = hashed_password
+
+        updated_obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        return updated_obj, strings.PASSWORD_CHANGED_SUCCESS
 
     def authenticate(self, db: Session, *, email: str, password: str) -> Tuple[Optional[User], str]:
         """

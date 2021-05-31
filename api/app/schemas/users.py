@@ -41,7 +41,13 @@ class UserCreateGoogle(UserBase):
 
 # schema for User Update
 class UserUpdate(UserBase):
-    password: Optional[str] = None
+    pass
+
+
+# schema to Update User's Password
+class UserUpdatePassword(BaseModel):
+    old_password: str
+    new_password: str
 
 
 # retrieve User from DB to client via API

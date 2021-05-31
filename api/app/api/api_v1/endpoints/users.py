@@ -44,6 +44,21 @@ async def edit_user(
     return updated_user_obj
 
 
+@router.put("/password-update/", response_model=schemas.UserInDB)
+async def update_user_password(
+        update_password: schemas.UserUpdatePassword,
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
+):
+    logger.debug("entering..")
+    if is_guest_user(user):
+        raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
+    update_password_obj, msg = crud_user.update_password(db=db, db_obj=user, obj_in=update_password)
+    if not update_password_obj:
+        raise HTTPException(status_code=400, detail=msg)
+    return update_password_obj
+
+
 @router.get("/{id}/reports-sent", response_model=List[ReportUserInDB])
 async def get_all_user_reports_sent(
         id: int,
@@ -187,7 +202,6 @@ def update_user_report(
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
 ) -> Any:
-
     # only admins can change a report
     if is_guest_user(user) or not user.is_superuser:
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
