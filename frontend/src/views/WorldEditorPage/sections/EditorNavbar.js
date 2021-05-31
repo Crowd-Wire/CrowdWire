@@ -47,9 +47,8 @@ class EditorNavbar extends React.Component {
         <Dropdown
           menuAlign="right"
           title="Dropdown right"
-          id="dropdown-menu-align-right"
         >
-          <Dropdown.Toggle id="dropdown-custom-1" as={CustomToggle}>View</Dropdown.Toggle>
+          <Dropdown.Toggle as={CustomToggle}>View</Dropdown.Toggle>
           <Dropdown.Menu style={{ backgroundColor: 'rgb(11, 19, 43)' }}>
 
             <Dropdown.Item className={classes.dropdownItem} eventKey="1">

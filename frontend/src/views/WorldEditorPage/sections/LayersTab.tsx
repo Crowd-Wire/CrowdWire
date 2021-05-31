@@ -198,8 +198,10 @@ class LayersTab extends Component<{}, LayersTabState> {
     const { activeLayers } = this.state;
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }} onClick={() => this.setState({ activeLayers: new Set() })}>
-
+      <div 
+        style={{ display: 'flex', flexDirection: 'column', height: '100%' }} 
+        onClick={(e) => this.handleActiveLayer(e, null)}
+      >
         <LayerGroup name="Collision Layers" info="Every tile and object on these layers is collidable">
           {
             this.mapManager && this.mapManager.map.objects.map((layer, index) => {

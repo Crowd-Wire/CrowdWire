@@ -74,6 +74,9 @@ class WorldEditorScene extends Scene {
         this.subscriptions.push(useWorldEditorStore.subscribe(
             (paintTool) => { this.paintTool = paintTool }, state => state.paintTool));
 
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (paintTool) => { this.paintTool = paintTool }, state => state.layers));
+
 
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
@@ -100,20 +103,26 @@ class WorldEditorScene extends Scene {
 
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
-            const activeLayerData = this.map.getLayer(useWorldEditorStore.getState().activeLayer);
-
-            if (activeLayerData) {
-                const activeLayer = activeLayerData.tilemapLayer;
-
-                if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
-                    activeLayer.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
-                }
-                else if (this.paintTool.type === PaintToolType.ERASE) {
-                    activeLayer.fill(-1, tileX, tileY, 1, 1);
-                }
-                else if (this.paintTool.type === PaintToolType.PICK) {
-                    const tile = activeLayer.getTileAt(tileX, tileY);
-                    tile && useWorldEditorStore.getState().setPaintTool({ tileId: tile.index })
+            const activeLayerName = useWorldEditorStore.getState().activeLayer;
+            console.log(useWorldEditorStore.getState())
+            if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
+                // Layer selected and not blocked
+                const activeLayerData = this.map.getLayer(activeLayerName);
+    
+                if (activeLayerData) {
+                    // Layer exists
+                    const activeLayer = activeLayerData.tilemapLayer;
+    
+                    if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
+                        activeLayer.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
+                    }
+                    else if (this.paintTool.type === PaintToolType.ERASE) {
+                        activeLayer.fill(-1, tileX, tileY, 1, 1);
+                    }
+                    else if (this.paintTool.type === PaintToolType.PICK) {
+                        const tile = activeLayer.getTileAt(tileX, tileY);
+                        tile && useWorldEditorStore.getState().setPaintTool({ tileId: tile.index })
+                    }
                 }
             }
         }

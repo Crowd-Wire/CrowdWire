@@ -12,6 +12,7 @@ import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
 import WallsTab from "./sections/WallsTab.tsx";
 import ObjectsTab from "./sections/ObjectsTab.tsx";
+import ConferencesTab from "./sections/ConferencesTab.tsx";
 import ToolsTab from "./sections/ToolsTab.tsx";
 import LayersTab from "./sections/LayersTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
@@ -54,9 +55,9 @@ class WorldEditorPage extends React.Component {
         {
           size: 50,
           grid: [
-            { size: 25, tabs: [5] },
+            { size: 25, tabs: [6] },
             { size: 50, tabs: [1, 2, 3] },
-            { size: 25, tabs: [4] },
+            { size: 25, tabs: [5, 4] },
           ]
         },
         { size: 50, tabs: [0] },
@@ -124,7 +125,7 @@ class WorldEditorPage extends React.Component {
         const totalHeightPx = boxA.offsetHeight + boxB.offsetHeight;
         const newHeightPx = e.clientY - boxA.offsetTop;
 
-        if (e.clientY - boxA.offsetTop < 100 || boxA.offsetTop + totalHeightPx - e.clientY < 100)
+        if (e.clientY - boxA.offsetTop < 200 || boxA.offsetTop + totalHeightPx - e.clientY < 200)
           return;
 
         this.setState(state => {
@@ -153,7 +154,7 @@ class WorldEditorPage extends React.Component {
         const totalWidthPx = boxA.offsetWidth + boxB.offsetWidth;
         const newWidthPx = e.clientX - boxA.offsetLeft;
 
-        if (e.clientX - boxA.offsetLeft < 100 || boxA.offsetLeft + totalWidthPx - e.clientX < 100)
+        if (e.clientX - boxA.offsetLeft < 200 || boxA.offsetLeft + totalWidthPx - e.clientX < 200)
           return;
 
         this.setState(state => {
@@ -273,14 +274,6 @@ class WorldEditorPage extends React.Component {
     );
   }
 
-  mouseDown = () => {
-
-  }
-
-  handleHighlight = () => {
-
-  }
-
   render() {
     const { classes } = this.props;
 
@@ -302,10 +295,14 @@ class WorldEditorPage extends React.Component {
         tabContent: <ObjectsTab />,
       },
       4: {
+        tabName: 'Conferences',
+        tabContent: <ConferencesTab />,
+      },
+      5: {
         tabName: 'Layers',
         tabContent: <LayersTab />,
       },
-      5: {
+      6: {
         tabName: 'Tools',
         tabContent: <ToolsTab />,
       },

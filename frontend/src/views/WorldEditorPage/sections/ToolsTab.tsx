@@ -17,6 +17,14 @@ interface ToolsTabState {
   toolType: string;
 }
 
+const tileStyle = {
+  width: 32,
+  height: 32,
+  transform: "scale(2.5)",
+  margin: 15,
+  boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+};
+
 
 class ToolsTab extends Component<{}, ToolsTabState> {
   subscriptions: any[];
@@ -61,7 +69,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     return (
       <>
         <div id="tile-container" style={{ display: 'flex', justifyContent: 'center', margin: '25px 0' }}>
-          <div></div>
+          <div style={tileStyle}></div>
         </div>
 
         <hr />
