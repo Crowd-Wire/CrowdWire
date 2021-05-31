@@ -14,14 +14,15 @@ from app.core import consts
 router = APIRouter()
 
 
-@router.get("/{world_id}", response_model=schemas.WorldMapInDB)
+@router.get("/{world_id}", response_model=schemas.WorldInDBWithUserPermissions)
 async def get_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     if not is_guest_user(user):
-        db_world, message = await crud.crud_world.get(db=db, world_id=world_id)
+        db_world, message = await crud.crud_world.get_world_with_user_permissions(
+            db=db, world_id=world_id, user_id=user.user_id)
     else:
         db_world, message = await crud.crud_world.get_available_for_guests(
             db=db, world_id=world_id
