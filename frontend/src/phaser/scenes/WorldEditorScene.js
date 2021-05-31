@@ -28,7 +28,8 @@ class WorldEditorScene extends Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        mapManager.buildObjects(this);
+        const { group, collisionGroup } = mapManager.buildObjects(this);
+        Object.assign(this, { group, collisionGroup });
 
         // Initialize layers on store
         const layers = {};
@@ -75,12 +76,31 @@ class WorldEditorScene extends Scene {
             (paintTool) => { this.paintTool = paintTool }, state => state.paintTool));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
-            (paintTool) => { this.paintTool = paintTool }, state => state.layers));
-
+            this.handleLayersChange, state => [{...state.layers}, state.highlight]));
 
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
+    }
+
+    handleLayersChange = ([layers, highlight]) => {
+        console.log(this)
+        
+        Object.entries(layers).forEach(([name, layer]) => {
+            const activeLayer = this.map.getLayer(name)?.tilemapLayer;
+    
+            if (activeLayer) {
+                // Layer exists
+                activeLayer.setVisible(layer.visible);
+                activeLayer.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+            } else if (name === 'Object') {
+                this.group.setVisible(layer.visible);
+                this.group.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+            } else if (name === 'ObjectCollision') {
+                this.collisionGroup.setVisible(layer.visible);
+                this.collisionGroup.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+            }
+        })
     }
 
     updateEdit = () => {
@@ -107,12 +127,10 @@ class WorldEditorScene extends Scene {
             console.log(useWorldEditorStore.getState())
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
-                const activeLayerData = this.map.getLayer(activeLayerName);
+                const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
     
-                if (activeLayerData) {
+                if (activeLayer) {
                     // Layer exists
-                    const activeLayer = activeLayerData.tilemapLayer;
-    
                     if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
                         activeLayer.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
                     }

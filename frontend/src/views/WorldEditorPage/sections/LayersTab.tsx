@@ -172,24 +172,23 @@ class LayersTab extends Component<{}, LayersTabState> {
     event.stopPropagation();
     useWorldEditorStore.getState().setState({ activeLayer });
     
-    if (useWorldEditorStore.getState().highlight) {
-      if (event.ctrlKey) {
-        useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
-      } else {
-        useWorldEditorStore.getState().setLayers({ highlighted: false });
-        useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
-      }
-    }
     if (event.ctrlKey) {
       this.setState(state => {
         const activeLayers = state.activeLayers;
-        if (activeLayers.has(activeLayer))
+        if (activeLayers.has(activeLayer)) {
           activeLayers.delete(activeLayer);
-        else
+          useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: false });
+        }
+        else {
           activeLayers.add(activeLayer);
+          useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
+        }
         return { activeLayers };
       });
     } else {
+      useWorldEditorStore.getState().setLayers({ highlighted: false });
+      useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
+
       this.setState({ activeLayers: new Set([activeLayer]) });
     }
   }

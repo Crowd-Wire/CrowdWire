@@ -58,8 +58,8 @@ const useWorldEditorStore = create(
             setLayers: (settings: Layer) => {
                 return set((s) => {
                     const layers = {...s.layers};
-                    Object.values(layers).map((layer) => {
-                        layer = {...layer, ...settings}
+                    Object.keys(layers).map((name) => {
+                        layers[name] = {...layers[name], ...settings}
                     })
                     return { layers };
                 });

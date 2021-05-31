@@ -16,7 +16,7 @@ class MapManager {
     private mapJson: any;
     private state: MapManagerState;
     private worldId: number;
-    
+
     public tilesetKeys: string[];
     public objectKeys: string[];
     public tilesetURL: Record<string, string>;
@@ -49,8 +49,8 @@ class MapManager {
                     this.objectKeys.push(tilesetName);//tileset.name
                     if ('objectgroup' in tile) {
                         // custom object collider
-                        const {x, y, width, height} = tile.objectgroup.objects[0];
-                        this.objectBody[tilesetName] = {x, y, width, height} as Geom.Rectangle;
+                        const { x, y, width, height } = tile.objectgroup.objects[0];
+                        this.objectBody[tilesetName] = { x, y, width, height } as Geom.Rectangle;
                     }
                 })
             } else {
@@ -73,7 +73,7 @@ class MapManager {
         // add tileset images
         const tilesets: Tilemaps.Tileset[] = []
         this.tilesetKeys.forEach((key) => {
-            tilesets.push( this.map.addTilesetImage(key) );
+            tilesets.push(this.map.addTilesetImage(key));
         })
         this.objectKeys.forEach((key) => {
             this.map.addTilesetImage(key);
@@ -85,18 +85,18 @@ class MapManager {
         })
 
         this.state = MapManagerState.BUILT;
-        
+
 
         return this.map;
     }
 
-    buildObjects(scene: Scene): Physics.Arcade.StaticGroup {
+    buildObjects(scene: Scene): Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup> {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
         const images = this.map.imageCollections.map((c) => {
-                return c.images.map((i) => ({gid: i.gid, key: i.image}));
-            })
+            return c.images.map((i) => ({ gid: i.gid, key: i.image }));
+        })
             .reduce((acc, val) => acc.concat(val), []);
 
         const collisionObjects = this.map.createFromObjects('ObjectCollision', images)
@@ -104,26 +104,26 @@ class MapManager {
 
         // Create a sprite group for all objects, set common properties to ensure that
         // sprites in the group don't move via gravity or by player collisions
-        const collisionObjectsGroup = scene.physics.add.staticGroup(
+        const collisionGroup = scene.physics.add.staticGroup(
             collisionObjects,
         );
 
-        const objectsGroup = scene.physics.add.group(
+        const group = scene.physics.add.group(
             objects,
         );
 
-        (<GameObjects.Sprite[]> collisionObjectsGroup.getChildren().concat(objectsGroup.getChildren()))
+        (<GameObjects.Sprite[]>collisionGroup.getChildren().concat(group.getChildren()))
             .forEach((obj) => {
                 if (obj.texture.key in this.objectBody) {
                     // has custom collider
-                    const {x, y, width, height} = this.objectBody[obj.texture.key];
+                    const { x, y, width, height } = this.objectBody[obj.texture.key];
                     const body = obj.body as Phaser.Physics.Arcade.Body;
                     body.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(body.y);
                 }
             })
         console.log(this.map)
-        return collisionObjectsGroup;
+        return { group, collisionGroup };
     }
 
     saveMap(): void {

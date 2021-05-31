@@ -44,7 +44,8 @@ class GameScene extends Phaser.Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        this.collisionGroup = mapManager.buildObjects(this);
+        const { collisionGroup } = mapManager.buildObjects(this);
+        this.collisionGroup = collisionGroup;
 
         // main player
         this.player = new Player(this, 50, 50);
@@ -65,7 +66,7 @@ class GameScene extends Phaser.Scene {
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
-        this.ws.joinPlayer({x: 50, y: 50});
+        this.ws.joinPlayer({ x: 50, y: 50 });
 
         // make camera follow player
         this.cameras.main
@@ -93,9 +94,9 @@ class GameScene extends Phaser.Scene {
         this.physics.add.existing(this.sprite);
         this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
         this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
-        
-        
-        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World', 
+
+
+        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World',
             { fontFamily: '"Lucida Console", Courier, monospace', fontSize: '16px', color: '#28FE14', backgroundColor: "#000" });
         this.debugText.setScrollFactor(0).setDepth(1001).setOrigin(0.5);
     }

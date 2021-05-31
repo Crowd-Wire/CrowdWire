@@ -9,7 +9,7 @@ const editorNavbarStyle = {
         fontSize: 15,
         fontWeight: 400,
         color: 'white',
-        margin: '0 20px',
+        padding: '0 20px',
         cursor: 'pointer',
     },
     dropdownItem: {
