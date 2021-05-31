@@ -2,7 +2,7 @@ import datetime
 from typing import Any, Dict, Optional, Union, Tuple
 
 from sqlalchemy.orm import Session
-
+from sqlalchemy import desc, asc
 from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
@@ -28,6 +28,30 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if not user or user.status != consts.USER_PENDING_STATUS:
             return None
         return user
+
+    def filter(
+            self, db: Session, email: str, banned: bool, normal: bool, order_by: str, order: str, page: int, limit: int
+    ):
+        """
+        Filters the users of the platform. This endpoint can only be used by the admin.
+        """
+        query = db.query(User)
+
+        if email:
+            query = query.filter(User.email.ilike(email + '%'))
+
+        # checks for banned and normal
+        query = query.filter(User.status.in_([i for i, s in enumerate([normal, banned]) if s]))
+
+        ord = desc if order == 'desc' else asc
+
+        # add more later
+        if order_by == 'register_date':
+            query = query.order_by(ord(User.register_date))
+
+        reports = query.offset(limit * (page - 1)).limit(limit).all()
+
+        return reports, ""
 
     def can_update(self, request_user: User, db: Session, id: int) -> Tuple[Optional[User], str]:
         user_obj = self.get(db=db, id=id)
