@@ -15,6 +15,7 @@ export enum PaintToolType {
 interface Layer {
     visible?: boolean;
     blocked?: boolean;
+    highlighted?: boolean;
 }
 
 export interface PaintTool {

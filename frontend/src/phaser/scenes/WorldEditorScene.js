@@ -15,6 +15,7 @@ class WorldEditorScene extends Scene {
     constructor() {
         super(sceneConfig);
         this.paintTool = null;
+        this.subscriptions = [];
     }
 
     create() {
@@ -26,6 +27,8 @@ class WorldEditorScene extends Scene {
             if (layer.name.startsWith("Float"))
                 layer.tilemapLayer.setDepth(1000);
         })
+
+        this.map.setLayer('Room');
 
         mapManager.buildObjects(this);
 
@@ -64,11 +67,12 @@ class WorldEditorScene extends Scene {
         // this.physics.world.bounds.width = this.map.widthInPixels;
         // this.physics.world.bounds.height = this.map.heightInPixels;
 
-        this.unsubscribe = useWorldEditorStore.subscribe(
-            (paintTool) => { this.paintTool = paintTool }, state => state.paintTool);
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (paintTool) => { this.paintTool = paintTool }, state => state.paintTool));
+
 
         this.game.input.events.on('unsubscribe', () => {
-            this.unsubscribe();
+            this.subscriptions.forEach((unsub) => unsub());
         });
     }
 
@@ -82,6 +86,9 @@ class WorldEditorScene extends Scene {
         let tileX = this.map.worldToTileX(worldPoint['x']);
         let tileY = this.map.worldToTileY(worldPoint['y']);
 
+        const tile = this.map.getTileAt(tileX, tileY);
+        tile && (tile.tint = '0xff00ff');
+
         // Snap to tile coordinates, but in world space
         // this.marker.x = this.map.tileToWorldX(tileX);
         // this.marker.y = this.map.tileToWorldY(tileY);
@@ -89,18 +96,32 @@ class WorldEditorScene extends Scene {
 
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
-            console.log()
+            const activeLayerData = this.map.getLayer(useWorldEditorStore.getState().activeLayer);
+            
+            if (activeLayerData) {
+                const activeLayer = activeLayerData.tilemapLayer;
 
-            if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId)
-                this.map.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
-            else if (this.paintTool.type === PaintToolType.ERASE)
-                this.map.fill(-1, tileX, tileY, 1, 1);
-            else if (this.paintTool.type === PaintToolType.PICK) {
-                const tile = this.map.getTileAt(tileX, tileY);
-                tile && useWorldEditorStore.getState().setPaintTool({tileId: tile.index})
+                if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
+                    activeLayer.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
+                }
+                else if (this.paintTool.type === PaintToolType.ERASE) {
+                    activeLayer.fill(-1, tileX, tileY, 1, 1);
+                }
+                else if (this.paintTool.type === PaintToolType.PICK) {
+                    const tile = activeLayer.getTileAt(tileX, tileY);
+                    tile && useWorldEditorStore.getState().setPaintTool({tileId: tile.index})
+                }
             }
         }
     }
+
+    intToRGB(i) {
+        var c = (i & 0x00FFFFFF)
+            .toString(16)
+            .toUpperCase();
+        return "00000".substring(0, 6 - c.length) + c;
+    }
+    
 
     updateCamera = () => {
         let x = this.cameras.main.scrollX,

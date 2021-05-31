@@ -15,7 +15,7 @@ import ToolsTab from "./sections/ToolsTab.tsx";
 import LayersTab from "./sections/LayersTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
 
-import style from "assets/jss/my-kit-react/views/mapEditorStyle";
+import style from "assets/jss/my-kit-react/views/worlEditorPage";
 import { withStyles } from '@material-ui/core/styles';
 
 import { withRouter } from "utils/wrapper.js";
@@ -62,95 +62,6 @@ class WorldEditorPage extends React.Component {
       ]
     }
   }
-
-  gridRemoveTabs = (tabs, elemPath) => {
-    this.setState(state => {
-      const grid = state.grid;
-      let parent;
-      let elem = { grid };
-
-      // locate element
-      for (let p of elemPath) {
-        parent = elem;
-        elem = elem.grid[p];
-      }
-
-      if (elem.tabs === undefined) {
-        // assert
-        console.error("elemPath wrong")
-      }
-
-      // remove tabs from element
-      for (let tab of tabs) {
-        const index = elem.tabs.indexOf(tab);
-        if (index > -1)
-          elem.tabs.splice(index, 1);
-      }
-
-      // normalize
-      if (!elem.tabs.length) {
-        const index = parent.grid.indexOf(elem);
-        if (index > -1) {
-            // remove element
-            parent.grid.splice(index, 1);
-
-            // resize siblings
-            const grow = elem.size / parent.grid.length;
-            for (let e of parent.grid) {
-                e.size += grow;
-            }
-        }
-      }
-
-      return { grid };
-    })
-  }
-
-  gridBuild = (grid = this.state.grid, depth = 0, path = []) => {
-    const dimension = (depth % 2 == 0) ? "height" : "width";
-    const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
-    
-    const {classes} = this.props;
-    const wrapper = (depth % 2 == 0) ? classes.wrapperRow : classes.wrapperCol;
-    const handler = (depth % 2 == 0) ? classes.handlerRow : classes.handlerCol;
-    
-    return (
-      grid.map((item, index) => {
-        return ([
-          (index > 0) ?
-            <div
-              key={`0${index}`}
-              className={classNames(handler, "handler")}
-              style={{ [margin]: '-10px' }}
-            ></div>
-            : null
-          ,
-          <div
-            key={index}
-            data-path={path.concat(index)}
-            data-size={item.size}
-            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
-            className={wrapper}
-          >
-            {
-              item.hasOwnProperty('tabs') ?
-                <GameUITabs
-                  headerColor="gray"
-                  tabs={item.tabs.map(t => this.gameWindows[t])}
-                />
-                :
-                this.gridBuild(item.grid, depth + 1, path.concat(index))
-            }
-          </div>
-        ])
-      })
-    );
-  }
-
-  mouseDown = () => {
-
-  }
-
 
   componentDidMount = () => {
     this.setState({loading: true});
@@ -276,6 +187,93 @@ class WorldEditorPage extends React.Component {
       getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
   }
 
+  gridRemoveTabs = (tabs, elemPath) => {
+    this.setState(state => {
+      const grid = state.grid;
+      let parent;
+      let elem = { grid };
+
+      // locate element
+      for (let p of elemPath) {
+        parent = elem;
+        elem = elem.grid[p];
+      }
+
+      if (elem.tabs === undefined) {
+        // assert
+        console.error("elemPath wrong")
+      }
+
+      // remove tabs from element
+      for (let tab of tabs) {
+        const index = elem.tabs.indexOf(tab);
+        if (index > -1)
+          elem.tabs.splice(index, 1);
+      }
+
+      // normalize
+      if (!elem.tabs.length) {
+        const index = parent.grid.indexOf(elem);
+        if (index > -1) {
+            // remove element
+            parent.grid.splice(index, 1);
+
+            // resize siblings
+            const grow = elem.size / parent.grid.length;
+            for (let e of parent.grid) {
+                e.size += grow;
+            }
+        }
+      }
+
+      return { grid };
+    })
+  }
+
+  gridBuild = (grid = this.state.grid, depth = 0, path = []) => {
+    const dimension = (depth % 2 == 0) ? "height" : "width";
+    const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
+    
+    const {classes} = this.props;
+    const wrapper = (depth % 2 == 0) ? classes.wrapperRow : classes.wrapperCol;
+    const handler = (depth % 2 == 0) ? classes.handlerRow : classes.handlerCol;
+    
+    return (
+      grid.map((item, index) => {
+        return ([
+          (index > 0) ?
+            <div
+              key={`0${index}`}
+              className={classNames(handler, "handler")}
+              style={{ [margin]: '-10px' }}
+            ></div>
+            : null
+          ,
+          <div
+            key={index}
+            data-path={path.concat(index)}
+            data-size={item.size}
+            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
+            className={wrapper}
+          >
+            {
+              item.hasOwnProperty('tabs') ?
+                <GameUITabs
+                  headerColor="gray"
+                  tabs={item.tabs.map(t => this.gameWindows[t])}
+                />
+                :
+                this.gridBuild(item.grid, depth + 1, path.concat(index))
+            }
+          </div>
+        ])
+      })
+    );
+  }
+
+  mouseDown = () => {
+
+  }
 
   render() {
     const {classes} = this.props;
@@ -315,12 +313,14 @@ class WorldEditorPage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
         <div className={classes.navbar} style={{display: 'flex'}}>
-          <div className={classes.navbarItem}>Option1</div>
-          <div className={classes.navbarItem}>Option2</div>
-          <div className={classes.navbarItem}>Option3</div>
+          <div className={classes.navbarItem}>View</div>
+          <div className={classes.navbarItem}>Help</div>
+          <div style={{flexGrow: 1}}></div>
+          <div className={classes.navbarItem}>Save</div>
+          <div className={classes.navbarItem}>Exit</div>
         </div>
 
-        <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 50px)', height: '100%' }}>
+        <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 30px)', height: '100%' }}>
           {this.gridBuild()}
         </div>
 

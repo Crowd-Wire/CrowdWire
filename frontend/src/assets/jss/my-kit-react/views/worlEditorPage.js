@@ -1,12 +1,13 @@
-const mapEditorStyle = {
+const worldEditorPage = {
     navbar: {
         background: '#666',
-        height: '50px',
+        maxHeight: 30,
+        height: 30,
         alignItems: 'center'
     },
     navbarItem: {
-        fontSize: '1.425rem',
-        fontWeight: '400',
+        fontSize: 15,
+        fontWeight: 400,
         color: 'white',
         margin: '0 20px',
         cursor: 'pointer'
@@ -20,14 +21,14 @@ const mapEditorStyle = {
         flexDirection: 'row'
     },
     handlerCol: {
-        width: '20px',
+        width: 20,
         padding: '0',
         cursor: 'ew-resize',
         flex: '0 0 auto',
         zIndex: 10,
     },
     handlerRow: {
-        height: '20px',
+        height: 20,
         padding: '0',
         cursor: 'ns-resize',
         flex: '0 0 auto',
@@ -35,4 +36,4 @@ const mapEditorStyle = {
     },
 } 
 
-export default mapEditorStyle;
+export default worldEditorPage;
