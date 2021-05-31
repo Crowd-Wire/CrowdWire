@@ -207,11 +207,11 @@ async def get_world_user_info(
         raise HTTPException(status_code=400, detail=strings.ACCESS_FORBIDDEN)
 
     if is_guest:
-        world_user = crud.crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user.user_id)
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
         if not world_user:
             return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
     else:
-        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        world_user = crud.crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user.user_id)
         if not world_user:
             return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
     return world_user
