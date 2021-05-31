@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     EMAIL_USER: Optional[str] = None
     EMAIL_PASSWORD: Optional[str] = None
     EMAIL_FROM: Optional[EmailStr] = None
-    EMAIL_EXPIRE: Optional[int] = 1000 # 1000 min?
+    EMAIL_EXPIRE: Optional[int] = 1000  # 1000 min?
 
     # Google Auth
     CLIENT_ID: str = ""

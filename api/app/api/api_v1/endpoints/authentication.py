@@ -9,9 +9,8 @@ from app.core import security, strings
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from app.core.config import settings
-from app.utils import is_guest_user
+from app.utils import is_guest_user, send_email
 # from app.core.security import get_password_hash
-from app.utils import send_email
 
 
 router = APIRouter()

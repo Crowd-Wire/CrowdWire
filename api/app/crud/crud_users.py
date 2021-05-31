@@ -56,7 +56,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             name=user_data.name,
             birth=user_data.birth,
             register_date=datetime.datetime.now(),
-            status=3, # pending
+            status=consts.USER_PENDING_STATUS,  # pending
             is_superuser=False
         )
         db.add(db_user)

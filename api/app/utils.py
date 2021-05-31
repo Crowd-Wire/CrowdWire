@@ -1,18 +1,15 @@
 from uuid import uuid4
-from datetime import datetime, timedelta
-from typing import Optional, Union, Any
-from jose import jwt
-
+from datetime import timedelta
+from typing import Union, Any
 from app import schemas, models
 from app.core.config import settings
 from app.core.consts import AVATARS_LIST
 from app.core.security import create_access_token
 from random import choice
 from loguru import logger
-from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
 from pydantic import EmailStr, BaseModel
 from typing import List, Dict
-
 
 
 def choose_avatar():
@@ -24,6 +21,10 @@ def choose_avatar():
 
 
 def is_guest_user(obj: Union[schemas.GuestUser, models.User]) -> bool:
+    """
+    Checks if an obj is a GuestSchema or a User Model
+    @return: a guest or a user
+    """
     return isinstance(obj, schemas.GuestUser)
 
 
