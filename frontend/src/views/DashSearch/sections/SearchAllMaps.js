@@ -137,14 +137,16 @@ class SearchAllMaps extends Component {
 					</Row>
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
-					<Row style={{marginTop: 50, marginBottom: 50}}>
-						{this.state.maps!==null && this.state.maps.length!==0 ? 
-						this.state.maps.map((m, i) => {
-							return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
-						})
+					<Row style={{marginTop: 50, marginBottom: 50, textAlign: 'center', width: '100%'}}>
+
+						{ this.state.maps!==null && this.state.maps.length!==0 ? 
+							this.state.maps.map((m, i) => {
+								return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
+							})
 						:
-						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
-					}
+							<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
+						}
+
 					</Row>
 					<hr />
 					{this.state.maps===null || this.state.maps.length===0 ?
