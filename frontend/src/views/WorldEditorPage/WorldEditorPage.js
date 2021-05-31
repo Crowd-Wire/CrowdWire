@@ -22,10 +22,11 @@ import { withStyles } from '@material-ui/core/styles';
 import { withRouter } from "utils/wrapper.js";
 
 import { toast } from 'react-toastify';
-import logo from '../../assets/crowdwire_white_logo.png';
-import useWorldUserStore from '../../stores/useWorldUserStore';
-import { getSocket } from "../../services/socket.js";
-import WorldService from "../../services/WorldService";
+import logo from 'assets/crowdwire_white_logo.png';
+import useWorldUserStore from 'stores/useWorldUserStore';
+import { getSocket } from "services/socket.js";
+import WorldService from "services/WorldService";
+import EditorNavbar from "./sections/EditorNavbar";
 
 
 const toast_props = {
@@ -42,7 +43,7 @@ const toast_props = {
 
 
 class WorldEditorPage extends React.Component {
-  
+
   constructor(props) {
     super(props);
     this.navigate = props.navigate;
@@ -65,7 +66,7 @@ class WorldEditorPage extends React.Component {
   }
 
   componentDidMount = () => {
-    this.setState({loading: true});
+    this.setState({ loading: true });
 
     WorldService.getWorldDetails(window.location.pathname.split('/')[2])
       .then((res) => {
@@ -74,21 +75,21 @@ class WorldEditorPage extends React.Component {
       }).then(
         (res) => {
           console.log(res);
-          if (res.detail){
+          if (res.detail) {
             toast.dark(
               <span>
-                <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+                <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
                 {res.detail}
               </span>
-            ,toast_props);
+              , toast_props);
             this.navigate("/dashboard/search/public");
           }
           else {
             useWorldUserStore.getState().joinWorld(res);
-            this.setState({loading: false});
+            this.setState({ loading: false });
           }
         }
-      ).catch(() => 
+      ).catch(() =>
         this.navigate("/dashboard/search")
       )
 
@@ -181,7 +182,7 @@ class WorldEditorPage extends React.Component {
       dragginHandler = null;
     });
   }
-  
+
   componentWillUnmount = () => {
     // close socket on component unmount
     if (useWorldUserStore.getState().world_user)
@@ -216,14 +217,14 @@ class WorldEditorPage extends React.Component {
       if (!elem.tabs.length) {
         const index = parent.grid.indexOf(elem);
         if (index > -1) {
-            // remove element
-            parent.grid.splice(index, 1);
+          // remove element
+          parent.grid.splice(index, 1);
 
-            // resize siblings
-            const grow = elem.size / parent.grid.length;
-            for (let e of parent.grid) {
-                e.size += grow;
-            }
+          // resize siblings
+          const grow = elem.size / parent.grid.length;
+          for (let e of parent.grid) {
+            e.size += grow;
+          }
         }
       }
 
@@ -234,11 +235,11 @@ class WorldEditorPage extends React.Component {
   gridBuild = (grid = this.state.grid, depth = 0, path = []) => {
     const dimension = (depth % 2 == 0) ? "height" : "width";
     const margin = (depth % 2 == 0) ? "marginTop" : "marginLeft";
-    
-    const {classes} = this.props;
+
+    const { classes } = this.props;
     const wrapper = (depth % 2 == 0) ? classes.wrapperRow : classes.wrapperCol;
     const handler = (depth % 2 == 0) ? classes.handlerRow : classes.handlerCol;
-    
+
     return (
       grid.map((item, index) => {
         return ([
@@ -276,8 +277,12 @@ class WorldEditorPage extends React.Component {
 
   }
 
+  handleHighlight = () => {
+
+  }
+
   render() {
-    const {classes} = this.props;
+    const { classes } = this.props;
 
     this.gameWindows = {
       0: {
@@ -317,13 +322,8 @@ class WorldEditorPage extends React.Component {
         {/* <div style={{backgroundColor: "#ccc", height: '100vh', display: 'flex', flexFlow: 'row wrap', overflow: 'hidden' }}>
           {gridBuilder(this.state.grid2)}
         </div> */}
-        <div className={classes.navbar} style={{display: 'flex'}}>
-          <div className={classes.navbarItem}>View</div>
-          <div className={classes.navbarItem}>Help</div>
-          <div style={{flexGrow: 1}}></div>
-          <div className={classes.navbarItem}>Save</div>
-          <div className={classes.navbarItem}>Exit</div>
-        </div>
+
+        <EditorNavbar />
 
         <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 30px)', height: '100%' }}>
           {this.gridBuild()}

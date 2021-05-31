@@ -33,19 +33,14 @@ const useWorldEditorStore = create(
             paintTool: {} as PaintTool,
         },
         (set) => ({
-            setReady: () => {
+            setState: (state: any) => {
                 return set(() => {
-                    return { ready: true };
+                    return { ...state };
                 });
             },
             setPaintTool: (settings: PaintTool) => {
                 return set((s) => {
                     return { paintTool: {...s.paintTool, ...settings} };
-                });
-            },
-            setActiveLayer: (activeLayer: string) => {
-                return set(() => {
-                    return { activeLayer };
                 });
             },
             addLayers: (layers: Record<string, Layer>) => {

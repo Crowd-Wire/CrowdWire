@@ -1,17 +1,4 @@
 const worldEditorPageStyle = {
-    navbar: {
-        background: 'rgb(11, 19, 43)',
-        maxHeight: 30,
-        height: 30,
-        alignItems: 'center'
-    },
-    navbarItem: {
-        fontSize: 15,
-        fontWeight: 400,
-        color: 'white',
-        margin: '0 20px',
-        cursor: 'pointer'
-    },
     wrapperCol: {
         display: 'flex',
         flexDirection: 'column'

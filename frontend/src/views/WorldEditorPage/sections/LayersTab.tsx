@@ -170,7 +170,7 @@ class LayersTab extends Component<{}, LayersTabState> {
 
   handleActiveLayer = (event, activeLayer) => {
     event.stopPropagation();
-    useWorldEditorStore.getState().setActiveLayer(activeLayer);
+    useWorldEditorStore.getState().setState({ activeLayer });
     
     if (useWorldEditorStore.getState().highlight) {
       if (event.ctrlKey) {

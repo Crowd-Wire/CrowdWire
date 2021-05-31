@@ -32,12 +32,12 @@ class WorldEditorScene extends Scene {
 
         // Initialize layers on store
         const layers = {};
-        this.map.objects.concat(this.map.layers).forEach((layer) => 
+        this.map.objects.concat(this.map.layers).forEach((layer) =>
             layers[layer.name] = { visible: true, blocked: false, highlighted: false })
         useWorldEditorStore.getState().addLayers(layers);
 
         // Emit READY to dependent components
-        useWorldEditorStore.getState().setReady();
+        useWorldEditorStore.getState().setState({ ready: true });
 
         const width = this.map.widthInPixels,
             height = this.map.heightInPixels,
