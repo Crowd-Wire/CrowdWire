@@ -81,8 +81,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             world_user_data: World_UserUpdate
     ):
 
-
-
         # registered user
         if not is_guest:
             world_user, msg = await self.update_world_user_info_db(
@@ -114,7 +112,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             'username': world_user_obj.username
         }
         world_user.update(data)
-        return world_user
+        return world_user, ""
 
     async def update_world_user_info_db(
             self, db: Session, world_id: int, request_user: User, user_to_change: int, world_user_data: World_UserUpdate
