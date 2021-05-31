@@ -56,9 +56,9 @@ class Settings(BaseSettings):
     REDIS_MASTER: str = 'mymaster'
 
     # email
-    EMAIL_USER: Optional[str] = None
-    EMAIL_PASSWORD: Optional[str] = None
-    EMAIL_FROM: Optional[EmailStr] = None
+    EMAIL_USER: Optional[str] = "user@example.com"
+    EMAIL_PASSWORD: Optional[str] = "pass"
+    EMAIL_FROM: Optional[EmailStr] = "user@example.com"
     EMAIL_EXPIRE: Optional[int] = 1000  # 1000 min?
 
     # Google Auth
