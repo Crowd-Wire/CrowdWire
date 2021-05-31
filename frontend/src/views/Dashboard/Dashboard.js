@@ -4,7 +4,7 @@ import SearchAllMaps from 'views/DashSearch/sections/SearchAllMaps.js';
 import DashboardContent from 'views/DashWorldDetails/sections/DashboardContent.js';
 import DashDrawer from 'components/DashDrawer/DashDrawer.js';
 import { withStyles } from '@material-ui/core/styles';
-
+import UserService from 'services/UserService.js';
 
 const useStyles = theme => ({
   root: {
@@ -23,12 +23,28 @@ class Dashboard extends Component {
     super(props);
   }
 
+  componentDidMount(){
+    UserService.getUserInfo()
+    .then((res) => {
+        if (res.status == 200)
+            return res.json();
+    })
+    .then( (res) => {
+      if (res)
+        this.setState({user_id:res.user_id});
+    }).catch((error) => {useAuthStore.getState().leave()});
+  };
 
+  userId = (my_id) => {
+    this.setState({
+      my_id:my_id
+    })
+  }
 
   // handler to change the state of the SearchAllMaps component based on the sidebar
   sidebar_handler = (joined) => {
     this.setState({
-      joined: joined
+      joined: joined,
     });
   }
 
@@ -37,11 +53,11 @@ class Dashboard extends Component {
     return(
       <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer handler={this.sidebar_handler}/>
+        <DashDrawer my_id={this.userId} handler={this.sidebar_handler}/>
         {this.state.focus ? 
           <DashboardContent />
           :
-          <SearchAllMaps joined={this.state.joined} />
+          <SearchAllMaps joined={this.state.joined} user_id={this.state.my_id}/>
         }
       </div>
     );

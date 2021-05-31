@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -16,6 +16,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthenticationService from "services/AuthenticationService.js";
 import useAuthStore from "stores/useAuthStore.ts";
 import created_worlds from "assets/img/save-the-planet.svg";
+import UserService from "services/UserService.js";
 
 const drawerWidth = 240;
 
@@ -83,7 +84,6 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing(2)+100;
   const definitions = theme.spacing(2)+50;
-  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -92,7 +92,6 @@ export default function DashDrawer(props){
     if(location.pathname!=="/dashboard/search/public")
       navigation("/dashboard/search/public");
   }
-
 
   const onClickJoinedWorlds = () => {
     if(location.pathname!=="/dashboard/search/joined")
@@ -107,6 +106,8 @@ export default function DashDrawer(props){
     navigation("/create-world");
   }
   const onClickCreatedWorlds = () => {
+    if(location.pathname!=="/dashboard/search/owned")
+      navigation("/dashboard/search/owned");
   }
 
   const handleDrawerClose = () => {
