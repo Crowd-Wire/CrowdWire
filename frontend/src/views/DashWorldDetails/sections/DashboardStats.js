@@ -4,7 +4,6 @@ import { Typography } from "@material-ui/core";
 import { createBrowserHistory } from 'history';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -18,6 +17,7 @@ import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
 import TextField from '@material-ui/core/TextField';
 import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';
+import Button from "components/CustomButtons/Button.js";
 
 
 class DashboardStats extends Component{
@@ -35,14 +35,6 @@ class DashboardStats extends Component{
     transition = React.forwardRef(function Transition(props, ref) {
         return <Slide direction="up" ref={ref} {...props} />;
     });
-    
-    actionButtons = {
-        marginRight:"10px",
-    };
-    descText = {
-        marginLeft:"5%",
-        color:"white",
-    };
     
     titleText = {
         marginLeft:"5%"
@@ -92,22 +84,32 @@ class DashboardStats extends Component{
                 <div style={{width: "100%"}}>
                     <br/>
                     <Row sm={12}>
-                        <Col xs={12} sm={12} md={6}>
+                        <Col xs={6} sm={6} md={6}>
                             <Row>
-                                    <Button variant="success" className={this.actionButtons} style={{color:"black"}}>Enter Map</Button>
-                                    <Button variant="primary" className={this.actionButtons} onClick={() => {this.showDialog()}} style={{paddingLeft:"10"}}>Edit Map</Button>
-                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showWorldManagement()}} style={{paddingLeft:"10"}}>Manage Map</Button>
-                            </Row>
-                            <Row style={{marginTop:"50px"}}>
-                                <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
+                                <Button color="success" size="lg" round>
+                                    <span style={{fontWeight: 600, fontSize: '1rem'}}>Enter Map</span>
+                                </Button>
+                                <div style={{paddingLeft: 20}}>
+                                    <Button color="primary" onClick={() => {this.showDialog()}}>
+                                        <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Edit Map</span>
+                                    </Button>
+                                </div>
+                                <div style={{paddingLeft: 20}}>
+                                    <Button color="primary" onClick={() => {this.showWorldManagement()}}>
+                                        <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Manage Map</span>
+                                    </Button>
+                                </div>
                             </Row>
                         </Col>
-                        <Col xs={12} sm={12} md={4} style={{float: "right"}}>
-                            <Row>
-                                <Button variant="danger" onClick={() => {this.handleClickOpen()}}>
-                                    Report World<ReportIcon/>
+                        <Col xs={6} sm={6} md={6}>
+                            <Row style={{float: "right"}}>
+                                <Button color="github" onClick={() => {this.handleClickOpen()}}>
+                                    <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Report World</span>
+                                    <ReportIcon/>
                                 </Button>
-                                <Button variant="danger" onClick={() => {this.showModal()}} style={{paddingLeft:"10"}}>Delete World</Button>
+                                <div style={{paddingLeft: 20}}><Button color="danger" onClick={() => {this.showModal()}}>
+                                    <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Delete World</span>
+                                </Button></div>
                                 <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
                                     world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                             </Row>
