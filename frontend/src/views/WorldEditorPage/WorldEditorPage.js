@@ -116,36 +116,33 @@ class WorldEditorPage extends React.Component {
     
     return (
       grid.map((item, index) => {
-        return (
-          <>
-            {
-              (index > 0) ?
-                <div
-                  key={`0${index}`}
-                  className={classNames(handler, "handler")}
-                  style={{ [margin]: '-10px' }}
-                ></div>
-                : null
-            }
+        return ([
+          (index > 0) ?
             <div
-              key={index}
-              data-path={path.concat(index)}
-              data-size={item.size}
-              style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
-              className={wrapper}
-            >
-              {
-                item.hasOwnProperty('tabs') ?
-                  <GameUITabs
-                    headerColor="gray"
-                    tabs={item.tabs.map(t => this.gameWindows[t])}
-                  />
-                  :
-                  this.gridBuild(item.grid, depth + 1, path.concat(index))
-              }
-            </div>
-          </>
-        )
+              key={`0${index}`}
+              className={classNames(handler, "handler")}
+              style={{ [margin]: '-10px' }}
+            ></div>
+            : null
+          ,
+          <div
+            key={index}
+            data-path={path.concat(index)}
+            data-size={item.size}
+            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
+            className={wrapper}
+          >
+            {
+              item.hasOwnProperty('tabs') ?
+                <GameUITabs
+                  headerColor="gray"
+                  tabs={item.tabs.map(t => this.gameWindows[t])}
+                />
+                :
+                this.gridBuild(item.grid, depth + 1, path.concat(index))
+            }
+          </div>
+        ])
       })
     );
   }

@@ -34,7 +34,9 @@ class TilesTab extends Component<{}, TilesTabState> {
 
   constructor(props) {
     super(props);
+  }
 
+  componentDidMount() {
     if (useWorldEditorStore.getState().ready)
       this.handleReady();
     else

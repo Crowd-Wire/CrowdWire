@@ -82,19 +82,21 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
     <div style={{
       display: 'flex',
       flexDirection: 'column',
-      border: '1px solid lightgray',
+      border: '1px solid black',
       margin: 6,
       borderRadius: 5,
       padding: 5
     }}
     >
       <div style={{ display: 'flex', fontSize: '1.125rem', margin: 3 }}>
-        {name}
+        <div  style={{ flexGrow: 1 }}>
+          {name}
+        </div>
         <Tooltip
           title={info}
-          placement="bottom"
+          placement="bottom-end"
         >
-          <InfoIcon style={{ fontSize: '1rem', marginLeft: 5 }} />
+          <InfoIcon style={{ fontSize: '1rem', marginLeft: 5, }} />
         </Tooltip>
       </div>
       {children}
@@ -118,13 +120,14 @@ class LayersTab extends Component<{}, LayersTabState> {
     this.state = {
       activeLayer: 'Ground',
     }
+  }
 
+  componentDidMount() {
     if (useWorldEditorStore.getState().ready)
       this.handleReady();
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
-
   }
 
   componentWillUnmount() {
@@ -147,52 +150,65 @@ class LayersTab extends Component<{}, LayersTabState> {
     return (
       <div style={{ display: 'flex', flexDirection: 'column' }}>
 
-        <LayerGroup name="Collision Layers" info="Every tile/object on these layers are collidable">
+        <LayerGroup name="Collision Layers" info="Every tile and object on these layers is collidable">
           {
-            this.mapManager && this.mapManager.map.layers.map((layer) => {
+            this.mapManager && this.mapManager.map.objects.map((layer, index) => {
               if (layer.name.includes("Collision")) {
                 return (
-                  <div onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
-                  </div>
-                );
-              }
-            })
-          }
-          {
-            this.mapManager && this.mapManager.map.objects.map((layer) => {
-              if (layer.name.includes("Collision")) {
-                return (
-                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
                     <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
                   </div>
                 );
               }
-            })
+            }).reverse()
+          }
+          {
+            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+              if (layer.name.includes("Collision")) {
+                return (
+                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  </div>
+                );
+              }
+            }).reverse()
           }
         </LayerGroup>
-        <LayerGroup name="Ground Layers" info="Non collidable">
+        <LayerGroup name="Ground Layers" info="These layers are non collidable">
           {
-            this.mapManager && this.mapManager.map.layers.map((layer) => {
-              if (layer.name.includes("Ground")) {
-                return (
-                  <div onClick={() => this.handleActiveLayer(layer.name)}>
-                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
-                  </div>
-                );
-              }
-            })
-          }
-          {
-            this.mapManager && this.mapManager.map.objects.map((layer) => {
+            this.mapManager && this.mapManager.map.objects.map((layer, index) => {
               if (!layer.name.includes("Collision")) {
                 return (
-                  <div onClick={() => this.handleActiveLayer(layer.name)}>
+                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
                     <Layer name={layer.name} object={true} selected={layer.name === activeLayer} />
                   </div>
                 );
               }
-            })
+            }).reverse()
+          }
+          {
+            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+              if (layer.name.includes("Ground")) {
+                return (
+                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  </div>
+                );
+              }
+            }).reverse()
+          }
+        </LayerGroup>
+        <LayerGroup name="Conference Layer" info="This layer is only meant for creating conference areas">
+          {
+            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+              if (layer.name === "Room") {
+                return (
+                  <div key={index} onClick={() => this.handleActiveLayer(layer.name)}>
+                    <Layer name={layer.name} object={false} selected={layer.name === activeLayer} />
+                  </div>
+                );
+              }
+            }).reverse()
           }
         </LayerGroup>
       </div>

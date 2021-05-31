@@ -75,13 +75,16 @@ class ToolsTab extends Component<{}, ToolsTabState> {
                 {type: PaintToolType.FILL, Icon: FaFill},
                 {type: PaintToolType.SELECT, Icon: FaRegSquare},
                 {type: PaintToolType.PICK, Icon: FaEyeDropper},
-              ].map(({type, Icon}) => {
-                return <Button 
-                  color={toolType === type ? 'primary' : null} 
-                  onClick={() => this.handlePaintToolChange(type)}
-                >
-                  <Icon style={{fontSize: '1.5rem'}} />
-                </Button>
+              ].map(({type, Icon}, index) => {
+                return (
+                  <Button 
+                    key={index}
+                    color={toolType === type ? 'primary' : null} 
+                    onClick={() => this.handlePaintToolChange(type)}
+                  >
+                    <Icon style={{fontSize: '1.5rem'}} />
+                  </Button>
+                )
               })
             }
           </ButtonGroup>
