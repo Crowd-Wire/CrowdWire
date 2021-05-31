@@ -36,6 +36,26 @@ class UserService {
         })
         
     }
+
+    updateUserPassword(old_password, new_password) {
+        let json_body = {};
+        if (old_password){
+            json_body['old_password'] = old_password;
+        }
+
+        if (new_password){
+            json_body['new_password'] = new_password;
+        }
+        return fetch(API_BASE + 'users/password-update/', {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization": "Bearer " + AuthenticationService.getToken(),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(json_body)
+        })
+    }
 }
 
 export default new UserService();

@@ -44,6 +44,7 @@ class UserProfile extends React.Component {
         email_val: "",
         name_val: "",
         bdate_val: "",
+        is_auth_google: false,
     }
 }
     notify = () => {
@@ -65,8 +66,11 @@ class UserProfile extends React.Component {
                     email_val: res.email,
                     name_val: res.name,
                     bdate_val: res.birth,
-
                 });
+            if(res.sub){
+                console.log("google auth");
+                this.setState({is_auth_google: true});
+            }
             }
             console.log(res)
         }).catch((error) => {useAuthStore.getState().leave()});
@@ -139,21 +143,22 @@ class UserProfile extends React.Component {
         <div>
             <div>
             { this.state.user == null ? "" : 
-            <GridContainer style={{marginTop: 25}} justify="center">
+            <GridContainer style={{marginTop: 50}} justify="center">
                 <GridItem xs={12} sm={12} md={12} lg={12}>
                 <Card className={this.props.classes[this.state.cardAnimaton]}>
                     <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
-                        <h4>Update Account</h4>
+                        <h4>Edit Account info</h4>
                     </CardHeader>
-                    <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
+                        {this.state.is_auth_google ? "": 
                         <CustomInput
                         helperText={this.state.emailHelperText}
                         labelText="Email..."
                         id="email"
                         formControlProps={{
-                            fullWidth: true
+                            fullWidth: true,
+                           
                         }}
                         inputProps={{
                             type: "email",
@@ -165,6 +170,7 @@ class UserProfile extends React.Component {
                             )
                         }}
                         />
+                        }
                         {this.state.emailHelperText!==""?
                         <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.emailHelperText}</Typography>
                         :
@@ -175,7 +181,7 @@ class UserProfile extends React.Component {
                         labelText="Name..."
                         id="name"
                         formControlProps={{
-                            fullWidth: true
+                            fullWidth: true,
                         }}
                         
                         inputProps={{

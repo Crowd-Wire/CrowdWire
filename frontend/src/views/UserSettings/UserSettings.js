@@ -1,5 +1,6 @@
 import React from "react";
-import UserProfile from "./sections/UserProfile"
+import UserProfile from "./sections/UserProfile";
+import UpdatePassword from "./sections/UpdatePassword";
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Tabs from '@material-ui/core/Tabs';
@@ -93,7 +94,7 @@ export default function UserSettings () {
             <UserProfile/>
             </TabPanel>
             <TabPanel value={value} index={1}>
-            <UserProfile/>
+            <UpdatePassword/>
             </TabPanel>
             </GridContainer>
         </div>

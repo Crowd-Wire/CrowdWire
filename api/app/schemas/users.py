@@ -54,6 +54,7 @@ class UserUpdatePassword(BaseModel):
 class UserInDB(UserBase):
     user_id: Optional[int] = None
     register_date: datetime.datetime
+    sub: Optional[str]
 
     class Config:
         orm_mode = True
