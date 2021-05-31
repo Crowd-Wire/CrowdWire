@@ -77,7 +77,7 @@ export default function UserSettings () {
         backgroundPosition: "top center"
         }}
     >
-        <div className={classes.root}>
+        <div className={`${classes.root} ${classes.container}`}>
         <GridContainer justify="center">
         <Tabs
             orientation="vertical"
