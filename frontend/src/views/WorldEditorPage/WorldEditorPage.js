@@ -15,7 +15,7 @@ import ToolsTab from "./sections/ToolsTab.tsx";
 import LayersTab from "./sections/LayersTab.tsx";
 import Phaser from "views/GamePage/Sections/Phaser";
 
-import style from "assets/jss/my-kit-react/views/worlEditorPage";
+import style from "assets/jss/my-kit-react/views/worlEditorPageStyle";
 import { withStyles } from '@material-ui/core/styles';
 
 import { withRouter } from "utils/wrapper.js";

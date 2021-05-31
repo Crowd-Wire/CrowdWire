@@ -1,6 +1,6 @@
-const worldEditorPage = {
+const worldEditorPageStyle = {
     navbar: {
-        background: '#666',
+        background: 'rgb(11, 19, 43)',
         maxHeight: 30,
         height: 30,
         alignItems: 'center'
@@ -36,4 +36,4 @@ const worldEditorPage = {
     },
 } 
 
-export default worldEditorPage;
+export default worldEditorPageStyle;
