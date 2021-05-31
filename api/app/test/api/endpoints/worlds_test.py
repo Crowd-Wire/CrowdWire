@@ -48,7 +48,7 @@ class TestWorlds(TestCase):
         Expects 200 Ok and that the world has the same id as the given one.
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
-        with patch("app.crud.crud_worlds.CRUDWorld.get") as mock_get:
+        with patch("app.crud.crud_worlds.CRUDWorld.get_world_with_user_permissions") as mock_get:
 
             # fields are required because of pydantic model
             mock_get.return_value = (models.World(world_id=1, world_map=bytes(), creator=1, max_users=1), "")

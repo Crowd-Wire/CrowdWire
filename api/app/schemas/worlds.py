@@ -51,3 +51,8 @@ class WorldInDB(BaseWorld):
 # Retrieve the Map of the World in the Database
 class WorldMapInDB(WorldInDB):
     world_map: bytes
+
+
+class WorldInDBWithUserPermissions(WorldInDB):
+    is_creator: bool = False
+    can_manage: bool = False

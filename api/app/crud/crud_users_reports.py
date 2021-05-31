@@ -71,10 +71,7 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate])
 
         query = query.filter(Report_User.reviewed.is_(reviewed))
 
-        if order == 'desc':
-            ord = desc
-        else:
-            ord = asc
+        ord = desc if order == 'desc' else asc
 
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_User.timestamp))
