@@ -46,7 +46,7 @@ export default function MapCard(props){
     const classes = useStyles();
     return(
         <>
-            <Col xs={12} sm={6} md={4} style={{margin: 'auto'}}>
+            <Col xs={12} sm={12} md={6} lg={4} style={{height: 380, marginLeft: 'auto', marginRight: 'auto'}}>
                 <Card className={classes.root}>
                     <CardActionArea onClick={routeChange}>
                         <CardMedia
