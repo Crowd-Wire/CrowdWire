@@ -57,7 +57,7 @@ class World_UserInDBBase(BaseModel):
 class World_UserInDB(World_UserInDBBase):
     avatar: Optional[str]
     username: Optional[str]
-    role_id: int
+    role_id: Optional[int]
 
 
 # Used to Return The Details Of A role

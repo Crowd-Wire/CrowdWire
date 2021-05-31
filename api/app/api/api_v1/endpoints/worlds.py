@@ -72,6 +72,7 @@ async def join_world_by_link(
 @router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
+        user_data: schemas.World_UserUpdate,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
@@ -138,6 +139,11 @@ async def join_world(
         # adds the world map to the data from the world_user
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
 
+    world_user, msg = await crud.crud_world_user.update_world_user_info(
+        db=db, world_id=world_id, request_user=user, user_to_change=user.user_id, is_guest=is_guest_user(user),
+        world_user_data=user_data
+    )
+
     return world_user
 
 
@@ -178,6 +184,35 @@ async def update_world(
     return world_obj_updated
 
 
+@router.get("/{world_id}/users/{user_id}", response_model=schemas.World_UserInDB)
+async def get_world_user_info(
+        world_id: int,
+        user_id: Union[int, UUID4],
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+):
+    """
+    Returns the user info of a user in a given world.
+    """
+    is_guest = type(user_id) != int
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=NotImplemented)
+
+    if user.user_id != user_id:
+        raise HTTPException(status_code=400, detail=strings.ACCESS_FORBIDDEN)
+
+    if is_guest:
+        world_user = crud.crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user.user_id)
+        if not world_user:
+            return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
+    else:
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        if not world_user:
+            return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
+    return world_user
+
+
 @router.put("/{world_id}/users/{user_id}",
             response_model=schemas.World_UserInDB)
 async def update_world_user_info(
@@ -206,37 +241,12 @@ async def update_world_user_info(
     if is_guest and user_id != user.user_id:
         raise HTTPException(status_code=400, detail=strings.CHANGE_USER_INFO_FORBIDDEN)
 
-    # registered user
-    if not is_guest:
-        world_user, msg = await crud.crud_world_user.update_world_user_info(
-            db=db, world_id=world_id, request_user=user, user_to_change=user_id, world_user_data=user_data
-        )
-        if world_user is None:
-            raise HTTPException(status_code=400, detail=msg)
-
-    # change user info in cache
-    world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
-    if not world_user_obj:
-        raise HTTPException(
-            status_code=400,
-            detail=strings.USER_NOT_IN_WORLD
-        )
-
-    data = {k: v for k, v in dict(user_data).items() if v is not None}
-    # updates the data present
-    await redis_connector.save_world_user_data(
-        world_id=world_id,
-        user_id=user_id,
-        data=data
+    world_user, msg = await crud.crud_world_user.update_world_user_info(
+        db=db, world_id=world_id, request_user=user, user_to_change=user_id, is_guest=is_guest,
+        world_user_data=user_data
     )
-    world_user = {
-        'world_id': world_id,
-        'user_id': user.user_id,
-        'role_id': world_user_obj.role.role_id,
-        'avatar': world_user_obj.avatar,
-        'username': world_user_obj.username
-    }
-    world_user.update(data)
+    if not world_user:
+        raise HTTPException(status_code=400, detail=msg)
     return world_user
 
 
