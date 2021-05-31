@@ -2,7 +2,6 @@ import React, { useState, Component, useEffect } from "react";
 import { makeStyles, withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import SearchIcon from '@material-ui/icons/Search';
-import MapCard from 'components/MapCard/MapCard.js';
 import InputLabel from '@material-ui/core/InputLabel';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import FormControl from '@material-ui/core/FormControl';
