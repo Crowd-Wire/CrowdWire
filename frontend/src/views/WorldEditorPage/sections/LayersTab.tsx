@@ -52,7 +52,7 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
   const classes = useLayerStyles();
 
   return (
-    <div className={classes.root} style={{ backgroundColor: selected ? "#3f51b5" : 'lightgray' }}>
+    <div className={classes.root} style={{ backgroundColor: selected ? "#3f51b5" : 'white' }}>
       {object ? <CategoryIcon color="secondary" /> : <GridOnIcon color="secondary" />}
       <div className={classes.name}>
         {name}
@@ -76,25 +76,41 @@ interface LayerGroupProps {
   children: React.ReactNode;
 }
 
+const useLayerGroupStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    border: '1px solid black',
+    backgroundColor: 'rgba(11, 19, 43, 1)',
+    margin: 6,
+    borderRadius: 5,
+    padding: 5,
+  },
+  title: {
+    display: 'flex',
+    fontSize: '1.125rem',
+    margin: 3,
+    color: 'white',
+  },
+  tooltip: {
+    backgroundColor: 'rgba(11, 19, 43, 1)',
+    fontSize: '0.8rem',
+  },
+});
+
 const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
+  const classes = useLayerGroupStyles();
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      border: '1px solid black',
-      margin: 6,
-      borderRadius: 5,
-      padding: 5
-    }}
-    >
-      <div style={{ display: 'flex', fontSize: '1.125rem', margin: 3 }}>
-        <div  style={{ flexGrow: 1 }}>
+    <div className={classes.root}>
+      <div className={classes.title}>
+        <div style={{ flexGrow: 1 }}>
           {name}
         </div>
         <Tooltip
           title={info}
           placement="bottom-end"
+          classes={{ tooltip: classes.tooltip }}
         >
           <InfoIcon style={{ fontSize: '1rem', marginLeft: 5, }} />
         </Tooltip>
