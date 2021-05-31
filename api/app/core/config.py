@@ -56,13 +56,10 @@ class Settings(BaseSettings):
     REDIS_MASTER: str = 'mymaster'
 
     # email
-    SMTP_TLS: bool = True
-    SMTP_PORT: Optional[int] = None
-    SMTP_HOST: Optional[str] = None
     EMAIL_USER: Optional[str] = None
     EMAIL_PASSWORD: Optional[str] = None
     EMAIL_FROM: Optional[EmailStr] = None
-    EMAIL_TEMPLATES_DIR: str = "/app/email-templates/build"
+    EMAIL_EXPIRE: Optional[int] = 1000 # 1000 min?
 
     # Google Auth
     CLIENT_ID: str = ""

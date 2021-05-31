@@ -6,6 +6,7 @@ from jose import jwt
 from app import schemas, models
 from app.core.config import settings
 from app.core.consts import AVATARS_LIST
+from app.core.security import create_access_token
 from random import choice
 from loguru import logger
 from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
@@ -54,8 +55,11 @@ conf = ConnectionConfig(
 
 async def send_email(
     email_to: str,
+    user_id: int
 ) -> None:
-    html = f"<h3>Hello {email_to}</h3>"
+    access_token, expires = create_access_token(user_id, expires_delta=timedelta(settings.EMAIL_EXPIRE))
+    html = f"<h3>Hello {email_to}</h3> " \
+           f"<a href={settings.FRONTEND_URL + '?confirm=' + access_token}> Confirm </a>"
 
     message = MessageSchema(
         subject="Crowdwire",

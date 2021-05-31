@@ -7,7 +7,7 @@ from app.core.security import get_password_hash, verify_password
 from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
-from app.core import strings
+from app.core import strings, consts
 from loguru import logger
 
 
@@ -21,6 +21,13 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         Retrieve user by user_id
         """
         return db.query(User).filter(User.user_id == id).first()
+
+    def is_pending(self, db: Session, user_id: int):
+
+        user = self.get(db=db, id=user_id)
+        if not user or user.status != consts.USER_PENDING_STATUS:
+            return None
+        return user
 
     def can_update(self, request_user: User, db: Session, id: int) -> Tuple[Optional[User], str]:
         user_obj = self.get(db=db, id=id)
@@ -49,13 +56,25 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             name=user_data.name,
             birth=user_data.birth,
             register_date=datetime.datetime.now(),
-            status=0,
+            status=3, # pending
             is_superuser=False
         )
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
         return db_user, strings.USER_REGISTERED_SUCCESS
+
+    def confirm_email(self, db: Session, user_id: int):
+
+        user = self.get(db=db, id=user_id)
+        if not user:
+            return None, strings.USER_NOT_FOUND
+
+        user.status = 0
+        db.add(user)
+        db.commit()
+
+        return user, ""
 
     def create_google(self, db: Session, user: UserCreateGoogle) -> Tuple[Optional[User], str]:
 

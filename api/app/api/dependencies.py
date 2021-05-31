@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from loguru import logger
 from datetime import datetime, timedelta
-
+from app.core import consts
 from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
@@ -43,6 +43,29 @@ def get_current_user_optional(
     return None
 
 
+def get_confirm_email_token(
+        token: str,
+        db: Session = Depends(get_db),
+) -> models.User:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        logger.debug(payload)
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError) as e:
+        logger.debug(e)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid Token",
+        )
+
+    user = crud.crud_user.is_pending(db=db, user_id=int(token_data.sub))
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist or is already confirmed")
+    return user
+
+
 def get_current_user(
         db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> Union[models.User, schemas.GuestUser]:
@@ -60,7 +83,7 @@ def get_current_user(
         )
     if not token_data.is_guest_user:
         user = crud.crud_user.get(db, id=token_data.sub)
-        if not user:
+        if not user or user.status != consts.USER_NORMAL_STATUS:
             raise HTTPException(status_code=404, detail="User not found")
         return user
 

@@ -17,7 +17,7 @@ from app.utils import send_email
 router = APIRouter()
 
 
-@router.post("/register", response_model=schemas.Token)
+@router.post("/register")
 async def register(
         user_data: schemas.UserCreate,
         db: Session = Depends(dependencies.get_db)
@@ -31,13 +31,30 @@ async def register(
     if not user:
         raise HTTPException(status_code=400, detail=message)
 
-    await send_email('brunosb@ua.pt')
+    await send_email('brunosb@ua.pt', user.user_id)
+
+    return {'status': 'ok'}
+
+
+@router.get('/confirm/{token}')
+def confirm_email(
+        db: Session = Depends(dependencies.get_db),
+        user: models.User = Depends(dependencies.get_confirm_email_token)
+):
+    """
+    Receives a token and confirms the user registration in the app.
+    Returns the access token so that there is no need for it to login.
+    """
+    user, msg = crud.crud_user.confirm_email(db=db, user_id=user.user_id)
+    if user is None:
+        raise HTTPException(status_code=400, detail=msg)
+
     access_token, expires = security.create_access_token(user.user_id)
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "expire_date": str(expires)
+        "expire_date": str(expires),
     }
 
 
