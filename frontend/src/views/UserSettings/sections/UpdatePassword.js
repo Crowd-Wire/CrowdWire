@@ -42,9 +42,6 @@ class UpdatePassword extends React.Component {
         cPassHelperText: "",
         birthdayHelperText: "",
         user: null,
-        email_val: "",
-        name_val: "",
-        bdate_val: "",
         is_auth_google: false,
     }
 }
@@ -65,6 +62,7 @@ class UpdatePassword extends React.Component {
                 this.setState({
                     user: res,
                 });
+                
             }
             if(res.sub){
                 console.log("google auth");

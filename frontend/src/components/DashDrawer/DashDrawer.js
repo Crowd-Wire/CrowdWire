@@ -109,7 +109,9 @@ export default function DashDrawer(props){
     if(location.pathname!=="/dashboard/search/owned")
       navigation("/dashboard/search/owned");
   }
-
+  const onClickUserSettings = () => {
+    navigation("/user/settings");
+  }
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -201,7 +203,10 @@ export default function DashDrawer(props){
                   })}/>
             </ListItem>
           }
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+          { st.guest_uuid ?
+            <></>
+            :
+          <ListItem onClick={onClickUserSettings} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Settings" style={{position: "fixed", bottom: definitions}}>
           <ListItemIcon>
               <Settings className={classes.iconDrawer}/>
@@ -209,6 +214,10 @@ export default function DashDrawer(props){
           <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
+          }
+
+
+
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Leave" style={{position: "fixed", bottom: theme.spacing(2)}}
             onClick={() => logout()}
