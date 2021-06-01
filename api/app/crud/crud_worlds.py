@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Optional, Tuple, Union, Dict, Any, List
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, asc
+from sqlalchemy import desc, asc, inspect
 from app.core import strings
 from app.models import World, User, Tag
 from app.redis import redis_connector
@@ -60,7 +61,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
-    async def get_world_with_user_permissions(self, db: Session, world_id: int, user_id: int)\
+    async def get_world_with_user_permissions(self, db: Session, world_id: int, user_id: int) \
             -> Tuple[Optional[WorldInDBWithUserPermissions], str]:
         """
         Returns the world details and the permissions that the request user has in that world.
@@ -69,14 +70,11 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         world, msg = await self.get(db=db, world_id=world_id)
         if not world:
             return None, msg
-        logger.debug(world.update_date)
         role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user_id)
-        data = row2dict(world)
-        data['is_creator'] = world.creator == user_id
-        data['can_manage'] = role is not None
-        data['update_date'] = world.update_date
-
-        return WorldInDBWithUserPermissions.parse_obj(data), ""
+        world.__setattr__('is_creator', world.creator == user_id)
+        world.__setattr__('can_manage', role is not None)
+        world.__setattr__('update_date', world.update_date)
+        return WorldInDBWithUserPermissions(**world.__dict__), ""
 
     @cache(model="World")
     async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
@@ -185,7 +183,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             update_data['tags'] = lst
         # clear cache of the queries related to the object
         await clear_cache_by_model("World", world_id=db_obj.world_id)
-        obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        obj = super().update(db=db, db_obj=db_obj, obj_in=update_data)
+        db.add(obj)
+        db.commit()
+        logger.debug(obj)
         return obj, strings.WORLD_UPDATE_SUCCESS
 
     def filter(self,
