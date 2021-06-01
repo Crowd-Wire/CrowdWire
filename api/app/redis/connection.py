@@ -154,7 +154,8 @@ class RedisConnector:
         be a string of the uuid for guests
         """
         for k, v in data.items():
-            await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
+            if v is not None:
+                await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
     async def get_online_users(self, world_id: int) -> int:
         """

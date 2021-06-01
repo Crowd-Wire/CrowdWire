@@ -199,11 +199,11 @@ async def get_world_user_info(
     if is_guest:
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
         if not world_user:
-            return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
+            raise HTTPException(status_code=404, detail=strings.USER_NOT_IN_WORLD)
     else:
         world_user = crud.crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user.user_id)
         if not world_user:
-            return {'world_id': world_id, 'user_id': user.user_id, 'username': None, 'avatar': None, 'role': None}
+            raise HTTPException(status_code=404, detail=strings.USER_NOT_IN_WORLD)
     return world_user
 
 
