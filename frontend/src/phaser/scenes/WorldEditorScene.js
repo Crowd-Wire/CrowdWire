@@ -121,8 +121,8 @@ class WorldEditorScene extends Scene {
             
             const tile = this.map.getTileAt(tileX, tileY, true, activeLayerName);
             console.log(tile)
-            const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
-            console.log(color)
+            // const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
+            // console.log(color)
             tile && this.paintTool?.conferenceId && (tile.tint = 0x197cb0);
 
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {

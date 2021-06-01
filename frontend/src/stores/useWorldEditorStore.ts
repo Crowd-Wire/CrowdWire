@@ -11,6 +11,10 @@ export enum PaintToolType {
     PICK = "PICK",
 }
 
+export interface Conference {
+    name: string;
+    color: string;
+}
 
 interface Layer {
     visible?: boolean;
@@ -20,7 +24,7 @@ interface Layer {
 
 export interface PaintTool {
     type?: PaintToolType;
-    tileId?: number;
+    tileId?: string;
 }
 
 const useWorldEditorStore = create(
@@ -30,6 +34,7 @@ const useWorldEditorStore = create(
             highlight: false,
             activeLayer: null,
             activeConference: null,
+            conferences: {} as Record<string, Conference>,
             layers: {} as Record<string, Layer>,
             paintTool: {} as PaintTool,
         },

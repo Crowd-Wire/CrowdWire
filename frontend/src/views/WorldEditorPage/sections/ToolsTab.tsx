@@ -46,13 +46,12 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   handleTileChange = (paintTool) => {
-    if (!paintTool.tileId)
-      return;
-
+    console.log(`tile-${paintTool.tileId}`)
     const tileElem: any = document.getElementById(`tile-${paintTool.tileId}`).cloneNode(true);
     tileElem.removeAttribute('id');
     tileElem.style["transform"] = "scale(2.5)";
     tileElem.style["display"] = "";
+    tileElem.style["margin"] = "15px";
     const tileContainer = document.getElementById("tile-container");
     tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
   }
@@ -70,6 +69,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
       <>
         <div id="tile-container" style={{ display: 'flex', justifyContent: 'center', margin: '25px 0' }}>
           <div style={tileStyle}></div>
+          <div id="tile-null" style={{...tileStyle, display: 'none'}}></div>
         </div>
 
         <hr />

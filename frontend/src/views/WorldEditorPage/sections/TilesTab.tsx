@@ -57,7 +57,7 @@ class TilesTab extends Component<{}, TilesTabState> {
     this.setState({ filterType: event.target.value });
   }
 
-  handleClick = (tileId: number) => {
+  handleClick = (tileId: string) => {
     useWorldEditorStore.getState().setPaintTool({ tileId });
   }
 
@@ -103,7 +103,7 @@ class TilesTab extends Component<{}, TilesTabState> {
                       <div
                         key={id}
                         id={`tile-${id}`}
-                        onClick={() => this.handleClick(id)}
+                        onClick={() => this.handleClick(id.toString())}
                         style={{
                           display: tileset.name.startsWith(filterType) ? '' : 'none',
                           width: tileWidth,

@@ -4,7 +4,7 @@ import classNames from "classnames";
 import Input from '@material-ui/core/Input';
 
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { Conference } from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
 import { makeStyles } from "@material-ui/core";
@@ -118,11 +118,6 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
   );
 }
 
-interface Conference {
-  name: string;
-  color: string;
-}
-
 interface ConferencesTabState {
   activeConference: string;
   conferences: Record<string, Conference>;
@@ -153,6 +148,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
         this.handleReady, state => state.ready));
   }
 
+  componentDidUpdate() {
+    const activeConference = this.state.activeConference;
+    if (activeConference)
+      useWorldEditorStore.getState().setPaintTool({ tileId: activeConference });
+  }
+
   componentWillUnmount() {
     this.subscriptions.forEach((unsub) => unsub());
   }
@@ -175,24 +176,22 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   }
 
   handleChange = (id: string, name: string, del?: boolean): void => {
-    if (del)
-      this.setState(state => {
-        const conferences = state.conferences;
-        let activeConference = state.activeConference;
-        delete conferences[id];
-        if (id === activeConference)
-          activeConference = null;
-        return { conferences, activeConference };
-      })
-    else
-      this.setState(state => {
-        const conferences = state.conferences;
-        conferences[id].name = name;
-        return { conferences, activeConference: id };
-      })
-    // const value = event.target.value;
-    // this.setState({ activeConference: value });
-    // useWorldEditorStore.getState().setState({ activeConference: value });
+    if (del) {
+      const conferences = this.state.conferences;
+      let activeConference = this.state.activeConference;
+      delete conferences[id];
+      if (id === activeConference) {
+        activeConference = null;
+        useWorldEditorStore.getState().setPaintTool({ tileId: null });
+      }
+      this.setState({ conferences, activeConference });
+      useWorldEditorStore.getState().setState({ conferences, activeConference });
+    } else {
+      const conferences = this.state.conferences;
+      conferences[id].name = name;
+      this.setState({ conferences, activeConference: id });
+      useWorldEditorStore.getState().setState({ conferences, activeConference: id });
+    }
   }
 
   render() {
@@ -200,12 +199,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     const color = conferences[activeConference]?.color;
 
     const conferenceTileStyles = color && {
-      display: '',
+      display: 'none',
       width: 32,
       height: 32,
       transform: "scale(2.5)",
-      backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.5)`,
-      borderColor: `1px solid ${color}`,
+      backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
+      border: `1px solid ${color}`,
       margin: "40px auto",
       boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
     };
