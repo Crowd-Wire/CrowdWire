@@ -130,7 +130,7 @@ class WorldService {
      * 
      * Unrecognized parameters will be ignored and undefined values will be removed by JSON.stringify.
      */
-    putWorld(world_id, { wName, accessibility, guests, maxUsers, tag_array, desc, worldMap }) {
+    putWorld(world_id, { wName, accessibility, guests, maxUsers, tag_array, desc, worldMap, world_picture }) {
 
         return fetch(API_BASE + 'worlds/' + world_id, {
             method: 'PUT',
@@ -146,7 +146,8 @@ class WorldService {
                 world_map: worldMap,
                 max_users: maxUsers,
                 tags: tag_array,
-                description: desc
+                description: desc,
+                profile_image: world_picture
             })
         })
     }
@@ -252,7 +253,7 @@ class WorldService {
         })
     }
     
-   getUserWorld(world_id, user_id) {
+   getWorldUser(world_id, user_id) {
         return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
             method: 'GET',
             mode: 'cors',

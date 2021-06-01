@@ -22,8 +22,20 @@ import Select from '@material-ui/core/Select';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import IconButton from '@material-ui/core/IconButton';
 import { createBrowserHistory } from 'history';
+import { toast } from 'react-toastify';
+import logo from 'assets/crowdwire_white_logo.png';
 
 
+const toast_props = {
+    position: toast.POSITION.TOP_RIGHT,
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    draggable: true,
+    pauseOnFocusLoss: false,
+    pauseOnHover: false,
+    progress: undefined,
+  }
 
 class DashboardContent extends Component{
 
@@ -35,9 +47,13 @@ class DashboardContent extends Component{
 			editing: false,
 			tags: [],
 			chosenTags: [],
-			goToWorld: null
+			goToWorld: null,
+			isCreator: false,
+			canManage: false
 		}
 		this.history = createBrowserHistory();
+		this.updateWorldInfo = this.updateWorldInfo.bind(this);
+		this.readFile = this.readFile.bind(this);
 	}
     cardTextStyles = {
 		marginLeft:"5%",
@@ -60,6 +76,13 @@ class DashboardContent extends Component{
 	
 	toggleEditing() {
 		this.setState({editing: !this.state.editing});
+		if (!this.state.editing) {
+			let chosTags = [];
+			for (let i = 0; i < this.state.worldInfo.tags.length;i++){
+				chosTags.push(this.state.worldInfo.tags[i].name)
+			}
+			this.setState({chosenTags: chosTags})
+		}
 	}
 
 	navigate(){
@@ -81,17 +104,26 @@ class DashboardContent extends Component{
 		  })
 		  .then((res) => {
 			if (res) {
-				this.setState({worldInfo:res})
-				if (res.tags !==undefined) {
-					let chosTags = []
-					for (let i = 0; i < res.tags.length;i++){
-						chosTags.push(res.tags[i].name)
+				if (res.detail){
+					toast.dark(
+						<span>
+						<img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+						{res.detail}
+						</span>
+					,toast_props);
+					this.navigate();
+				} else {
+					console.log(res)
+					this.setState({worldInfo:res, isCreator: res.is_creator, canManage: res.can_manage})
+					if (res.tags !==undefined) {
+						let chosTags = []
+						for (let i = 0; i < res.tags.length;i++){
+							chosTags.push(res.tags[i].name)
+						}
+						this.setState({chosenTags: chosTags})
 					}
-					this.setState({chosenTags: chosTags})
 				}
 			}
-
-			console.log(res)
 		  }).catch((error) => { useAuthStore.getState().leave() });
 		
 		TagService.getAll()
@@ -107,6 +139,7 @@ class DashboardContent extends Component{
 			})
 		
 			console.log((this.state.worldInfo != null && this.state.worldInfo.tags != undefined) ? this.state.worldInfo.tags : [])
+
 	}
 		
 
@@ -156,10 +189,14 @@ class DashboardContent extends Component{
 		return labels;
 	}
 
-	updateWorldInfo = () => {
-		const url = window.location.pathname;
 
-		console.log(this.state.worldInfo)
+	updateWorldInfo({world_picture = undefined}) {
+		const url = window.location.pathname;
+		if (world_picture === undefined && document.getElementById("world_pic").files.item(0)) {
+			let file = document.getElementById("world_pic").files.item(0)
+			this.readFile(file)
+			return
+		}
 		let wName = document.getElementById("world_name").value;
 		let accessibility = document.getElementById("world_public").value;;
 		let guests =  document.getElementById("world_allow_guests").value;
@@ -172,35 +209,54 @@ class DashboardContent extends Component{
 			guests,
 			maxUsers,
 			tag_array,
-			desc
-		}	)
+			desc,
+			world_picture
+		})
 		WorldService.putWorld(url[url.length - 1],
 			{
 				wName,
 				accessibility,
-                guests,
-                maxUsers,
-                tag_array,
-                desc
+				guests,
+				maxUsers,
+				tag_array,
+				desc
 			}	
 		).then((res) => {
-			if(res.status == 200)
-				return res.json()
-			else
-				console.log(res)
-			})
+			return res.json()
+		})
 		.then((res) => {
-			this.setState({worldInfo:res})
-			if (res.tags !==undefined) {
-				let chosTags = []
-				for (let i = 0; i < res.tags.length;i++){
-					chosTags.push(res.tags[i].name)
+			if (res) {
+				if (res.detail) {
+					toast.dark(
+						<span>
+						<img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+							{res.detail[0].msg}
+						</span>
+					,toast_props);
+				} else {
+					this.setState({worldInfo:res})
+					if (res.tags !==undefined) {
+						let chosTags = []
+						for (let i = 0; i < res.tags.length;i++){
+							chosTags.push(res.tags[i].name)
+						}
+						this.setState({chosenTags: chosTags})
+					}
+					this.toggleEditing()
 				}
-				this.setState({chosenTags: chosTags})
 			}
-			this.toggleEditing()
 		})
 	}
+	
+	readFile(file) {
+		var reader = new FileReader();
+		const scope = this;
+		reader.onload = function() {
+			scope.updateWorldInfo({world_picture: reader.result});
+		}
+		reader.readAsBinaryString(file);
+	}
+
 
 	date = () => {
 		if(this.state.worldInfo.creation_date===undefined)
@@ -233,7 +289,7 @@ class DashboardContent extends Component{
 					</Col>
 				</Row>
 				<Row style={{ width:"100%", minHeight: 480, marginTop:"5%", minWidth:"450px" }}>
-					<Col xs={12} sm={12} md={12} lg={7} style={{
+					<Col xs={12} sm={12} md={12} lg={9} style={{
 						bottom: 0,
 						overflow: "hidden",
 						display: 'flex',
@@ -252,22 +308,25 @@ class DashboardContent extends Component{
 								{ this.state.editing ?
 									<div style={{top: 0, marginLeft: 30, width: '40%', textAlign: "left", paddingTop: 10}}>
 										<Button color="primary" round >
-											<input type="file" id="world_pic" />
+											<input type="file"  id="world_pic" accept="image/*" name="img" />
 										</Button>
 									</div>
 								:
 									''
 								}
 							</Col>
-							<Col xs={6} style={{textAlign: "right"}}>
-								<Button color="primary" round onClick={() => {this.toggleEditing()}}>
-									{ !this.state.editing ?
-										<span style={{fontWeight: 500, fontSize: '0.9rem'}}><EditIcon />Edit</span>
-									:
-										<span style={{fontWeight: 500, fontSize: '0.9rem'}}><ClearIcon />Cancel</span>
-									}
-								</Button>
-							</Col>
+							{ this.state.isCreator ? 
+								<Col xs={6} style={{textAlign: "right"}}>
+									<Button color="primary" round onClick={() => {this.toggleEditing()}}>
+										{ !this.state.editing ?
+											<span style={{fontWeight: 500, fontSize: '0.9rem'}}><EditIcon />Edit</span>
+										:
+											<span style={{fontWeight: 500, fontSize: '0.9rem'}}><ClearIcon />Cancel</span>
+										}
+									</Button>
+								</Col>
+							: ''
+							}
 						</Row>
 						<div style={{ paddingTop: 15, marginTop: 'auto', borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", minHeight:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
 							{ this.state.editing ?
@@ -430,8 +489,8 @@ class DashboardContent extends Component{
 											</Typography>
 										</Col>
 										<Col sm={4} style={{textAlign: "right"}}>
-											<Button color="success" size="md" round>
-												<span style={{fontWeight: 600, fontSize: '1rem'}} onClick={() => this.enterMap()}>Enter</span>
+											<Button color="success" size="md" round onClick={() => this.enterMap()}>
+												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
 											</Button>
 										</Col>
 									</Row>
@@ -439,8 +498,8 @@ class DashboardContent extends Component{
 							}
 						</div>
 					</Col>
-					<Col xs={12} sm={12} md={12} lg={4}>
-						<DashboardStats details={this.state.worldInfo} />
+					<Col xs={12} sm={12} md={12} lg={2} style={{margin: 'auto'}}>
+						<DashboardStats details={this.state.worldInfo} isCreator={this.state.isCreator} canManage={this.state.canManage}/>
 					</Col>
 				</Row>
 			</div>

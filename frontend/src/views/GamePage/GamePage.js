@@ -29,8 +29,8 @@ const GamePage = (props) => {
   const [loading, setLoading] = useState(1)
   const navigation = useNavigate();
   const [choosingSettings, setChoosingSettings] = useState(true)
+  const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("https://picsum.photos/800/600?random=1")
-
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -61,12 +61,14 @@ const GamePage = (props) => {
         }
         else {
           useWorldUserStore.getState().joinWorld(res);
+          setUsername(res.username)
           setLoading(0);
         }
       }
     ).catch(() => 
       navigation("/dashboard/search/public")
     )
+
   }, [])
 
   useEffect(() => {
@@ -77,16 +79,16 @@ const GamePage = (props) => {
   }, [])
 
   const updateWorldUser = () => {
-    let username = document.getElementById('world_user_username').value;
-    if (username === "") {
-      username = undefined;
+    let user_username = document.getElementById("world_user_username").value;
+    if (user_username === "") {
+      user_username = username;
     }
     console.log(avatar)
     WorldService.updateWorldUser(
       window.location.pathname.split('/')[2],
       useWorldUserStore.getState().world_user.user_id,
       'avatar_1',
-      username
+      user_username
     )
       .then((res) => {
         if (res.ok) return res.json()
@@ -94,6 +96,8 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
+            console.log(res)
+
             if (res.detail){
               toast.dark(
                 <span>
@@ -172,12 +176,12 @@ const GamePage = (props) => {
                       </Col>
                     </Row>
                     <Row sm={12} style={{paddingTop: 30}}>
-                      <TextField style={{marginLeft:"auto", marginRight:"auto"}} id="world_user_username" label="username" variant="outlined" />
+                      <TextField style={{marginLeft:"auto", marginRight:"auto"}} defaultValue={username} id="world_user_username" label="username" variant="outlined" />
                     </Row>
                     <div style={{textAlign: "center", paddingTop: 50}}>
-                      <Button color="primary" onClick={() => updateWorldUser()}>
-                        Enter World
-                      </Button>
+                    <Button color="success" size="md" round onClick={() => updateWorldUser()}>
+												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
+											</Button>
                     </div>
                   </CardBody>
                 </Card>
