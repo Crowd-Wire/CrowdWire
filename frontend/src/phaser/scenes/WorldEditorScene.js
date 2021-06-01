@@ -68,7 +68,8 @@ class WorldEditorScene extends Scene {
             in: Phaser.Input.Keyboard.KeyCodes.Q,
             out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
-        console.log(this.cameras)
+        
+        this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // this.physics.world.bounds.width = this.map.widthInPixels;
         // this.physics.world.bounds.height = this.map.heightInPixels;

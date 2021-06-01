@@ -21,7 +21,6 @@ interface Layer {
 export interface PaintTool {
     type?: PaintToolType;
     tileId?: number;
-    conferenceId?: string;
 }
 
 const useWorldEditorStore = create(
@@ -30,6 +29,7 @@ const useWorldEditorStore = create(
             ready: false,
             highlight: false,
             activeLayer: null,
+            activeConference: null,
             layers: {} as Record<string, Layer>,
             paintTool: {} as PaintTool,
         },

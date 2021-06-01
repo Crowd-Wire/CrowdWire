@@ -1,24 +1,116 @@
-import React, { Component } from "react";
+import React, { Component, useState, useEffect, useRef } from "react";
 
-import { withStyles } from '@material-ui/core/styles';
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
+import classNames from "classnames";
 import Input from '@material-ui/core/Input';
 
 import MapManager from "phaser/MapManager";
 import useWorldEditorStore from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
-import { API_BASE } from "config";
+import { makeStyles } from "@material-ui/core";
 
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+
+
+interface ConferenceItemProps {
+  id: string;
+  name: string;
+  color: string;
+  handle: (id: string, name: string) => void;
+  active: boolean;
+}
+
+const useConferenceItemStyles = makeStyles({
+  activeRoot: {
+    backgroundColor: "rgba(11, 19, 43, 0.8) !important",
+    color: 'white',
+  },
+  root: {
+    display: 'flex',
+    "&:hover": {
+      backgroundColor: "rgba(11, 19, 43, 0.5)",
+      color: 'white',
+    },
+    "&[active]": {
+    }
+  },
+  text: {
+    fontSize: '1rem',
+    "word-break": "break-all",
+    fontWeight: 400,
+  },
+  color: {
+    width: 10,
+    height: 10,
+  }
+})
+
+const ConferenceItem: React.FC<ConferenceItemProps> = (
+  { id, name, color, handle, active }) => {
+  const classes = useConferenceItemStyles();
+  const [toggle, setToggle] = useState(true);
+
+  const handleChange = (event) => {
+    const value = event.target.value;
+    handle(id, value);
+  }
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === 'Escape') {
+      setToggle(true)
+      event.preventDefault()
+      event.stopPropagation()
+    }
+  }
+
+  return (
+    <div
+      className={classNames(classes.root, { [classes.activeRoot]: active })}
+      onClick={() => handle(id, name)}
+    >
+      <div style={{ flexGrow: 1 }}>
+        {
+          toggle ? (
+            <p
+              className={classes.text}
+              onDoubleClick={() => setToggle(false)}
+            >{name}</p>
+          ) : (
+            <Input
+              autoFocus
+              type="text"
+              value={name}
+              style={{color: 'white'}}
+              onChange={handleChange}
+              onBlur={() => setToggle(true)}
+              onKeyDown={handleKeyDown}
+            />
+          )
+        }
+      </div>
+      <div
+        className={classes.color}
+        style={{ backgroundColor: color }}
+      ></div>
+    </div>
+  );
+}
+
+interface Conference {
+  name: string;
+  color: string;
+}
 
 interface ConferencesTabState {
-  conferenceId: string;
-  conferences: string[];
+  activeConference: string;
+  conferences: Record<string, Conference>;
 }
 
 
 class ConferencesTab extends Component<{}, ConferencesTabState> {
+  static curConference: number;
+
   subscriptions: any[];
   mapManager: MapManager;
 
@@ -27,8 +119,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     this.subscriptions = [];
 
     this.state = {
-      conferenceId: 'C1',
-      conferences: ['C1'],
+      activeConference: 'C1',
+      conferences: { 
+        'C1': { name: 'Conference #1', color: '#ff00ff' },
+        'C2': { name: 'Conference #2', color: '#00ffff' },
+        'C3': { name: 'Conference #3', color: '#00ff00' } 
+      },
     }
   }
 
@@ -44,99 +140,64 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     this.subscriptions.forEach((unsub) => unsub());
   }
 
+  addConference = () => {
+    this.setState(state => {
+      const conferences = state.conferences;
+
+    });
+  }
+
   handleReady = () => {
     this.mapManager = new MapManager();
     this.forceUpdate();
   }
 
-  handleChange = (event) => {
-    const value = event.target.value;
-    this.setState({ conferenceId: value });
-    useWorldEditorStore.getState().setPaintTool({ conferenceId: `C${value}` })
+  handleChange = (id: string, name: string): void => {
+    this.setState(state => {
+      const conferences = state.conferences;
+      conferences[id].name = name;
+      return { conferences, activeConference: id };
+    })
+    // const value = event.target.value;
+    // this.setState({ activeConference: value });
+    // useWorldEditorStore.getState().setState({ activeConference: value });
   }
 
   render() {
-    const { conferenceId, conferences } = this.state;
+    const { activeConference, conferences } = this.state;
 
-    const ConferenceTile = withStyles({
-      root: {
-        width: 32,
-        height: 32,
-        backgroundImage: `url(${API_BASE + "static/maps/tilesets/conference-tile.png"})`,
-        transform: "scale(2.5)",
-        margin: "40px auto",
-        boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        backgroundRepeat: "no-repeat",
-        "&:before": {
-          content: '""',
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: `rgba(${Object.values(hexToRGB(intToHex(cyrb53Hash(`C${conferenceId}`, 129)))).join(',')},0.5)`,
-        }
-      },
-    // @ts-expect-error
-    })(({ classes }) => (
-      <div
-        className={classes.root}
-      ></div>
-    ));
+    const hexColor = `#${intToHex(cyrb53Hash(activeConference, 129))}`;
 
-    const ConferenceTile2 = withStyles({
-      root: {
-        width: 32,
-        height: 32,
-        backgroundImage: `url(${API_BASE + "static/maps/tilesets/conference-tile.png"})`,
-        opacity: 0,
-        position: 'absolute',
-        bottom: 50,
-        right: 50,
-        transform: "scale(2.5)",
-        boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-        backgroundRepeat: "no-repeat",
-      },
-      copy: {
-        width: 32,
-        height: 32,
-        transform: "scale(2.5)",
-        position: 'absolute',
-        bottom: 50,
-        right: 50,
-        background: `rgba(${Object.values(hexToRGB(intToHex(cyrb53Hash(`C${conferenceId}`, 129)))).join(',')},0.5)`,
-      }
-    // @ts-expect-error
-    })(({ classes }) => (
-      <>
-      <div
-        className={classes.root}
-      ></div>
-      <div
-        className={classes.copy}
-      ></div>
-      </>
-    ));
+    const conferenceTileStyles = {
+      width: 32,
+      height: 32,
+      transform: "scale(2.5)",
+      backgroundColor: `rgba(${Object.values(hexToRGB(hexColor)).join(',')},0.5)`,
+      borderColor: `1px solid ${hexColor}`,
+      margin: "40px auto",
+      boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+      backgroundRepeat: "no-repeat",
+    };
 
     return (
-      <> 
-        <ConferenceTile />
-        <ConferenceTile2 />
+      <>
+        <div
+          id={`tile-${activeConference}`}
+          style={conferenceTileStyles}
+        ></div>
 
         <hr />
 
-        <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
-          <InputLabel htmlFor="input-conference">Conference ID:</InputLabel>
-          <Input
-            type="number"
-            value={conferenceId}
-            onChange={this.handleChange}
-            inputProps={{
-              id: 'input-conference',
-              min: '0'
-            }}
+        {Object.entries(conferences).map(([id, conference]) => (
+          <ConferenceItem
+            id={id} {...conference}
+            handle={this.handleChange}
+            active={activeConference === id}
           />
-        </FormControl>
+        ))}
+
+        <AddIcon />
+
       </>
     );
   }
