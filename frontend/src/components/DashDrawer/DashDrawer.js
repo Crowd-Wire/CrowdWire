@@ -110,7 +110,7 @@ export default function DashDrawer(props){
       navigation("/dashboard/search/owned");
   }
   const onClickUserSettings = () => {
-    navigation("/user/settings");
+    navigation("/dashboard/user");
   }
   const handleDrawerClose = () => {
     setOpen(false);
