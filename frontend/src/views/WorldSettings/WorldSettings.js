@@ -7,7 +7,7 @@ import WSettingsContent from 'views/WorldSettings/sections/WSettingsContent.js';
 const useStyles = theme => ({
   root: {
     display: 'flex',
-    backgroundColor: '#1C2541',
+    backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',
     height:'100%',width:'100%', overflow:"auto"
   },
 });
