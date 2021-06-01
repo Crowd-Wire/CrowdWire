@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect, useRef } from "react";
+import React, { Component, useState } from "react";
 
 import classNames from "classnames";
 import Input from '@material-ui/core/Input';
@@ -17,7 +17,7 @@ interface ConferenceItemProps {
   id: string;
   name: string;
   color: string;
-  handle: (id: string, name: string) => void;
+  handle: (id: string, name: string, del?: boolean) => void;
   active: boolean;
 }
 
@@ -27,6 +27,7 @@ const useConferenceItemStyles = makeStyles({
     color: 'white',
   },
   root: {
+    padding: '.25rem .75rem',
     display: 'flex',
     "&:hover": {
       backgroundColor: "rgba(11, 19, 43, 0.5)",
@@ -36,13 +37,20 @@ const useConferenceItemStyles = makeStyles({
     }
   },
   text: {
+    // whiteSpace: 'nowrap',
     fontSize: '1rem',
-    "word-break": "break-all",
     fontWeight: 400,
   },
   color: {
-    width: 10,
-    height: 10,
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  square: {
+    marginLeft: 'auto',
+    width: 16,
+    height: 16,
+    marginRight: 10,
   }
 })
 
@@ -58,10 +66,16 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' || event.key === 'Escape') {
-      setToggle(true)
-      event.preventDefault()
-      event.stopPropagation()
+      setToggle(true);
+      event.preventDefault();
+      event.stopPropagation();
     }
+  }
+
+  const handleDel = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handle(id, '', true);
   }
 
   return (
@@ -69,19 +83,20 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
       className={classNames(classes.root, { [classes.activeRoot]: active })}
       onClick={() => handle(id, name)}
     >
-      <div style={{ flexGrow: 1 }}>
+      <div>
         {
           toggle ? (
-            <p
+            <span
               className={classes.text}
               onDoubleClick={() => setToggle(false)}
-            >{name}</p>
+            >{name}</span>
           ) : (
             <Input
               autoFocus
+              inputProps={{ "maxlength": 30 }}
               type="text"
               value={name}
-              style={{color: 'white'}}
+              style={{ color: 'white' }}
               onChange={handleChange}
               onBlur={() => setToggle(true)}
               onKeyDown={handleKeyDown}
@@ -89,10 +104,16 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
           )
         }
       </div>
-      <div
-        className={classes.color}
-        style={{ backgroundColor: color }}
-      ></div>
+      <div className={classes.color}>
+        <div
+          className={classes.square}
+          style={{ backgroundColor: color }}
+        ></div>
+        <RemoveIcon
+          onClick={handleDel}
+          style={{ cursor: 'pointer' }}
+        />
+      </div>
     </div>
   );
 }
@@ -109,7 +130,7 @@ interface ConferencesTabState {
 
 
 class ConferencesTab extends Component<{}, ConferencesTabState> {
-  static curConference: number;
+  static curConference: number = 0;
 
   subscriptions: any[];
   mapManager: MapManager;
@@ -120,10 +141,10 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
     this.state = {
       activeConference: 'C1',
-      conferences: { 
+      conferences: {
         'C1': { name: 'Conference #1', color: '#ff00ff' },
         'C2': { name: 'Conference #2', color: '#00ffff' },
-        'C3': { name: 'Conference #3', color: '#00ff00' } 
+        'C3': { name: 'Conference #3', color: '#00ff00' }
       },
     }
   }
@@ -143,7 +164,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   addConference = () => {
     this.setState(state => {
       const conferences = state.conferences;
-
+      const id = `C${ConferencesTab.curConference++}`;
+      conferences[id] = {
+        name: `Conference #${id}`,
+        color: `#${intToHex(cyrb53Hash(id, 129))}`
+      }
+      return { conferences };
     });
   }
 
@@ -152,12 +178,22 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     this.forceUpdate();
   }
 
-  handleChange = (id: string, name: string): void => {
-    this.setState(state => {
-      const conferences = state.conferences;
-      conferences[id].name = name;
-      return { conferences, activeConference: id };
-    })
+  handleChange = (id: string, name: string, del?: boolean): void => {
+    if (del)
+      this.setState(state => {
+        const conferences = state.conferences;
+        let activeConference = state.activeConference;
+        delete conferences[id];
+        if (id === activeConference)
+          activeConference = null;
+        return { conferences, activeConference };
+      })
+    else
+      this.setState(state => {
+        const conferences = state.conferences;
+        conferences[id].name = name;
+        return { conferences, activeConference: id };
+      })
     // const value = event.target.value;
     // this.setState({ activeConference: value });
     // useWorldEditorStore.getState().setState({ activeConference: value });
@@ -165,18 +201,17 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   render() {
     const { activeConference, conferences } = this.state;
+    const color = conferences[activeConference]?.color;
 
-    const hexColor = `#${intToHex(cyrb53Hash(activeConference, 129))}`;
-
-    const conferenceTileStyles = {
+    const conferenceTileStyles = color && {
+      display: '',
       width: 32,
       height: 32,
       transform: "scale(2.5)",
-      backgroundColor: `rgba(${Object.values(hexToRGB(hexColor)).join(',')},0.5)`,
-      borderColor: `1px solid ${hexColor}`,
+      backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.5)`,
+      borderColor: `1px solid ${color}`,
       margin: "40px auto",
       boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-      backgroundRepeat: "no-repeat",
     };
 
     return (
@@ -186,17 +221,19 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
           style={conferenceTileStyles}
         ></div>
 
-        <hr />
-
-        {Object.entries(conferences).map(([id, conference]) => (
+        {Object.entries(conferences).map(([id, conference], index) => (
           <ConferenceItem
+            key={index}
             id={id} {...conference}
             handle={this.handleChange}
             active={activeConference === id}
           />
         ))}
 
-        <AddIcon />
+        <AddIcon
+          onClick={this.addConference}
+          style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
+        />
 
       </>
     );
