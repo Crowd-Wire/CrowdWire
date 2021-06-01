@@ -145,8 +145,6 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         if world_user_data.avatar is None:
             delattr(world_user_data, 'avatar')
 
-        logger.debug(world_user_data)
-        logger.debug(world_user_obj)
         # no need to return error
         world_user = self.update(
             db=db,
