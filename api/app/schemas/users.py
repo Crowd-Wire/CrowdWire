@@ -50,7 +50,7 @@ class UserInDB(BaseModel):
     register_date: datetime.datetime
     name: str
     email: str
-    birth: Optional[datetime.datetime]
+    birth: Optional[datetime.date]
     status: int
 
     class Config:

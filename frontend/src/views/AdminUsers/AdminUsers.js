@@ -9,6 +9,76 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Button } from 'react-bootstrap';
+import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from '@material-ui/core/Avatar';
+import Typography from '@material-ui/core/Typography';
+import { useNavigate } from "react-router-dom";
+const useStyles2 = makeStyles((theme) => ({
+  root: {
+    width: '90%',
+    marginLeft:"auto",
+    marginRight:"auto",
+    backgroundColor: theme.palette.background.paper,
+    borderRadius:"15px",
+    webkitBoxShadow: "0px 10px 13px -7px #000000, 5px 5px 5px 5px rgba(148,148,148,0)", 
+    boxShadow: "0px 10px 13px -7px #000000, 5px 5px 5px 5px rgba(148,148,148,0)",
+  },
+  item:{
+    '&:hover': {
+      backgroundColor: "#ddd",
+      cursor:"pointer"
+    },
+  },
+  circle:{
+    marginLeft:"10px",
+    marginRight:"10px",
+    marginTop:"auto",
+    marginBottom:"auto",
+    height: "10px",
+    width: "10px",
+    borderRadius: "50%",
+    display: "inline-block",
+  },
+  inline: {
+    display: 'inline',
+  },
+}));
+
+const UserStatus = ({ status }) => {
+    const classes2 = useStyles2();
+    if(status===0)
+        return (
+            <>
+                <span className={classes2.circle} style={{ backgroundColor: "#11f511" }}></span>
+                <Typography variant="caption">Active</Typography>
+            </>
+        );
+    if(status===1)
+        return (
+            <>
+                <span className={classes2.circle} style={{ backgroundColor: "#f51137" }}></span>
+                <Typography variant="caption">Banned</Typography>
+            </>
+        );
+    if(status===2)
+        return (
+            <>
+                <span className={classes2.circle} style={{ backgroundColor: "#000" }}></span>
+                <Typography variant="caption">Deleted</Typography>
+            </>
+        );
+    if(status===3)
+        return (
+            <>
+                <span className={classes2.circle} style={{ backgroundColor: "#aedff2" }}></span>
+                <Typography variant="caption">Pending</Typography>
+            </>
+        );
+  };
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -22,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AdminUsers() {
     const classes = useStyles();
-
+    const classes2 = useStyles2();
     const [email, setEmail] = React.useState("");
     const [banned, setBanned] = React.useState(false);
     const [normal, setNormal] = React.useState(true);
@@ -31,6 +101,7 @@ export default function AdminUsers() {
     const [page, setPage] = React.useState(1);
   
     const [users, setUsers] = React.useState([]);
+    const navigation = useNavigate();
 
     React.useEffect(() => {
         UserService.search("", true, false, null, null, 1, 10)
@@ -39,7 +110,6 @@ export default function AdminUsers() {
         })
         .then((res) =>{
             // TODO: handle errors
-            console.log(res);
             setUsers(res);
         })
 
@@ -126,16 +196,46 @@ export default function AdminUsers() {
                 </Select>
             </FormControl>
 
-            <Button id="search" onClick={handleSearch} >Search</Button>
+            <Button id="search" onClick={handleSearch}>Search</Button>
 
             {users && users.length !== 0 ?
             <div>
+                <List className={classes2.root}>
                 {users.map((u, i) => {
                     // TODO: create card?? table?? 
+                    console.log(u)
                     return(
-                        <h1>{u.email}</h1>
+                        <>
+                            <ListItem alignItems="flex-start" onClick={()=>navigation(""+u.user_id)} className={classes2.item}>
+                                <ListItemAvatar>
+                                <Avatar alt={u.name} src="/static/images/avatar/1.jpg" />
+                                </ListItemAvatar>
+                                <ListItemText
+                                primary={
+                                <React.Fragment>
+                                    {u.name}
+                                    <UserStatus status={u.status}/>
+                                </React.Fragment>}
+                                secondary={
+                                    <React.Fragment>
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        className={classes2.inline}
+                                        color="textPrimary"
+                                    >
+                                        {u.email}
+                                    </Typography>
+                                    {"\t"+u.register_date}
+                                    </React.Fragment>
+                                }
+                                />
+                            </ListItem>
+                            <Divider variant="inset" component="li" />
+                        </> 
                     )
                 })}
+                </List>
             </div>
             : <h1>Loading</h1>}
         </div>

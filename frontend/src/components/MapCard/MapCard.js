@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 const useStyles = makeStyles((theme) => ({
     root: {
         maxWidth: 345,
+        minWidth: 250,
         marginLeft: "auto",
         marginRight: "auto",
         marginBottom: "30px",
@@ -44,7 +45,7 @@ export default function MapCard(props){
     const classes = useStyles();
     return(
         <>
-            <Col xs={12} sm={6} md={4}>
+            <Col xs={12} sm={6} md={4} >
                 <Card className={classes.root}>
                     <CardActionArea onClick={routeChange}>
                         <CardMedia

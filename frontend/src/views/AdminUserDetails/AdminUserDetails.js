@@ -1,39 +1,69 @@
 import React from 'react';
-import { Box, Grid, Container, Card, CardContent, Divider, CardHeader, TextField } from '@material-ui/core';
+import { Box, Grid, Container, Card, CardContent, Divider, CardHeader, Typography } from '@material-ui/core';
 import UserService from 'services/UserService';
 import ReportService from 'services/ReportService';
 import WorldService from 'services/WorldService';
 import MapCard from 'components/MapCard/MapCard.js';
+import UserReportCard from 'components/UserReportCard/UserReportCard.js';
+import { makeStyles } from '@material-ui/core/styles';
+import Col from 'react-bootstrap/Col';
+const useStyles = makeStyles((theme) => ({
+    paper: {
+      padding: theme.spacing(2),
+    },
+  }));
 
 export default function AdminUserDetails() {
 
 
     const [user, setUser] = React.useState(null);
     const [worlds, setWorlds] = React.useState([]);
-
+    const [reports, setReports] = React.useState(null);
+    const classes = useStyles();
     React.useEffect(() => {
-        UserService.getUserDetails(1)
-            .then((res) => {
-                return res.json();
-            })
-            .then((res) => {
-                // TODO: handle errors
-                console.log(res);
-                setUser(res);
-            })
-            .then(() => {
-                WorldService.searchAdmin("", [], true, true, true, 1 , null, null, 1, 3)
+        console.log(window.location.pathname)
+        if(window.location.pathname.split("/").length===4){
+            UserService.getUserDetails(window.location.pathname.split("/")[3])
                 .then((res) => {
                     return res.json();
                 })
                 .then((res) => {
                     // TODO: handle errors
-                    console.log(res);
-                    setWorlds(res);
+                    setUser(res);
                 })
+                .then(() => {
+                    WorldService.searchAdmin("", [], true, true, true, 1 , null, null, 1, 3)
+                    .then((res) => {
+                        if(res.status!==200)
+                            return null;
+                        return res.json();
+                    })
+                    .then((res) => {
+                        // TODO: handle errors
+                        setWorlds(res);
+                    })
+                })
+            UserService.getUserReports(null, null, window.location.pathname.split("/")[3], null, null, null, 1, 10)
+            .then((res)=>{
+                if(res.status !== 200)
+                    return null;
+                return res.json();
             })
+            .then((res)=>{
+                console.log(res)
+                if(res===null || res.length===0){
+                    setReports(<Typography variant="body1"><em>No reports to be reviewed</em></Typography>)
+                    return;
+                }
+                setReports(res.map((r,i) => {
+                    return(
+                        <UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id + '_' + r.reviewed} report={r} />
+                    )
+                }));
+            });
+        }
 
-    }, []);
+        }, []);
 
     return (
         <>
@@ -42,7 +72,7 @@ export default function AdminUserDetails() {
                     <Box sx={{ backgroundColor: 'background.default', minHeight: '100%', py: 3 }}>
                         <Container maxWidth="lg">
                             <Grid container>
-                                <Grid item lg={8} md={12} xs={12}>
+                                <Grid item lg={10} md={12} xs={12}>
                                     <Card>
                                         <CardHeader title="User Details" />
                                         <Divider />
@@ -72,21 +102,27 @@ export default function AdminUserDetails() {
                                         <Divider />
                                     </Card>
                                 </Grid>
-                                <Grid className="px-4" item lg={4} md={12} xs={12}>
-                                    <h3>User Reports</h3>
-
-
+                                <Grid className={classes.paper} item lg={5} md={12} xs={12}>
+                                    <Card>
+                                        <CardHeader subheader="User Reports"/>
+                                        <Divider/>
+                                        <CardContent>
+                                            { reports }
+                                        </CardContent>
+                                    </Card>
                                 </Grid>
-                                <Grid className="my-4" item lg={8} md={12} xs={12}>
+                                <Grid className={classes.paper} item lg={5} md={12} xs={12}>
                                     <Card>
                                         <CardHeader subheader="Worlds" />
                                         <Divider />
                                         <CardContent>
-                                            {worlds.map((m,i) => {
-                                                return(
-                                                    <MapCard map={m} key={m.name} />
-                                                )
-                                            })}
+                                            <Col style={{marginLeft:"auto", marginRight:"auto"}}>
+                                                {worlds.map((m,i) => {
+                                                    return(
+                                                        <MapCard map={m} key={m.name} />
+                                                    )
+                                                })}
+                                            </Col>
                                         </CardContent>
                                         <Divider />
                                     </Card>
