@@ -93,7 +93,7 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
           ) : (
             <Input
               autoFocus
-              inputProps={{ "maxlength": 30 }}
+              inputProps={{ maxLength: 30 }}
               type="text"
               value={name}
               style={{ color: 'white' }}
@@ -140,12 +140,8 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     this.subscriptions = [];
 
     this.state = {
-      activeConference: 'C1',
-      conferences: {
-        'C1': { name: 'Conference #1', color: '#ff00ff' },
-        'C2': { name: 'Conference #2', color: '#00ffff' },
-        'C3': { name: 'Conference #3', color: '#00ff00' }
-      },
+      activeConference: null,
+      conferences: {},
     }
   }
 

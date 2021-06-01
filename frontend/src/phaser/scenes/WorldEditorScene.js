@@ -35,7 +35,7 @@ class WorldEditorScene extends Scene {
         // Initialize layers on store
         const layers = {};
         this.map.objects.concat(this.map.layers).forEach((layer) =>
-            layers[layer.name] = { visible: true, blocked: false, highlighted: false })
+            layers[layer.name] = { visible: true, blocked: false, active: false })
         useWorldEditorStore.getState().addLayers(layers);
 
         // Emit READY to dependent components
@@ -68,7 +68,7 @@ class WorldEditorScene extends Scene {
             in: Phaser.Input.Keyboard.KeyCodes.Q,
             out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
-        
+
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // this.physics.world.bounds.width = this.map.widthInPixels;
@@ -94,13 +94,13 @@ class WorldEditorScene extends Scene {
             if (activeLayer) {
                 // Layer exists
                 activeLayer.setVisible(layer.visible);
-                activeLayer.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+                activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.5);
             } else if (name === 'Object') {
                 this.group.setVisible(layer.visible);
-                this.group.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+                this.group.setAlpha(layer.active || !highlight ? 1 : 0.5);
             } else if (name === 'ObjectCollision') {
                 this.collisionGroup.setVisible(layer.visible);
-                this.collisionGroup.setAlpha(layer.highlighted || !highlight ? 1 : 0.5);
+                this.collisionGroup.setAlpha(layer.active || !highlight ? 1 : 0.5);
             }
         })
     }

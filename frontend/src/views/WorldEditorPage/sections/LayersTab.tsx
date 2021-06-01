@@ -49,7 +49,7 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
   const classes = useLayerStyles();
   let visible = useWorldEditorStore(state => state.layers[name].visible);
   let blocked = useWorldEditorStore(state => state.layers[name].blocked);
-  
+
   const handleVisible = (event) => {
     event.stopPropagation();
     useWorldEditorStore.setState(state => {
@@ -136,11 +136,11 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
 
 interface LayersTabState {
   activeLayers: Set<string>;
+  map: any;
 }
 
 class LayersTab extends Component<{}, LayersTabState> {
   subscriptions: any;
-  mapManager: MapManager;
 
   constructor(props) {
     super(props);
@@ -148,6 +148,7 @@ class LayersTab extends Component<{}, LayersTabState> {
 
     this.state = {
       activeLayers: new Set(),
+      map: {},
     }
   }
 
@@ -157,6 +158,17 @@ class LayersTab extends Component<{}, LayersTabState> {
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
+
+    this.subscriptions.push(useWorldEditorStore.subscribe(
+      this.handleReady, state => state.layers));
+
+    this.setState({
+      activeLayers: new Set(
+        Object.entries(useWorldEditorStore.getState().layers)
+          .filter(([_, l]) => l.active)
+          .map(([name, _]) => name) as string[]
+      )
+    })
   }
 
   componentWillUnmount() {
@@ -164,46 +176,43 @@ class LayersTab extends Component<{}, LayersTabState> {
   }
 
   handleReady = () => {
-    this.mapManager = new MapManager();
-    this.forceUpdate()
+    this.setState({ map: new MapManager().map });
   }
 
   handleActiveLayer = (event, activeLayer) => {
     event.stopPropagation();
     useWorldEditorStore.getState().setState({ activeLayer });
-    
+
     if (event.ctrlKey) {
-      this.setState(state => {
-        const activeLayers = state.activeLayers;
-        if (activeLayers.has(activeLayer)) {
-          activeLayers.delete(activeLayer);
-          useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: false });
-        }
-        else {
-          activeLayers.add(activeLayer);
-          useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
-        }
-        return { activeLayers };
-      });
+      const activeLayers = this.state.activeLayers;
+      if (activeLayers.has(activeLayer)) {
+        activeLayers.delete(activeLayer);
+        useWorldEditorStore.getState().setLayer(activeLayer, { active: false });
+      }
+      else {
+        activeLayers.add(activeLayer);
+        useWorldEditorStore.getState().setLayer(activeLayer, { active: true });
+      }
+      this.setState({ activeLayers });
     } else {
-      useWorldEditorStore.getState().setLayers({ highlighted: false });
-      useWorldEditorStore.getState().setLayer(activeLayer, { highlighted: true });
+      useWorldEditorStore.getState().setLayers({ active: false });
+      useWorldEditorStore.getState().setLayer(activeLayer, { active: true });
 
       this.setState({ activeLayers: new Set([activeLayer]) });
     }
   }
 
   render() {
-    const { activeLayers } = this.state;
+    const { activeLayers, map } = this.state;
 
     return (
-      <div 
-        style={{ display: 'flex', flexDirection: 'column', height: '100%' }} 
+      <div
+        style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         onClick={(e) => this.handleActiveLayer(e, null)}
       >
         <LayerGroup name="Collision Layers" info="Every tile and object on these layers is collidable">
           {
-            this.mapManager && this.mapManager.map.objects.map((layer, index) => {
+            map.objects?.map((layer, index) => {
               if (layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
@@ -214,7 +223,7 @@ class LayersTab extends Component<{}, LayersTabState> {
             }).reverse()
           }
           {
-            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+            map.layers?.map((layer, index) => {
               if (layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
@@ -227,7 +236,7 @@ class LayersTab extends Component<{}, LayersTabState> {
         </LayerGroup>
         <LayerGroup name="Ground Layers" info="These layers are non collidable">
           {
-            this.mapManager && this.mapManager.map.objects.map((layer, index) => {
+            map.objects?.map((layer, index) => {
               if (!layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
@@ -238,7 +247,7 @@ class LayersTab extends Component<{}, LayersTabState> {
             }).reverse()
           }
           {
-            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+            map.layers?.map((layer, index) => {
               if (layer.name.includes("Ground")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
@@ -251,7 +260,7 @@ class LayersTab extends Component<{}, LayersTabState> {
         </LayerGroup>
         <LayerGroup name="Conference Layer" info="This layer is only meant for creating conference areas">
           {
-            this.mapManager && this.mapManager.map.layers.map((layer, index) => {
+            map.layers?.map((layer, index) => {
               if (layer.name === "Room") {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
