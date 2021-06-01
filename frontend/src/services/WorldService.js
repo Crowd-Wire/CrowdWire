@@ -251,6 +251,27 @@ class WorldService {
             body: JSON.stringify({status: status})
         })
     }
+    
+   getUserWorld(world_id, user_id) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+        })
+    }
+
+    updateWorldUser(world_id, user_id, avatar, username) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({username: username, avatar: avatar})
+        })
+    }
 
 }
 

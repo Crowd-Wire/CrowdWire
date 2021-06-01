@@ -19,6 +19,9 @@ import Container from '@material-ui/core/Container';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import Select from '@material-ui/core/Select';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import IconButton from '@material-ui/core/IconButton';
+import { createBrowserHistory } from 'history';
 
 
 
@@ -31,8 +34,10 @@ class DashboardContent extends Component{
 			navigate: false,
 			editing: false,
 			tags: [],
-			chosenTags: []
+			chosenTags: [],
+			goToWorld: null
 		}
+		this.history = createBrowserHistory();
 	}
     cardTextStyles = {
 		marginLeft:"5%",
@@ -52,13 +57,19 @@ class DashboardContent extends Component{
 		backgroundColor: 'transparent',
 		border: 0,
 	};
-
+	
 	toggleEditing() {
 		this.setState({editing: !this.state.editing});
 	}
 
 	navigate(){
 		this.setState({navigate:true});
+	}
+
+	enterMap = () => {
+		const url = window.location.pathname;
+		let path = `/world/`+url[url.length - 1];
+		this.setState({goToWorld: path})
 	}
 
 	componentDidMount(){
@@ -197,16 +208,38 @@ class DashboardContent extends Component{
 		let x = this.state.worldInfo.creation_date.split("T");
 		return x[0];
 	}
-	render(){
+
+	goBack = () => {
+		this.history.back();
+	} 
+
+	  render(){
 		if(!this.state.worldInfo){
 			return(<div></div>);
 		}
 		else if(this.state.navigate)
 			return(<Navigate to="../search/public"></Navigate>);
+		else if (this.state.goToWorld)
+			return(<Navigate to={this.state.goToWorld}></Navigate>);
 		return(
 			<div style={{ padding: '10px', marginLeft:"5%", marginRight:"2%", width:"100%"}}>    
-				<Row style={{ width:"100%", minHeight: 480, height: "50%", marginTop:"5%", minWidth:"450px" }}>
+				<Row style={{height:"80px", marginLeft:"auto", marginRight:"auto"}}>
+					<Col>
+						<Row style={{ height:"100%", marginLeft:"auto", marginRight:"auto"}}>
+							<IconButton style={{border:"white solid 1px",borderRadius:"10px",height:"50px", width:"50px"}} onClick={() => {this.goBack()}}>
+								<ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"white", marginBottom:"auto"}}/>
+							</IconButton>
+						</Row>
+					</Col>
+				</Row>
+				<Row style={{ width:"100%", minHeight: 480, marginTop:"5%", minWidth:"450px" }}>
 					<Col xs={12} sm={12} md={12} lg={7} style={{
+						bottom: 0,
+						overflow: "hidden",
+						display: 'flex',
+						flexDirection: 'column',
+						paddingRight:0,
+						paddingLeft: 0,
 						backgroundSize:"cover",
 						marginBottom: 40,
 						borderRadius:"15px",
@@ -214,16 +247,29 @@ class DashboardContent extends Component{
 						backgroundRepeat:"no-repeat",
 						backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")',
 						}}>
-						<div style={{top: 0, right: 0, width: '100%', textAlign: "right", paddingTop: 8}}>
-							<Button color="primary" round onClick={() => {this.toggleEditing()}}>
-								{ !this.state.editing ?
-									<span style={{fontWeight: 500, fontSize: '0.9rem'}}><EditIcon />Edit</span>
+						<Row style={{paddingTop: 8, width: '100%'}}>
+							<Col xs={6}>
+								{ this.state.editing ?
+									<div style={{top: 0, marginLeft: 30, width: '40%', textAlign: "left", paddingTop: 10}}>
+										<Button color="primary" round >
+											<input type="file" id="world_pic" />
+										</Button>
+									</div>
 								:
-									<span style={{fontWeight: 500, fontSize: '0.9rem'}}><ClearIcon />Cancel</span>
+									''
 								}
-							</Button>
-						</div>
-						<div style={{ paddingTop: 15, position: 'absolute', bottom: 0, left: 0, overflow: 'hidden', borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", minHeight:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
+							</Col>
+							<Col xs={6} style={{textAlign: "right"}}>
+								<Button color="primary" round onClick={() => {this.toggleEditing()}}>
+									{ !this.state.editing ?
+										<span style={{fontWeight: 500, fontSize: '0.9rem'}}><EditIcon />Edit</span>
+									:
+										<span style={{fontWeight: 500, fontSize: '0.9rem'}}><ClearIcon />Cancel</span>
+									}
+								</Button>
+							</Col>
+						</Row>
+						<div style={{ paddingTop: 15, marginTop: 'auto', borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", minHeight:"50%", width:"100%", backgroundColor: "rgba(11, 19, 43, 0.85)"}}>
 							{ this.state.editing ?
 								<>
 									<Row style={{width:"90%", marginRight:"auto", marginLeft:"30px", marginTop:"20px"}}>
@@ -239,12 +285,12 @@ class DashboardContent extends Component{
 											</Typography>
 										</Col>
 										<Col xs={4} sm={4} md={4} style={{textAlign: "right"}}>
-											<label style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
+											<p style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
 												World:{' '}
 												<Select
 													native
 													className="MuiTypography-root MuiTypography-body1"
-													style={{fontWeight: 700, width: 80,color: "white", background: 'transparent', border: 0, marginLeft:"auto", color:"white", marginTop:"10px"}}
+													style={{fontWeight: 700, width: 80,color: "white", background: 'transparent', border: 0, marginLeft:"auto", marginTop:"10px"}}
 													inputProps={{
 														id: 'world_public',
 													}}
@@ -253,13 +299,13 @@ class DashboardContent extends Component{
 													<option value={true}>Public</option>
 													<option value={false}>Private</option>
 												</Select>
-											</label>
-											<label style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
+											</p>
+											<p style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
 												Guests:{' '}
 												<Select
 													native
 													className="MuiTypography-root MuiTypography-body1"
-													style={{fontWeight: 700, width: 80,color: "white", background: 'transparent', border: 0, marginLeft:"auto", color:"white", marginTop:"10px"}}
+													style={{fontWeight: 700, width: 80,color: "white", background: 'transparent', border: 0, marginLeft:"auto", marginTop:"10px"}}
 													inputProps={{
 														id: 'world_allow_guests',
 													}}
@@ -268,8 +314,8 @@ class DashboardContent extends Component{
 													<option value={true}>Allow</option>
 													<option value={false}>Deny</option>
 												</Select>
-											</label>
-											<label style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
+											</p>
+											<p style={{color:"white"}} className="MuiTypography-root MuiTypography-body1"> 
 												Max Online Users:
 												<input
 													id="world_max_online"
@@ -278,7 +324,7 @@ class DashboardContent extends Component{
 													style={{fontWeight: 700, width: 60,color: "white", background: 'transparent', border: 0, marginLeft:"auto", color:"white", marginTop:"10px"}}
 													defaultValue={this.state.worldInfo.max_users}
 												/>
-											</label>
+											</p>
 										</Col>
 									</Row>
 									<Row style={{width:"90%", marginRight:"auto", marginLeft:"30px", marginTop:"20px"}}>
@@ -385,7 +431,7 @@ class DashboardContent extends Component{
 										</Col>
 										<Col sm={4} style={{textAlign: "right"}}>
 											<Button color="success" size="md" round>
-												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
+												<span style={{fontWeight: 600, fontSize: '1rem'}} onClick={() => this.enterMap()}>Enter</span>
 											</Button>
 										</Col>
 									</Row>
