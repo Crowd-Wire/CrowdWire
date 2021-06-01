@@ -26,7 +26,6 @@ class RedisConnector:
         # uncomment this to reset redis everytime
         # self.master = await aioredis.create_connection('redis://localhost/0')
         # await self.master.execute('flushall')
-        # await self.add_users_to_world('1', '20')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -155,7 +154,8 @@ class RedisConnector:
         be a string of the uuid for guests
         """
         for k, v in data.items():
-            await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
+            if v is not None:
+                await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
     async def get_online_users(self, world_id: int) -> int:
         """

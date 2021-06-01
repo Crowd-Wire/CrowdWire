@@ -398,28 +398,19 @@ class TestWorlds(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
         with patch("app.crud.crud_world_users.CRUDWorld_User.update_world_user_info") as db_update:
-            with patch("app.redis.connection.RedisConnector.get_world_user_data") as mock_get:
-                with patch("app.redis.connection.RedisConnector.save_world_user_data") as mock_put:
-                    role = models.Role(role_id=1, world_id=1)
+            db_update.return_value = \
+                World_User(role_id=1, avatar="avatar_1", username="new_username", world_id=1), ""
 
-                    db_update.return_value = World_User(role_id=1, avatar="avatar_1", username="name"), ""
-                    mock_get.return_value = schemas.World_UserWithRoleInDB(
-                        role_id=1, avatar='avatar_1', username='name', role=role, world_id=1
-                    )
-
-                    response = client.put(
-                        "/worlds/1/users/1",
-                        json={
-                            'username': 'new_username'
-                        }
-                    )
-
-                    assert response.status_code == 200
-                    assert response.json()['username'] == "new_username"
-                    assert response.json()['avatar'] == 'avatar_1'
-                    assert db_update.call_count == 1
-                    assert mock_get.call_count == 1
-                    assert mock_put.call_count == 1
+            response = client.put(
+                "/worlds/1/users/1",
+                json={
+                    'username': 'new_username'
+                }
+            )
+            assert response.status_code == 200
+            assert response.json()['username'] == "new_username"
+            assert response.json()['avatar'] == 'avatar_1'
+            assert db_update.call_count == 1
 
     def test_update_world_guest(self):
         """

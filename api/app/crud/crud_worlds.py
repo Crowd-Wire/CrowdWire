@@ -134,6 +134,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             public=obj_in.public,
             creation_date=creation_date,
             update_date=creation_date,
+            profile_image=obj_in.profile_image,
             status=0
         )
 
