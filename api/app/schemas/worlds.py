@@ -1,13 +1,14 @@
 from typing import Optional, List
+from typing_extensions import Annotated
 from datetime import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 
 from .tags import TagInDB
 
 
 class BaseWorld(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: Annotated[Optional[str], Field(max_length=50)] = None
+    description: Annotated[Optional[str], Field(max_length=300)] = None
     max_users: Optional[int] = None
     public: Optional[bool] = True
     creator: Optional[int]
@@ -18,13 +19,14 @@ class BaseWorld(BaseModel):
 
     @validator('max_users')
     def max_users_max_zero(cls, num):
-        if num < 1:
-            raise ValueError('Max_Users should be at least 1')
+        if num < 1 or num > 1000:
+            raise ValueError('Max_Users should be between 1 and 1000')
+
         return num
 
 
 class WorldCreate(BaseWorld):
-    name: str
+    name: Annotated[str, Field(max_length=50)]
     public: bool
     allow_guests: bool
     tags: List[str]
