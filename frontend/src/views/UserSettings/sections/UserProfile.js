@@ -84,7 +84,7 @@ class UserProfile extends React.Component {
     handleRevert = () => {
         document.getElementById("email").value = this.state.email_val
         document.getElementById("name").value = this.state.name_val;
-        // let bdate = document.getElementById("date").value;
+        document.getElementById("date").value = this.state.bdate_val;
     }
     handleSubmit = () => {
         let email = document.getElementById("email").value
