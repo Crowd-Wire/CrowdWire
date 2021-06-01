@@ -81,7 +81,11 @@ class UserProfile extends React.Component {
     }, 700
 
     );
-
+    handleRevert = () => {
+        document.getElementById("email").value = this.state.email_val
+        document.getElementById("name").value = this.state.name_val;
+        document.getElementById("date").value = this.state.bdate_val;
+    }
     handleSubmit = () => {
         let email = document.getElementById("email").value
         let name = document.getElementById("name").value;
@@ -158,7 +162,6 @@ class UserProfile extends React.Component {
                         id="email"
                         formControlProps={{
                             fullWidth: true,
-                           
                         }}
                         inputProps={{
                             type: "email",
@@ -219,6 +222,11 @@ class UserProfile extends React.Component {
                         />
                     </CardBody>
                     <CardFooter className={this.props.classes.cardFooter}>
+                        <Button 
+                        onClick={this.handleRevert}    
+                        >
+                        Revert Changes
+                        </Button>
                         <Button     
                         onClick={this.handleSubmit} 
                         >
