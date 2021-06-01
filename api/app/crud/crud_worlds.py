@@ -1,10 +1,9 @@
 from datetime import datetime
 from typing import Optional, Tuple, Union, Dict, Any, List
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, asc, inspect
+from sqlalchemy import desc, asc
 from app.core import strings
 from app.models import World, User, Tag
 from app.redis import redis_connector
@@ -16,7 +15,6 @@ from app.crud.crud_roles import crud_role
 from loguru import logger
 from app.crud.crud_world_users import crud_world_user
 from app.core import consts
-from app.utils import row2dict
 
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):

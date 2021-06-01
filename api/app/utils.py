@@ -29,6 +29,7 @@ def generate_guest_username(user_id: uuid4) -> str:
     sub_uuid = str(user_id.fields[-1])[:8]
     return f'Guest_{sub_uuid}'
 
+
 # TODO: Remove this function usage!
 def row2dict(model) -> dict:
     return {c.name: str(getattr(model, c.name)) for c in model.__table__.columns}
