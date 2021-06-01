@@ -13,6 +13,7 @@ class BaseWorld(BaseModel):
     creator: Optional[int]
     status: Optional[int] = None
     allow_guests: Optional[bool] = True
+    profile_image: Optional[bytes] = None
     tags: Optional[List[str]] = []
 
     @validator('max_users')
