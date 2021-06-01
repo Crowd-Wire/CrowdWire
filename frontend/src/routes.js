@@ -76,7 +76,8 @@ const routes = (token, guest_uuid) => [
 		element: token  ? <DrawerLayout/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashboardContent/>},
-			{path:"/search/:type", element: <SearchAllMaps/>}		
+			{path:"/search/:type", element: <SearchAllMaps/>},
+			{path: "/user", element: <UserSettings /> },
 		]
 	},
     {

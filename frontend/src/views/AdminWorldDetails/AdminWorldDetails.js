@@ -81,7 +81,12 @@ class AdminWorldDetails extends Component {
                                                     <CardContent>
                                                         <CardMedia
                                                             className={classes.media}
-                                                            image="https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
+                                                            image={
+                                                                this.state.world.profile_image === null ? 
+                                                                    "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
+                                                                :
+                                                                    this.state.world.profile_image
+                                                                }
                                                             title="Contemplative Reptile"
                                                         />
                                                         <Typography gutterBottom variant="h4" component="h2" style={{marginTop:"15px"}}>

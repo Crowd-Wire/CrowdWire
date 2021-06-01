@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 
 import { Typography } from "@material-ui/core";
-import CancelIcon from '@material-ui/icons/Cancel';
-import Badge from 'components/Badge/Badge.js';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import DashboardStats from 'views/DashWorldDetails/sections/DashboardStats.js'
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import WorldService from 'services/WorldService.js';
-import useAuthStore from 'stores/useAuthStore.ts';
 import { Navigate } from 'react-router-dom';
 import EditIcon from '@material-ui/icons/Edit';
 import Button from "components/CustomButtons/Button.js";
