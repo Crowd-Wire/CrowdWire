@@ -118,12 +118,12 @@ async def join_world(
             raise HTTPException(status_code=400, detail=msg)
 
         # This allows the same guest to join the same world without losing its data
-        world_user= await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
             # gives the guest the default role for that world
             world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
-            world_user, msg = await redis_connector.join_new_guest_user(world_id=world_id, max_users=world_obj.max_users,
-                                                                   user_id=user.user_id, role=world_default_role)
+            world_user, msg = await redis_connector.join_new_guest_user(
+                world_id=world_id, max_users=world_obj.max_users, user_id=user.user_id, role=world_default_role)
 
             if world_user is None:
                 raise HTTPException(status_code=400, detail=msg)

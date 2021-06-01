@@ -45,7 +45,7 @@ class RedisConnector:
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
 
-    async def incrby(self, key:str, value: int):
+    async def incrby(self, key: str, value: int):
         return await self.master.execute('incrby', key, value)
 
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:

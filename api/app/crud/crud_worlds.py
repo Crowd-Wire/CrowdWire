@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from app.core import strings
 from app.models import World, User, Tag
-from app.redis import redis_connector
 from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate, WorldInDBWithUserPermissions
 from app.crud.base import CRUDBase
