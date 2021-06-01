@@ -1,13 +1,15 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
+
+from typing_extensions import Annotated
 
 
 class ReportWorldBase(BaseModel):
     reporter: Optional[int]
     reported: Optional[int]
     timestamp: Optional[datetime]
-    comment: Optional[str]
+    comment: Annotated[Optional[str], Field(max_length=300)]
 
 
 # does not need the id of the reporter because it is necessary a token
