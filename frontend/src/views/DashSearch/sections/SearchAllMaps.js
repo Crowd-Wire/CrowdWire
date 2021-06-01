@@ -129,7 +129,7 @@ class SearchAllMaps extends Component {
 		const { classes } = this.props;
 		return (
 			<>
-				<Container style={{ overflowX: "hidden" }}>
+				<Container style={{ height: '100%' }}>
 					<Row sm={12} style={{paddingBottom: 60}}>
 						<Col sm={12} style={{textAlign: "center"}}>
 							<IntroText />
@@ -137,21 +137,23 @@ class SearchAllMaps extends Component {
 					</Row>
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
 					<hr />
-					<Row style={{marginTop: 50, marginBottom: 50}}>
-						{this.state.maps!==null && this.state.maps.length!==0 ? 
-						this.state.maps.map((m, i) => {
-							return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
-						})
+					<Row style={{marginTop: 50, textAlign: 'center', width: '100%' }}>
+
+						{ this.state.maps!==null && this.state.maps.length!==0 ? 
+							this.state.maps.map((m, i) => {
+								return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
+							})
 						:
-						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
-					}
+							<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
+						}
+
 					</Row>
 					<hr />
 					{this.state.maps===null || this.state.maps.length===0 ?
 						<></>
 						:
-						<Row style={{marginBottom:"30px"}}>
-							<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
+						<Row style={{paddingBottom:"35px"}}>
+							<Pagination color="primary" onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto", color:"white"}} count={10} />
 						</Row>
 					}
 				</Container>
