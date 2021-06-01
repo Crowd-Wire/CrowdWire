@@ -38,17 +38,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return world_obj, ""
         return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
 
-    async def update_online_users(self, world: World, offset: int):
-        """
-        Verifies the current number of online users in a world, if  not possible to join
-        , due to max number of users, no values are updated.
-        """
-        n_users = await redis_connector.get_online_users(world.world_id)
-        if n_users == world.max_users:
-            return None, strings.MAX_USERS_IN_WORLD
-        await redis_connector.update_online_users(world_id=world.world_id, offset=offset)
-        return world, ""
-
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         world_obj = db.query(World).filter(

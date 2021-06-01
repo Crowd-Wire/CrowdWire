@@ -46,6 +46,7 @@ class WorldInDB(BaseWorld):
     tags: Optional[List[TagInDB]] = []
     creation_date: Optional[datetime] = None
     update_date: Optional[datetime] = None
+    online_users: Optional[int] = 0
 
     class Config:
         orm_mode = True

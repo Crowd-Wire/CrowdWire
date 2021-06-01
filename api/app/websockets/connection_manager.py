@@ -46,6 +46,7 @@ class ConnectionManager:
 
         # save user on redis
         await redis_connector.add_users_to_world(world_id, user_id)
+        await redis_connector.update_online_users(world_id=world_id, offset=1)
 
         logger.info(
             f"Connected User {user_id} to World {world_id}"
