@@ -8,7 +8,7 @@ from .crud_roles import crud_role
 from .base import CRUDBase
 from app.redis.connection import redis_connector
 from app.models import World_User, World, User, Role
-from app.schemas import World_UserCreate, World_UserUpdate, GuestUser
+from app.schemas import World_UserCreate, World_UserUpdate
 from app.utils import choose_avatar
 from app.core import strings
 from sqlalchemy import or_

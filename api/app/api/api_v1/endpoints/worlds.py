@@ -72,7 +72,6 @@ async def join_world_by_link(
 @router.post("/{world_id}/users", response_model=schemas.World_UserWithRoleAndMap)
 async def join_world(
         world_id: int,
-        user_data: schemas.World_UserUpdate,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
@@ -110,7 +109,6 @@ async def join_world(
             delattr(world_user, 'role_id')
             setattr(world_user, 'role', role)
             setattr(world_user, 'map', world_obj.world_map)
-            db.refresh(world_user)
 
         else:
 
@@ -140,15 +138,7 @@ async def join_world(
         # adds the world map to the data from the world_user
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
 
-    update, msg = await crud.crud_world_user.update_world_user_info(
-        db=db, world_id=world_id, request_user=user, user_to_change=user.user_id, is_guest=is_guest_user(user),
-        world_user_data=user_data
-    )
-    # TODO: find better way
-    data = world_user.__dict__
-    data.update({'username': update['username'], 'avatar': update['avatar']})
-
-    return data
+    return world_user
 
 
 @router.put("/{world_id}", response_model=schemas.WorldMapInDB)
