@@ -1,13 +1,14 @@
 from datetime import datetime
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Union
 
+from pydantic import UUID4
 from sqlalchemy.orm import Session
 from loguru import logger
 from .crud_roles import crud_role
 from .base import CRUDBase
 from app.redis.connection import redis_connector
 from app.models import World_User, World, User, Role
-from app.schemas import World_UserCreate, World_UserUpdate
+from app.schemas import World_UserCreate, World_UserUpdate, World_UserInDB
 from app.utils import choose_avatar
 from app.core import strings
 from sqlalchemy import or_
@@ -71,13 +72,65 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         return updated_objs, ""
 
     async def update_world_user_info(
+            self,
+            db: Session,
+            world_id: int,
+            request_user: User,
+            user_to_change: Union[int, UUID4],
+            is_guest: bool,
+            world_user_data: World_UserUpdate
+    ) -> Tuple[Optional[World_UserInDB], str]:
+        """
+        Updates user info in a world. Changes redis for both users and guests and changes db for users.
+        @returns: WorldUserInDB
+        """
+
+        # registered user
+        if not is_guest:
+            world_user, msg = await self.update_world_user_info_db(
+                db=db, world_id=world_id,
+                request_user=request_user,
+                user_to_change=user_to_change,
+                world_user_data=world_user_data
+            )
+            if world_user is None:
+                return None, msg
+
+        # change user info in cache
+        world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_to_change)
+        if not world_user_obj:
+            return None, strings.USER_NOT_IN_WORLD
+
+        # removes the values that were not provided by the user
+        # this makes it easier to update the returning data later on
+        data = {k: v for k, v in dict(world_user_data).items() if v is not None}
+
+        # updates the data present
+        await redis_connector.save_world_user_data(
+            world_id=world_id,
+            user_id=user_to_change,
+            data=data
+        )
+        world_user = {
+            'world_id': world_id,
+            'user_id': user_to_change,
+            'role_id': world_user_obj.role.role_id,
+            'avatar': world_user_obj.avatar,
+            'username': world_user_obj.username
+        }
+        world_user.update(data)
+        return World_UserInDB(**world_user), ""
+
+    async def update_world_user_info_db(
             self, db: Session, world_id: int, request_user: User, user_to_change: int, world_user_data: World_UserUpdate
-    ):
-        logger.info("starting...")
+    ) -> Tuple[Optional[World_UserInDB], str]:
+        """
+        Updates the world_user data in db.
+        @returns: WorldUserInDB
+        """
         # checks if the user has already joined this world
         world_user_obj = self.get_user_joined(db=db, world_id=world_id, user_id=user_to_change)
         if not world_user_obj:
-            logger.debug("here")
             return None, strings.USER_NOT_IN_WORLD
 
         # checks if the user has access to change status if status is given
@@ -109,7 +162,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             db_obj=world_user_obj,
             obj_in=world_user_data
         )
-        return world_user, ""
+        return World_UserInDB(**world_user.__dict__), ""
 
     async def join_world(self, db: Session, _world: World, _user: User) -> Tuple[World_User, Role]:
         """
