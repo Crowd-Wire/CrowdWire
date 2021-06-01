@@ -140,7 +140,6 @@ class RegisterPage extends React.Component {
       .then(
         (res) => {
           console.log(res);
-          if(true)
           this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
       }
     )

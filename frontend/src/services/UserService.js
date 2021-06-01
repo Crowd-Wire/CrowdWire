@@ -71,10 +71,10 @@ class UserService {
             json_body['email'] = email
         if (name)
             json_body['name'] = name
-
-        if (birthdate)
-            json_body['birthdate'] = birthdate
-
+        
+        if(birthdate)
+            json_body['birth'] = birthdate
+        
         return fetch(API_BASE + 'users/' + user_id, {
             method: 'PUT',
             mode: 'cors',
@@ -85,6 +85,26 @@ class UserService {
             body: JSON.stringify(json_body)
         })
 
+    }
+
+    updateUserPassword(old_password, new_password) {
+        let json_body = {};
+        if (old_password){
+            json_body['old_password'] = old_password;
+        }
+
+        if (new_password){
+            json_body['new_password'] = new_password;
+        }
+        return fetch(API_BASE + 'users/password-update/', {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization": "Bearer " + AuthenticationService.getToken(),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(json_body)
+        })
     }
 
 }
