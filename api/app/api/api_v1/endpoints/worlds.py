@@ -283,7 +283,8 @@ def search_world(
             # admins
             list_world_objs, msg = crud.crud_world.filter(
                 db=db, search=search, tags=tags, is_superuser=True, page=page, limit=limit, creator=creator,
-                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
+                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by,
+                requester_id=user.user_id, order=order)
         else:
             # registered users
             list_world_objs, msg = crud.crud_world.filter(
