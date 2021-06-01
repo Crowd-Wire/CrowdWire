@@ -31,6 +31,14 @@ spec:
       - env:
         - name: RUNNING_MODE
           value: {{ .Values.running_mode }}
+        - name: CLIENT_ID
+          value: {{ .Values.CLIENT_ID }}
+        - name: CLIENT_SECRET
+          value: {{ .Values.CLIENT_SECRET }}
+        - name: EMAIL
+          value: {{ .Values.EMAIL }}  
+        - name: EMAIL_PASSWORD
+          value: {{ .Values.EMAIL_PASSWORD }}
     #Check out the changes to the Secrets in the Redis, Postgres Charts!
     #Change this later to a for loop, puting here the values destroys the idea of templating
     {{- if and .Values.postgresql.enabled .Values.rabbitmq.enabled }}

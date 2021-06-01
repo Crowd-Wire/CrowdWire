@@ -37,7 +37,6 @@ podAnnotations: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
-
 securityContext: {}
   # capabilities:
   #   drop:
@@ -51,7 +50,10 @@ service:
   port: 8000
 
 running_mode: 'production'
-  
+CLIENT_ID: '251817047000-upjua2t776rni76i52grnpmbi2ju1i2c.apps.googleusercontent.com'
+CLIENT_SECRET: 'RvgMZwsIrcOZNhTUQfcEYo3-'
+EMAIL: 'crowdwirenoreply@gmail.com'
+EMAIL_PASSWORD: 'xFUe9iAdAMeuUJ8'
 
 
 ingress:

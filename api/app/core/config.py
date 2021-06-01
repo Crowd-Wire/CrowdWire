@@ -56,14 +56,14 @@ class Settings(BaseSettings):
     REDIS_MASTER: str = 'mymaster'
 
     # email
-    EMAIL_USER: Optional[str] = "user@example.com"
-    EMAIL_PASSWORD: Optional[str] = "pass"
-    EMAIL_FROM: Optional[EmailStr] = "user@example.com"
+    EMAIL_USER: Optional[str] = os.getenv('EMAIL', "user@example.com")
+    EMAIL_PASSWORD: Optional[str] = os.getenv('EMAIL_PASSWORD', 'pass')
+    EMAIL_FROM: Optional[EmailStr] = os.getenv('EMAIL', "user@example.com")
     EMAIL_EXPIRE: Optional[int] = 1000  # 1000 min?
 
     # Google Auth
-    CLIENT_ID: str = ""
-    CLIENT_SECRET: str = ""
+    CLIENT_ID: str = os.getenv('CLIENT_ID', '')
+    CLIENT_SECRET: str = os.getenv('CLIENT_SECRET', '')
 
     class Config:
         env_file = ".env"
