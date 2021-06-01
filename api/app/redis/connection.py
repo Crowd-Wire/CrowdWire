@@ -1,5 +1,5 @@
 import pickle
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 
 import aioredis
 from app.core.config import settings
@@ -44,6 +44,9 @@ class RedisConnector:
 
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
+
+    async def incrby(self, key: str, value: int):
+        return await self.master.execute('incrby', key, value)
 
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
@@ -161,35 +164,25 @@ class RedisConnector:
         """
         gets the number of online users in a world
         """
-        key = f"world:{world_id}:onlineusers"
+        key = f"world:{world_id}:online_users"
         value = await self.get(key)
+        return int(value) if value else 0
 
-        if not value or not value.decode().isdecimal():
-            return 0
-        return int(value.decode())
+    async def update_online_users(self, world_id: int, offset: int):
+        key = f"world:{world_id}:online_users"
+        return await self.incrby(key, offset)
 
-    async def update_online_users(self, world_id: int, offset: int) -> int:
-        """
-        updates the number of online users in a world
-        @return: an integer with the number of  updated online users at the moment
-        """
-        key = f"world:{world_id}:onlineusers"
-        # verify is key exists and has is an integer
-        value = await self.get_online_users(world_id)
-        updated_number = value + offset
-        value = str(updated_number)
-        if updated_number < 0:
-            value = "0"
-        await self.set(key=key, value=value)
-        return updated_number
-
-    async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) \
-            -> schemas.World_UserWithRoleInDB:
+    async def join_new_guest_user(self, world_id: int, max_users: int, user_id: uuid4, role: models.Role) \
+            -> Tuple[Optional[schemas.World_UserWithRoleInDB], str]:
         """
         Generates a username for guests and the user the @method save_world_user_data
         to store the user data
         @return : a schema of a World User taking into consideration Redis Stored Values
         """
+
+        online_users = await self.get_online_users(world_id=world_id)
+        if online_users + 1 > max_users:
+            return None, strings.WORLD_IS_FULL
         logger.info(user_id)
         username = generate_guest_username(user_id)
         avatar = choose_avatar()
@@ -204,7 +197,7 @@ class RedisConnector:
             username=username,
             avatar=avatar,
             role=RoleInDB(**role.__dict__)
-        )
+        ), ""
 
     async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) \
             -> Optional[schemas.World_UserWithRoleInDB]:

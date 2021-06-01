@@ -6,7 +6,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from app.core import strings
 from app.models import World, User, Tag
-from app.redis import redis_connector
 from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate, WorldInDBWithUserPermissions
 from app.crud.base import CRUDBase
@@ -37,17 +36,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if not world_obj:
             return world_obj, ""
         return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
-
-    async def update_online_users(self, world: World, offset: int):
-        """
-        Verifies the current number of online users in a world, if  not possible to join
-        , due to max number of users, no values are updated.
-        """
-        n_users = await redis_connector.get_online_users(world.world_id)
-        if n_users == world.max_users:
-            return None, strings.MAX_USERS_IN_WORLD
-        await redis_connector.update_online_users(world_id=world.world_id, offset=offset)
-        return world, ""
 
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
