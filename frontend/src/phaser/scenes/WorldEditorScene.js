@@ -2,6 +2,7 @@ import Phaser, { Scene } from 'phaser';
 
 import MapManager from "../MapManager.ts";
 import useWorldEditorStore, { PaintToolType } from "stores/useWorldEditorStore.ts";
+import { cyrb53Hash, intToHex } from "utils/color.js";
 
 const sceneConfig = {
     active: false,
@@ -106,25 +107,23 @@ class WorldEditorScene extends Scene {
     updateEdit = () => {
         if (!this.paintTool)
             return;
-
-        let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-        // Rounds down to nearest tile
-        let tileX = this.map.worldToTileX(worldPoint['x']);
-        let tileY = this.map.worldToTileY(worldPoint['y']);
-
-        const tile = this.map.getTileAt(tileX, tileY);
-        tile && (tile.tint = '0xff00ff');
-
-        // Snap to tile coordinates, but in world space
-        // this.marker.x = this.map.tileToWorldX(tileX);
-        // this.marker.y = this.map.tileToWorldY(tileY);
-
-
+        
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
             const activeLayerName = useWorldEditorStore.getState().activeLayer;
-            console.log(useWorldEditorStore.getState())
+
+            let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+
+            // Rounds down to nearest tile
+            let tileX = this.map.worldToTileX(worldPoint['x']);
+            let tileY = this.map.worldToTileY(worldPoint['y']);
+            
+            const tile = this.map.getTileAt(tileX, tileY, true, activeLayerName);
+            console.log(tile)
+            const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
+            console.log(color)
+            tile && this.paintTool?.conferenceId && (tile.tint = 0x197cb0);
+
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
@@ -138,21 +137,13 @@ class WorldEditorScene extends Scene {
                         activeLayer.fill(-1, tileX, tileY, 1, 1);
                     }
                     else if (this.paintTool.type === PaintToolType.PICK) {
-                        const tile = activeLayer.getTileAt(tileX, tileY);
+                        const tile = activeLayer.getTileAt(tileX, tileY, false /**bug if true */, activeLayerName);
                         tile && useWorldEditorStore.getState().setPaintTool({ tileId: tile.index })
                     }
                 }
             }
         }
     }
-
-    intToRGB(i) {
-        var c = (i & 0x00FFFFFF)
-            .toString(16)
-            .toUpperCase();
-        return "00000".substring(0, 6 - c.length) + c;
-    }
-
 
     updateCamera = () => {
         let x = this.cameras.main.scrollX,

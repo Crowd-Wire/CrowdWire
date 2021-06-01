@@ -21,6 +21,7 @@ interface Layer {
 export interface PaintTool {
     type?: PaintToolType;
     tileId?: number;
+    conferenceId?: string;
 }
 
 const useWorldEditorStore = create(

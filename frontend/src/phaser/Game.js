@@ -34,7 +34,6 @@ const gameConfig = {
       fps: 60,
     },
   },
-  backgroundColor: '#434366',
 };
 
 const sceneConfig = {
