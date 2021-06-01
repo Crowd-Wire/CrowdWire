@@ -131,7 +131,6 @@ class WorldService {
      * Unrecognized parameters will be ignored and undefined values will be removed by JSON.stringify.
      */
     putWorld(world_id, { wName, accessibility, guests, maxUsers, tag_array, desc, worldMap, world_picture }) {
-
         return fetch(API_BASE + 'worlds/' + world_id, {
             method: 'PUT',
             mode: 'cors',

@@ -53,7 +53,7 @@ class DashboardContent extends Component{
 		}
 		this.history = createBrowserHistory();
 		this.updateWorldInfo = this.updateWorldInfo.bind(this);
-		this.readFile = this.readFile.bind(this);
+		this.uploadFile = this.uploadFile.bind(this);
 	}
     cardTextStyles = {
 		marginLeft:"5%",
@@ -113,7 +113,6 @@ class DashboardContent extends Component{
 					,toast_props);
 					this.navigate();
 				} else {
-					console.log(res)
 					this.setState({worldInfo:res, isCreator: res.is_creator, canManage: res.can_manage})
 					if (res.tags !==undefined) {
 						let chosTags = []
@@ -124,7 +123,7 @@ class DashboardContent extends Component{
 					}
 				}
 			}
-		  }).catch((error) => { useAuthStore.getState().leave() });
+		  }).catch((error) => { this.navigate() });
 		
 		TagService.getAll()
 			.then((res) => {
@@ -137,9 +136,7 @@ class DashboardContent extends Component{
 					res.forEach(tag => arr.push(tag.name)); 
 				this.setState({tags: arr})
 			})
-		
-			console.log((this.state.worldInfo != null && this.state.worldInfo.tags != undefined) ? this.state.worldInfo.tags : [])
-
+	
 	}
 		
 
@@ -194,7 +191,7 @@ class DashboardContent extends Component{
 		const url = window.location.pathname;
 		if (world_picture === undefined && document.getElementById("world_pic").files.item(0)) {
 			let file = document.getElementById("world_pic").files.item(0)
-			this.readFile(file)
+			this.uploadFile(file)
 			return
 		}
 		let wName = document.getElementById("world_name").value;
@@ -203,15 +200,7 @@ class DashboardContent extends Component{
 		let maxUsers =  document.getElementById("world_max_online").value;
 		let tag_array =  this.state.chosenTags;
 		let desc = document.getElementById("world_desc").innerText;
-		console.log({
-			wName,
-			accessibility,
-			guests,
-			maxUsers,
-			tag_array,
-			desc,
-			world_picture
-		})
+
 		WorldService.putWorld(url[url.length - 1],
 			{
 				wName,
@@ -219,7 +208,8 @@ class DashboardContent extends Component{
 				guests,
 				maxUsers,
 				tag_array,
-				desc
+				desc,
+				world_picture
 			}	
 		).then((res) => {
 			return res.json()
@@ -248,15 +238,14 @@ class DashboardContent extends Component{
 		})
 	}
 	
-	readFile(file) {
+	uploadFile(file) {
 		var reader = new FileReader();
 		const scope = this;
 		reader.onload = function() {
 			scope.updateWorldInfo({world_picture: reader.result});
 		}
-		reader.readAsBinaryString(file);
+		reader.readAsDataURL(file);
 	}
-
 
 	date = () => {
 		if(this.state.worldInfo.creation_date===undefined)
@@ -301,7 +290,9 @@ class DashboardContent extends Component{
 						borderRadius:"15px",
 						minHeight: 500,
 						backgroundRepeat:"no-repeat",
-						backgroundImage: 'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")',
+						backgroundImage: this.state.worldInfo.profile_image === null ? 
+							'url("https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg")'
+						: 'url("'+this.state.worldInfo.profile_image+'")',
 						}}>
 						<Row style={{paddingTop: 8, width: '100%'}}>
 							<Col xs={6}>
@@ -400,7 +391,6 @@ class DashboardContent extends Component{
 														style={{width:"100%", marginLeft:"auto",marginRight:"auto"}}
 														multiple
 														value={this.state.chosenTags}
-														onChange={(event, value) => {console.log(value)}}
 														id="tags-standard"
 														options={this.state.tags}
 														getOptionLabel={(option) => option}
