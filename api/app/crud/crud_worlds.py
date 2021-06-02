@@ -208,10 +208,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
         if page < 1:
             return None, strings.INVALID_PAGE_NUMBER
-
         if not tags:
             tags = []
-
         query = db.query(World)
 
         if is_guest:
@@ -242,10 +240,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-        if order == 'desc':
-            ord = desc
-        else:
-            ord = asc
+        ord = desc if order == 'desc' else asc
         # TODO: change this to add more filters, also change the name of this one it is only an example
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
