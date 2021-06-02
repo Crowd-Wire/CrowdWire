@@ -38,15 +38,17 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     }
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
-      this.handleTileChange, state => state.paintTool));
+      this.handleTileChange, state => state.paintTool.tileId));
   }
 
   componentWillUnmount() {
     this.subscriptions.forEach((unsub) => unsub());
   }
 
-  handleTileChange = (paintTool) => {
-    const tileElem: any = document.getElementById(`tile-${paintTool.tileId}`).cloneNode(true);
+  handleTileChange = (tileId, prevTileId) => {
+    if (tileId === prevTileId)
+      return;
+    const tileElem: any = document.getElementById(`tile-${tileId}`).cloneNode(true);
     tileElem.removeAttribute('id');
     tileElem.style["transform"] = "scale(2.5)";
     tileElem.style["display"] = "";

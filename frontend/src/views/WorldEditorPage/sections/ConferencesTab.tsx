@@ -129,10 +129,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   subscriptions: any[];
   mapManager: MapManager;
+  didMount: boolean;
 
   constructor(props) {
     super(props);
     this.subscriptions = [];
+    this.didMount = false;
 
     this.state = {
       activeConference: null,
@@ -154,8 +156,11 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   componentDidUpdate() {
     const activeConference = this.state.activeConference;
-    if (activeConference)
+    if (this.didMount) {
       useWorldEditorStore.getState().setPaintTool({ tileId: activeConference });
+    } else {
+      this.didMount = true;
+    }
   }
 
   componentWillUnmount() {

@@ -89,9 +89,9 @@ class TilesTab extends Component<{}, TilesTabState> {
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
           {
             this.mapManager && this.mapManager.map.tilesets.map((tileset) => {
-              if (tileset.total != 0) {
+              if (tileset.total != 0 && !tileset.name.startsWith('_')) {
+                // Not an object and not private
                 const tiles = [];
-                // not an object
 
                 const tilesetURL = this.mapManager.tilesetURL[tileset.name];
                 const { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
