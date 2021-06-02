@@ -134,12 +134,13 @@ class WorldEditorScene extends Scene {
         });
     }
 
-    handleConferencesChange = (prevConferences, conferences) => {
+    handleConferencesChange = (conferences, prevConferences) => {
         console.log(prevConferences, conferences)
         if (conferences.length > prevConferences.length) {
             // add conference
             for (const cid of conferences) {
                 if (prevConferences.indexOf(cid) < 0) {
+                    console.log('ADD')
                     this.mapManager.addConference(cid);
                     break;
                 }
@@ -150,7 +151,9 @@ class WorldEditorScene extends Scene {
             // del conference
             for (const cid of prevConferences) {
                 if (conferences.indexOf(cid) < 0) {
-                    this.mapManager.addConference(cid);
+                    console.log('DEL')
+
+                    this.mapManager.removeConference(cid);
                     break;
                 }
             }
