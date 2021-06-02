@@ -46,7 +46,13 @@ class GameScene extends Phaser.Scene {
         this.collisionGroup = mapManager.buildObjects(this);
 
         // main player
-        this.player = new Player(this, 50, 50);
+        let last_pos = useWorldUserStore.getState().world_user.last_pos;
+        if (last_pos){
+            this.player = new Player(this, last_pos.x, last_pos.y);
+        } else {
+            this.player = new Player(this, 50, 50);
+        }
+
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -64,7 +70,11 @@ class GameScene extends Phaser.Scene {
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
-        this.ws.joinPlayer({x: 50, y: 50});
+        if (last_pos){
+            this.ws.joinPlayer({x: last_pos.x, y: last_pos.y});
+        } else {
+            this.ws.joinPlayer({x: 50, y: 50});
+        }
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)

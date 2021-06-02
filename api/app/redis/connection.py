@@ -196,6 +196,7 @@ class RedisConnector:
             user_id=user_id,
             username=username,
             avatar=avatar,
+            last_pos=[],
             role=RoleInDB(**role.__dict__)
         ), ""
 
@@ -213,7 +214,7 @@ class RedisConnector:
         role = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'role'
         )
-
+        last_pos = await self.get_user_position(world_id, user_id)
         if username and avatar and role:
             data = {
                 'username': pickle.loads(username),
@@ -224,6 +225,7 @@ class RedisConnector:
                 world_id=world_id,
                 user_id=user_id,
                 avatar=data['avatar'],
+                last_pos=last_pos,
                 username=data['username'],
                 role=schemas.RoleInDB(**data['role'])
             )
