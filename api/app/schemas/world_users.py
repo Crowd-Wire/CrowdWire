@@ -70,7 +70,7 @@ class World_UserWithRoleInDB(World_UserInDBBase):
     avatar: Annotated[Optional[str], Field(max_length=50)] = None
     username: Annotated[Optional[str], Field(max_length=50)] = None
     role: RoleInDB
-    last_pos: Optional[Dict[str, float]] = []
+    last_pos: Optional[Dict[str, float]] = {}
 
 
 class World_UserWithRoleAndMap(World_UserWithRoleInDB):

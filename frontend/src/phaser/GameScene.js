@@ -421,13 +421,17 @@ class RemotePlayer extends Player {
         ]);
 
         this.unsubscribe = usePlayerStore.subscribe(
-            this.updateMovement, state => state.players[this.id]);
+            this.updateMovement, state => state.players);
     }
 
-    updateMovement = ({ position, velocity }) => {
-        this.updateAnimation(velocity);
-        this.body.reset(position.x, position.y);
-        this.body.setVelocity(velocity.x, velocity.y);
+    updateMovement = (players) => {
+        if (players && players[this.id]) {
+            let position = players[this.id].position;
+            let velocity = players[this.id].velocity;
+            this.updateAnimation(velocity);
+            this.body.reset(position.x, position.y);
+            this.body.setVelocity(velocity.x, velocity.y);
+        }
     }
 
     /**
