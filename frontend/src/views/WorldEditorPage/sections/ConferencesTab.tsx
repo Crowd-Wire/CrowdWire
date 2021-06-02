@@ -148,6 +148,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
         this.handleReady, state => state.ready));
     
     const { conferences, activeConference } = useWorldEditorStore.getState();
+    ConferencesTab.curConference = Object.keys(conferences).length;
     this.setState({ conferences, activeConference });
   }
 
@@ -162,15 +163,14 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   }
 
   addConference = () => {
-    this.setState(state => {
-      const conferences = state.conferences;
-      const id = `C${ConferencesTab.curConference++}`;
-      conferences[id] = {
-        name: `Conference #${id}`,
-        color: `#${intToHex(cyrb53Hash(id, 129))}`
-      }
-      return { conferences };
-    });
+    const conferences = this.state.conferences;
+    const id = `C${ConferencesTab.curConference++}`;
+    conferences[id] = {
+      name: `Conference #${id}`,
+      color: `#${intToHex(cyrb53Hash(id, 129))}`
+    }
+    this.setState({conferences});
+    useWorldEditorStore.getState().setState({ conferences });
   }
 
   handleReady = () => {

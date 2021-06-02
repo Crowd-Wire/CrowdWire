@@ -20,16 +20,16 @@ class WorldEditorScene extends Scene {
     }
 
     create() {
-        const mapManager = new MapManager();
+        this.mapManager = new MapManager();
 
-        this.map = mapManager.buildMap(this);
+        this.map = this.mapManager.buildMap(this);
 
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Float"))
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        const { group, collisionGroup } = mapManager.buildObjects(this);
+        const { group, collisionGroup } = this.mapManager.buildObjects(this);
         Object.assign(this, { group, collisionGroup });
 
         // Initialize layers on store
@@ -74,8 +74,8 @@ class WorldEditorScene extends Scene {
         //     newTileset
         // )
         // this.map.getLayer('Room').tilemapLayer.tileset.push(newTileset);
-
-        mapManager.addConference('C0');
+        /*
+        this.mapManager.addConference('C0');
 
         this.map.getLayer('Room').tilemapLayer.fill(100000, 1, 1, 1, 1);
         const v = this.map.getTileAt(1, 1, false, 'Room');
@@ -85,7 +85,7 @@ class WorldEditorScene extends Scene {
         
         const w = this.map.getTileAt(14, 5, false, 'Room');
         w && (w.tint = 0x00ff00);
-        console.log(w);
+        console.log(w);*/
 
         const width = this.map.widthInPixels,
             height = this.map.heightInPixels,
@@ -136,27 +136,26 @@ class WorldEditorScene extends Scene {
 
     handleConferencesChange = (prevConferences, conferences) => {
         console.log(prevConferences, conferences)
-        const storeConferences = useWorldEditorStore.getState().conferences;
+        if (conferences.length > prevConferences.length) {
+            // add conference
+            for (const cid of conferences) {
+                if (prevConferences.indexOf(cid) < 0) {
+                    this.mapManager.addConference(cid);
+                    break;
+                }
+            }
+            console.log(this.map)
 
-        // if (conferences.length > prevConferences.length) {
-        //     // add conference
-        //     for (const cid of conferences) {
-        //         if (!(id in this.remotePlayers)) {
-        //             const position = usePlayerStore.getState().players[id].position;
-        //             this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
-        //         }
-        //     }
-        // } else {
-        //     // del conference
-        //     for (const id of prevPlayers) {
-        //         if (!(id in storePlayers)) {
-        //             if (this.remotePlayers[id]) {
-        //                 this.remotePlayers[id].disconnect();
-        //                 delete this.remotePlayers[id];
-        //             }
-        //         }
-        //     }
-        // }
+        } else if (conferences.length < prevConferences.length) {
+            // del conference
+            for (const cid of prevConferences) {
+                if (conferences.indexOf(cid) < 0) {
+                    this.mapManager.addConference(cid);
+                    break;
+                }
+            }
+            console.log(this.map)
+        }
     }
 
     handleLayersChange = ([layers, highlight]) => {
@@ -193,11 +192,11 @@ class WorldEditorScene extends Scene {
             let tileX = this.map.worldToTileX(worldPoint['x']);
             let tileY = this.map.worldToTileY(worldPoint['y']);
             
-            const tile = this.map.getTileAt(tileX, tileY, true, activeLayerName);
-            // console.log(tile)
-            // const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
-            // console.log(color)
-            tile && this.paintTool?.conferenceId && (tile.tint = 0x197cb0);
+            // const tile = this.map.getTileAt(tileX, tileY, true, activeLayerName);
+            // // console.log(tile)
+            // // const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
+            // // console.log(color)
+            // tile && this.paintTool?.conferenceId && (tile.tint = 0x197cb0);
 
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
@@ -206,7 +205,20 @@ class WorldEditorScene extends Scene {
                 if (activeLayer) {
                     // Layer exists
                     if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
-                        activeLayer.fill(this.paintTool.tileId, tileX, tileY, 1, 1);
+                        let tileId = this.paintTool.tileId;
+                        console.log(tileId)
+                        if (tileId[0] === 'C') {
+                            const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
+                            console.log(tint);
+                            tileId = this.mapManager.getConferenceId(tileId);
+                            activeLayer.fill(tileId, tileX, tileY, 1, 1);
+                            const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
+                            console.log(tint)
+                            tile.tint = tint;
+                            console.log(tile)
+                        } else {
+                            activeLayer.fill(tileId, tileX, tileY, 1, 1);
+                        }
                     }
                     else if (this.paintTool.type === PaintToolType.ERASE) {
                         activeLayer.fill(-1, tileX, tileY, 1, 1);

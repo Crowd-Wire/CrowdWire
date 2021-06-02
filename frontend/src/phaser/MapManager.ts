@@ -131,7 +131,7 @@ class MapManager {
         // Create tileset
         const id: number = parseInt(cid.substr(1), 10);
         const newTileset = new Tilemaps.Tileset(`__conference${cid}`, 100000 + id, 32, 32, 0, 0);
-        newTileset.setImage(this.map.scene.textures.get('util-tiles'))
+        newTileset.setImage(this.map.scene.textures.get('conference-tile'))
 
         // Add tileset to map
         this.map.tilesets.push(newTileset);
@@ -139,6 +139,14 @@ class MapManager {
         // Add tileset to conference layer
         const tilesets = this.map.getLayer('Room').tilemapLayer.tileset.concat(newTileset);
         (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(tilesets);
+    }
+
+    getConferenceId(cid: string): number {
+        for (const tileset of this.map.getLayer('Room').tilemapLayer.tileset) {
+            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+                return tileset.firstgid;
+            }
+        }
     }
 
     removeConference(cid: string): void {
