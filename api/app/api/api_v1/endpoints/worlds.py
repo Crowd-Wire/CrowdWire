@@ -42,7 +42,7 @@ async def join_world_by_link(
         result=Depends(deps.get_current_user_for_invite)
 ):
     user, world_obj = result
-    
+
     # If it's not the first time the user has joined the world, get it from redis(cache)
     world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
     if world_user:
