@@ -24,7 +24,7 @@ async def user_in_request(
     return current_user
 
 
-@router.get("/{user_id}/", response_model=schemas.UserInDB)
+@router.get("/{user_id}", response_model=schemas.UserInDB)
 async def get_user_info(
         user_id: int,
         db: Session = Depends(deps.get_db),

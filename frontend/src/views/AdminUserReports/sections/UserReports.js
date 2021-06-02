@@ -13,6 +13,7 @@ import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
 import ReportService from 'services/ReportService';
 import UserReportCard from 'components/UserReportCard/UserReportCard';
+import Paginator from 'components/Paginator/Paginator.js';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function UserReports() {
     const classes = useStyles();
-    const [page, setPage] = React.useState("1");
+    const [page, setPage] = React.useState(1);
     const [reports, setReports] = React.useState([]);
     const [orderBy, setOrderBy] = React.useState("");
     const [order, setOrder] = React.useState("");
@@ -38,6 +39,7 @@ export default function UserReports() {
 
     const numberRegex = /[0-9]+|^/;
 
+    const limit = 10;
 
     const handleOrderBy = (event) => {
         setOrderBy(event.target.value);
@@ -68,8 +70,14 @@ export default function UserReports() {
         setReviewed(!reviewed);
     }
 
-    const handleSubmit = () => {
-        request(world, reporter, reported, reviewed, orderBy, order, page, 10);
+    const handleSubmit = (newRequest) => {
+        if (newRequest) {
+            if (page !== 1)
+                setPage(1);
+            else
+                request(world, reporter, reported, reviewed, orderBy, order, 1, limit);
+        }
+        request(world, reporter, reported, reviewed, orderBy, order, page, limit);
     }
 
     const request = (world_id, reporter_id, reported_id, reviewed, order_by, order, page, limit) => {
@@ -78,13 +86,22 @@ export default function UserReports() {
                 return res.json();
             })
             .then((res) => {
+                console.log(res);
                 setReports(res);
             })
     }
 
+    const changePage = (p) =>{
+        setPage(p);
+    }
+
     React.useEffect(() => {
-        request(null, null, null, false, null, null, 1, 10);
+        request(null, null, null, false, null, null, 1, limit);
     }, []);
+
+    React.useEffect(() => {
+        handleSubmit()
+    }, [page]);
 
     return (
         <div style={{ marginTop: '100px' }}>
@@ -146,13 +163,15 @@ export default function UserReports() {
                     <MenuItem value={"desc"}>Desc</MenuItem>
                 </Select>
             </FormControl>
-            <Button onClick={handleSubmit}>Search</Button>
+            <Button onClick={() => { handleSubmit(1) }}>Search</Button>
             {reports && reports.length !== 0 ? reports.map((r, i) => {
-                return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id + '_' + r.reviewed}
-                    report={r} />)
+                if( i !== limit)
+                    return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id + '_' + r.reviewed}
+                        report={r} />)
 
             }) : <h1>No reports found for this search...</h1>}
-
+            <hr/>
+            <Paginator hasNext={reports.length === limit + 1} page={page} changePage={(page) => { changePage(page) }} />
         </div>
     )
 }

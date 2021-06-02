@@ -17,6 +17,7 @@ import MapCard from 'components/MapCard/MapCard.js';
 import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Paginator from 'components/Paginator/Paginator.js';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -44,6 +45,8 @@ export default function WorldsList() {
     const [worlds, setWorlds] = React.useState([]);
     const [tags, setTags] = React.useState([]);
 
+    const limit = 1;
+
     const handleWorld = (event) => {
         setWorld(event.target.value);
     }
@@ -51,7 +54,7 @@ export default function WorldsList() {
     const handleCreator = (event) => {
         // TODO: find a cleaner way of doing this
         let value = event.target.value;
-        if(value === '')
+        if (value === '')
             value = null;
         setCreator(value);
     }
@@ -77,19 +80,27 @@ export default function WorldsList() {
         setOrder(event.target.value);
     }
 
+    const changePage = (page1) => {
+        setPage(page1);
+    }
+
     const request = (search, tags, banned, deleted, normal, creator, order_by, order, page, limit) => {
         WorldService.searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit)
             .then((res) => {
                 return res.json();
             })
             .then((res) => {
+                console.log(res);
                 setWorlds(res);
             })
     }
 
+    React.useEffect(() => {
+        handleSearch();
+    }, [page]);
 
     React.useEffect(() => {
-        request("", [], null, null, true, null, null, null, 1, 10);
+        request("", [], null, null, true, null, null, null, 1, limit);
         TagService.getAll()
             .then((res) => {
                 if (res.status == 200)
@@ -103,8 +114,15 @@ export default function WorldsList() {
             })
     }, [])
 
-    const handleSearch = () => {
-        request(world, selectedTags, null, banned, deleted, normal, creator, orderBy, order, page, 10);
+    const handleSearch = (newRequest) => {
+        if(newRequest){
+            if(page !== 1)
+                setPage(1)
+            else
+                request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, 1, limit);  
+        }
+
+        request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, page, limit);
     }
 
 
@@ -196,25 +214,19 @@ export default function WorldsList() {
                 </Select>
             </FormControl>
 
-            <Button id="search" onClick={handleSearch} >Search</Button>
+            <Button id="search" onClick={() => {handleSearch(1)}} >Search</Button>
 
 
             {worlds && worlds.length !== 0 ?
                 worlds.map((m, i) => {
-                    return (<MapCard key={i} map={m} />)
+                    if(i !== limit)
+                        return (<MapCard key={i} map={m} />)
                 })
                 :
                 <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>
             }
-
-
-            {worlds === null || worlds.length === 0 ?
-                <></>
-                :
-                <Row style={{ marginBottom: "30px" }}>
-                    <Pagination onChange={(event, page1) => { setPage(page1); handleSearch() }} style={{ marginLeft: "auto", marginRight: "auto" }} count={10} />
-                </Row>
-            }
+            <hr />
+            <Paginator hasNext={worlds.length === limit + 1} page={page} changePage={(page) => { changePage(page) }} />
         </div>
     )
 }
