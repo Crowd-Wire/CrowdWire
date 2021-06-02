@@ -129,7 +129,6 @@ class DashboardContent extends Component{
 				})
 			.then((res) => {
 				let arr = [];
-				console.log(res)
 				if(res){
 					res.forEach(tag => arr.push(tag.name)); 
 				}
