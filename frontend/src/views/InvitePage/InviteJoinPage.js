@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AuthenticationService from "../../services/AuthenticationService";
 import WorldService from "../../services/WorldService";
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +10,12 @@ import {
 import {Col, Row, Card} from 'react-bootstrap';
 import Image from "assets/img/bg8.png";
 import useAuthStore from "stores/useAuthStore";
+import {URL_BASE} from "config";
 
 
 export default function InviteJoinPage(props){
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(0);
 
     let qs = new URLSearchParams(useLocation().search);
 
@@ -31,24 +33,36 @@ export default function InviteJoinPage(props){
                     console.log(res && res.world_id, res, res.world_id)
                     if(res && res.world_id)
                         navigate("/world/"+res.world_id);
-                }).catch((error) => {useAuthStore.getState().leave()});
+                    else {
+                        setLoading(1)
+                        useAuthStore.getState().setLastLocation(null)
+                    }
+                }).catch((error) => {
+                    setLoading(1)
+                    useAuthStore.getState().setLastLocation(null)
+                });
             }
         }else{
+            useAuthStore.getState().leave()
+            useAuthStore.getState().setLastLocation(window.location.href.replace(URL_BASE, ''))
             navigate("/login");
         }
     }, []);
 
-    return (
-        <Row style={{height: "100%", backgroundImage: "url("+Image+")", backgroundSize: "cover"}} className="align-items-center">
-            <Col xs={1} md={2}>
-            </Col>
-            <Col xs={4} md={8}>
-                <Card style={{padding: "4rem 8rem"}}>
-                    <h1 style={{margin:"auto"}}>Invalid Invite Link!</h1>
-                </Card>
-            </Col>
-            <Col xs={1} md={2}></Col>
-        </Row>
-
-    )
+    if (loading) {
+        return (
+            <Row style={{height: "100%", backgroundImage: "url("+Image+")", backgroundSize: "cover"}} className="align-items-center">
+                <Col xs={1} md={2}>
+                </Col>
+                <Col xs={4} md={8}>
+                    <Card style={{padding: "4rem 8rem"}}>
+                        <h1 style={{margin:"auto"}}>Invalid Invite Link!</h1>
+                    </Card>
+                </Col>
+                <Col xs={1} md={2}></Col>
+            </Row>
+    
+        )
+    }
+    return ''
 }

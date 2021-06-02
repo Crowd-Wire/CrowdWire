@@ -31,6 +31,7 @@ const GamePage = (props) => {
   const [choosingSettings, setChoosingSettings] = useState(true)
   const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("https://picsum.photos/800/600?random=1")
+  import useAuthStore from "stores/useAuthStore";
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -44,6 +45,7 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
+    useAuthStore.getState().setLastLocation(null)
     WorldService.joinWorld(window.location.pathname.split('/')[2])
     .then((res) => {
       if (res.ok) return res.json()
