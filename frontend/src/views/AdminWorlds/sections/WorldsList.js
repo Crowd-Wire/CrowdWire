@@ -109,7 +109,7 @@ export default function WorldsList() {
 
 
     return (
-        <div style={{ 'marginTop': '100px' }}>
+        <div style={{ 'paddingTop': '100px' }}>
 
             <TextField id="world_name" label="World Name" type="search" variant="outlined" onChange={handleWorld} />
             <Input type="number" placeholder="Creator Id" onChange={handleCreator} />

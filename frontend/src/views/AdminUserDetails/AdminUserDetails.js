@@ -68,7 +68,7 @@ export default function AdminUserDetails() {
     return (
         <>
             { user !== null ?
-                <div style={{ marginTop: '100px' }}>
+                <div style={{ paddingTop: '100px', backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'}}>
                     <Box sx={{ backgroundColor: 'background.default', minHeight: '100%', py: 3 }}>
                         <Container maxWidth="lg">
                             <Grid container>

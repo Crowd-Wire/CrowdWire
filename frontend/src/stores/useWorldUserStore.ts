@@ -98,6 +98,16 @@ const useWorldUserStore = create(
                     }
                 })
             },
+            updateWorldUserAvatarUsername: (avatar, username) => {
+                return set((s) => {
+                    let update_world_user = {...s.world_user}
+                    update_world_user.avatar = avatar;
+                    update_world_user.username = username;
+                    return {
+                        world_user: update_world_user
+                    }
+                })
+            },
         })
     )
 );

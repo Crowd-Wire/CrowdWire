@@ -17,7 +17,7 @@ import Input from '@material-ui/core/Input';
 const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 150,
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -94,25 +94,18 @@ export default function WorldReports(props) {
     }
 
     return (
-        <div style={{ marginTop: '100px' }}>
-            <Row>
-                <Col>
-                {/*
-                    <TextField className="mx-2"
-                    id="world_search" label="World Id" type="search" variant="outlined" type="number"
-                    />
-
-                    <TextField
-                    id="reporter_search" label="Reporter Id" type="search" variant="outlined" type="number"
-                    />
-                */}
+        <div style={{ paddingTop: '100px', height:"100%"}}>
+            <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                <Col md={4}>
                     <Input className="mx-3"
+                        className={classes.formControl}
                         type="number"
                         id="world_search"
                         placeholder="World Id"
                         onChange={handleWorld}    
                     />
                     <Input 
+                        className={classes.formControl}
                         type="number" 
                         id="reporter_search"
                         placeholder="Reporter Id"
@@ -120,8 +113,9 @@ export default function WorldReports(props) {
                     />
 
                 </Col>
-                <Col>
+                <Col md={4}>
                     <FormControlLabel
+                        className={classes.formControl}
                         control={
                             <Checkbox
                                 checked={reviewed}
@@ -134,6 +128,7 @@ export default function WorldReports(props) {
                     />
 
                     <FormControlLabel
+                        className={classes.formControl}
                         control={
                             <Checkbox
                                 checked={banned}
@@ -144,49 +139,57 @@ export default function WorldReports(props) {
                         }
                         label="Show Banned"
                     />
-
+                </Col>
+                <Col md={4}>
                     <FormControl className={classes.formControl}>
-                        <InputLabel id="orderBy-label">Order by</InputLabel>
                         <Select
                             labelId="orderBy-label"
                             id="order_by"
+                            displayEmpty
                             value={orderBy}
                             onChange={handleOrderBy}
                             autoWidth
                         >
+                            <MenuItem value={""}>
+                                <em>OrderBy</em>
+                            </MenuItem>
                             <MenuItem value={"timestamp"}>Date</MenuItem>
                         </Select>
                     </FormControl>
 
                     <FormControl className={classes.formControl}>
-                        <InputLabel id="order-label">Order</InputLabel>
                         <Select
                             labelId="order-label"
                             id="order"
+                            displayEmpty
                             value={order}
                             onChange={handleOrder}
                             autoWidth
                         >
+                            <MenuItem value={""}><em>Order</em></MenuItem>
                             <MenuItem value={"asc"}>Asc</MenuItem>
                             <MenuItem value={"desc"}>Desc</MenuItem>
                         </Select>
                     </FormControl>
                 </Col>
             </Row>
-            <Row className="my-2">
+            <Row className="my-2" style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md="3">
                     <Button onClick={handleSubmit}>Search</Button>
                 </Col>
             </Row>
             <hr/>
             <div className="">
+                <Row className="my-3" style={{marginLeft:"auto", marginRight:"auto"}}>
                 {reports.map((r, i) => {
                     console.log(JSON.stringify(r));
-                    return (<Row key={r.reported + '_' + r.reporter + '_' + r.reviewed} className="my-3"><Col></Col>
-                        <Col><WorldReportCard  report={r} /> </Col>
-                        <Col></Col>
-                        </Row>)
-                })}
+                    return (
+                        <Col md={4} sm={6}>
+                            <WorldReportCard key={r.reported + '_' + r.reporter + '_' + r.reviewed} report={r} /> 
+                        </Col>
+                        )
+                    })}
+                </Row>
             </div>
         </div>
     )

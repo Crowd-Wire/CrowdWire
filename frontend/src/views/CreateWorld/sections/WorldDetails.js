@@ -90,8 +90,8 @@ export default function WorldDetails(props){
     return(
         <Row style={{height:"100%", width:"100%"}}>
             <Col xs={2} sm={1} md={2} lg={3}></Col>
-            <Col xs={8} sm={11} md={8} lg={6} style={{minWidth:"270px"}}>
-                <div style={{height:"100%",width:"100%", borderRadius:"8px", backgroundColor:"white"}}>
+            <Col xs={8} sm={11} md={8} lg={6} style={{minWidth:"270px", background: 'white'}}>
+                <div style={{height:"100%",width:"100%", borderRadius:"8px"}}>
                     <Row style={{height:"20px"}}/>
                     <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                         <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>

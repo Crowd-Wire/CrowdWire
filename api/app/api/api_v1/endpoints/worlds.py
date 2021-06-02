@@ -14,23 +14,23 @@ from app.core import consts
 router = APIRouter()
 
 
-@router.get("/{world_id}", response_model=schemas.WorldMapInDB)
+@router.get("/{world_id}", response_model=schemas.WorldInDBWithUserPermissions)
 async def get_world(
         world_id: int,
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     if not is_guest_user(user):
-        db_world, message = await crud.crud_world.get(db=db, world_id=world_id)
+        db_world, message = await crud.crud_world.get_world_with_user_permissions(
+            db=db, world_id=world_id, user_id=user.user_id)
     else:
         db_world, message = await crud.crud_world.get_available_for_guests(
             db=db, world_id=world_id
         )
     if not db_world:
-        raise HTTPException(
-            status_code=400,
-            detail=message,
-        )
+        raise HTTPException(status_code=400, detail=message)
+    online_users = await redis_connector.get_online_users(world_id=world_id)
+    setattr(db_world, 'online_users', online_users)
     return db_world
 
 
@@ -90,11 +90,6 @@ async def join_world(
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 
-        # check whether the maximum number of users has been passed
-        world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
-        if not world_obj:
-            raise HTTPException(status_code=400, detail=msg)
-
         # verify if the user is already in redis cache
         # If it's not the first time the user has joined the world, get it from redis(cache)
         world_user = await redis_connector.get_world_user_data(world_id, user.user_id)
@@ -103,7 +98,8 @@ async def join_world(
             # Otherwise, goes to PostgreSQL database
             logger.debug("no cache")
             world_user, role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
-
+            if world_user is None:
+                raise HTTPException(status_code=400, detail=role)
             # pydantic schema is waiting for a role object not a role id
             delattr(world_user, 'role_id')
             setattr(world_user, 'role', role)
@@ -121,18 +117,16 @@ async def join_world(
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 
-        # check whether the maximum number of users has been passed
-        world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
-        if not world_obj:
-            raise HTTPException(status_code=400, detail=msg)
-
         # This allows the same guest to join the same world without losing its data
         world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user.user_id)
         if not world_user:
             # gives the guest the default role for that world
             world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_id)
-            world_user = await redis_connector.join_new_guest_user(world_id=world_id,
-                                                                   user_id=user.user_id, role=world_default_role)
+            world_user, msg = await redis_connector.join_new_guest_user(
+                world_id=world_id, max_users=world_obj.max_users, user_id=user.user_id, role=world_default_role)
+
+            if world_user is None:
+                raise HTTPException(status_code=400, detail=msg)
 
         # adds the world map to the data from the world_user
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
@@ -177,6 +171,35 @@ async def update_world(
     return world_obj_updated
 
 
+@router.get("/{world_id}/users/{user_id}", response_model=schemas.World_UserInDB)
+async def get_world_user_info(
+        world_id: int,
+        user_id: Union[int, UUID4],
+        db: Session = Depends(deps.get_db),
+        user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user)
+):
+    """
+    Returns the user info of a user in a given world.
+    """
+    is_guest = type(user_id) != int
+
+    if is_guest_user(user):
+        raise HTTPException(status_code=NotImplemented)
+
+    if user.user_id != user_id:
+        raise HTTPException(status_code=400, detail=strings.ACCESS_FORBIDDEN)
+
+    if is_guest:
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        if not world_user:
+            raise HTTPException(status_code=404, detail=strings.USER_NOT_IN_WORLD)
+    else:
+        world_user = crud.crud_world_user.get_user_joined(db=db, world_id=world_id, user_id=user.user_id)
+        if not world_user:
+            raise HTTPException(status_code=404, detail=strings.USER_NOT_IN_WORLD)
+    return world_user
+
+
 @router.put("/{world_id}/users/{user_id}",
             response_model=schemas.World_UserInDB)
 async def update_world_user_info(
@@ -205,37 +228,12 @@ async def update_world_user_info(
     if is_guest and user_id != user.user_id:
         raise HTTPException(status_code=400, detail=strings.CHANGE_USER_INFO_FORBIDDEN)
 
-    # registered user
-    if not is_guest:
-        world_user, msg = await crud.crud_world_user.update_world_user_info(
-            db=db, world_id=world_id, request_user=user, user_to_change=user_id, world_user_data=user_data
-        )
-        if world_user is None:
-            raise HTTPException(status_code=400, detail=msg)
-
-    # change user info in cache
-    world_user_obj = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
-    if not world_user_obj:
-        raise HTTPException(
-            status_code=400,
-            detail=strings.USER_NOT_IN_WORLD
-        )
-
-    data = {k: v for k, v in dict(user_data).items() if v is not None}
-    # updates the data present
-    await redis_connector.save_world_user_data(
-        world_id=world_id,
-        user_id=user_id,
-        data=data
+    world_user, msg = await crud.crud_world_user.update_world_user_info(
+        db=db, world_id=world_id, request_user=user, user_to_change=user_id, is_guest=is_guest,
+        world_user_data=user_data
     )
-    world_user = {
-        'world_id': world_id,
-        'user_id': user.user_id,
-        'role_id': world_user_obj.role.role_id,
-        'avatar': world_user_obj.avatar,
-        'username': world_user_obj.username
-    }
-    world_user.update(data)
+    if not world_user:
+        raise HTTPException(status_code=400, detail=msg)
     return world_user
 
 
@@ -261,7 +259,7 @@ async def create_world(
 
 
 @router.get("/", response_model=List[schemas.WorldInDB])
-def search_world(
+async def search_world(
         search: Optional[str] = "",
         tags: Optional[List[str]] = Query(None),  # required when passing a list as parameter
         visibility: Optional[str] = None,
@@ -282,7 +280,8 @@ def search_world(
             # admins
             list_world_objs, msg = crud.crud_world.filter(
                 db=db, search=search, tags=tags, is_superuser=True, page=page, limit=limit, creator=creator,
-                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by, order=order)
+                visibility=visibility, banned=banned, deleted=deleted, normal=normal, order_by=order_by,
+                requester_id=user.user_id, order=order)
         else:
             # registered users
             list_world_objs, msg = crud.crud_world.filter(
@@ -293,6 +292,10 @@ def search_world(
         list_world_objs, msg = crud.crud_world.filter(
             db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility,
             order_by=order_by, order=order)
+
+    for world in list_world_objs:
+        online_users = await redis_connector.get_online_users(world_id=world.world_id)
+        setattr(world, 'online_users', online_users)
 
     if list_world_objs is None:
         raise HTTPException(status_code=400, detail=msg)

@@ -143,7 +143,7 @@ export default function AdminUsers() {
     
 
     return (
-        <div style={{marginTop: '100px'}}>
+        <div style={{paddingTop: '100px'}}>
             <TextField id="user_email" label="User email" type="search" variant="outlined" onChange={handleEmail} />
             <FormControlLabel
                 control={

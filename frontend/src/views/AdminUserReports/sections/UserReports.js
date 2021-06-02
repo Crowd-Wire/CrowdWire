@@ -87,7 +87,7 @@ export default function UserReports() {
     }, []);
 
     return (
-        <div style={{ marginTop: '100px' }}>
+        <div style={{ paddingTop: '100px' }}>
             <Input className="mx-3"
                 type="number"
                 id="world_id"
