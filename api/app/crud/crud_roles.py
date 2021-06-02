@@ -211,14 +211,12 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             for k, v in new_data.items():
                 if v is True and k not in consts.role_default_permissions + ['is_default']:
                     return None, "cannot give this permissions to default role"
-
             # change old default role to not default
-            default_role = self.get_world_default(db=db, world_id=obj_in['world_id'])
-            if default_role.role_id != db_obj.role_id:
+            if not db_obj.is_default:
+                default_role = self.get_world_default(db=db, world_id=update_data['world_id'])
                 default_role.is_default = False
                 db.add(default_role)
                 db.commit()
-
         await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS

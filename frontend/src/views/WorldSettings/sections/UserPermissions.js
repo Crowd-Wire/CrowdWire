@@ -15,6 +15,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import SaveIcon from '@material-ui/icons/Save';
 import RoleService from 'services/RoleService.js';
+import { toast } from 'react-toastify';
 
 const useStyles = makeStyles((theme) => ({
   button: {
@@ -48,6 +49,17 @@ export default function UserPermissions(props) {
 
 
   }
+  const notifyError = (msg) => {
+    toast.error(msg, {
+    position: toast.POSITION.TOP_CENTER
+    });
+  };
+
+  const notifySuccess = (msg) => {
+    toast.success(msg, {
+    position: toast.POSITION.TOP_CENTER
+    });
+  };
 
   const deleteRole = () => {
     if(props.world_id.length===1){
@@ -60,10 +72,17 @@ export default function UserPermissions(props) {
     if(props.world_id.length===1)
       RoleService.editRole(props.world_id,newState,props.roleId)
       .then((res)=>{
-        return res.json();
+        
+          return res.json();
       })
       .then((res)=>{
-        props.setRoles([]);
+        if(res.detail){
+          notifyError(res.detail)
+        }
+        else {
+          notifySuccess("Success Updating Role Permissions!")
+          props.setRoles([]);
+        }
       });
   }
 
@@ -198,7 +217,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={newState.write}
+                  checked={newState.chat}
                   onChange={handleChange}
                   name="chat"
                   color="primary"
