@@ -54,6 +54,7 @@ class ReportService{
         if (query.length !== 0)
             url = url.concat('?' + query.join('&'));
 
+        console.log(url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
