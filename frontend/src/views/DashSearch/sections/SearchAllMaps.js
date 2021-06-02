@@ -132,7 +132,7 @@ class SearchAllMaps extends Component {
 		const { classes } = this.props;
 		return (
 			<>
-				<Container style={{ overflowX: "hidden" }}>
+				<Container style={{ height: '100%' }}>
 					<Row sm={12} style={{paddingBottom: 60}}>
 						<Col sm={12} style={{textAlign: "center"}}>
 							<IntroText />
@@ -140,6 +140,7 @@ class SearchAllMaps extends Component {
 					</Row>
 					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={() => {this.changePage(1)}} />
 					<hr />
+
 					<Row style={{marginTop: 50, marginBottom: 50}}>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
 						this.state.maps.map((m, i) => {
@@ -149,10 +150,12 @@ class SearchAllMaps extends Component {
 								)
 						})
 						:
-						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
-					}
+							<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
+						}
+
 					</Row>
 					<hr />
+
 					<Paginator hasNext={this.state.maps.length === this.limit + 1} page={this.state.page} changePage={(page) => {this.changePage(page)}} />
 				</Container>
 			</>

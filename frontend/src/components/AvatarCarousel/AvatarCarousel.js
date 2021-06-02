@@ -7,7 +7,6 @@ import React, { useState } from 'react';
 import Carousel from "react-grid-carousel";
 import styled from 'styled-components';
 
-const randomImageUrl = 'https://picsum.photos/800/600?random='
 
 const Item = styled.div`
   background-image: ${({ img }) => `url(${img})`};
@@ -18,19 +17,13 @@ const Item = styled.div`
   height: 200px;
 `
 
-const AvatarCarousel = () => {
-    const [cols, setCols] = useState(1)
-    const [rows, setRows] = useState(1)
-    const [gap, setGap] = useState(10)
-    const [pages, setPages] = useState(3)
-
+const AvatarCarousel = ({avatar="https://picsum.photos/800/600?random=0"}) => {
+    console.log(avatar)
     return (
-      <Carousel cols={cols} rows={rows} gap={gap}>
-        {[...Array(cols * rows * pages)].map((_, i) => (
-          <Carousel.Item key={i}>
-            <Item img={randomImageUrl + i} />
-          </Carousel.Item>
-        ))}
+      <Carousel cols={1} rows={1} gap={10}>
+        <Carousel.Item key={avatar}>
+          <Item img={avatar}/>
+        </Carousel.Item>
       </Carousel>
     );
 };

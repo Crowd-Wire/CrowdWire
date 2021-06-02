@@ -46,7 +46,13 @@ class GameScene extends Phaser.Scene {
         this.collisionGroup = mapManager.buildObjects(this);
 
         // main player
-        this.player = new Player(this, 50, 50);
+        let last_pos = useWorldUserStore.getState().world_user.last_pos;
+        if (Object.keys(last_pos).length !== 0) {
+            this.player = new Player(this, last_pos.x, last_pos.y);
+        } else {
+            this.player = new Player(this, 50, 50);
+        }
+
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -64,7 +70,11 @@ class GameScene extends Phaser.Scene {
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
-        this.ws.joinPlayer({x: 50, y: 50});
+        if (Object.keys(last_pos).length !== 0) {
+            this.ws.joinPlayer({x: last_pos.x, y: last_pos.y});
+        } else {
+            this.ws.joinPlayer({x: 50, y: 50});
+        }
 
         // make camera follow player
         this.cameras.main.startFollow(this.player)
@@ -411,13 +421,17 @@ class RemotePlayer extends Player {
         ]);
 
         this.unsubscribe = usePlayerStore.subscribe(
-            this.updateMovement, state => state.players[this.id]);
+            this.updateMovement, state => state.players);
     }
 
-    updateMovement = ({ position, velocity }) => {
-        this.updateAnimation(velocity);
-        this.body.reset(position.x, position.y);
-        this.body.setVelocity(velocity.x, velocity.y);
+    updateMovement = (players) => {
+        if (players && players[this.id]) {
+            let position = players[this.id].position;
+            let velocity = players[this.id].velocity;
+            this.updateAnimation(velocity);
+            this.body.reset(position.x, position.y);
+            this.body.setVelocity(velocity.x, velocity.y);
+        }
     }
 
     /**

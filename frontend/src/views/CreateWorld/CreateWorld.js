@@ -57,11 +57,10 @@ class CreateWorld extends Component {
           <CssBaseline />
           <Col style={{height:"100%"}}>
             <Row style={{height:"80px", marginLeft:"auto", marginRight:"auto"}}>
-              <Col md={1}></Col>
               <Col>
                 <Row style={{ height:"100%", marginLeft:"auto", marginRight:"auto"}}>
-                  <IconButton style={{border:"black solid 1px",borderRadius:"10px",height:"50px", width:"50px"}} onClick={() => {this.goBack()}}>
-                    <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"black", marginBottom:"auto"}}/>
+                  <IconButton style={{border:"white solid 1px",borderRadius:"10px",height:"50px", width:"50px"}} onClick={() => {this.goBack()}}>
+                    <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"white", marginBottom:"auto"}}/>
                   </IconButton>
                 </Row>
               </Col>

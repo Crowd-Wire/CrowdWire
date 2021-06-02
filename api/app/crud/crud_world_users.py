@@ -10,7 +10,7 @@ from app.redis.connection import redis_connector
 from app.models import World_User, World, User, Role
 from app.schemas import World_UserCreate, World_UserUpdate, World_UserInDB
 from app.utils import choose_avatar
-from app.core import strings
+from app.core import strings, consts
 from sqlalchemy import or_
 
 
@@ -116,6 +116,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             'user_id': user_to_change,
             'role_id': world_user_obj.role.role_id,
             'avatar': world_user_obj.avatar,
+            'last_pos': world_user_obj.last_pos,
             'username': world_user_obj.username
         }
         world_user.update(data)
@@ -170,6 +171,11 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         Else, Update the attributes n_joins and last_join
         @return: a Tuple of a WorldUser and the default Role(easier to assign to pydantic schemas)
         """
+
+        online_users = await redis_connector.get_online_users(world_id=_world.world_id)
+        if online_users + 1 > _world.max_users:
+            return None, "World is currently full"
+
         world_user = self.get_user_joined(db=db, world_id=_world.world_id, user_id=_user.user_id)
         current_time = datetime.now()
 
@@ -181,7 +187,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
                 join_date=current_time,
                 last_join=current_time,
                 n_joins=1,
-                status=0,
+                status=consts.WORLD_NORMAL_STATUS,
                 avatar=assigned_avatar,
                 username=_user.name
             )
