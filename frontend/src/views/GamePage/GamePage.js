@@ -21,6 +21,7 @@ import { Card } from '@material-ui/core';
 import Button from "components/CustomButtons/Button.js";
 import CardBody from "components/Card/CardBody.js";
 import Select from '@material-ui/core/Select';
+import useAuthStore from "stores/useAuthStore";
 
 
 const GamePage = (props) => {
@@ -31,7 +32,6 @@ const GamePage = (props) => {
   const [choosingSettings, setChoosingSettings] = useState(true)
   const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("https://picsum.photos/800/600?random=1")
-  import useAuthStore from "stores/useAuthStore";
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
