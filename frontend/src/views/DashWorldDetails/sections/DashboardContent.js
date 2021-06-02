@@ -1,14 +1,11 @@
 import React, { Component } from "react";
 
 import { Typography } from "@material-ui/core";
-import CancelIcon from '@material-ui/icons/Cancel';
-import Badge from 'components/Badge/Badge.js';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import DashboardStats from 'views/DashWorldDetails/sections/DashboardStats.js'
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
 import WorldService from 'services/WorldService.js';
-import useAuthStore from 'stores/useAuthStore.ts';
 import { Navigate } from 'react-router-dom';
 import EditIcon from '@material-ui/icons/Edit';
 import Button from "components/CustomButtons/Button.js";
@@ -24,7 +21,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { createBrowserHistory } from 'history';
 import { toast } from 'react-toastify';
 import logo from 'assets/crowdwire_white_logo.png';
-
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -132,8 +129,9 @@ class DashboardContent extends Component{
 				})
 			.then((res) => {
 				let arr = [];
-				if(res)
+				if(res){
 					res.forEach(tag => arr.push(tag.name)); 
+				}
 				this.setState({tags: arr})
 			})
 	
@@ -479,6 +477,10 @@ class DashboardContent extends Component{
 											</Typography>
 										</Col>
 										<Col sm={4} style={{textAlign: "right"}}>
+											<p style={{color: '#4caf50', fontWeight: 600}}>
+												<span>{this.state.worldInfo.online_users ? this.state.worldInfo.online_users : 0}</span>
+												<FiberManualRecordIcon style={{color: '#4caf50'}}/> Online Users {' '}
+											</p>
 											<Button color="success" size="md" round onClick={() => this.enterMap()}>
 												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
 											</Button>

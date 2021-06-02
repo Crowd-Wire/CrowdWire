@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, validator, UUID4, Field
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 
 from typing_extensions import Annotated
 
@@ -70,6 +70,7 @@ class World_UserWithRoleInDB(World_UserInDBBase):
     avatar: Annotated[Optional[str], Field(max_length=50)] = None
     username: Annotated[Optional[str], Field(max_length=50)] = None
     role: RoleInDB
+    last_pos: Optional[Dict[str, float]] = {}
 
 
 class World_UserWithRoleAndMap(World_UserWithRoleInDB):

@@ -9,6 +9,7 @@ import DashDrawer from 'components/DashDrawer/DashDrawer.js';
 
 const useStyles = theme => ({
   root: {
+    position:"fixed",
     display: 'flex',
     height:'100%',
     width:'100%',

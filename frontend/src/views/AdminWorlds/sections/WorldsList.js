@@ -2,11 +2,10 @@ import React from 'react';
 import WorldService from '../../../services/WorldService.js';
 import TagService from '../../../services/TagService.js';
 import { Checkbox } from '@material-ui/core';
-import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
+import Container from '@material-ui/core/Container';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
@@ -17,6 +16,7 @@ import MapCard from 'components/MapCard/MapCard.js';
 import Typography from '@material-ui/core/Typography';
 import Pagination from '@material-ui/lab/Pagination';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Paginator from 'components/Paginator/Paginator.js';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -46,6 +46,8 @@ export default function WorldsList() {
     const [worlds, setWorlds] = React.useState([]);
     const [tags, setTags] = React.useState([]);
 
+    const limit = 9;
+
     const handleWorld = (event) => {
         setWorld(event.target.value);
     }
@@ -53,7 +55,7 @@ export default function WorldsList() {
     const handleCreator = (event) => {
         // TODO: find a cleaner way of doing this
         let value = event.target.value;
-        if(value === '')
+        if (value === '')
             value = null;
         setCreator(value);
     }
@@ -79,19 +81,27 @@ export default function WorldsList() {
         setOrder(event.target.value);
     }
 
+    const changePage = (page1) => {
+        setPage(page1);
+    }
+
     const request = (search, tags, banned, deleted, normal, creator, order_by, order, page, limit) => {
         WorldService.searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit)
             .then((res) => {
                 return res.json();
             })
             .then((res) => {
+                console.log(res);
                 setWorlds(res);
             })
     }
 
+    React.useEffect(() => {
+        handleSearch();
+    }, [page]);
 
     React.useEffect(() => {
-        request("", [], null, null, true, null, null, null, 1, 10);
+        request("", [], null, null, true, null, null, null, 1, limit);
         TagService.getAll()
             .then((res) => {
                 if (res.status == 200)
@@ -105,13 +115,20 @@ export default function WorldsList() {
             })
     }, [])
 
-    const handleSearch = () => {
-        request(world, selectedTags, null, banned, deleted, normal, creator, orderBy, order, page, 10);
+    const handleSearch = (newRequest) => {
+        if(newRequest){
+            if(page !== 1)
+                setPage(1)
+            else
+                request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, 1, limit);  
+        }
+
+        request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, page, limit);
     }
 
 
     return (
-        <div style={{ paddingTop: '80px'}}>
+        <div style={{ paddingTop: '80px', paddingBottom:"20px"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col sm={12} md={6} style={{marginLeft:"auto", marginRight:"auto"}}>
                     <TextField className={classes.formControl} id="world_name" placeholder="World Name" type="search" onChange={handleWorld} />
@@ -223,16 +240,11 @@ export default function WorldsList() {
                     <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>
                 }
             </Row>
-
-
-
-            {worlds === null || worlds.length === 0 ?
-                <></>
-                :
-                <Row style={{ marginBottom: "30px", marginLeft:"auto", marginRight:"auto"}}>
-                    <Pagination onChange={(event, page1) => { setPage(page1); handleSearch() }} style={{ marginLeft: "auto", marginRight: "auto" }} count={10} />
-                </Row>
-            }
+            <hr />
+            <Container>
+                <Paginator hasNext={worlds.length === limit + 1} page={page} changePage={(page) => { changePage(page) }} />
+            </Container>
+            <Row style={{height:"15px"}}/>
         </div>
     )
 }

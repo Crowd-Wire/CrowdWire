@@ -1,6 +1,9 @@
 import AuthenticationService from './AuthenticationService.js';
 import fetchIntercept from 'fetch-intercept';
 import useAuthStore from 'stores/useAuthStore.ts';
+import {URL_BASE} from "config";
+
+
 const originalRequest = {}
 export const interceptor = fetchIntercept.register({    
     request: function (url, config) {
@@ -16,6 +19,7 @@ export const interceptor = fetchIntercept.register({
     response: async function (response) {
         if(response.status === 401)
         {
+            useAuthStore.getState().setLastLocation(window.location.href.replace(URL_BASE, ''))
             if(!AuthenticationService.getToken()){
                 return Promise.reject("No authentication token");
             }

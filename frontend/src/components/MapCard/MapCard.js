@@ -12,6 +12,8 @@ import Col from 'react-bootstrap/Col';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -52,16 +54,19 @@ export default function MapCard(props){
                     <CardActionArea onClick={routeChange}>
                         <CardMedia
                             className={classes.media}
-                            image=
-                            {
-                                map.profile_image === null ? 
+                            image={
+                                    map.profile_image === null ? 
 							        "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
 						        :
                                     map.profile_image
-                            }
+                                }
                             title={map.name}
                         />
                         <CardContent style={{height: 80}}>
+                            <span style={{fontWeight: 600, color: '#4caf50', float: 'right', top: 0}}>
+                                {map.online_users ? map.online_users: 0}
+                                <FiberManualRecordIcon />
+                            </span>
                             <Typography gutterBottom variant="h5" component="h2">
                             {   map.name}
                             </Typography>

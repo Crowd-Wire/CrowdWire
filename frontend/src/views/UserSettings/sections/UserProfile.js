@@ -8,7 +8,6 @@ import Email from "@material-ui/icons/Email";
 import TextField from '@material-ui/core/TextField';
 // import Header from "components/Header/Header.js";
 // import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -25,6 +24,8 @@ import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
 import UserService from "../../../services/UserService"
 import useAuthStore from "stores/useAuthStore";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 
 
@@ -33,8 +34,6 @@ class UserProfile extends React.Component {
         super(props);
     
     this.state = {
-        cardAnimation: "",
-        cardAnimaton: "", 
         navigate: false,
         emailHelperText: "",
         nameHelperText: "",
@@ -53,7 +52,6 @@ class UserProfile extends React.Component {
         });
     };
     componentDidMount() {
-        this.setState({ cardAnimaton: "cardHidden" })
         UserService.getUserInfo()
         .then((res) => {
             if (res.status == 200)
@@ -76,11 +74,6 @@ class UserProfile extends React.Component {
         }).catch((error) => {useAuthStore.getState().leave()});
     }
 
-    timer = setTimeout(() => {
-        this.setState({ cardAnimaton: "" })
-    }, 700
-
-    );
     handleRevert = () => {
         document.getElementById("email").value = this.state.email_val
         document.getElementById("name").value = this.state.name_val;
@@ -134,9 +127,8 @@ class UserProfile extends React.Component {
         )
         .catch(
             (error) => {
-            console.log(error);
-
-            // TODO: change state to show error;
+                console.log(error);
+                // TODO: change state to show error;
             }
         );
 
@@ -145,11 +137,10 @@ class UserProfile extends React.Component {
     render() {
         return (
         <div>
-            <div>
             { this.state.user == null ? "" : 
-            <GridContainer style={{marginTop: 50}} justify="center">
+            <GridContainer justify="center">
                 <GridItem xs={12} sm={12} md={12} lg={12}>
-                <Card className={this.props.classes[this.state.cardAnimaton]}>
+                <Card>
                     <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                         <h4>Edit Account info</h4>
@@ -222,24 +213,34 @@ class UserProfile extends React.Component {
                         />
                     </CardBody>
                     <CardFooter className={this.props.classes.cardFooter}>
-                        <Button 
-                        onClick={this.handleRevert}    
-                        >
-                        Revert Changes
-                        </Button>
-                        <Button     
-                        onClick={this.handleSubmit} 
-                        >
-                        Submit Changes
-                        </Button>
+                        <Row style={{width: '100%'}}>
+                            <Col xs={12} style={{textAlign: 'center'}}>
+                                <Button
+                                size="lg"
+                                onClick={this.handleRevert}    
+                                >
+                                Revert
+                                </Button>
+                            </Col>
+                            <Col xs={12} style={{textAlign: 'center'}}>
+                                <Button
+                                style={{ 
+                                    backgroundColor: "#5BC0BE", marginLeft: "auto", 
+                                    marginRight: "auto" 
+                                }} 
+                                size="md"
+                                onClick={this.handleSubmit} 
+                                >
+                                Submit
+                                </Button>
+                            </Col>
+                        </Row>
                     </CardFooter>
                     </form>
                 </Card>
                 </GridItem>
             </GridContainer>
             }
-            </div>
-            <Footer whiteFont />
         </div>
     );
     }

@@ -8,7 +8,6 @@ import Email from "@material-ui/icons/Email";
 import TextField from '@material-ui/core/TextField';
 // import Header from "components/Header/Header.js";
 // import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -34,8 +33,6 @@ class UpdatePassword extends React.Component {
         super(props);
     
     this.state = {
-        cardAnimation: "",
-        cardAnimaton: "", 
         navigate: false,
         opassHelperText: "",
         passHelperText: "",
@@ -51,7 +48,6 @@ class UpdatePassword extends React.Component {
         });
     };
     componentDidMount() {
-        this.setState({ cardAnimaton: "cardHidden" })
         UserService.getUserInfo()
         .then((res) => {
             if (res.status == 200)
@@ -71,12 +67,6 @@ class UpdatePassword extends React.Component {
             console.log(res)
         }).catch((error) => {useAuthStore.getState().leave()});
     }
-
-    timer = setTimeout(() => {
-        this.setState({ cardAnimaton: "" })
-    }, 700
-
-    );
 
     handleLogin = (mail, password) => {
         AuthenticationService.login(
@@ -157,11 +147,10 @@ class UpdatePassword extends React.Component {
     render() {
         return (
         <div>
-            <div>
             { ( this.state.user == null ? "" : 
-            <GridContainer style={{marginTop: 25}} justify="center">
+            <GridContainer justify="center">
                 <GridItem xs={12} sm={12} md={12} lg={12}>
-                <Card className={this.props.classes[this.state.cardAnimaton]}>
+                <Card>
                     <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                         <h4>Change Password</h4>
@@ -183,7 +172,6 @@ class UpdatePassword extends React.Component {
                         }}
                         inputProps={{
                             type: "password",
-                            defaultValue: ".",
                             endAdornment: (
                             <InputAdornment position="end">
                                 <Icon className={this.props.classes.inputIconsColor}>
@@ -253,6 +241,11 @@ class UpdatePassword extends React.Component {
                     <CardFooter className={this.props.classes.cardFooter}>
                     {this.state.is_auth_google ? "" : 
                         <Button     
+                        style={{ 
+                            backgroundColor: "#5BC0BE", marginLeft: "auto", 
+                            marginRight: "auto" 
+                        }} 
+                        size="md"
                         onClick={this.handleSubmit} 
                         >
                         Submit Changes
@@ -264,8 +257,6 @@ class UpdatePassword extends React.Component {
                 </GridItem>
             </GridContainer>
             )}
-            </div>
-            <Footer whiteFont />
         </div>
     );
     }

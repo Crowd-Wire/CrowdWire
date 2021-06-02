@@ -21,6 +21,7 @@ import { Card } from '@material-ui/core';
 import Button from "components/CustomButtons/Button.js";
 import CardBody from "components/Card/CardBody.js";
 import Select from '@material-ui/core/Select';
+import useAuthStore from "stores/useAuthStore";
 
 
 const GamePage = (props) => {
@@ -44,6 +45,7 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
+    useAuthStore.getState().setLastLocation(null)
     WorldService.joinWorld(window.location.pathname.split('/')[2])
     .then((res) => {
       if (res.ok) return res.json()

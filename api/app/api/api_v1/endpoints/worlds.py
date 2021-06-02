@@ -42,10 +42,6 @@ async def join_world_by_link(
         result=Depends(deps.get_current_user_for_invite)
 ):
     user, world_obj = result
-    # check whether the maximum number of users has been passed
-    world_obj, msg = await crud.crud_world.update_online_users(world_obj, 1)
-    if not world_obj:
-        raise HTTPException(status_code=400, detail=msg)
     # If it's not the first time the user has joined the world, get it from redis(cache)
     world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
     if world_user:
@@ -62,8 +58,11 @@ async def join_world_by_link(
         # Saves on Redis for Guest Users
         logger.debug('not cached:/')
         world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_obj.world_id)
-        world_user = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id,
-                                                               role=world_default_role)
+        world_user, msg = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id,
+                                                                    role=world_default_role,
+                                                                    max_users=world_obj.max_users)
+        if world_user is None:
+            raise HTTPException(status_code=400, detail=msg)
         world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
     return world_user
 

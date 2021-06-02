@@ -33,6 +33,7 @@ import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
+import useAuthStore from "stores/useAuthStore";
 
 /**
  * Public and protected routes list 
@@ -42,7 +43,7 @@ import AdminUsers from "views/AdminUsers/AdminUsers";
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-const routes = (token, guest_uuid) => [
+const routes = (token, guest_uuid, last_location) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -57,26 +58,27 @@ const routes = (token, guest_uuid) => [
 	},
 	{
 		path: "/",
-		element: token ? <Navigate to="/dashboard/search/public"/> : <Outlet/>,
+		element: token ? <Navigate to={last_location ? last_location : "/dashboard/search/public"}/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },
 		],
 	},
 	{
-		path:"/",
-		element:  token ? <Outlet /> : <Navigate to="/login"/>,
-		children: [
-			{ path: "/create-world", element: <CreateWorld /> },
-			{ path: "/join", element: <InviteJoinPage />},
-		],
+		path:"/create-world",
+		element:  token ? <CreateWorld /> : <Navigate to="/login"/>,
 	},
+	{
+		path:"/join",
+		element:  <InviteJoinPage />,
+	},	
 	{ 
 		path: "/dashboard", 
 		element: token  ? <DrawerLayout/> : <Navigate to="/login"/>,
 		children: [
 			{path: "/:id", element: <DashboardContent/>},
-			{path:"/search/:type", element: <SearchAllMaps/>}		
+			{path:"/search/:type", element: <SearchAllMaps/>},
+			{path: "/user", element: <UserSettings /> },
 		]
 	},
     {

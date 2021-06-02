@@ -149,7 +149,7 @@ export default function AdminUsers() {
     
 
     return (
-        <div style={{paddingTop: '100px', width:"100%"}}>
+        <div style={{paddingTop: '80px', width:"100%"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md={3}>
                     <TextField className={classes.formControl} id="user_email" placeholder="User email" type="search" onChange={handleEmail} />
