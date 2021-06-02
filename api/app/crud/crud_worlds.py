@@ -247,7 +247,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
 
-        return query.offset(limit * (page - 1)).limit(limit).all(), ""
+        return query.offset(limit * (page - 1)).limit(limit + 1).all(), ""
 
     def filter_by_visibility(self, query, visibility: str, requester_id: int):
         # normal users cannot access deleted worlds

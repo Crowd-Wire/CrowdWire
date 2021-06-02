@@ -69,7 +69,7 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_World.timestamp))
 
-        reports = query.offset(limit * (page - 1)).limit(limit).all()
+        reports = query.offset(limit * (page - 1)).limit(limit + 1).all()
 
         # the results are not inside a dict so it is hard to convert to json
         return [r._asdict() for r in reports], ""

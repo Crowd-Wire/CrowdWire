@@ -49,7 +49,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if order_by == 'register_date':
             query = query.order_by(ord(User.register_date))
 
-        reports = query.offset(limit * (page - 1)).limit(limit).all()
+        reports = query.offset(limit * (page - 1)).limit(limit + 1).all()
 
         return reports, ""
 
