@@ -36,6 +36,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     this.state = {
       toolType: PaintToolType.DRAW,
     }
+    useWorldEditorStore.getState().setPaintTool({ type: PaintToolType.DRAW });
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
       this.handleTileChange, state => state.paintTool.tileId));
