@@ -94,7 +94,7 @@ export default function WorldReports(props) {
     }
 
     return (
-        <div style={{ paddingTop: '100px', height:"100%"}}>
+        <div style={{ paddingTop: '80px', height:"100%"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md={4}>
                     <Input className="mx-3"
@@ -113,7 +113,7 @@ export default function WorldReports(props) {
                     />
 
                 </Col>
-                <Col md={4}>
+                <Col md={3}>
                     <FormControlLabel
                         className={classes.formControl}
                         control={
@@ -140,7 +140,7 @@ export default function WorldReports(props) {
                         label="Show Banned"
                     />
                 </Col>
-                <Col md={4}>
+                <Col md={3}>
                     <FormControl className={classes.formControl}>
                         <Select
                             labelId="orderBy-label"
@@ -172,9 +172,7 @@ export default function WorldReports(props) {
                         </Select>
                     </FormControl>
                 </Col>
-            </Row>
-            <Row className="my-2" style={{marginLeft:"auto", marginRight:"auto"}}>
-                <Col md="3">
+                <Col md={2}>
                     <Button onClick={handleSubmit}>Search</Button>
                 </Col>
             </Row>

@@ -17,6 +17,8 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
 import { useNavigate } from "react-router-dom";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 const useStyles2 = makeStyles((theme) => ({
   root: {
     width: '90%',
@@ -88,6 +90,10 @@ const useStyles = makeStyles((theme) => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 150,
+    },
 }));
 
 export default function AdminUsers() {
@@ -96,8 +102,8 @@ export default function AdminUsers() {
     const [email, setEmail] = React.useState("");
     const [banned, setBanned] = React.useState(false);
     const [normal, setNormal] = React.useState(true);
-    const [orderBy, setOrderBy] = React.useState(null);
-    const [order, setOrder] = React.useState(null);
+    const [orderBy, setOrderBy] = React.useState("");
+    const [order, setOrder] = React.useState("");
     const [page, setPage] = React.useState(1);
   
     const [users, setUsers] = React.useState([]);
@@ -143,61 +149,78 @@ export default function AdminUsers() {
     
 
     return (
-        <div style={{paddingTop: '100px'}}>
-            <TextField id="user_email" label="User email" type="search" variant="outlined" onChange={handleEmail} />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={normal}
-                        onChange={handleNormal}
-                        name="normal"
-                        color="primary"
+        <div style={{paddingTop: '100px', width:"100%"}}>
+            <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                <Col md={3}>
+                    <TextField className={classes.formControl} id="user_email" placeholder="User email" type="search" onChange={handleEmail} />
+                </Col>
+                <Col md={3}>
+                    <FormControlLabel
+                        className={classes.formControl}
+                        control={
+                            <Checkbox
+                                checked={normal}
+                                onChange={handleNormal}
+                                name="normal"
+                                color="primary"
+                            />
+                        }
+                        label="Show Normal"
                     />
-                }
-                label="Show Normal"
-            />
 
 
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={banned}
-                        onChange={handleBanned}
-                        name="banned"
-                        color="primary"
+                    <FormControlLabel
+                        className={classes.formControl}
+                        control={
+                            <Checkbox
+                                checked={banned}
+                                onChange={handleBanned}
+                                name="banned"
+                                color="primary"
+                            />
+                        }
+                        label="Show Banned"
                     />
-                }
-                label="Show Banned"
-            />
-            <FormControl className={classes.formControl}>
-                <InputLabel id="orderBy-label">Order by</InputLabel>
-                <Select
-                    labelId="orderBy-label"
-                    id="order_by"
-                    value={orderBy}
-                    onChange={handleOrderBy}
-                    autoWidth
-                >
-                    <MenuItem value={"timestamp"}>Date</MenuItem>
-                </Select>
-            </FormControl>
+                </Col>
+                <Col md={4}>
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            labelId="orderBy-label"
+                            id="order_by"
+                            displayEmpty
+                            value={orderBy}
+                            onChange={handleOrderBy}
+                            autoWidth
+                        >
+                            <MenuItem value={""}>
+                                <em>OrderBy</em>
+                            </MenuItem>
+                            <MenuItem value={"timestamp"}>Date</MenuItem>
+                        </Select>
+                    </FormControl>
 
-            <FormControl className={classes.formControl}>
-                <InputLabel id="order-label">Order</InputLabel>
-                <Select
-                    labelId="order-label"
-                    id="order"
-                    value={order}
-                    onChange={handleOrder}
-                    autoWidth
-                >
-                    <MenuItem value={"asc"}>Asc</MenuItem>
-                    <MenuItem value={"desc"}>Desc</MenuItem>
-                </Select>
-            </FormControl>
-
-            <Button id="search" onClick={handleSearch}>Search</Button>
-
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            labelId="order-label"
+                            id="order"
+                            displayEmpty
+                            value={order}
+                            onChange={handleOrder}
+                            autoWidth
+                        >
+                            <MenuItem value={""}><em>Order</em></MenuItem>
+                            <MenuItem value={"asc"}>Asc</MenuItem>
+                            <MenuItem value={"desc"}>Desc</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Col>
+                <Col md={2}>
+                    <Row>
+                        <Button id="search" style={{marginRight:"auto", marginLeft:"auto"}} onClick={handleSearch}>Search</Button>
+                    </Row>
+                </Col>
+            </Row>                
+            <hr/>
             {users && users.length !== 0 ?
             <div>
                 <List className={classes2.root}>

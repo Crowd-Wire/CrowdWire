@@ -20,11 +20,13 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
-        margin: theme.spacing(1),
+        marginLeft: theme.spacing(1),
+        marginRight: theme.spacing(1),
         minWidth: 120,
     },
-    selectEmpty: {
+    checkboxes:{
         marginTop: theme.spacing(2),
+        minWidth: 120
     },
 }));
 
@@ -36,8 +38,8 @@ export default function WorldsList() {
     const [normal, setNormal] = React.useState(true);
     const [banned, setBanned] = React.useState(false);
     const [deleted, setDeleted] = React.useState(false);
-    const [orderBy, setOrderBy] = React.useState("timestamp");
-    const [order, setOrder] = React.useState("desc");
+    const [orderBy, setOrderBy] = React.useState("");
+    const [order, setOrder] = React.useState("");
     const [page, setPage] = React.useState(1);
     const [selectedTags, setSelectedTags] = React.useState([]);
 
@@ -109,109 +111,125 @@ export default function WorldsList() {
 
 
     return (
-        <div style={{ 'paddingTop': '100px' }}>
+        <div style={{ paddingTop: '80px'}}>
+            <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                <Col sm={12} md={6} style={{marginLeft:"auto", marginRight:"auto"}}>
+                    <TextField className={classes.formControl} id="world_name" placeholder="World Name" type="search" onChange={handleWorld} />
+                    <Input className={classes.formControl} type="number" placeholder="Creator Id" onChange={handleCreator} />
+                </Col>
+                <Col sm={12} md={6} style={{marginLeft:"auto", marginRight:"auto"}}>
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            labelId="orderBy-label"
+                            id="order_by"
+                            displayEmpty
+                            value={orderBy}
+                            onChange={handleOrderBy}
+                            autoWidth
+                        >
+                            <MenuItem value={""}>
+                                <em>OrderBy</em>
+                            </MenuItem>
+                            <MenuItem value={"timestamp"}>Date</MenuItem>
+                        </Select>
+                    </FormControl>
 
-            <TextField id="world_name" label="World Name" type="search" variant="outlined" onChange={handleWorld} />
-            <Input type="number" placeholder="Creator Id" onChange={handleCreator} />
-
-            <Autocomplete
-                limitTags={5}
-                style={{ width: "70%", marginLeft: "auto", marginRight: "auto" }}
-                multiple
-                value={selectedTags}
-                onChange={(event, value) => setSelectedTags(value)}
-                id="tags-standard"
-                options={tags}
-                getOptionLabel={(option) => option}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        variant="standard"
-                        label="Tags"
+                    <FormControl className={classes.formControl}>
+                        <Select
+                            labelId="order-label"
+                            id="order"
+                            displayEmpty
+                            value={order}
+                            onChange={handleOrder}
+                            autoWidth
+                        >
+                            <MenuItem value={""}><em>Order</em></MenuItem>
+                            <MenuItem value={"asc"}>Asc</MenuItem>
+                            <MenuItem value={"desc"}>Desc</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Col>
+            </Row>
+            <Row style={{marginLeft:"auto", marginRight:"auto", marginTop:"10px"}}>
+                <Col sm={12} md={5} style={{marginLeft:"auto", marginRight:"auto"}}>
+                    <FormControlLabel
+                        className={classes.checkboxes}
+                        control={
+                            <Checkbox
+                                checked={normal}
+                                onChange={handleNormal}
+                                name="normal"
+                                color="primary"
+                            />
+                        }
+                        label="Show Normal"
                     />
-                )}
-            />
-
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={normal}
-                        onChange={handleNormal}
-                        name="normal"
-                        color="primary"
+                    <FormControlLabel
+                        className={classes.checkboxes}
+                        control={
+                            <Checkbox
+                                checked={banned}
+                                onChange={handleBanned}
+                                name="banned"
+                                color="primary"
+                            />
+                        }
+                        label="Show Banned"
                     />
+
+                    <FormControlLabel
+                        className={classes.checkboxes}
+                        control={
+                            <Checkbox
+                                checked={deleted}
+                                onChange={handleDeleted}
+                                name="deleted"
+                                color="primary"
+                            />
+                        }
+                        label="Show Deleted"
+                    />
+                </Col>
+                <Col sm={12} md={5} style={{marginLeft:"auto", marginRight:"auto"}}>
+                    <Autocomplete
+                        limitTags={5}
+                        style={{ width: "80%", marginLeft: "auto", marginRight: "auto" }}
+                        multiple
+                        value={selectedTags}
+                        onChange={(event, value) => setSelectedTags(value)}
+                        id="tags-standard"
+                        options={tags}
+                        getOptionLabel={(option) => option}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="standard"
+                                label="Tags"
+                            />
+                        )}
+                    />
+                </Col>
+                <Col sm={12} md={2} style={{marginLeft:"auto", marginRight:"auto"}}>
+                    <Button className={classes.checkboxes} style={{marginLeft:"auto", marginRight:"auto"}} id="search" onClick={handleSearch}>Search</Button>
+                </Col>
+            </Row>
+            <hr/>
+            <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                {worlds && worlds.length !== 0 ?
+                    worlds.map((m, i) => {
+                        return (<MapCard key={i} map={m} />)
+                    })
+                    :
+                    <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>
                 }
-                label="Show Normal"
-            />
+            </Row>
 
-
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={banned}
-                        onChange={handleBanned}
-                        name="banned"
-                        color="primary"
-                    />
-                }
-                label="Show Banned"
-            />
-
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={deleted}
-                        onChange={handleDeleted}
-                        name="deleted"
-                        color="primary"
-                    />
-                }
-                label="Show Deleted"
-            />
-
-            <FormControl className={classes.formControl}>
-                <InputLabel id="orderBy-label">Order by</InputLabel>
-                <Select
-                    labelId="orderBy-label"
-                    id="order_by"
-                    value={orderBy}
-                    onChange={handleOrderBy}
-                    autoWidth
-                >
-                    <MenuItem value={"timestamp"}>Date</MenuItem>
-                </Select>
-            </FormControl>
-
-            <FormControl className={classes.formControl}>
-                <InputLabel id="order-label">Order</InputLabel>
-                <Select
-                    labelId="order-label"
-                    id="order"
-                    value={order}
-                    onChange={handleOrder}
-                    autoWidth
-                >
-                    <MenuItem value={"asc"}>Asc</MenuItem>
-                    <MenuItem value={"desc"}>Desc</MenuItem>
-                </Select>
-            </FormControl>
-
-            <Button id="search" onClick={handleSearch} >Search</Button>
-
-
-            {worlds && worlds.length !== 0 ?
-                worlds.map((m, i) => {
-                    return (<MapCard key={i} map={m} />)
-                })
-                :
-                <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>
-            }
 
 
             {worlds === null || worlds.length === 0 ?
                 <></>
                 :
-                <Row style={{ marginBottom: "30px" }}>
+                <Row style={{ marginBottom: "30px", marginLeft:"auto", marginRight:"auto"}}>
                     <Pagination onChange={(event, page1) => { setPage(page1); handleSearch() }} style={{ marginLeft: "auto", marginRight: "auto" }} count={10} />
                 </Row>
             }
