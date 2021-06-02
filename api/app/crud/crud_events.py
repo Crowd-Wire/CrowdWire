@@ -32,6 +32,9 @@ class CRUDEvents:
             end_date: datetime.datetime = None,
             order_desc: bool = True
     ):
+        if page_num < 1:
+            return None, strings.INVALID_PAGE_NUMBER
+
         query = db.query(Event).filter(Event.world_id == world_id)
         if user_id:
             query = query.filter(Event.user_id == user_id)
