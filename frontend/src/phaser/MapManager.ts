@@ -74,7 +74,7 @@ class MapManager {
         const tilesets: Tilemaps.Tileset[] = []
         this.tilesetKeys.forEach((key) => {
             tilesets.push(this.map.addTilesetImage(key));
-        })
+        });
         this.objectKeys.forEach((key) => {
             this.map.addTilesetImage(key);
         });
@@ -85,8 +85,6 @@ class MapManager {
         })
 
         this.state = MapManagerState.BUILT;
-
-
         return this.map;
     }
 
@@ -124,6 +122,47 @@ class MapManager {
             })
         console.log(this.map)
         return { group, collisionGroup };
+    }
+
+    /**
+     * Create a new tileset to represent the new conference tiles
+     */
+    addConference(cid: string): void {
+        // Create tileset
+        const id: number = parseInt(cid.substr(1), 10);
+        const newTileset = new Tilemaps.Tileset(`__conference${cid}`, 100000 + id, 32, 32, 0, 0);
+        newTileset.setImage(this.map.scene.textures.get('util-tiles'))
+
+        // Add tileset to map
+        this.map.tilesets.push(newTileset);
+
+        // Add tileset to conference layer
+        const tilesets = this.map.getLayer('Room').tilemapLayer.tileset.concat(newTileset);
+        (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(tilesets);
+    }
+
+    removeConference(cid: string): void {
+        // Remove tileset from map
+        let arr = this.map.tilesets;
+        for (let i = 0; i < arr.length; i++) {
+            const tileset = arr[i];
+        
+            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+                arr.splice(i, 1);
+                break;
+            }
+        }
+        // Remove tileset conference layer
+        arr = this.map.getLayer('Room').tilemapLayer.tileset;
+        for (let i = 0; i < arr.length; i++) {
+            const tileset = arr[i];
+        
+            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+                arr.splice(i, 1);
+                break;
+            }
+        }
+        (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(this.map.getLayer('Room').tilemapLayer.tileset);
     }
 
     saveMap(): void {
