@@ -1,4 +1,4 @@
-from copy import copy, deepcopy
+from copy import deepcopy
 from typing import Union, Optional, List, Tuple, Any, Dict
 
 from sqlalchemy.orm import Session
@@ -9,7 +9,6 @@ from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings, consts
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
-from loguru import logger
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
