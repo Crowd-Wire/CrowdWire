@@ -214,11 +214,13 @@ class WorldEditorScene extends Scene {
                             const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
                             console.log(tint);
                             tileId = this.mapManager.getConferenceId(tileId);
-                            activeLayer.fill(tileId, tileX, tileY, 1, 1);
-                            const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
-                            console.log(tint)
-                            tile.tint = tint;
-                            console.log(tile)
+                            if (tileId >= 0) {
+                                activeLayer.fill(tileId, tileX, tileY, 1, 1);
+                                const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
+                                console.log(tint)
+                                tile.tint = tint;
+                                console.log(tile)
+                            }
                         } else {
                             activeLayer.fill(tileId, tileX, tileY, 1, 1);
                         }

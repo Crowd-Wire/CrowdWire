@@ -129,12 +129,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   subscriptions: any[];
   mapManager: MapManager;
-  didMount: boolean;
+  flag: boolean;
 
   constructor(props) {
     super(props);
     this.subscriptions = [];
-    this.didMount = false;
+    this.flag = false;
 
     this.state = {
       activeConference: null,
@@ -156,10 +156,10 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   componentDidUpdate() {
     const activeConference = this.state.activeConference;
-    if (this.didMount) {
-      useWorldEditorStore.getState().setPaintTool({ tileId: activeConference });
-    } else {
-      this.didMount = true;
+    if (this.flag) {
+        console.log(activeConference, useWorldEditorStore.getState().paintTool.tileId)
+        useWorldEditorStore.getState().setPaintTool({ tileId: activeConference });
+        this.flag = false;
     }
   }
 
@@ -197,6 +197,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     } else {
       const conferences = this.state.conferences;
       conferences[id].name = name;
+      this.flag = true;
       this.setState({ conferences, activeConference: id });
       useWorldEditorStore.getState().setState({ conferences, activeConference: id });
     }

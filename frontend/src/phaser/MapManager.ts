@@ -147,6 +147,7 @@ class MapManager {
                 return tileset.firstgid;
             }
         }
+        return -1;
     }
 
     removeConference(cid: string): void {
