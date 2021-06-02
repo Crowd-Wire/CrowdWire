@@ -9,7 +9,6 @@ import Email from "@material-ui/icons/Email";
 // core components
 // import Header from "components/Header/Header.js";
 // import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -27,6 +26,9 @@ import image from "assets/img/bg8.png";
 import Typography from "@material-ui/core/Typography"
 import { toast } from 'react-toastify';
 import GoogleLogin from 'react-google-login';
+import useAuthStore from "stores/useAuthStore";
+import { createBrowserHistory } from 'history';
+
 
 class LoginPage extends React.Component {
 
@@ -42,6 +44,8 @@ class LoginPage extends React.Component {
 
 
   componentDidMount() {
+    console.log(useAuthStore.getState())
+    // console.log(this.goBack())
     this.setState({ cardAnimaton: "cardHidden" })
   }
 
@@ -49,6 +53,12 @@ class LoginPage extends React.Component {
     this.setState({cardAnimaton:""})},300
 
   );
+
+  goBack(){
+    const history = createBrowserHistory();
+    history.back();
+  } 
+  
 
   notify = (authType) => {
     if(authType==="Auth"){
@@ -245,7 +255,6 @@ class LoginPage extends React.Component {
               </GridItem>
             </GridContainer>
           </div>
-          <Footer whiteFont />
         </div>
       </div>
 

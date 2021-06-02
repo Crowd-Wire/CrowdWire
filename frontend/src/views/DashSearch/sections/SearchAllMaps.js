@@ -96,6 +96,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
+		console.log(useAuthStore.getState().last_location)
 		WorldService.searchUsers("", [], this.type, null, null, 1, 10)
 			.then((res) => {
 				if(res.status == 200) 
