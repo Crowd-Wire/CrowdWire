@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import WorldService from 'services/WorldService';
-import Pagination from '@material-ui/lab/Pagination';
+import Paginator from 'components/Paginator/Paginator.js';
 import Typography from '@material-ui/core/Typography';
 import useAuthStore from "stores/useAuthStore";
 import IntroText from 'components/IntroText/IntroText';
@@ -59,6 +59,8 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
+	limit = 1;
+
 	constructor(props){
 		super(props)
 		this.type = props.params.type;
@@ -76,15 +78,15 @@ class SearchAllMaps extends Component {
 	}
 
 	search_handler = () => {
-		WorldService.searchUsers(this.state.search, this.state.tags, this.type, null, null, this.state.page, 10)
+		WorldService.searchUsers(this.state.search, this.state.tags, this.type, null, null, this.state.page, this.limit)
 			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
 			.catch((err) => { useAuthStore.getState().leave() });
 	}
 
-	changePage = async (event, page) => {
+	changePage = async (page) => {
 		await this.setState({page: page});
-		this.search_handler(this.state.prevSearch, this.state.prevTags);
+		this.search_handler();
 	}
 
 	changeTags = async (value) => {
@@ -96,7 +98,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
-		WorldService.searchUsers("", [], this.type, null, null, 1, 10)
+		WorldService.searchUsers("", [], this.type, null, null, 1, this.limit)
 			.then((res) => {
 				if(res.status == 200) 
 					return res.json()
@@ -106,13 +108,13 @@ class SearchAllMaps extends Component {
 					this.setState({ maps: res }) 
 			}).catch((error) => {useAuthStore.getState().leave()});
 	}
-	async componentDidUpdate(){
+	async componentDidUpdate(prevProps, prevState){
 		// TODO: there might be a bug here because of the page variable when calling the service
 		// TODO: add the order_by filters
-		if(this.type!=this.props.params.type){
+		if(this.type != this.props.params.type) {
 			this.type = this.props.params.type;
-			await this.setState({prevSearch: "", prevTags: []});
-			WorldService.searchUsers("", [], this.type, null, null, this.state.page, 10)
+			await this.setState({search: "", tags: []});
+			WorldService.searchUsers("", [], this.type, null, null, this.state.page, this.limit)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()
@@ -123,6 +125,7 @@ class SearchAllMaps extends Component {
 					this.setState({search:"", tags: []});
 				}).catch((error) => {useAuthStore.getState().leave()});
 		}
+
 	}
 
 	render() {
@@ -135,27 +138,25 @@ class SearchAllMaps extends Component {
 							<IntroText />
 						</Col>
 					</Row>
-					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
+					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={() => {this.changePage(1)}} />
 					<hr />
-					<Row style={{marginTop: 50, textAlign: 'center', width: '100%' }}>
 
-						{ this.state.maps!==null && this.state.maps.length!==0 ? 
-							this.state.maps.map((m, i) => {
-								return (<MapCard key={i} focusMap={this.focusMap} map={m} />)
-							})
+					<Row style={{marginTop: 50, marginBottom: 50}}>
+						{this.state.maps!==null && this.state.maps.length!==0 ? 
+						this.state.maps.map((m, i) => {
+							if(i !== this.limit)
+								return (
+									<MapCard key={i} focusMap={this.focusMap} map={m} />
+								)
+						})
 						:
 							<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
 						}
 
 					</Row>
 					<hr />
-					{this.state.maps===null || this.state.maps.length===0 ?
-						<></>
-						:
-						<Row style={{paddingBottom:"35px"}}>
-							<Pagination color="primary" onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto", color:"white"}} count={10} />
-						</Row>
-					}
+
+					<Paginator hasNext={this.state.maps.length === this.limit + 1} page={this.state.page} changePage={(page) => {this.changePage(page)}} />
 				</Container>
 			</>
 		);

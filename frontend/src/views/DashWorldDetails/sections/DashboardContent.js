@@ -110,7 +110,6 @@ class DashboardContent extends Component{
 					,toast_props);
 					this.navigate();
 				} else {
-					console.log(res)
 					this.setState({worldInfo:res, isCreator: res.is_creator, canManage: res.can_manage})
 					if (res.tags !==undefined) {
 						let chosTags = []

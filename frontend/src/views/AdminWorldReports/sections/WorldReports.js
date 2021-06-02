@@ -13,6 +13,7 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
+import Paginator from 'components/Paginator/Paginator.js';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 export default function WorldReports(props) {
 
     const classes = useStyles();
-    const [page, setPage] = React.useState("1");
+    const [page, setPage] = React.useState(1);
     const [reports, setReports] = React.useState([]);
     const [orderBy, setOrderBy] = React.useState("");
     const [order, setOrder] = React.useState("");
@@ -35,6 +36,8 @@ export default function WorldReports(props) {
     const [reviewed, setReviewed] = React.useState(false);
     const [world, setWorld] = React.useState(null);
     const [reporter, setReporter] = React.useState(null);
+
+    const limit = 10;
 
     // matches positive integers and empty string
     const numberRegex = /[0-9]+|^/;
@@ -57,8 +60,12 @@ export default function WorldReports(props) {
     React.useEffect(() => {
         // this will call the function with page=1
         // limit is also an option but shouldnt be used because it can complicate the css
-        request(null, null, null, null, null, null, 1, null);
+        request(null, null, null, null, null, null, 1, limit);
     }, []);
+
+    React.useEffect(() => {
+        handleSubmit();
+    }, [page]);
 
     const handleOrderBy = (event) => {
         setOrderBy(event.target.value);
@@ -89,8 +96,19 @@ export default function WorldReports(props) {
       
     }
 
-    const handleSubmit = () => {
-        request(world, reporter, reviewed, banned, orderBy, order, page, 10);
+    const changePage = (page) => {
+        setPage(page);
+    }
+
+    const handleSubmit = (newRequest) => {
+        if(newRequest){
+            if(page !== 1)
+                setPage(1);
+            else
+                request(world, reporter, reviewed, banned, orderBy, order, 1, limit);
+
+        }
+        request(world, reporter, reviewed, banned, orderBy, order, page, limit);
     }
 
     return (
@@ -175,22 +193,25 @@ export default function WorldReports(props) {
             </Row>
             <Row className="my-2" style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md="3">
-                    <Button onClick={handleSubmit}>Search</Button>
+                    <Button onClick={() => {handleSubmit(1)}}>Search</Button>
                 </Col>
             </Row>
             <hr/>
             <div className="">
                 <Row className="my-3" style={{marginLeft:"auto", marginRight:"auto"}}>
                 {reports.map((r, i) => {
-                    console.log(JSON.stringify(r));
-                    return (
-                        <Col md={4} sm={6}>
-                            <WorldReportCard key={r.reported + '_' + r.reporter + '_' + r.reviewed} report={r} /> 
-                        </Col>
-                        )
-                    })}
+                    if(i !== limit)
+                        return (
+                            <Col md={4} sm={6}>
+                                <WorldReportCard key={r.reported + '_' + r.reporter + '_' + r.reviewed} report={r} /> 
+                            </Col>
+                            )
+                        }
+                )}
                 </Row>
             </div>
+            <hr />
+            <Paginator hasNext={reports.length === limit + 1} page={page} changePage={(page) => {changePage(page)}} />
         </div>
     )
 }

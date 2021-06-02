@@ -14,6 +14,7 @@ const useAuthStore = createStore(
             token: String as null,
             expire_date: String as null,
             guest_uuid: String as null,
+            last_location: String as null,
             login: (token: string, expire_date: string) => {
                 set((state) => ({
                     token:token,
@@ -39,6 +40,13 @@ const useAuthStore = createStore(
                         token: token,
                         expire_date: expire_date
                 }))
+            },
+            setLastLocation: (loc) => {
+                if (loc !== "/login" && loc !== "login") {
+                    set((state) => ({
+                        last_location: loc
+                    }))
+                }
             }
         })
     ),

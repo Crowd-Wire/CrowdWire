@@ -195,9 +195,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                requester_id: int = None,
                ):
 
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
         if not tags:
             tags = []
-
         query = db.query(World)
 
         if is_guest:
@@ -228,15 +229,12 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-        if order == 'desc':
-            ord = desc
-        else:
-            ord = asc
+        ord = desc if order == 'desc' else asc
         # TODO: change this to add more filters, also change the name of this one it is only an example
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
 
-        return query.offset(limit * (page - 1)).limit(limit).all(), ""
+        return query.offset(limit * (page - 1)).limit(limit + 1).all(), ""
 
     def filter_by_visibility(self, query, visibility: str, requester_id: int):
         # normal users cannot access deleted worlds
