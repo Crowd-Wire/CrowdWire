@@ -108,12 +108,12 @@ class SearchAllMaps extends Component {
 					this.setState({ maps: res }) 
 			}).catch((error) => {useAuthStore.getState().leave()});
 	}
-	async componentDidUpdate(){
+	async componentDidUpdate(prevProps, prevState){
 		// TODO: there might be a bug here because of the page variable when calling the service
 		// TODO: add the order_by filters
 		if(this.type != this.props.params.type) {
 			this.type = this.props.params.type;
-			await this.setState({prevSearch: "", prevTags: []});
+			await this.setState({search: "", tags: []});
 			WorldService.searchUsers("", [], this.type, null, null, this.state.page, this.limit)
 				.then((res) => {
 					if(res.status == 200) 
@@ -138,7 +138,7 @@ class SearchAllMaps extends Component {
 							<IntroText />
 						</Col>
 					</Row>
-					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
+					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={() => {this.changePage(1)}} />
 					<hr />
 					<Row style={{marginTop: 50, marginBottom: 50}}>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
