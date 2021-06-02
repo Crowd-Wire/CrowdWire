@@ -23,6 +23,9 @@ class CRUDReport_World(CRUDBase[Report_World, ReportWorldCreate, ReportWorldUpda
         Returns every report for that world.
         """
 
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
+
         # this query gets all reports for a world and gets the email and name the of the world
         query = db.query(
             Report_World.reported,

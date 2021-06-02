@@ -35,6 +35,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         """
         Filters the users of the platform. This endpoint can only be used by the admin.
         """
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
+
         query = db.query(User)
 
         if email:

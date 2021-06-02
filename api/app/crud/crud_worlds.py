@@ -206,6 +206,9 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                requester_id: int = None,
                ):
 
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
+
         if not tags:
             tags = []
 
