@@ -62,7 +62,8 @@ async def edit_role_in_world(
     if not role:
         raise HTTPException(status_code=400, detail=msg)
 
-    role_obj_upd, msg = await crud_role.update(db=db, db_obj=role, obj_in=role_in, world_id=world_id)
+    role_in.world_id = world_id
+    role_obj_upd, msg = await crud_role.update(db=db, db_obj=role, obj_in=role_in)
     if role_obj_upd is None:
         raise HTTPException(status_code=400, detail=msg)
     return role_obj_upd

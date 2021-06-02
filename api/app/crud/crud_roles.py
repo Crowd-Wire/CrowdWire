@@ -1,3 +1,4 @@
+from copy import copy, deepcopy
 from typing import Union, Optional, List, Tuple, Any, Dict
 
 from sqlalchemy.orm import Session
@@ -8,7 +9,7 @@ from app.schemas import RoleCreate, RoleUpdate
 from ..core import strings, consts
 from ..redis.redis_decorator import cache, clear_cache_by_model
 from app.crud import crud_user
-from app.utils import row2dict
+from loguru import logger
 
 
 class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
@@ -188,22 +189,23 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             *,
             db_obj: Role,
             obj_in: Union[RoleUpdate, Dict[str, Any]],
-            world_id: int
     ) -> Tuple[Optional[Role], str]:
+
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
             update_data = obj_in.dict(exclude_unset=True)
 
+        if 'world_id' not in update_data:
+            return None, ""
         # cannot change default role without setting a new one
-        if 'is_default' in update_data and not update_data['is_default']:
+        if db_obj.is_default and 'is_default' in update_data and not update_data['is_default']:
             return None, "cannot remove default role"
 
-        # this is required because when converting a sqlalchemy model to dict it returns another attribute
-        # sa_instance
-        new_data = row2dict(db_obj)
+        # a deepcopy is needed in order to get a new reference to the object dictionary
+        # otherwise, the original db_obj would be affected
+        new_data = deepcopy(db_obj.__dict__)
         new_data.update(update_data)
-
         # when trying to change the default role there cannot be some permissions in this role
         if new_data.get('is_default'):
             # the new object in the database cannot have some permissions
@@ -212,7 +214,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                     return None, "cannot give this permissions to default role"
 
             # change old default role to not default
-            default_role = self.get_world_default(db=db, world_id=world_id)
+            default_role = self.get_world_default(db=db, world_id=obj_in['world_id'])
             if default_role.role_id != db_obj.role_id:
                 default_role.is_default = False
                 db.add(default_role)
