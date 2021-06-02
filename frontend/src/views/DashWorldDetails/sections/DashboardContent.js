@@ -129,8 +129,9 @@ class DashboardContent extends Component{
 				})
 			.then((res) => {
 				let arr = [];
-				if(res)
+				if(res){
 					res.forEach(tag => arr.push(tag.name)); 
+				}
 				this.setState({tags: arr})
 			})
 	

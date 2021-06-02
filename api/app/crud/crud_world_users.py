@@ -116,6 +116,7 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
             'user_id': user_to_change,
             'role_id': world_user_obj.role.role_id,
             'avatar': world_user_obj.avatar,
+            'last_pos': world_user_obj.last_pos,
             'username': world_user_obj.username
         }
         world_user.update(data)

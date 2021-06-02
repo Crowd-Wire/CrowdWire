@@ -24,6 +24,7 @@ interface WorldUser {
     username: string;
     in_conference: string;
     color?: string;
+    last_pos?: any;
     map?: string;
 }
 
