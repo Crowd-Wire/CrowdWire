@@ -47,7 +47,7 @@ class GameScene extends Phaser.Scene {
 
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
-        if (last_pos){
+        if (Object.keys(last_pos).length !== 0) {
             this.player = new Player(this, last_pos.x, last_pos.y);
         } else {
             this.player = new Player(this, 50, 50);
@@ -70,7 +70,7 @@ class GameScene extends Phaser.Scene {
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
-        if (last_pos){
+        if (Object.keys(last_pos).length !== 0) {
             this.ws.joinPlayer({x: last_pos.x, y: last_pos.y});
         } else {
             this.ws.joinPlayer({x: 50, y: 50});

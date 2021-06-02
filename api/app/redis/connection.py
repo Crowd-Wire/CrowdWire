@@ -18,14 +18,14 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
-        # self.master = await aioredis.create_connection('redis://localhost/0')
-        # await self.master.execute('flushall')
+        self.master = await aioredis.create_connection('redis://localhost/0')
+        await self.master.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -320,6 +320,8 @@ class RedisConnector:
 
     async def set_user_position(self, world_id: str, user_id: str, position: dict):
         """Update last user position received"""
+        if not position:
+            position = {'x': 50.0, 'y': 50.0}
         return await self.master.execute('hmset',
                                          f"world:{world_id}:user:{user_id}:position", 'x', position['x'],
                                          'y', position['y'])
