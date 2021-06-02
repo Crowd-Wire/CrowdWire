@@ -146,6 +146,9 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
+    
+    const { conferences, activeConference } = useWorldEditorStore.getState();
+    this.setState({ conferences, activeConference });
   }
 
   componentDidUpdate() {

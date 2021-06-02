@@ -46,7 +46,6 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   handleTileChange = (paintTool) => {
-    console.log(`tile-${paintTool.tileId}`)
     const tileElem: any = document.getElementById(`tile-${paintTool.tileId}`).cloneNode(true);
     tileElem.removeAttribute('id');
     tileElem.style["transform"] = "scale(2.5)";

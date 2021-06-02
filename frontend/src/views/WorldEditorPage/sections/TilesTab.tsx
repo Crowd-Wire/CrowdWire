@@ -75,6 +75,7 @@ class TilesTab extends Component<{}, TilesTabState> {
             inputProps={{
               id: 'select-tileset',
             }}
+            style={{minWidth: '15ch'}}
           >
             <option aria-label="None" value="" />
             {
