@@ -62,7 +62,6 @@ const GamePage = (props) => {
           navigation("/dashboard/search/public");
         }
         else {
-          console.log(res)
           useWorldUserStore.getState().joinWorld(res);
           setUsername(res.username)
           setLoading(0);
