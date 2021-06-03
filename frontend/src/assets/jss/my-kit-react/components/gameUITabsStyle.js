@@ -5,13 +5,13 @@ const gameUITabsStyle = {
   card: {
     boxSizing: 'border-box',
     padding: '5px',
-    backgroundColor: "rgba(200, 200, 200, .3)",
+    backgroundColor: "rgba(11, 19, 43, 0.8)",
+    borderRadius: '0 !important',
     margin: 0,
     flexGrow: '1',
     display: 'flex',
     flexDirection: 'column',
-    /* for Firefox */
-    minHeight: '0',
+    minHeight: '0', // for Firefox
   },
   cardHeader: {
     padding: "3px 0 0 0",
@@ -24,7 +24,19 @@ const gameUITabsStyle = {
     overflow: 'auto',
     minHeight: 0, // for Firefox
     flexGrow: 1,
-    backgroundColor: "#777"
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    "&::-webkit-scrollbar-track": {
+      '-webkit-box-shadow': 'inset 0 0 6px rgba(0,0,0,0.3)',
+      backgroundColor: 'transparent',
+    },
+    "&::-webkit-scrollbar": {
+      backgroundColor: 'transparent',
+      width: 12,
+      height: 12,
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: 'rgb(11, 19, 43)',
+    }
   },
   tabRootButton: {
     minHeight: "unset !important",
@@ -35,17 +47,14 @@ const gameUITabsStyle = {
     maxHeight: "unset !important",
     borderRadius: "3px 3px 0 0",
     lineHeight: "6px",
-    backgroundColor: "rgba(9, 25, 33, .5) !important",
+    backgroundColor: "rgba(11, 19, 43, 0.5) !important",
     border: "0 !important",
     color: "#fff !important",
     fontWeight: "500",
     fontSize: "12px",
-    "&:first-child": {
-      marginLeft: "4px"
-    }
   },
   tabSelected: {
-    backgroundColor: "rgba(9, 25, 33, 1)",
+    backgroundColor: "rgba(11, 19, 43, 1) !important",
     transition: "0.2s background-color 0.1s"
   },
 };
