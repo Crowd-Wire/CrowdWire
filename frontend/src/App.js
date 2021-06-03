@@ -15,8 +15,9 @@ export default function App(){
   const token = useAuthStore(state => state.token);
   const expire_date = useAuthStore(state => state.expire_date);
   const guest_uuid = useAuthStore(state => state.guest_uuid);
+  const is_superuser = useAuthStore(state => state.is_superuser);
   const last_location = useAuthStore(state => state.last_location);
   return <PersistGate>
-    {useRoutes(routes(token, guest_uuid, last_location))}
+    {useRoutes(routes(token, guest_uuid, last_location, is_superuser))}
   </PersistGate>; 
 }

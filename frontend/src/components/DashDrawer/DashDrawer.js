@@ -114,6 +114,11 @@ export default function DashDrawer(props){
   const onClickUserSettings = () => {
     navigation("/dashboard/user");
   }
+
+  const onClickPlatformStats = () => {
+    navigation("/admin/worlds");
+  }
+
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -205,15 +210,15 @@ export default function DashDrawer(props){
                   })}/>
             </ListItem>
           }
-          { st.guest_uuid ?
+          { !st.is_superuser ?
             <></>
             :
-          <ListItem onClick={onClickUserSettings} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Settings" style={{position: "fixed", bottom: stats}}>
+          <ListItem onClick={onClickPlatformStats} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+            button key="Platform Statistics" style={{position: "fixed", bottom: stats}}>
           <ListItemIcon>
               <EqualizerIcon className={classes.iconDrawer}/>
           </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+          <ListItemText style={{ color: '#FFFFFF' }} primary="Platform Statistics"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           }
