@@ -137,12 +137,11 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         db.commit()
 
         # Create Default Roles for a World
-        default_role = crud_role.create_default(db=db, world_id=db_world.world_id)
+        crud_role.create_default(db=db, world_id=db_world.world_id)
 
         world_user, msg = await crud_world_user.join_world(db=db, _world=db_world, _user=user)
         if world_user is None:
             return None, msg
-        logger.debug(default_role)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
 
