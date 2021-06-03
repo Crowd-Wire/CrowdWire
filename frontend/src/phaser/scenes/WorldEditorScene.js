@@ -51,42 +51,6 @@ class WorldEditorScene extends Scene {
         // Emit READY to dependent components
         useWorldEditorStore.getState().setState({ ready: true });
 
-        // const newTileset = new Tilemaps.Tileset('__conference2', 1000, 32, 32, 0, 0, [{
-        //     "name":"idgeneral",
-        //     "type":"string",
-        //     "value":"C1"
-        //    }]).setImage(this.textures.get('util-tiles')).updateTileData(96, 64);
-        // const newTileset = this.map.addTilesetImage("util-tile");
-
-        //  addTilesetImage: function (tilesetName, key, tileWidth, tileHeight, tileMargin, tileSpacing, gid)
-        // const newTileset = this.map.addTilesetImage('__conference2', 'util-tiles', 32, 32, 0, 0, 1000,);
-
-        // newTileset = new Tileset(tilesetName, gid, tileWidth, tileHeight, tileMargin, tileSpacing);
-        
-
-        // this.map.getLayer('Room').tilemapLayer.tileset.splice(5, 1);
-        // this.map.getLayer('Room').tilemapLayer.setTilesets(this.map.getLayer('Room').tilemapLayer.tileset);
-        // this.map.tilesets.splice(h-1, 1);
-
-        // newTileset.firstgid = 1000;
-
-        // this.map.tilesets.push( 
-        //     newTileset
-        // )
-        // this.map.getLayer('Room').tilemapLayer.tileset.push(newTileset);
-        /*
-        this.mapManager.addConference('C0');
-
-        this.map.getLayer('Room').tilemapLayer.fill(100000, 1, 1, 1, 1);
-        const v = this.map.getTileAt(1, 1, false, 'Room');
-        // v.tileset = newTileset;
-        v.tint = 0x00ff00;
-        console.log(v);
-        
-        const w = this.map.getTileAt(14, 5, false, 'Room');
-        w && (w.tint = 0x00ff00);
-        console.log(w);*/
-
         const width = this.map.widthInPixels,
             height = this.map.heightInPixels,
             margin = 100,
@@ -99,8 +63,17 @@ class WorldEditorScene extends Scene {
                 width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
             .setBackgroundColor("#0C1117")
             .setZoom(1.5).centerToBounds();
-
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
+        
+        const grid1 = this.add.grid(width/2, height/2, width, height, 32, 32)
+            .setOutlineStyle(0x000000)
+            .setDepth(1001);
+        grid1.showOutline = false;
+
+        const grid2 = this.add.grid(width/2, height/2, width, height, 16, 16)
+            .setOutlineStyle(0x000000, 0.1)
+            .setDepth(1001);
+        grid2.showOutline = false;
 
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -129,41 +102,35 @@ class WorldEditorScene extends Scene {
         this.subscriptions.push(useWorldEditorStore.subscribe(
             this.handleConferencesChange, state => Object.keys(state.conferences)));
 
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (grid) => {grid1.showOutline = grid2.showOutline = grid }, state => state.grid));
+
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
-        console.log(prevConferences, conferences)
         if (conferences.length > prevConferences.length) {
-            // add conference
+            // Add conference
             for (const cid of conferences) {
                 if (prevConferences.indexOf(cid) < 0) {
-                    console.log('ADD')
                     this.mapManager.addConference(cid);
                     break;
                 }
             }
-            console.log(this.map)
-
         } else if (conferences.length < prevConferences.length) {
-            // del conference
+            // Delete conference
             for (const cid of prevConferences) {
                 if (conferences.indexOf(cid) < 0) {
-                    console.log('DEL')
-
                     this.mapManager.removeConference(cid);
                     break;
                 }
             }
-            console.log(this.map)
         }
     }
 
     handleLayersChange = ([layers, highlight]) => {
-        console.log(this)
-        
         Object.entries(layers).forEach(([name, layer]) => {
             const activeLayer = this.map.getLayer(name)?.tilemapLayer;
     
@@ -178,7 +145,7 @@ class WorldEditorScene extends Scene {
                 this.collisionGroup.setVisible(layer.visible);
                 this.collisionGroup.setAlpha(layer.active || !highlight ? 1 : 0.5);
             }
-        })
+        });
     }
 
     updateEdit = () => {

@@ -31,6 +31,7 @@ const useWorldEditorStore = create(
     combine(
         {   
             ready: false,
+            grid: false,
             highlight: false,
             activeLayer: null,
             activeConference: null,

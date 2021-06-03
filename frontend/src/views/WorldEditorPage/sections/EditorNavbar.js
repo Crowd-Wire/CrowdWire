@@ -21,8 +21,6 @@ class EditorNavbar extends React.Component {
     const name = event.target.name;
     const value = !this.state[name];
 
-    console.log(name, value)
-
     this.setState({ [name]: value });
     useWorldEditorStore.getState().setState({ [name]: value });
   }
