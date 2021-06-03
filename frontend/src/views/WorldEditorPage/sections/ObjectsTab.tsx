@@ -81,31 +81,6 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
             ></div>
           );                   
         }
-
-        // for (let i = 0; i < rows; i++)
-        //   for (let j = 0; j < columns; j++) {
-        //     const id = (firstgid + i * columns + j).toString();
-        //     const imageURL = API_BASE + "static/maps/" + tilesetURL;
-        //     const style = {
-        //       backgroundImage: `url(${imageURL})`,
-        //       backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
-        //     };
-        //     useWorldEditorStore.getState().addTile(id, { style });
-        //     tiles.push(
-        //       <div
-        //         key={id}
-        //         id={`tile-${id}`}
-        //         onClick={() => this.handleClick(id)}
-        //         style={{
-        //           width: tileWidth,
-        //           height: tileHeight,
-        //           ...style,
-        //           ...objectStyle,
-        //         }}
-        //       ></div>
-        //     );
-        //   }
-
         collectionObjects[collection.name] = objects;
       }
     }

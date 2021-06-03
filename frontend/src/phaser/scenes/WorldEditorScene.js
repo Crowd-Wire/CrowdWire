@@ -148,6 +148,33 @@ class WorldEditorScene extends Scene {
         });
     }
 
+    fillBFS(layer, tileId, x, y, tint) {
+        let count = 400;
+        const replaceId = layer.getTileAt(x, y, true).index,
+            queue = [{ x, y }];
+
+        console.log(layer, tileId, x, y, tint)
+    
+        while (queue.length > 0) {
+            const { x, y } = queue.shift(),
+                destinations = [{ x: x-1, y }, { x: x+1, y }, { x, y: y-1 }, { x, y: y+1 }];
+    
+            for (const dest of destinations) {
+                const { x, y } = dest,
+                    tile = layer.getTileAt(x, y, true);
+
+                if (tile && tile.index === replaceId) {
+                    console.log(tile.index, replaceId)
+                    layer.fill(tileId, x, y, 1, 1);
+                    tint && (tile.tint = tint);
+                    queue.push(dest);
+                    if (count-- < 0)
+                        return;
+                }
+            }
+        }
+    }
+
     updateEdit = () => {
         if (!this.paintTool)
             return;
@@ -177,16 +204,13 @@ class WorldEditorScene extends Scene {
                     // Layer exists
                     if (this.paintTool.type === PaintToolType.DRAW && activeTile) {
                         let tileId = activeTile;
-                        console.log(tileId)
                         if (tileId[0] === 'C') {
                             const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
                             tileId = this.mapManager.getConferenceGid(tileId);
-                            if (tileId >= 0) {
+                            if (tileId) {
                                 activeLayer.fill(tileId, tileX, tileY, 1, 1);
                                 const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
-                                console.log(tint)
                                 tile.tint = tint;
-                                console.log(tile)
                             }
                         } else {
                             activeLayer.fill(tileId, tileX, tileY, 1, 1);
@@ -201,6 +225,27 @@ class WorldEditorScene extends Scene {
                             // Check if index is from a conference tile and set active tile accordingly
                             const cid = this.mapManager.getConferenceCid(tile.index);
                             useWorldEditorStore.getState().setState({ activeTile: cid || tile.index })
+                        }
+                    } else if (this.paintTool.type === PaintToolType.FILL) {
+                        const tile = activeLayer.getTileAt(tileX, tileY, false /**bug if true */, activeLayerName);
+                        if (tile) {
+                            // Check if index is from a conference tile and set active tile accordingly
+                            const cid = this.mapManager.getConferenceCid(tile.index);
+                            const tileIndex = cid || tile.index;
+
+                            console.log(tileId, tileIndex)
+
+                            let tileId = activeTile;
+                            if (tileId[0] === 'C') {
+                                const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
+                                tileId = this.mapManager.getConferenceGid(tileId);
+                                if (tileId && tileId != tileIndex) {
+                                    this.fillBFS(activeLayer, tileId, tileX, tileY, tint);
+                                }
+                            } else if (tileId != tileIndex) {
+                                console.log('entriy')
+                                this.fillBFS(activeLayer, tileId, tileX, tileY);
+                            }
                         }
                     }
                 }
