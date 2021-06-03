@@ -15,7 +15,7 @@ class WorldEditorScene extends Scene {
 
     constructor() {
         super(sceneConfig);
-        this.paintTool = null;
+        this.paintTool = { type: PaintToolType.DRAW };
         this.subscriptions = [];
     }
 
