@@ -98,8 +98,6 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
-            console.log(res)
-
             if (res.detail){
               toast.dark(
                 <span>

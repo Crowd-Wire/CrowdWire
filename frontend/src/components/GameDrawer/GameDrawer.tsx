@@ -27,7 +27,10 @@ import { useNavigate } from "react-router-dom";
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
 import useMessageStore from 'stores/useMessageStore';
+import useWorldUserStore from 'stores/useWorldUserStore';
 import usePlayerStore from 'stores/usePlayerStore';
+import useAuthStore from 'stores/useAuthStore';
+
 
 const drawerWidth = 360;
 const sideBarWidth = 80;
@@ -63,7 +66,7 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: 'flex-end'
     },
     drawer: {
-      // width: drawerWidth,
+      //width: drawerWidth,
       flexShrink: 0,
     },
     drawerPaper: {
@@ -101,6 +104,7 @@ const GameDrawer = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
+    console.log(useWorldUserStore.getState())
     if (!textChat) {
       textChat = document.getElementById('text-chat');
     } else {
@@ -246,31 +250,36 @@ const GameDrawer = () => {
           </IconButton>
         </div>
         <div className={classes.sideBot}>
-          <IconButton
-            aria-label="open drawer"
-            onClick={() => handleOpen(<GenerateInviteCard />)}
-          >
-            <LinkIcon style={iconsStyle} />
-          </IconButton>
+          { useWorldUserStore.getState().world_user.role.invite ?
+            <IconButton
+              aria-label="open drawer"
+              onClick={() => handleOpen(<GenerateInviteCard />)}
+            >
+              <LinkIcon style={iconsStyle} />
+            </IconButton>
+            : '' }
           <IconButton onClick={handleFullscreen}>
-          {
-            fullScreen ?
-            <FullscreenExitIcon style={iconsStyle} />
+          { fullScreen ?
+              <FullscreenExitIcon style={iconsStyle} />
             : <FullscreenIcon style={iconsStyle} />
           }
           </IconButton>
-          <IconButton
-            aria-label="open drawer"
-            onClick={() => handleOpen(<WSettingsContent />)}
-          >
-            <SettingsIcon style={iconsStyle} />
-          </IconButton>
-          <IconButton
-            aria-label="open report modal"
-            onClick={() => handleOpenReport()}
-          >
-            <ReportIcon style={iconsStyle} />
-          </IconButton>
+          { useWorldUserStore.getState().world_user.role.role_manage ? 
+            <IconButton
+              aria-label="open drawer"
+              onClick={() => handleOpen(<WSettingsContent />)}
+            >
+              <SettingsIcon style={iconsStyle} />
+            </IconButton>
+            : '' }
+          { !useAuthStore.getState().guest_uuid ?
+            <IconButton
+              aria-label="open report modal"
+              onClick={() => handleOpenReport()}
+            >
+              <ReportIcon style={iconsStyle} />
+            </IconButton>
+          : '' }
           <IconButton
             onClick={() => leaveWorld()}
           >
