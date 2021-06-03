@@ -4,8 +4,9 @@ import { getSocket } from "services/socket";
 
 import usePlayerStore from "stores/usePlayerStore.ts";
 
-import { useConsumerStore } from "../webrtc/stores/useConsumerStore";
-import useWorldUserStore from "../stores/useWorldUserStore";
+import { useConsumerStore } from "webrtc/stores/useConsumerStore";
+import useWorldUserStore from "stores/useWorldUserStore";
+import MapManager from '../MapManager';
 
 
 const sceneConfig = {
@@ -25,11 +26,12 @@ class GameScene extends Phaser.Scene {
 
     constructor() {
         super(sceneConfig);
+        this.subscriptions = [];
     }
 
     create() {
 
-        const mapManager = this.registry.get('mapManager');
+        const mapManager = new MapManager();
 
         this.map = mapManager.buildMap(this);
 
@@ -43,7 +45,8 @@ class GameScene extends Phaser.Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        this.collisionGroup = mapManager.buildObjects(this);
+        const { collisionGroup } = mapManager.buildObjects(this);
+        this.collisionGroup = collisionGroup;
 
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
@@ -62,9 +65,15 @@ class GameScene extends Phaser.Scene {
         // this.cursors = this.input.keyboard.createCursorKeys();
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
+            up2: Phaser.Input.Keyboard.KeyCodes.UP,
             down: Phaser.Input.Keyboard.KeyCodes.S,
+            down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
             left: Phaser.Input.Keyboard.KeyCodes.A,
-            right: Phaser.Input.Keyboard.KeyCodes.D
+            left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
+            right: Phaser.Input.Keyboard.KeyCodes.D,
+            right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+            in: Phaser.Input.Keyboard.KeyCodes.Q,
+            out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
@@ -77,7 +86,8 @@ class GameScene extends Phaser.Scene {
         }
 
         // make camera follow player
-        this.cameras.main.startFollow(this.player)
+        this.cameras.main
+            .startFollow(this.player)
             .setBackgroundColor("#0C1117")//'#080C10');
             .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
@@ -91,21 +101,27 @@ class GameScene extends Phaser.Scene {
             const position = player.position;
             this.remotePlayers[id] = new RemotePlayer(this, position.x, position.y, id);
         })
-        this.unsubscribe = usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players));
+        this.subscriptions.push(
+            usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players)));
 
         // TODO: remove after testing
-        this.unsubscribe2 = usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups }));
+        this.subscriptions.push(
+            usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups })));
 
-        this.sprite = this.add.sprite(0, 0, '26');
+        this.sprite = this.add.sprite(0, 0, 'tilesets/objects/movel.png');
         this.add.existing(this.sprite);
         this.physics.add.existing(this.sprite);
         this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
         this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
-        
-        
-        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World', 
+
+
+        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World',
             { fontFamily: '"Lucida Console", Courier, monospace', fontSize: '16px', color: '#28FE14', backgroundColor: "#000" });
         this.debugText.setScrollFactor(0).setDepth(1001).setOrigin(0.5);
+
+        this.game.input.events.on('unsubscribe', () => {
+            this.subscriptions.forEach((unsub) => unsub());
+        });
     }
 
     log() {
@@ -295,8 +311,8 @@ class Player extends Phaser.GameObjects.Container {
             .addText(text)
             .add(circle);
 
-        this.body.setSize(sprite.width * 2, sprite.height)
-            .setOffset(-sprite.width / 2 * 2, 0);
+        this.body.setSize(sprite.width * 4/3, sprite.height)
+            .setOffset(-sprite.width/2 * 4/3, 0);
 
         // set some default physics properties
         this.body.setCollideWorldBounds(true);
@@ -352,13 +368,13 @@ class Player extends Phaser.GameObjects.Container {
         this.body.setVelocity(0);
 
         // get resultant direction
-        if (this.scene.cursors.left.isDown)
+        if (this.scene.cursors.left.isDown || this.scene.cursors.left2.isDown)
             direction.x += -1;
-        if (this.scene.cursors.right.isDown)
+        if (this.scene.cursors.right.isDown || this.scene.cursors.right2.isDown)
             direction.x += 1;
-        if (this.scene.cursors.up.isDown)
+        if (this.scene.cursors.up.isDown || this.scene.cursors.up2.isDown)
             direction.y += -1;
-        if (this.scene.cursors.down.isDown)
+        if (this.scene.cursors.down.isDown || this.scene.cursors.down2.isDown)
             direction.y += 1;
 
         // set normalized velocity (player doesn't move faster on diagonals)

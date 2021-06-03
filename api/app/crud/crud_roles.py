@@ -120,7 +120,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         """
         Gets roles by Name
         """
-        role = db.query(Role).filter(Role.world_id == world_id, Role.name == name)
+        role = db.query(Role).filter(Role.world_id == world_id, Role.name == name).first()
         if not role:
             return None, strings.ROLE_NAME_NOT_FOUND
         return role, ""
@@ -166,7 +166,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
         role_obj = super().create(db=db, obj_in=obj_in)
         return role_obj, ""
 
-    def create_default(self, db: Session, world_id: int):
+    def create_default(self, db: Session, world_id: int) -> List[Role]:
         """
         Create default roles when a world is created
         """
@@ -178,9 +178,25 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             talk=True,
             chat=True
         )
+        world_creator_role = Role(
+            world_id=world_id,
+            name="Admin",
+            is_default=False,
+            walk=True,
+            talk=True,
+            talk_conference=True,
+            chat=True,
+            invite=True,
+            world_mute=True,
+            role_manage=True,
+            conference_manage=True,
+            interact=True,
+            ban=True
+        )
+        db.add(world_creator_role)
         db.add(default_role)
         db.commit()
-        return default_role
+        return [default_role, world_creator_role]
 
     async def update(
             self,
@@ -199,8 +215,9 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             return None, ""
         # cannot change default role without setting a new one
         if db_obj.is_default and 'is_default' in update_data and not update_data['is_default']:
-            return None, "cannot remove default role"
-
+            return None, strings.DEFAULT_ERROR_DELETE_ERROR
+        if db_obj.name == 'Admin' and 'name' in update_data:
+            return None, strings.ROLE_WORLDCREATOR_UPDATE_ERROR
         # a deepcopy is needed in order to get a new reference to the object dictionary
         # otherwise, the original db_obj would be affected
         new_data = deepcopy(db_obj.__dict__)
@@ -211,14 +228,12 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             for k, v in new_data.items():
                 if v is True and k not in consts.role_default_permissions + ['is_default']:
                     return None, "cannot give this permissions to default role"
-
             # change old default role to not default
-            default_role = self.get_world_default(db=db, world_id=obj_in['world_id'])
-            if default_role.role_id != db_obj.role_id:
+            if not db_obj.is_default:
+                default_role = self.get_world_default(db=db, world_id=update_data['world_id'])
                 default_role.is_default = False
                 db.add(default_role)
                 db.commit()
-
         await clear_cache_by_model('Role', world_id=db_obj.world_id)
         role_updated = super().update(db=db, db_obj=db_obj, obj_in=obj_in)
         return role_updated, strings.ROLE_UPDATED_SUCCESS
@@ -233,6 +248,8 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
                 return None, msg
             if role.is_default:
                 return None, strings.ROLE_DEFAULT_DELETE_FORBIDDEN
+            if role.name == 'Admin':
+                return None, strings.ROLE_WORLDCREATOR_DELETE_FORBIDDEN
             default_role = self.get_world_default(db=db, world_id=world_id)
             # Before Deleting, change the role to the default one
             crud_world_user.change_roles(

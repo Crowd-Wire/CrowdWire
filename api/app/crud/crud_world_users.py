@@ -180,7 +180,11 @@ class CRUDWorld_User(CRUDBase[World_User, World_UserCreate, World_UserUpdate]):
         current_time = datetime.now()
 
         if not world_user:
-            role = crud_role.get_world_default(db=db, world_id=_world.world_id)
+            if _world.creator == _user.user_id:
+                role, _ = crud_role.get_by_name(db=db, world_id=_world.world_id, name="Admin")
+            else:
+                role = crud_role.get_world_default(db=db, world_id=_world.world_id)
+            logger.info(role)
             assigned_avatar = choose_avatar()
             world_user = World_User(
                 role_id=role.role_id,

@@ -16,7 +16,7 @@ import RegisterPage from "views/RegisterPage/RegisterPage.js";
 import GamePage from "views/GamePage/GamePage.js";
 import WorldSettings from "views/WorldSettings/WorldSettings.js"
 import UserSettings from "views/UserSettings/UserSettings.js"
-import MapEditor from "views/MapEditor/MapEditor.js";
+import WorldEditorPage from "views/WorldEditorPage/WorldEditorPage.js";
 import FAQs from "views/FAQs/FAQs.js";
 import ContactUs from "views/ContactUs/ContactUs.js";
 import AboutUs from "views/AboutUs/AboutUs.js";
@@ -95,7 +95,7 @@ const routes = (token, guest_uuid, last_location) => [
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
-            { path: "/:id/editor", element: <MapEditor /> },
+            { path: "/:id/editor", element: <WorldEditorPage /> },
 		],
 	},
 	{
