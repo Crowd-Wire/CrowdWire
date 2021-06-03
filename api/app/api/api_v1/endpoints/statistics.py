@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=schemas.GlobalStatistics)
-def get_platform_statistics(
+async def get_platform_statistics(
     db: Session = Depends(deps.get_db),
     user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ):
@@ -20,7 +20,7 @@ def get_platform_statistics(
     if is_guest_user(user) or not user.is_superuser:
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
-    return crud.crud_statistics.get_platform_statistics(db=db)
+    return await crud.crud_statistics.get_platform_statistics(db=db)
 
 
 @router.get("/worlds/{world_id}", response_model=schemas.WorldStatistics)
@@ -29,9 +29,9 @@ async def get_world_statistics(
     db: Session = Depends(deps.get_db),
     user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ):
-
-    # TODO: change this to allow world moderators to see this
-    if is_guest_user(user) or not user.is_superuser:
+    # only the admins and creators of the world can access the world statistics
+    if is_guest_user(user) or \
+            (not user.is_superuser and crud.crud_world.get_creator(db=db, world_id=world_id).user_id != user.user_id):
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
     return await crud.crud_statistics.get_world_statistics(db=db, world_id=world_id)

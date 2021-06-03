@@ -6,6 +6,7 @@ class GlobalStatistics(BaseModel):
     worlds: int
     user_reports: int
     world_reports: int
+    online_users: int
 
 
 class WorldStatistics(BaseModel):

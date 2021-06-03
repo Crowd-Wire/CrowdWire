@@ -38,6 +38,11 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return world_obj, ""
         return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
 
+    def get_creator(self, db: Session, world_id: int):
+
+        return db.query(User).join(World).filter(World.world_id == world_id).first()
+
+
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         world_obj = db.query(World).filter(
@@ -71,7 +76,9 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             World.world_id == world_id,
             World.status == consts.WORLD_NORMAL_STATUS
         ).first()
-        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        world_user = None
+        if user_id:
+            world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
         if not world_obj or not world_obj.allow_guests or (not world_obj.public and not world_user):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
