@@ -82,13 +82,13 @@ const Chat = (props) => {
       </div>
       <div className={classes.sendToInput}>
         <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="age-native-simple" style={{color: 'white'}}>Send To:</InputLabel>
+          <InputLabel htmlFor="select-send-to" style={{color: 'white'}}>Send To:</InputLabel>
           <Select
             native
             value={sendTo}
             onChange={handleSelectChange}
             inputProps={{
-              id: 'age-native-simple',
+              id: 'select-send-to',
             }}
             style={{color: 'white'}}
           >

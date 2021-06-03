@@ -14,7 +14,7 @@ import AuthenticationService from "services/AuthenticationService";
 
 import usePlayerStore from "stores/usePlayerStore.ts";
 import useMessageStore from "stores/useMessageStore.ts";
-import GameScene from "phaser/GameScene";
+import GameScene from "phaser/scenes/GameScene.js";
 
 async function flushConsumerQueue(_roomId) {
   try {

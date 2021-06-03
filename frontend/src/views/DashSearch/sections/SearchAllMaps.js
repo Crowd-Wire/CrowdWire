@@ -59,7 +59,7 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
-	limit = 1;
+	limit = 6;
 
 	constructor(props){
 		super(props)

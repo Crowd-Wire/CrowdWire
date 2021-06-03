@@ -28,23 +28,26 @@ export default function GenerateInviteCard() {
     }
 
     return (
-        <Card bg={'dark'} text={'light'}>
-            <Card.Header>Invite Link</Card.Header>
-            <Card.Body>
-                <InputGroup className="mb-3"  >
-                    <FormControl
-                    style={{backgroundColor:'#32383e', color: 'white'} }
-                    readOnly
-                    placeholder="Click to generate..."
-                    aria-describedby="basic-addon2"
-                    value={link}
-                    />
-                    <InputGroup.Append>
-                    <Button variant="outline-secondary" onClick={copy}>Copy</Button>
-                    </InputGroup.Append>
-                </InputGroup>
-                <Button variant="primary" onClick={generateLink}>Generate Link</Button>
-            </Card.Body>
-        </Card>
+        <div style={{width: '80%', 
+        position: 'relative',left: '50%', top: '50%', transform: 'translate(-50%, -50%)', justifyContent: 'center', alignItems: 'center'}}>
+            <Card bg={'dark'} text={'light'}>
+                <Card.Header>Invite Link</Card.Header>
+                <Card.Body style={{textAlign: 'center'}}>
+                    <InputGroup className="mb-3"  >
+                        <FormControl
+                        style={{backgroundColor:'#32383e', color: 'white'} }
+                        readOnly
+                        placeholder="Click to generate..."
+                        aria-describedby="basic-addon2"
+                        value={link}
+                        />
+                        <InputGroup.Append>
+                            <Button variant="outline-secondary" onClick={copy}>Copy</Button>
+                        </InputGroup.Append>
+                    </InputGroup>
+                    <Button style={{margin: 'auto'}} variant="primary" onClick={generateLink}>Generate Link</Button>
+                </Card.Body>
+            </Card>
+        </div>
     )
 }

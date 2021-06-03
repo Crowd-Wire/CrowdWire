@@ -74,7 +74,7 @@ class World_UserWithRoleInDB(World_UserInDBBase):
 
 
 class World_UserWithRoleAndMap(World_UserWithRoleInDB):
-    map: bytes
+    world_map: bytes
 
 
 # Return Data for Statistics
