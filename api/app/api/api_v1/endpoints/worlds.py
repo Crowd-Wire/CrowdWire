@@ -31,7 +31,6 @@ async def get_world(
         raise HTTPException(status_code=400, detail=message)
     online_users = await redis_connector.get_online_users(world_id=world_id)
     setattr(db_world, 'online_users', online_users)
-    logger.debug('yoooo', db_world)
     return db_world
 
 
