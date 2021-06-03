@@ -27,7 +27,6 @@ class MapManager {
         if (!MapManager._instance) {
             const worldUser = useWorldUserStore.getState().world_user;
             this.worldId = worldUser.world_id;
-            console.log(worldUser.world_map, worldUser.world_id)
             this.mapJson = JSON.parse(worldUser.world_map);
             MapManager._instance = this;
         }
@@ -131,8 +130,8 @@ class MapManager {
     addConference(cid: string): void {
         // Create tileset
         const id: number = parseInt(cid.substr(1), 10);
-        const newTileset = new Tilemaps.Tileset(`__conference${cid}`, 100000 + id, 32, 32, 0, 0);
-        newTileset.setImage(this.map.scene.textures.get('conference-tile'))
+        const newTileset = new Tilemaps.Tileset(`_conference${cid}`, 100000 + id, 32, 32, 0, 0);
+        newTileset.setImage(this.map.scene.textures.get('_conference'))
 
         // Add tileset to map
         this.map.tilesets.push(newTileset);
@@ -144,7 +143,7 @@ class MapManager {
 
     getConferenceId(cid: string): number {
         for (const tileset of this.map.getLayer('Room').tilemapLayer.tileset) {
-            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
                 return tileset.firstgid;
             }
         }
@@ -157,7 +156,7 @@ class MapManager {
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
         
-            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
             }
@@ -167,7 +166,7 @@ class MapManager {
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
         
-            if (tileset.name.startsWith("__conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
             }

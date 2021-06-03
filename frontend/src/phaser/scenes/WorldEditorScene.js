@@ -41,7 +41,7 @@ class WorldEditorScene extends Scene {
         // Initialize conferences on store
         const conferences = {};
         this.map.tilesets
-            .filter((tileset) => tileset.name.startsWith('__conference'))
+            .filter((tileset) => tileset.name.startsWith('_conferenceC'))
             .forEach((tileset, index) => {
                 const cid = tileset.name.substr(12);
                 conferences[cid] = {name: `Conference ${index}`, color: `#${intToHex(cyrb53Hash(cid))}`};

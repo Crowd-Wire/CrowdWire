@@ -57,6 +57,6 @@ class WorldMapInDB(WorldInDB):
     world_map: bytes
 
 
-class WorldInDBWithUserPermissions(WorldInDB):
+class WorldInDBWithUserPermissions(WorldMapInDB):
     is_creator: bool = False
     can_manage: bool = False
