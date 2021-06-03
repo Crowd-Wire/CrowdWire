@@ -9,3 +9,4 @@ from .report_world import ReportWorldBase, ReportWorldCreate, ReportWorldInDBWit
     ReportWorldUpdate
 from .report_user import ReportUserBase, ReportUserCreate, ReportUserInDB, ReportUserInDBDetailed, ReportUserUpdate
 from .events import EventBase, EventInDB, EventUpdate, EventCreate
+from .statistics import GlobalStatistics, WorldStatistics
