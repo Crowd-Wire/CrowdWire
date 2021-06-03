@@ -7,6 +7,13 @@ import MapCard from 'components/MapCard/MapCard.js';
 import UserReportCard from 'components/UserReportCard/UserReportCard.js';
 import { makeStyles } from '@material-ui/core/styles';
 import Col from 'react-bootstrap/Col';
+import { createBrowserHistory } from 'history';
+import IconButton from '@material-ui/core/IconButton';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import Row from 'react-bootstrap/Row';
+import { useNavigate } from "react-router-dom";
+
+
 const useStyles = makeStyles((theme) => ({
     paper: {
       padding: theme.spacing(2),
@@ -19,11 +26,15 @@ export default function AdminUserDetails() {
     const [user, setUser] = React.useState(null);
     const [worlds, setWorlds] = React.useState([]);
     const [reports, setReports] = React.useState(null);
+    const [url_id, setUrlID] = React.useState(null);
+    const navigation = useNavigate();
     const classes = useStyles();
     React.useEffect(() => {
         console.log(window.location.pathname)
         if(window.location.pathname.split("/").length===4){
-            UserService.getUserDetails(window.location.pathname.split("/")[3])
+            let now_url = window.location.pathname;
+            setUrlID(now_url.split("/")[3]);
+            UserService.getUserDetails(now_url.split("/")[3])
                 .then((res) => {
                     return res.json();
                 })
@@ -65,12 +76,26 @@ export default function AdminUserDetails() {
             });
         }
 
-        }, []);
+    }, []);
+
+    const goBack = () => {
+        if(window.location.pathname==="/admin/users/"+url_id){
+            navigation("/admin/users")
+            return;
+        }
+        const history = createBrowserHistory();
+        history.back();
+    } 
 
     return (
         <>
             { user !== null ?
-                <div style={{ paddingTop: '80px', backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'}}>
+                <div style={{ paddingTop: '30px'}}>
+                <Row style={{ marginLeft:"auto", marginRight:"auto"}}>
+                  <IconButton style={{border:"white solid 1px",borderRadius:"10px",height:"50px", width:"50px", margin:"30px"}} onClick={() => {goBack()}}>
+                    <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"white", marginBottom:"auto"}}/>
+                  </IconButton>
+                </Row>
                     <Box sx={{ backgroundColor: 'background.default', minHeight: '100%', py: 3 }}>
                         <Container maxWidth="lg">
                             <Grid container>
@@ -121,7 +146,7 @@ export default function AdminUserDetails() {
                                             <Col style={{marginLeft:"auto", marginRight:"auto"}}>
                                                 {worlds.map((m,i) => {
                                                     return(
-                                                        <MapCard map={m} key={m.name} />
+                                                        <MapCard map={m} key={m.name} baseUrl={"/dashboard/"}/>
                                                     )
                                                 })}
                                             </Col>

@@ -32,7 +32,8 @@ const useStyles2 = makeStyles((theme) => ({
   item:{
     '&:hover': {
       backgroundColor: "#ddd",
-      cursor:"pointer"
+      cursor:"pointer",
+      borderRadius:"5px"
     },
   },
   circle:{
@@ -149,7 +150,7 @@ export default function AdminUsers() {
     
 
     return (
-        <div style={{paddingTop: '80px', width:"100%"}}>
+        <div style={{paddingTop: '30px', width:"100%"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md={3}>
                     <TextField className={classes.formControl} id="user_email" placeholder="User email" type="search" onChange={handleEmail} />

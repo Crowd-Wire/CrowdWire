@@ -56,7 +56,7 @@ class AdminStatistics extends Component {
     render() {
         return (
             <>
-            <div style={{ marginTop: '100px' }}>
+            <div style={{ marginTop: '30px' }}>
                 {this.state.worlds!==null && this.state.worlds.length!==0 ? (
                 <EventFilters  handler={this.handleCallBack}  worlds = {this.state.worlds} />
                 )

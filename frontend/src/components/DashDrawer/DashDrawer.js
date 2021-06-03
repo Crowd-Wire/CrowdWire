@@ -16,9 +16,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthenticationService from "services/AuthenticationService.js";
 import useAuthStore from "stores/useAuthStore.ts";
 import created_worlds from "assets/img/save-the-planet.svg";
-import UserService from "services/UserService.js";
 import EqualizerIcon from '@material-ui/icons/Equalizer';
-
+import userStats from "assets/img/polling.svg";
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -86,6 +85,7 @@ export default function DashDrawer(props){
   const addWorld = theme.spacing(2)+100;
   const definitions = theme.spacing(2)+50;
   const stats = theme.spacing(2)+150;
+  const userstats = theme.spacing(2)+200;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -105,6 +105,7 @@ export default function DashDrawer(props){
   }
 
   const onClickCreateWorld = () => {
+    if(location.pathname!=="/create-world")
     navigation("/create-world");
   }
   const onClickCreatedWorlds = () => {
@@ -112,11 +113,18 @@ export default function DashDrawer(props){
       navigation("/dashboard/search/owned");
   }
   const onClickUserSettings = () => {
-    navigation("/dashboard/user");
+    if(location.pathname!=="/dashboard/user")
+      navigation("/dashboard/user");
   }
 
   const onClickPlatformStats = () => {
-    navigation("/admin/worlds");
+    if(location.pathname!=="/admin/worlds")
+      navigation("/admin/worlds");
+  }
+
+  const onClickPlatformUserStats = () => {
+    if(location.pathname!=="/admin/users")
+      navigation("/admin/users");
   }
 
   const handleDrawerClose = () => {
@@ -210,15 +218,29 @@ export default function DashDrawer(props){
                   })}/>
             </ListItem>
           }
+
+          { !st.is_superuser ?
+            <></>
+            :
+          <ListItem onClick={onClickPlatformUserStats} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+            button key="Platform User Statistics" style={{position: "fixed", bottom: userstats}}>
+          <ListItemIcon>
+              <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+          </ListItemIcon>
+          <ListItemText style={{ color: '#FFFFFF' }} primary="USER STATISTICS"
+            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+          </ListItem>
+          }
+
           { !st.is_superuser ?
             <></>
             :
           <ListItem onClick={onClickPlatformStats} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Platform Statistics" style={{position: "fixed", bottom: stats}}>
+            button key="Platform World Statistics" style={{position: "fixed", bottom: stats}}>
           <ListItemIcon>
               <EqualizerIcon className={classes.iconDrawer}/>
           </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="Platform Statistics"
+          <ListItemText style={{ color: '#FFFFFF' }} primary="WORLD STATISTICS"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
           }

@@ -131,7 +131,7 @@ export default function WorldsList() {
 
 
     return (
-        <div style={{ paddingTop: '80px', paddingBottom:"20px"}}>
+        <div style={{ paddingTop: '30px', paddingBottom:"20px"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col sm={12} md={6} style={{marginLeft:"auto", marginRight:"auto"}}>
                     <TextField className={classes.formControl} id="world_name" placeholder="World Name" type="search" onChange={handleWorld} />

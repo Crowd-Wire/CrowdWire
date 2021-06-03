@@ -9,7 +9,10 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import IconButton from '@material-ui/core/IconButton';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 
 const useStyles = theme => ({    
     root: {
@@ -24,13 +27,18 @@ class AdminWorldDetails extends Component {
 
     constructor(props) {
         super(props);
-        this.state = { world: null, reports: [] }
+        this.state = { world: null, reports: [], url_id: null }
     }
+
+    goBack(){
+                const history = createBrowserHistory();
+        history.back();
+    } 
 
     componentDidMount() {
         // returns the world_id based on the url
         let world_id = window.location.pathname.split('/').pop();
-
+        this.setState({url_id: world_id})
         // retrieves the world details
         WorldService.getWorldDetails(world_id)
             .then((res) => {
@@ -76,13 +84,18 @@ class AdminWorldDetails extends Component {
         return (
             <>
                 {!this.state.world ? <h1>Loading</h1> :
-                    <div className="px-3" style={{ paddingTop: "80px", height:"100%", width:"100%"}}>
+                    <div className="px-3" style={{ paddingTop: "30px", height:"100%", width:"100%"}}>
+                        <Row style={{ marginLeft:"auto", marginRight:"auto"}}>
+                        <IconButton style={{border:"white solid 1px",borderRadius:"10px",height:"50px", width:"50px"}} onClick={() => {this.goBack()}}>
+                            <ArrowBackIcon style={{height:"40px", width:"40px", marginTop:"auto", color:"white", marginBottom:"auto"}}/>
+                        </IconButton>
+                        </Row>
                         <Row style={{height:"100%"}}>
                             <Col sm={12} md={8} style={{marginBottom:"50px"}}>
                                 <Row style={{height:"70%"}}>
                                     <Col>
                                         <h3>World Details</h3>
-                                        <Card style={{height:"93%"}}>
+                                        <Card style={{height:"90%"}}>
                                             {this.state.world.status == 2
                                                 ? <h1>This world has been deleted by the user</h1> :
                                                 <>

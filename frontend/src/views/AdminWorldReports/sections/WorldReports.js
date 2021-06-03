@@ -115,7 +115,7 @@ export default function WorldReports(props) {
     }
 
     return (
-        <div style={{ paddingTop: '80px', height:"100%"}}>
+        <div style={{ paddingTop: '30px', height:"100%"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md={4}>
                     <Input className="mx-3"
