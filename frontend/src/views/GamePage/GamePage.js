@@ -85,7 +85,6 @@ const GamePage = (props) => {
     if (user_username === "") {
       user_username = username;
     }
-    console.log(avatar)
     WorldService.updateWorldUser(
       window.location.pathname.split('/')[2],
       useWorldUserStore.getState().world_user.user_id,
