@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 export default function MapCard(props){
-    const {map, focusMap, ...other } = props;
+    const {baseUrl, map, focusMap, ...other } = props;
     const history = useNavigate();
     const routeChange = () =>{
       let path = `/world/`+map.world_id; 
@@ -43,7 +43,7 @@ export default function MapCard(props){
     }
 
     const goToDetails = () => {
-        history(`../../`+map.world_id, {state:map.world_id});
+        history(""+baseUrl+map.world_id, {state:map.world_id});
     }
 
     const classes = useStyles();

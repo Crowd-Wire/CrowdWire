@@ -35,7 +35,7 @@ class AuthenticationService {
             useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
         }
         else if(type==="AUTH"){
-            useAuthStore.getState().login(auth.access_token, auth.expire_date);
+            useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.is_superuser);
         }
         console.log(useAuthStore.getState().token)
     }

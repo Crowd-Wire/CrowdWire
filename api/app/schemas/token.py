@@ -7,7 +7,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     expire_date: str
-
+    is_superuser: bool = False
 
 class TokenGuest(Token):
     # It is useful to return the uuid to the client

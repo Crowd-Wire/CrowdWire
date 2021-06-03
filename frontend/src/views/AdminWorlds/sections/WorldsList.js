@@ -234,7 +234,7 @@ export default function WorldsList() {
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 {worlds && worlds.length !== 0 ?
                     worlds.map((m, i) => {
-                        return (<MapCard key={i} map={m} />)
+                        return (<MapCard key={i} baseUrl={""} map={m} />)
                     })
                     :
                     <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>

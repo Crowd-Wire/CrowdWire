@@ -17,6 +17,7 @@ import AuthenticationService from "services/AuthenticationService.js";
 import useAuthStore from "stores/useAuthStore.ts";
 import created_worlds from "assets/img/save-the-planet.svg";
 import UserService from "services/UserService.js";
+import EqualizerIcon from '@material-ui/icons/Equalizer';
 
 const drawerWidth = 240;
 
@@ -84,6 +85,7 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing(2)+100;
   const definitions = theme.spacing(2)+50;
+  const stats = theme.spacing(2)+150;
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -202,6 +204,18 @@ export default function DashDrawer(props){
                       [classes.hide]: !open,
                   })}/>
             </ListItem>
+          }
+          { st.guest_uuid ?
+            <></>
+            :
+          <ListItem onClick={onClickUserSettings} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+            button key="Settings" style={{position: "fixed", bottom: stats}}>
+          <ListItemIcon>
+              <EqualizerIcon className={classes.iconDrawer}/>
+          </ListItemIcon>
+          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+          </ListItem>
           }
           { st.guest_uuid ?
             <></>
