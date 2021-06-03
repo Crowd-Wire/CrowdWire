@@ -20,6 +20,10 @@ class Phaser extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    this.game.input.events.emit('unsubscribe');
+  }
+
   resizePhaser = (width, height) => {
     this.game.scale.setParentSize(width, height);
   }
@@ -30,7 +34,7 @@ class Phaser extends React.Component {
   }
 
   disablePhaser = () => {
-    this.game.input.events.emit("reset");
+    this.game.input.events.emit('reset');
     this.game.input.enabled = false;
     this.game.input.keyboard.enabled = false;
   }
