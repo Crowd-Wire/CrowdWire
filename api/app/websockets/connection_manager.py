@@ -71,7 +71,7 @@ class ConnectionManager:
 
             key = f'world:{world_id}:{user_id}'
             # clear user_data in a day timeout
-            await redis_connector.setexpire(key=key, timeout=60*24)
+            await redis_connector.setexpire(key=key, timeout=60 * 24)
         else:
             logger.error(
                 f"Unrecognized User {user_id}"
