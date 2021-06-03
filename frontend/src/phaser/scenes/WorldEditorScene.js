@@ -66,12 +66,12 @@ class WorldEditorScene extends Scene {
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
         
         const grid1 = this.add.grid(width/2, height/2, width, height, 32, 32)
-            .setOutlineStyle(0x000000)
+            .setOutlineStyle(0x000000, 0.9)
             .setDepth(1001);
         grid1.showOutline = false;
 
         const grid2 = this.add.grid(width/2, height/2, width, height, 16, 16)
-            .setOutlineStyle(0x000000, 0.1)
+            .setOutlineStyle(0x000000, 0.2)
             .setDepth(1001);
         grid2.showOutline = false;
 
@@ -137,13 +137,13 @@ class WorldEditorScene extends Scene {
             if (activeLayer) {
                 // Layer exists
                 activeLayer.setVisible(layer.visible);
-                activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.5);
+                activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.4);
             } else if (name === 'Object') {
                 this.group.setVisible(layer.visible);
-                this.group.setAlpha(layer.active || !highlight ? 1 : 0.5);
+                this.group.setAlpha(layer.active || !highlight ? 1 : 0.4);
             } else if (name === 'ObjectCollision') {
                 this.collisionGroup.setVisible(layer.visible);
-                this.collisionGroup.setAlpha(layer.active || !highlight ? 1 : 0.5);
+                this.collisionGroup.setAlpha(layer.active || !highlight ? 1 : 0.4);
             }
         });
     }
@@ -154,7 +154,8 @@ class WorldEditorScene extends Scene {
         
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
-            const activeLayerName = useWorldEditorStore.getState().activeLayer;
+            const activeLayerName = useWorldEditorStore.getState().activeLayer,
+                activeTile = useWorldEditorStore.getState().activeTile;
 
             let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
@@ -174,13 +175,12 @@ class WorldEditorScene extends Scene {
     
                 if (activeLayer) {
                     // Layer exists
-                    if (this.paintTool.type === PaintToolType.DRAW && this.paintTool.tileId) {
-                        let tileId = this.paintTool.tileId;
+                    if (this.paintTool.type === PaintToolType.DRAW && activeTile) {
+                        let tileId = activeTile;
                         console.log(tileId)
                         if (tileId[0] === 'C') {
                             const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
-                            console.log(tint);
-                            tileId = this.mapManager.getConferenceId(tileId);
+                            tileId = this.mapManager.getConferenceGid(tileId);
                             if (tileId >= 0) {
                                 activeLayer.fill(tileId, tileX, tileY, 1, 1);
                                 const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
@@ -197,7 +197,11 @@ class WorldEditorScene extends Scene {
                     }
                     else if (this.paintTool.type === PaintToolType.PICK) {
                         const tile = activeLayer.getTileAt(tileX, tileY, false /**bug if true */, activeLayerName);
-                        tile && useWorldEditorStore.getState().setPaintTool({ tileId: tile.index })
+                        if (tile) {
+                            // Check if index is from a conference tile and set active tile accordingly
+                            const cid = this.mapManager.getConferenceCid(tile.index);
+                            useWorldEditorStore.getState().setState({ activeTile: cid || tile.index })
+                        }
                     }
                 }
             }
