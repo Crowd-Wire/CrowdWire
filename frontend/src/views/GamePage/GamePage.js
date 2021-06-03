@@ -62,7 +62,6 @@ const GamePage = (props) => {
           navigation("/dashboard/search/public");
         }
         else {
-          console.log(res)
           useWorldUserStore.getState().joinWorld(res);
           setUsername(res.username)
           setLoading(0);
@@ -99,8 +98,6 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
-            console.log(res)
-
             if (res.detail){
               toast.dark(
                 <span>
