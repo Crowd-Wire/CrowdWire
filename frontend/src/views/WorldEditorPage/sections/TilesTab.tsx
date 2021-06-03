@@ -11,8 +11,8 @@ import { API_BASE } from "config";
 
 
 interface TilesTabState {
-  filterType: string,
-  tilesetTiles: Record<string, React.ReactNode[]>,
+  filterType: string;
+  tilesetTiles: Record<string, React.ReactNode[]>;
 }
 
 const tileStyle = {
@@ -70,7 +70,6 @@ class TilesTab extends Component<{}, TilesTabState> {
             tiles.push(
               <div
                 key={id}
-                id={`tile-${id}`}
                 onClick={() => this.handleClick(id)}
                 style={{
                   width: tileWidth,
@@ -121,7 +120,6 @@ class TilesTab extends Component<{}, TilesTabState> {
         </FormControl>
         <hr />
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {console.log(filterType, tilesetTiles)}
         {
           filterType ? 
             tilesetTiles[filterType] : Object.values(tilesetTiles)

@@ -1,5 +1,9 @@
 import React, { Component } from "react";
 
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+
 import MapManager from "phaser/MapManager";
 import useWorldEditorStore from "stores/useWorldEditorStore";
 
@@ -7,7 +11,15 @@ import { API_BASE } from "config";
 
 
 interface ObjectsTabState {
+  filterType: string;
+  collectionObjects: Record<string, React.ReactNode[]>;
+}
 
+const objectStyle = {
+  transform: "scale(1.5)",
+  margin: 15,
+  boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+  backgroundRepeat: "no-repeat",
 }
 
 
@@ -18,6 +30,11 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
   constructor(props) {
     super(props);
     this.subscriptions = [];
+
+    this.state = {
+      filterType: '',
+      collectionObjects: {},
+    }
   }
 
   componentDidMount() {
@@ -33,12 +50,109 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
   }
 
   handleReady = () => {
-    this.mapManager = new MapManager();
-    this.forceUpdate();
+    const mapManager = new MapManager();
+
+    const collectionObjects = {};
+    for (const collection of mapManager.map.imageCollections) {
+      if (!collection.name.startsWith('_')) {
+        // Not private
+        const objects = [];
+
+        for (const object of collection.images) {
+          const { gid, image } = object;
+          const style = {
+            backgroundImage: `url(${API_BASE + "static/maps/" + image})`,
+            backgroundPosition: 'center',
+            backgroundSize: 'contain, cover',
+            backgroundRepeat: 'no-repeat',
+          };
+
+          useWorldEditorStore.getState().addTile(gid, { style });
+          objects.push(
+            <div
+              key={gid}
+              onClick={() => this.handleClick(gid)}
+              style={{
+                width: 32,
+                height: 32,
+                ...style,
+                ...objectStyle,
+              }}
+            ></div>
+          );                   
+        }
+
+        // for (let i = 0; i < rows; i++)
+        //   for (let j = 0; j < columns; j++) {
+        //     const id = (firstgid + i * columns + j).toString();
+        //     const imageURL = API_BASE + "static/maps/" + tilesetURL;
+        //     const style = {
+        //       backgroundImage: `url(${imageURL})`,
+        //       backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
+        //     };
+        //     useWorldEditorStore.getState().addTile(id, { style });
+        //     tiles.push(
+        //       <div
+        //         key={id}
+        //         id={`tile-${id}`}
+        //         onClick={() => this.handleClick(id)}
+        //         style={{
+        //           width: tileWidth,
+        //           height: tileHeight,
+        //           ...style,
+        //           ...objectStyle,
+        //         }}
+        //       ></div>
+        //     );
+        //   }
+
+        collectionObjects[collection.name] = objects;
+      }
+    }
+    this.setState({ collectionObjects });
+  }
+
+  handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
+    this.setState({ filterType: event.target.value });
+  }
+
+  handleClick = (id: string) => {
+    useWorldEditorStore.getState().setState({ activeTile: id });
   }
 
   render() {
-    return 'ObjectsTab';
+    const { filterType, collectionObjects } = this.state;
+
+    return (
+      <>
+        <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
+          <InputLabel htmlFor="select-collection">Collection:</InputLabel>
+          <Select
+            native
+            value={filterType}
+            onChange={this.handleSelectChange}
+            inputProps={{
+              id: 'select-collection',
+            }}
+            style={{ minWidth: '15ch' }}
+          >
+            <option aria-label="None" value="" />
+            {
+              Object.keys(collectionObjects).map((name, index) => (
+                <option key={index} value={name}>{name}</option>
+              ))
+            }
+          </Select>
+        </FormControl>
+        <hr />
+        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        {
+          filterType ? 
+            collectionObjects[filterType] : Object.values(collectionObjects)
+        }
+        </div>
+      </>
+    )
   }
 }
 
