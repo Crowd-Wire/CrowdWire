@@ -31,7 +31,7 @@ class GameScene extends Phaser.Scene {
 
     create() {
 
-        const mapManager = new MapManager;
+        const mapManager = new MapManager();
 
         this.map = mapManager.buildMap(this);
 
