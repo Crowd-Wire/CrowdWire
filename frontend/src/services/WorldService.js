@@ -48,6 +48,7 @@ class WorldService {
         if (query.length !== 0)
             url = url.concat('?' + query.join('&'));
 
+        console.log(url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
@@ -130,9 +131,8 @@ class WorldService {
      * 
      * Unrecognized parameters will be ignored and undefined values will be removed by JSON.stringify.
      */
-    putWorld({ wName, accessibility, guests, maxUsers, tag_array, desc, worldMap }) {
-
-        return fetch(API_BASE + 'worlds/', {
+    putWorld(world_id, { wName, accessibility, guests, maxUsers, tag_array, desc, worldMap, world_picture }) {
+        return fetch(API_BASE + 'worlds/' + world_id, {
             method: 'PUT',
             mode: 'cors',
             headers: {
@@ -146,7 +146,8 @@ class WorldService {
                 world_map: worldMap,
                 max_users: maxUsers,
                 tags: tag_array,
-                description: desc
+                description: desc,
+                profile_image: world_picture
             })
         })
     }
@@ -249,6 +250,27 @@ class WorldService {
                 "Authorization" : "Bearer "+ AuthenticationService.getToken()
             },
             body: JSON.stringify({status: status})
+        })
+    }
+    
+   getWorldUser(world_id, user_id) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+        })
+    }
+
+    updateWorldUser(world_id, user_id, avatar, username) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({username: username, avatar: avatar})
         })
     }
 

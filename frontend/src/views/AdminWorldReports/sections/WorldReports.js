@@ -13,11 +13,12 @@ import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import { Row, Col, Button } from 'react-bootstrap';
 import Input from '@material-ui/core/Input';
+import Paginator from 'components/Paginator/Paginator.js';
 
 const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 150,
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 export default function WorldReports(props) {
 
     const classes = useStyles();
-    const [page, setPage] = React.useState("1");
+    const [page, setPage] = React.useState(1);
     const [reports, setReports] = React.useState([]);
     const [orderBy, setOrderBy] = React.useState("");
     const [order, setOrder] = React.useState("");
@@ -35,6 +36,8 @@ export default function WorldReports(props) {
     const [reviewed, setReviewed] = React.useState(false);
     const [world, setWorld] = React.useState(null);
     const [reporter, setReporter] = React.useState(null);
+
+    const limit = 10;
 
     // matches positive integers and empty string
     const numberRegex = /[0-9]+|^/;
@@ -57,8 +60,12 @@ export default function WorldReports(props) {
     React.useEffect(() => {
         // this will call the function with page=1
         // limit is also an option but shouldnt be used because it can complicate the css
-        request(null, null, null, null, null, null, 1, null);
+        request(null, null, null, null, null, null, 1, limit);
     }, []);
+
+    React.useEffect(() => {
+        handleSubmit();
+    }, [page]);
 
     const handleOrderBy = (event) => {
         setOrderBy(event.target.value);
@@ -89,30 +96,34 @@ export default function WorldReports(props) {
       
     }
 
-    const handleSubmit = () => {
-        request(world, reporter, reviewed, banned, orderBy, order, page, 10);
+    const changePage = (page) => {
+        setPage(page);
+    }
+
+    const handleSubmit = (newRequest) => {
+        if(newRequest){
+            if(page !== 1)
+                setPage(1);
+            else
+                request(world, reporter, reviewed, banned, orderBy, order, 1, limit);
+
+        }
+        request(world, reporter, reviewed, banned, orderBy, order, page, limit);
     }
 
     return (
-        <div style={{ marginTop: '100px' }}>
-            <Row>
-                <Col>
-                {/*
-                    <TextField className="mx-2"
-                    id="world_search" label="World Id" type="search" variant="outlined" type="number"
-                    />
-
-                    <TextField
-                    id="reporter_search" label="Reporter Id" type="search" variant="outlined" type="number"
-                    />
-                */}
+        <div style={{ paddingTop: '100px', height:"100%"}}>
+            <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                <Col md={4}>
                     <Input className="mx-3"
+                        className={classes.formControl}
                         type="number"
                         id="world_search"
                         placeholder="World Id"
                         onChange={handleWorld}    
                     />
                     <Input 
+                        className={classes.formControl}
                         type="number" 
                         id="reporter_search"
                         placeholder="Reporter Id"
@@ -120,8 +131,9 @@ export default function WorldReports(props) {
                     />
 
                 </Col>
-                <Col>
+                <Col md={4}>
                     <FormControlLabel
+                        className={classes.formControl}
                         control={
                             <Checkbox
                                 checked={reviewed}
@@ -134,6 +146,7 @@ export default function WorldReports(props) {
                     />
 
                     <FormControlLabel
+                        className={classes.formControl}
                         control={
                             <Checkbox
                                 checked={banned}
@@ -144,50 +157,61 @@ export default function WorldReports(props) {
                         }
                         label="Show Banned"
                     />
-
+                </Col>
+                <Col md={4}>
                     <FormControl className={classes.formControl}>
-                        <InputLabel id="orderBy-label">Order by</InputLabel>
                         <Select
                             labelId="orderBy-label"
                             id="order_by"
+                            displayEmpty
                             value={orderBy}
                             onChange={handleOrderBy}
                             autoWidth
                         >
+                            <MenuItem value={""}>
+                                <em>OrderBy</em>
+                            </MenuItem>
                             <MenuItem value={"timestamp"}>Date</MenuItem>
                         </Select>
                     </FormControl>
 
                     <FormControl className={classes.formControl}>
-                        <InputLabel id="order-label">Order</InputLabel>
                         <Select
                             labelId="order-label"
                             id="order"
+                            displayEmpty
                             value={order}
                             onChange={handleOrder}
                             autoWidth
                         >
+                            <MenuItem value={""}><em>Order</em></MenuItem>
                             <MenuItem value={"asc"}>Asc</MenuItem>
                             <MenuItem value={"desc"}>Desc</MenuItem>
                         </Select>
                     </FormControl>
                 </Col>
             </Row>
-            <Row className="my-2">
+            <Row className="my-2" style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md="3">
-                    <Button onClick={handleSubmit}>Search</Button>
+                    <Button onClick={() => {handleSubmit(1)}}>Search</Button>
                 </Col>
             </Row>
             <hr/>
             <div className="">
+                <Row className="my-3" style={{marginLeft:"auto", marginRight:"auto"}}>
                 {reports.map((r, i) => {
-                    console.log(JSON.stringify(r));
-                    return (<Row key={r.reported + '_' + r.reporter + '_' + r.reviewed} className="my-3"><Col></Col>
-                        <Col><WorldReportCard  report={r} /> </Col>
-                        <Col></Col>
-                        </Row>)
-                })}
+                    if(i !== limit)
+                        return (
+                            <Col md={4} sm={6}>
+                                <WorldReportCard key={r.reported + '_' + r.reporter + '_' + r.reviewed} report={r} /> 
+                            </Col>
+                            )
+                        }
+                )}
+                </Row>
             </div>
+            <hr />
+            <Paginator hasNext={reports.length === limit + 1} page={page} changePage={(page) => {changePage(page)}} />
         </div>
     )
 }

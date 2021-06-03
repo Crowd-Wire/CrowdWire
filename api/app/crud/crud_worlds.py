@@ -1,14 +1,14 @@
 from datetime import datetime
 from typing import Optional, Tuple, Union, Dict, Any, List
-
+from app.redis import redis_connector
+from pydantic import UUID4
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from app.core import strings
 from app.models import World, User, Tag
-from app.redis import redis_connector
 from app.redis.redis_decorator import cache, clear_cache_by_model
-from app.schemas import WorldCreate, WorldUpdate
+from app.schemas import WorldCreate, WorldUpdate, WorldInDBWithUserPermissions
 from app.crud.base import CRUDBase
 from app.crud.crud_tags import crud_tag
 from app.crud.crud_roles import crud_role
@@ -38,17 +38,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return world_obj, ""
         return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
 
-    async def update_online_users(self, world: World, offset: int):
-        """
-        Verifies the current number of online users in a world, if  not possible to join
-        , due to max number of users, no values are updated.
-        """
-        n_users = await redis_connector.get_online_users(world.world_id)
-        if n_users == world.max_users:
-            return None, strings.MAX_USERS_IN_WORLD
-        await redis_connector.update_online_users(world_id=world.world_id, offset=offset)
-        return world, ""
-
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         world_obj = db.query(World).filter(
@@ -59,16 +48,31 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
+    async def get_world_with_user_permissions(self, db: Session, world_id: int, user_id: int) \
+            -> Tuple[Optional[WorldInDBWithUserPermissions], str]:
+        """
+        Returns the world details and the permissions that the request user has in that world.
+        """
+
+        world, msg = await self.get(db=db, world_id=world_id)
+        if not world:
+            return None, msg
+        role, msg = await crud_role.can_access_world_roles(db=db, world_id=world_id, user_id=user_id)
+        world.__setattr__('is_creator', world.creator == user_id)
+        world.__setattr__('can_manage', role is not None)
+        world.__setattr__('update_date', world.update_date)
+        return WorldInDBWithUserPermissions(**world.__dict__), ""
+
     @cache(model="World")
-    async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+    async def get_available_for_guests(self, db: Session, world_id: int, user_id: Optional[UUID4])\
+            -> Tuple[Optional[World], str]:
 
         world_obj = db.query(World).filter(
             World.world_id == world_id,
-            World.public.is_(True),
-            World.allow_guests.is_(True),
-            World.status != consts.WORLD_DELETED_STATUS
+            World.status == consts.WORLD_NORMAL_STATUS
         ).first()
-        if not world_obj:
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        if not world_obj or not world_obj.allow_guests or (not world_obj.public and not world_user):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
@@ -119,6 +123,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             public=obj_in.public,
             creation_date=creation_date,
             update_date=creation_date,
+            profile_image=obj_in.profile_image,
             status=0
         )
 
@@ -166,7 +171,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             update_data['tags'] = lst
         # clear cache of the queries related to the object
         await clear_cache_by_model("World", world_id=db_obj.world_id)
-        obj = super().update(db, db_obj=db_obj, obj_in=update_data)
+        obj = super().update(db=db, db_obj=db_obj, obj_in=update_data)
+        db.add(obj)
+        db.commit()
+        logger.debug(obj)
         return obj, strings.WORLD_UPDATE_SUCCESS
 
     def filter(self,
@@ -187,9 +195,10 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
                requester_id: int = None,
                ):
 
+        if page < 1:
+            return None, strings.INVALID_PAGE_NUMBER
         if not tags:
             tags = []
-
         query = db.query(World)
 
         if is_guest:
@@ -220,15 +229,12 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         if tags:
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
-        if order == 'desc':
-            ord = desc
-        else:
-            ord = asc
+        ord = desc if order == 'desc' else asc
         # TODO: change this to add more filters, also change the name of this one it is only an example
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
 
-        return query.offset(limit * (page - 1)).limit(limit).all(), ""
+        return query.offset(limit * (page - 1)).limit(limit + 1).all(), ""
 
     def filter_by_visibility(self, query, visibility: str, requester_id: int):
         # normal users cannot access deleted worlds

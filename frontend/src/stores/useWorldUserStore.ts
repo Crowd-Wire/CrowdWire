@@ -25,6 +25,7 @@ interface WorldUser {
     in_conference: string;
     color?: string;
     world_map?: string;
+    last_pos?: any;
 }
 
 const colorArray = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', 
@@ -95,6 +96,16 @@ const useWorldUserStore = create(
                     if (user_id in new_users_info) delete new_users_info[user_id]
                     return {
                         users_info: new_users_info,
+                    }
+                })
+            },
+            updateWorldUserAvatarUsername: (avatar, username) => {
+                return set((s) => {
+                    let update_world_user = {...s.world_user}
+                    update_world_user.avatar = avatar;
+                    update_world_user.username = username;
+                    return {
+                        world_user: update_world_user
                     }
                 })
             },

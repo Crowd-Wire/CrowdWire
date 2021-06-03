@@ -9,7 +9,6 @@ import Email from "@material-ui/icons/Email";
 import TextField from '@material-ui/core/TextField';
 // import Header from "components/Header/Header.js";
 // import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -140,7 +139,6 @@ class RegisterPage extends React.Component {
       .then(
         (res) => {
           console.log(res);
-          if(true)
           this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
       }
     )
@@ -173,17 +171,6 @@ class RegisterPage extends React.Component {
                   <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                       <h4>Register</h4>
-                      <div className={this.props.classes.socialLine}>
-                        <Button
-                          justIcon
-                          target="_blank"
-                          color="transparent"
-                          style={{ border: "1px solid #476385" }}
-                          onClick={e => e.preventDefault()}
-                        >
-                          <i className={"fab fa-google"} />
-                        </Button>
-                      </div>
                     </CardHeader>
                     <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
@@ -303,7 +290,6 @@ class RegisterPage extends React.Component {
               </GridItem>
             </GridContainer>
           </div>
-          <Footer whiteFont />
         </div>
       </div>
     );

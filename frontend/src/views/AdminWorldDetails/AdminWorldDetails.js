@@ -2,18 +2,21 @@ import React, { Component } from 'react';
 import WorldService from 'services/WorldService.js';
 import WorldReportCard from 'components/WorldReportCard/WorldReportCard.js';
 import { Row, Col } from 'react-bootstrap';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
+import CardMedia from '@material-ui/core/CardMedia';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import { Link } from 'react-router-dom';
-const useStyles = makeStyles({
+
+const useStyles = theme => ({    
     root: {
         maxWidth: 345,
+    },
+    media: {
+        paddingTop: "30%",
     },
 });
 
@@ -59,47 +62,70 @@ class AdminWorldDetails extends Component {
     }
 
     render() {
+        const { classes } = this.props;
+
         return (
             <>
                 {!this.state.world ? <h1>Loading</h1> :
-                    <div className="px-3" style={{ marginTop: "100px" }}>
-                        <Row>
-                            <Col md="8">
-                                <h3>World Details</h3>
-                                <Card>
-                                    {this.state.world.status == 2
-                                        ? <h1>This world has been deleted by the user</h1> :
-                                        <>
-                                            <CardContent>
-                                                <Typography gutterBottom variant="h5" component="h2">
-                                                    {this.state.world.name}
-                                                </Typography>
-                                                <Typography variant="body2" component="p">
-                                                    Created by: <Link to='/'>{this.state.world.creator}</Link>
-                                                </Typography>
-                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                    {this.state.world.description}
-                                                </Typography>
-                                            </CardContent>
-                                            <CardActions>
-                                                <Button onClick={this.handleBan} size="small" variant="contained" color={this.state.world.status == 0 ? "primary" : 'secondary'}>
-                                                    {this.state.world.status == 0 ? "Ban" : "Unban"}
-                                                </Button>
-                                                <Link to="/admin/statistics"><Button size="small" variant="contained" color="primary">View statistics</Button></Link>
-                                            </CardActions>
-                                        </>
-                                    }
-                                </Card>
+                    <div className="px-3" style={{ paddingTop: "100px", height:"100%", backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'
+                }}>
+                        <Row style={{height:"100%"}}>
+                            <Col sm={12} md={8} style={{marginBottom:"50px"}}>
+                                <Row style={{height:"70%"}}>
+                                    <Col>
+                                        <h3>World Details</h3>
+                                        <Card style={{height:"93%"}}>
+                                            {this.state.world.status == 2
+                                                ? <h1>This world has been deleted by the user</h1> :
+                                                <>
+                                                    <CardContent>
+                                                        <CardMedia
+                                                            className={classes.media}
+                                                            image={
+                                                                this.state.world.profile_image === null ? 
+                                                                    "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg"
+                                                                :
+                                                                    this.state.world.profile_image
+                                                                }
+                                                            title="Contemplative Reptile"
+                                                        />
+                                                        <Typography gutterBottom variant="h4" component="h2" style={{marginTop:"15px"}}>
+                                                            {this.state.world.name}
+                                                        </Typography>
+                                                        <Typography variant="body2" component="p">
+                                                            Created by: <Link to='/'>{this.state.world.creator}</Link>
+                                                        </Typography>
+                                                        <Typography variant="body2" color="textSecondary" component="p">
+                                                            {this.state.world.description}
+                                                        </Typography>
+                                                    </CardContent>
+                                                    <CardActions>
+                                                        <Button onClick={this.handleBan} size="small" variant="contained" color={this.state.world.status == 0 ? "primary" : 'secondary'}>
+                                                            {this.state.world.status == 0 ? "Ban" : "Unban"}
+                                                        </Button>
+                                                        <Link to="/admin/statistics"><Button size="small" variant="contained" color="primary">View statistics</Button></Link>
+                                                    </CardActions>
+                                                </>
+                                            }
+                                        </Card>
+                                    </Col>
+                                </Row>
                             </Col>
-                            <Col md="4">
-                                <h3> Last World Reports </h3>
-                                {this.state.reports && this.state.reports.length !== 0 ? this.state.reports.map((r, i) => {
+                            <Col sm={12} md={4}>
+                                <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    <h3 style={{marginLeft:"auto", marginRight:"auto"}}> Last World Reports </h3>
+                                </Row>
+                                <Row style={{marginLeft:"auto", marginRight:"auto"}}>
+                                    {this.state.reports && this.state.reports.length !== 0 ? this.state.reports.map((r, i) => {
 
-                                    return (<div className="mb-3" key={r.reporter}>
-                                        <WorldReportCard report={r} />
-                                    </div>)
+                                        return (
+                                        <div className="md-3" key={r.reporter} style={{overflowY:"auto", marginLeft:"auto", marginRight:"auto"}}>
+                                            <WorldReportCard report={r} />
+                                        </div>)
 
-                                }) : <h2>No reports found...</h2>}
+                                    }) : <h2>No reports found...</h2>}
+                                </Row>
+                                
                             </Col>
                         </Row>
                     </div>

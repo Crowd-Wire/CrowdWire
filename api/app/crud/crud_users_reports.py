@@ -71,23 +71,19 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate])
 
         query = query.filter(Report_User.reviewed.is_(reviewed))
 
-        if order == 'desc':
-            ord = desc
-        else:
-            ord = asc
+        ord = desc if order == 'desc' else asc
 
         if order_by == 'timestamp':
             query = query.order_by(ord(Report_User.timestamp))
 
-        reports = query.offset(limit * (page - 1)).limit(limit).all()
+        reports = query.offset(limit * (page - 1)).limit(limit + 1).all()
         return [r._asdict() for r in reports], ""
 
-    def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int)\
+    def get_all_user_reports_sent(self, db: Session, user_id: int, request_user: User, page: int, limit: int = 10)\
             -> Tuple[List[Report_User], str]:
         """
         Gets all the reports made by a user.
         """
-        page_size = 10
 
         # page cannot be lower than 1
         if page < 1:
@@ -97,7 +93,7 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate])
             return None, strings.USER_SENT_REPORTS_ACCESS_FORBIDDEN
 
         reports = db.query(Report_User).filter(Report_User.reporter == user_id)\
-            .offset(page_size * (page - 1)).limit(page_size).all()
+            .offset(limit * (page - 1)).limit(limit + 1).all()
 
         return reports, ""
 

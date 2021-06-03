@@ -27,6 +27,7 @@ class MapManager {
         if (!MapManager._instance) {
             const worldUser = useWorldUserStore.getState().world_user;
             this.worldId = worldUser.world_id;
+            console.log(worldUser.world_map, worldUser.world_id)
             this.mapJson = JSON.parse(worldUser.world_map);
             MapManager._instance = this;
         }

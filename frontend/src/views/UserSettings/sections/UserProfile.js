@@ -8,7 +8,6 @@ import Email from "@material-ui/icons/Email";
 import TextField from '@material-ui/core/TextField';
 // import Header from "components/Header/Header.js";
 // import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
@@ -25,6 +24,8 @@ import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
 import UserService from "../../../services/UserService"
 import useAuthStore from "stores/useAuthStore";
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 
 
@@ -33,63 +34,129 @@ class UserProfile extends React.Component {
         super(props);
     
     this.state = {
-        cardAnimation: "",
-        cardAnimaton: "", 
         navigate: false,
         emailHelperText: "",
         nameHelperText: "",
         passHelperText: "",
         birthdayHelperText: "",
-        user: null
+        user: null,
+        email_val: "",
+        name_val: "",
+        bdate_val: "",
+        is_auth_google: false,
     }
 }
-
+    notify = () => {
+        toast.success("Successfully Updated Account! 🎉", {
+        position: toast.POSITION.TOP_CENTER
+        });
+    };
     componentDidMount() {
-        this.setState({ cardAnimaton: "cardHidden" })
         UserService.getUserInfo()
         .then((res) => {
             if (res.status == 200)
                 return res.json();
         })
         .then( (res) => {
-            if (res)
+            if (res){
                 this.setState({
-                    user: res
+                    user: res,
+                    email_val: res.email,
+                    name_val: res.name,
+                    bdate_val: res.birth,
                 });
+            if(res.sub){
+                console.log("google auth");
+                this.setState({is_auth_google: true});
+            }
+            }
             console.log(res)
         }).catch((error) => {useAuthStore.getState().leave()});
     }
 
-    timer = setTimeout(() => {
-        this.setState({ cardAnimaton: "" })
-    }, 700
+    handleRevert = () => {
+        document.getElementById("email").value = this.state.email_val
+        document.getElementById("name").value = this.state.name_val;
+        document.getElementById("date").value = this.state.bdate_val;
+    }
+    handleSubmit = () => {
+        let email = document.getElementById("email").value
+        let name = document.getElementById("name").value;
+        let bdate = document.getElementById("date").value;
+        let dDate = new Date(bdate);
+        let passed = true;
 
-    );
-    
+        if(email.length == 0){
+            this.setState({emailHelperText:"Email needs to have at least 1 character."});
+            passed = false;
+        }
+            this.setState({emailHelperText:""});
+        if(name.length == 0){
+            this.setState({nameHelperText:"Name needs to have at least 1 character."});
+            passed = false;
+        }
+        else
+            this.setState({nameHelperText:""});
+
+        if(dDate > new Date()){
+            console.log("date must be past")
+            this.setState({birthdayHelperText:"Birthdays are in the past."});
+            passed = false;
+        }
+        else
+            this.setState({birthdayHelperText:""});
+
+        if(passed){
+            UserService.updateUserInfo(
+            this.state.user.user_id,
+            email,
+            name,
+            bdate
+            )
+            .then(
+            (res) => {
+                console.log(res.status);
+                return res.json();
+            }
+            )
+            .then(
+            (res) => {
+                this.setState({email_val: res.email, name_val: res.name, bdate_val: res.birth})
+                this.notify()
+            }
+        )
+        .catch(
+            (error) => {
+                console.log(error);
+                // TODO: change state to show error;
+            }
+        );
+
+        }
+    }
     render() {
         return (
         <div>
-            <div className={this.props.classes.container}>
             { this.state.user == null ? "" : 
             <GridContainer justify="center">
-                <GridItem xs={12} sm={12} md={12}>
-                <Card className={this.props.classes[this.state.cardAnimaton]}>
+                <GridItem xs={12} sm={12} md={12} lg={12}>
+                <Card>
                     <form className={this.props.classes.form}>
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
-                        <h4>Update Account</h4>
+                        <h4>Edit Account info</h4>
                     </CardHeader>
-                    <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
+                        {this.state.is_auth_google ? "": 
                         <CustomInput
                         helperText={this.state.emailHelperText}
                         labelText="Email..."
                         id="email"
                         formControlProps={{
-                            fullWidth: true
+                            fullWidth: true,
                         }}
                         inputProps={{
                             type: "email",
-                            value: this.state.user.email,
+                            defaultValue: this.state.user.email,
                             endAdornment: (
                             <InputAdornment position="end">
                                 <Email className={this.props.classes.inputIconsColor} />
@@ -97,6 +164,7 @@ class UserProfile extends React.Component {
                             )
                         }}
                         />
+                        }
                         {this.state.emailHelperText!==""?
                         <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.emailHelperText}</Typography>
                         :
@@ -107,12 +175,12 @@ class UserProfile extends React.Component {
                         labelText="Name..."
                         id="name"
                         formControlProps={{
-                            fullWidth: true
+                            fullWidth: true,
                         }}
                         
                         inputProps={{
                             type: "text",
-                            value: this.state.user.name,
+                            defaultValue: this.state.user.name,
                             endAdornment: (
                             <InputAdornment position="end">
                                 <Email className={this.props.classes.inputIconsColor} />
@@ -125,49 +193,6 @@ class UserProfile extends React.Component {
                         :
                         <></>
                         }
-                        <CustomInput
-                        helperText={this.state.passHelperText}
-                        labelText="Password"
-                        id="pass"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                        inputProps={{
-                            type: "password",
-                            endAdornment: (
-                            <InputAdornment position="end">
-                                <Icon className={this.props.classes.inputIconsColor}>
-                                lock_outline
-                                </Icon>
-                            </InputAdornment>
-                            ),
-                            autoComplete: "off"
-                        }}
-                        />
-                        {this.state.passHelperText!==""?
-                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.passHelperText}</Typography>
-                        :
-                        <></>
-                        }
-                        <CustomInput
-                        helperText={this.state.cPassHelperText}
-                        labelText="Confirm Password"
-                        id="cpass"
-                        formControlProps={{
-                            fullWidth: true
-                        }}
-                        inputProps={{
-                            type: "password",
-                            endAdornment: (
-                            <InputAdornment position="end">
-                                <Icon className={this.props.classes.inputIconsColor}>
-                                lock_outline
-                                </Icon>
-                            </InputAdornment>
-                            ),
-                            autoComplete: "off"
-                        }}
-                        />
                         {this.state.cPassHelperText!==""?
                         <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.cPassHelperText}</Typography>
                         :
@@ -188,19 +213,34 @@ class UserProfile extends React.Component {
                         />
                     </CardBody>
                     <CardFooter className={this.props.classes.cardFooter}>
-                        <Button     
-                        onClick={this.handleSubmit} 
-                        >
-                        Submit
-                        </Button>
+                        <Row style={{width: '100%'}}>
+                            <Col xs={12} style={{textAlign: 'center'}}>
+                                <Button
+                                size="lg"
+                                onClick={this.handleRevert}    
+                                >
+                                Revert
+                                </Button>
+                            </Col>
+                            <Col xs={12} style={{textAlign: 'center'}}>
+                                <Button
+                                style={{ 
+                                    backgroundColor: "#5BC0BE", marginLeft: "auto", 
+                                    marginRight: "auto" 
+                                }} 
+                                size="md"
+                                onClick={this.handleSubmit} 
+                                >
+                                Submit
+                                </Button>
+                            </Col>
+                        </Row>
                     </CardFooter>
                     </form>
                 </Card>
                 </GridItem>
             </GridContainer>
             }
-            </div>
-            <Footer whiteFont />
         </div>
     );
     }

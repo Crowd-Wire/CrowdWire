@@ -1,29 +1,32 @@
 from typing import Optional, List
+from typing_extensions import Annotated
 from datetime import datetime
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 
 from .tags import TagInDB
 
 
 class BaseWorld(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
+    name: Annotated[Optional[str], Field(max_length=50)] = None
+    description: Annotated[Optional[str], Field(max_length=300)] = None
     max_users: Optional[int] = None
     public: Optional[bool] = True
     creator: Optional[int]
     status: Optional[int] = None
     allow_guests: Optional[bool] = True
+    profile_image: Optional[bytes] = None
     tags: Optional[List[str]] = []
 
     @validator('max_users')
     def max_users_max_zero(cls, num):
-        if num < 1:
-            raise ValueError('Max_Users should be at least 1')
+        if num < 1 or num > 1000:
+            raise ValueError('Max_Users should be between 1 and 1000')
+
         return num
 
 
 class WorldCreate(BaseWorld):
-    name: str
+    name: Annotated[str, Field(max_length=50)]
     public: bool
     allow_guests: bool
     tags: List[str]
@@ -43,6 +46,7 @@ class WorldInDB(BaseWorld):
     tags: Optional[List[TagInDB]] = []
     creation_date: Optional[datetime] = None
     update_date: Optional[datetime] = None
+    online_users: Optional[int] = 0
 
     class Config:
         orm_mode = True
@@ -51,3 +55,8 @@ class WorldInDB(BaseWorld):
 # Retrieve the Map of the World in the Database
 class WorldMapInDB(WorldInDB):
     world_map: bytes
+
+
+class WorldInDBWithUserPermissions(WorldInDB):
+    is_creator: bool = False
+    can_manage: bool = False

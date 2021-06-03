@@ -86,6 +86,7 @@ class WorldEditorPage extends React.Component {
             this.navigate("/dashboard/search/public");
           }
           else {
+            console.log(res)
             useWorldUserStore.getState().joinWorld(res);
             this.setState({ loading: false });
           }

@@ -1,13 +1,15 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
+
+from typing_extensions import Annotated
 
 
 class ReportUserBase(BaseModel):
     reporter: Optional[int]
     reported: Optional[int]
     world_id: Optional[int]
-    comment: Optional[str]
+    comment: Annotated[Optional[str], Field(max_length=300)]
     timestamp: Optional[datetime]
 
 
@@ -24,7 +26,7 @@ class ReportUserInDB(ReportUserBase):
     reporter: int
     reported: int
     world_id: int
-    comment: str
+    comment: Annotated[str, Field(max_length=300)]
     timestamp: datetime
     reviewed: bool
 

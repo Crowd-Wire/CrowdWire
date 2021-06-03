@@ -1,14 +1,17 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator, UUID4
-from typing import Optional, Union
+from pydantic import BaseModel, validator, UUID4, Field
+from typing import Optional, Union, Dict
+
+from typing_extensions import Annotated
+
 from app.core.consts import AVATARS_LIST
 from app.schemas import RoleInDB
 
 
 class World_UserBase(BaseModel):
-    avatar: Optional[str] = None
-    username: Optional[str] = None
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     status: Optional[int] = None
     user_id: Optional[int] = None
     world_id: Optional[int] = None
@@ -32,8 +35,8 @@ class World_UserCreate(World_UserBase):
 
 
 class World_UserUpdate(BaseModel):
-    username: Optional[str]
-    avatar: Optional[str]
+    username: Annotated[Optional[str], Field(max_length=50)] = None
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
     status: Optional[int]
 
     @validator("avatar")
@@ -55,8 +58,8 @@ class World_UserInDBBase(BaseModel):
 
 # Return Normal User's data when Joining World
 class World_UserInDB(World_UserInDBBase):
-    avatar: Optional[str]
-    username: Optional[str]
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     role_id: int
 
 
@@ -64,9 +67,10 @@ class World_UserInDB(World_UserInDBBase):
 # instead of only the id, useful to avoid more
 # requests to the API
 class World_UserWithRoleInDB(World_UserInDBBase):
-    avatar: Optional[str]
-    username: Optional[str]
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     role: RoleInDB
+    last_pos: Optional[Dict[str, float]] = {}
 
 
 class World_UserWithRoleAndMap(World_UserWithRoleInDB):

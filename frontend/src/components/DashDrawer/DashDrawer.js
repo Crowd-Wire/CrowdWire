@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -15,7 +15,8 @@ import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthenticationService from "services/AuthenticationService.js";
 import useAuthStore from "stores/useAuthStore.ts";
-
+import created_worlds from "assets/img/save-the-planet.svg";
+import UserService from "services/UserService.js";
 
 const drawerWidth = 240;
 
@@ -70,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },  
   iconDrawer: {
-    fill:"white"
+    fill:"white",
   },
 }));
 
@@ -83,7 +84,6 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing(2)+100;
   const definitions = theme.spacing(2)+50;
-  
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -92,7 +92,6 @@ export default function DashDrawer(props){
     if(location.pathname!=="/dashboard/search/public")
       navigation("/dashboard/search/public");
   }
-
 
   const onClickJoinedWorlds = () => {
     if(location.pathname!=="/dashboard/search/joined")
@@ -106,8 +105,13 @@ export default function DashDrawer(props){
   const onClickCreateWorld = () => {
     navigation("/create-world");
   }
-
-
+  const onClickCreatedWorlds = () => {
+    if(location.pathname!=="/dashboard/search/owned")
+      navigation("/dashboard/search/owned");
+  }
+  const onClickUserSettings = () => {
+    navigation("/dashboard/user");
+  }
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -149,29 +153,42 @@ export default function DashDrawer(props){
         </div>
         <Divider />
         <List>
+            <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
+            className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
+              <ListItemIcon>
+                <Explore className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary='Public Worlds' className={classes.toolbar}
+                    className={clsx(classes.menuButton, {
+                        [classes.hide]: !open,
+                    })}/>
+            </ListItem>
           {st.guest_uuid ? <></> :
-          <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
-              [classes.drawerOpen]: open,
-              [classes.drawerClose]: !open,})}>
-            <ListItemIcon>
-              <Explore className={classes.iconDrawer}/>
-            </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
-                  className={clsx(classes.menuButton, {
-                      [classes.hide]: !open,
-                  })}/>
-          </ListItem>
+            <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
+                [classes.drawerOpen]: open,
+                [classes.drawerClose]: !open,})}>
+              <ListItemIcon>
+                <Public className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
+                    className={clsx(classes.menuButton, {
+                        [classes.hide]: !open,
+                    })}/>
+            </ListItem>
           }
-          <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
-          className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
-            <ListItemIcon>
-              <Public className={classes.iconDrawer}/>
-            </ListItemIcon>
-            <ListItemText style={{ color: '#FFFFFF' }} primary='Public Worlds' className={classes.toolbar}
-                  className={clsx(classes.menuButton, {
-                      [classes.hide]: !open,
-                  })}/>
-          </ListItem>
+          {st.guest_uuid ? <></> :
+            <ListItem button key='Created Worlds' onClick={onClickCreatedWorlds} className={clsx(classes.drawer, {
+                [classes.drawerOpen]: open,
+                [classes.drawerClose]: !open,})}>
+              <ListItemIcon>
+                <img src={created_worlds} className={classes.iconDrawer} style={{height:"25px", width:"25px"}}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary='Created Worlds' className={classes.toolbar}
+                    className={clsx(classes.menuButton, {
+                        [classes.hide]: !open,
+                    })}/>
+            </ListItem>
+          }
           { st.guest_uuid ?
             <></>
             :
@@ -186,7 +203,10 @@ export default function DashDrawer(props){
                   })}/>
             </ListItem>
           }
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+          { st.guest_uuid ?
+            <></>
+            :
+          <ListItem onClick={onClickUserSettings} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Settings" style={{position: "fixed", bottom: definitions}}>
           <ListItemIcon>
               <Settings className={classes.iconDrawer}/>
@@ -194,6 +214,10 @@ export default function DashDrawer(props){
           <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
             className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
           </ListItem>
+          }
+
+
+
           <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
             button key="Leave" style={{position: "fixed", bottom: theme.spacing(2)}}
             onClick={() => logout()}
