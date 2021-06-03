@@ -42,7 +42,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
         return db.query(User).join(World).filter(World.world_id == world_id).first()
 
-
     @cache(model="World")
     async def get(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
         world_obj = db.query(World).filter(
