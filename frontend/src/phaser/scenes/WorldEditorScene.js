@@ -149,11 +149,14 @@ class WorldEditorScene extends Scene {
     }
 
     fillBFS(layer, tileId, x, y, tint) {
-        let count = 400;
-        const replaceId = layer.getTileAt(x, y, true).index,
-            queue = [{ x, y }];
-
-        console.log(layer, tileId, x, y, tint)
+        const replaceId = layer.getTileAt(x, y, true).index;
+        
+        if (tileId === replaceId) {
+            // Nothing to do, avoid loop
+            return;
+        }
+        
+        const queue = [{ x, y }];
     
         while (queue.length > 0) {
             const { x, y } = queue.shift(),
@@ -164,12 +167,9 @@ class WorldEditorScene extends Scene {
                     tile = layer.getTileAt(x, y, true);
 
                 if (tile && tile.index === replaceId) {
-                    console.log(tile.index, replaceId)
                     layer.fill(tileId, x, y, 1, 1);
                     tint && (tile.tint = tint);
                     queue.push(dest);
-                    if (count-- < 0)
-                        return;
                 }
             }
         }
@@ -190,63 +190,55 @@ class WorldEditorScene extends Scene {
             let tileX = this.map.worldToTileX(worldPoint['x']);
             let tileY = this.map.worldToTileY(worldPoint['y']);
             
-            // const tile = this.map.getTileAt(tileX, tileY, true, activeLayerName);
-            // // console.log(tile)
-            // // const color = intToHex(cyrb53Hash(this.paintTool.conferenceId), 129)
-            // // console.log(color)
-            // tile && this.paintTool?.conferenceId && (tile.tint = 0x197cb0);
-
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
     
                 if (activeLayer) {
                     // Layer exists
-                    if (this.paintTool.type === PaintToolType.DRAW && activeTile) {
-                        let tileId = activeTile;
-                        if (tileId[0] === 'C') {
-                            const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
-                            tileId = this.mapManager.getConferenceGid(tileId);
-                            if (tileId) {
-                                activeLayer.fill(tileId, tileX, tileY, 1, 1);
-                                const tile = activeLayer.getTileAt(tileX, tileY, false, activeLayerName);
-                                tile.tint = tint;
-                            }
-                        } else {
-                            activeLayer.fill(tileId, tileX, tileY, 1, 1);
-                        }
-                    }
-                    else if (this.paintTool.type === PaintToolType.ERASE) {
-                        activeLayer.fill(-1, tileX, tileY, 1, 1);
-                    }
-                    else if (this.paintTool.type === PaintToolType.PICK) {
-                        const tile = activeLayer.getTileAt(tileX, tileY, false /**bug if true */, activeLayerName);
-                        if (tile) {
-                            // Check if index is from a conference tile and set active tile accordingly
-                            const cid = this.mapManager.getConferenceCid(tile.index);
-                            useWorldEditorStore.getState().setState({ activeTile: cid || tile.index })
-                        }
-                    } else if (this.paintTool.type === PaintToolType.FILL) {
-                        const tile = activeLayer.getTileAt(tileX, tileY, false /**bug if true */, activeLayerName);
-                        if (tile) {
-                            // Check if index is from a conference tile and set active tile accordingly
-                            const cid = this.mapManager.getConferenceCid(tile.index);
-                            const tileIndex = cid || tile.index;
 
-                            console.log(tileId, tileIndex)
+                    let activeGid, tint = 0xffffff;
+                    if (activeTile && activeTile[0] === 'C') {
+                        activeGid = this.mapManager.getConferenceGid(activeTile);
+                        tint = `0x${useWorldEditorStore.getState().conferences[activeTile].color.substr(1)}`;
 
-                            let tileId = activeTile;
-                            if (tileId[0] === 'C') {
-                                const tint = `0x${useWorldEditorStore.getState().conferences[tileId].color.substr(1)}`;
-                                tileId = this.mapManager.getConferenceGid(tileId);
-                                if (tileId && tileId != tileIndex) {
-                                    this.fillBFS(activeLayer, tileId, tileX, tileY, tint);
-                                }
-                            } else if (tileId != tileIndex) {
-                                console.log('entriy')
-                                this.fillBFS(activeLayer, tileId, tileX, tileY);
+                        if (!activeGid)
+                            throw Error(`Could not find GID of ${activeTile}`);
+                    } else {
+                        activeGid = activeTile;
+                    }
+
+                    let clickedGid, clickedCid;
+                    const clickedTile = activeLayer.getTileAt(tileX, tileY, true);
+                    if (clickedTile) {
+                        // Check if index is from a conference tile and set active tile accordingly
+                        clickedCid = this.mapManager.getConferenceCid(clickedTile.index) || clickedTile.index;
+                        clickedGid = clickedTile.index;
+                    }
+
+                    switch (this.paintTool.type) {
+                        case PaintToolType.DRAW:
+                            console.log(activeGid, tint)
+                            if (activeGid) {
+                                activeLayer.fill(activeGid, tileX, tileY, 1, 1);
+                                clickedTile && (clickedTile.tint = tint);
                             }
-                        }
+                            break;
+                        case PaintToolType.ERASE:
+                            activeLayer.fill(-1, tileX, tileY, 1, 1);
+                            break;
+                        case PaintToolType.PICK:
+                            if (clickedCid > -1) {
+                                useWorldEditorStore.getState().setState({ activeTile: clickedCid })
+                            }
+                            break;
+                        case PaintToolType.FILL:
+                            if (activeGid) {
+                                this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
+                            }
+                            break;
+                        case PaintToolType.SELECT:
+                            break;
                     }
                 }
             }
@@ -284,8 +276,6 @@ class WorldEditorScene extends Scene {
         this.updateCamera();
         this.updateEdit();
     }
-
-
 }
 
 export default WorldEditorScene;

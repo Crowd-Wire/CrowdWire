@@ -49,20 +49,11 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   handleTileChange = (tileId, prevTileId) => {
-    console.log('activeTile')
     if (tileId === prevTileId)
       return;
 
-    const tileStyle = useWorldEditorStore.getState().tiles[tileId].style;
-    console.log(tileId,tileStyle )
+    const tileStyle = tileId ? useWorldEditorStore.getState().tiles[tileId].style : {};
     this.setState({ tileStyle });
-    // const tileElem: any = document.getElementById(`tile-${tileId}`).cloneNode(true);
-    // tileElem.removeAttribute('id');
-    // tileElem.style["transform"] = "scale(2.5)";
-    // tileElem.style["display"] = "";
-    // tileElem.style["margin"] = "15px";
-    // const tileContainer = document.getElementById("tile-container");
-    // tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
   }
 
   handlePaintToolChange = (toolType: PaintToolType) => {
