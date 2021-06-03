@@ -92,7 +92,10 @@ export default function WorldsList() {
             })
             .then((res) => {
                 console.log(res);
-                setWorlds(res);
+                if(! res.detail){
+                    setWorlds(res);
+                }
+                
             })
     }
 

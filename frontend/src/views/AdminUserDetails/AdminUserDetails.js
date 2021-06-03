@@ -40,8 +40,10 @@ export default function AdminUserDetails() {
                     })
                     .then((res) => {
                         // TODO: handle errors
-                        setWorlds(res);
-                    })
+                        if(!res.detail){
+                            setWorlds(res);
+                        }
+                    })                    
                 })
             UserService.getUserReports(null, null, window.location.pathname.split("/")[3], null, null, null, 1, 10)
             .then((res)=>{

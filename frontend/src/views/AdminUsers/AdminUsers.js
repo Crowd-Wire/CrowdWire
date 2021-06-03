@@ -116,7 +116,7 @@ export default function AdminUsers() {
         })
         .then((res) =>{
             // TODO: handle errors
-            setUsers(res);
+            if(!res.detail) setUsers(res);
         })
 
     }, [])
