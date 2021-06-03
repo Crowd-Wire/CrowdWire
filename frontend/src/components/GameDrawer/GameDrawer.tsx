@@ -250,28 +250,28 @@ const GameDrawer = () => {
           </IconButton>
         </div>
         <div className={classes.sideBot}>
-          {/* { useWorldUserStore.getState().world_user.role.invite ? */}
+          { useWorldUserStore.getState().world_user.role.invite ?
             <IconButton
               aria-label="open drawer"
               onClick={() => handleOpen(<GenerateInviteCard />)}
             >
               <LinkIcon style={iconsStyle} />
             </IconButton>
-          {/* : '' } */}
+            : '' }
           <IconButton onClick={handleFullscreen}>
           { fullScreen ?
               <FullscreenExitIcon style={iconsStyle} />
             : <FullscreenIcon style={iconsStyle} />
           }
           </IconButton>
-          {/* { useWorldUserStore.getState().world_user.role.role_manage ?  */}
+          { useWorldUserStore.getState().world_user.role.role_manage ? 
             <IconButton
               aria-label="open drawer"
               onClick={() => handleOpen(<WSettingsContent />)}
             >
               <SettingsIcon style={iconsStyle} />
             </IconButton>
-          {/* : '' } */}
+            : '' }
           { !useAuthStore.getState().guest_uuid ?
             <IconButton
               aria-label="open report modal"
