@@ -104,6 +104,22 @@ class RedisConnector:
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
 
+    async def setexpire(self, key: str, timeout: int = 60):
+        """
+        Puts an expire time on a redis key
+        @param key: the key we want to set an expire time
+        @param timeout:the timeout time in minutes
+        """
+        seconds = timeout * 60
+        return await self.master.execute('expire', key, seconds)
+
+    async def setpersistent(self, key: str):
+        """
+        Remove any expire time associated with a given key
+        @param key: the key we want to remove the expire time
+        """
+        return await self.master.execute('persist', key)
+
     async def add_media_server(self):
         media_servers = await self.scan_match_all('media_server_')
         num_servers = str(len(media_servers) + 1)

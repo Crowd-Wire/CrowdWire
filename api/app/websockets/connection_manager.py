@@ -47,6 +47,8 @@ class ConnectionManager:
         # save user on redis
         await redis_connector.add_users_to_world(world_id, user_id)
         await redis_connector.update_online_users(world_id=world_id, offset=1)
+        key = f'world:{world_id}:{user_id}'
+        await redis_connector.setpersistent(key)
 
         logger.info(
             f"Connected User {user_id} to World {world_id}"
@@ -66,6 +68,10 @@ class ConnectionManager:
             )
             # decrease number of online users
             await redis_connector.update_online_users(world_id=world_id, offset=-1)
+
+            key = f'world:{world_id}:{user_id}'
+            # clear user_data in a day timeout
+            await redis_connector.setexpire(key=key, timeout=60 * 24)
         else:
             logger.error(
                 f"Unrecognized User {user_id}"
