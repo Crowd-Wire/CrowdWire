@@ -87,7 +87,10 @@ export default function UserReports() {
             })
             .then((res) => {
                 console.log(res);
-                setReports(res);
+                if(!res.detail){
+                    setReports(res);
+                }
+                
             })
     }
 

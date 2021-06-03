@@ -29,7 +29,10 @@ export default function AdminUserDetails() {
                 .then((res) => {
                     // TODO: handle errors
                     console.log(res);
-                    setWorlds(res);
+                    if(!res.detail){
+                        setWorlds(res);
+                    }
+                    
                 })
             })
 

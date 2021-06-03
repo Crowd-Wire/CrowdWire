@@ -38,17 +38,24 @@ class AdminWorldDetails extends Component {
             })
             .then((res) => {
                 // TODO: handle errors
-                this.setState({ world: res });
+                if(!res.detail){
+                    this.setState({ world: res });
+                }
             }).then(() => {
                 // retrieves the most recent reports
+                if(this.state.world){
                 if (this.state.world.status !== 2)
                     WorldService.getAllReports(
                         world_id, null, null, this.state.world.status == 0 ? false : true,
                         'timestamp', 'desc', 1, 3)
                         .then((res) => { return res.json() })
                         .then((res) => {
-                            this.setState({ reports: res })
+                            if(!res.detail){
+                                this.setState({ reports: res })
+                            }
+                            
                         })
+                }
             })
     }
 
@@ -57,7 +64,9 @@ class AdminWorldDetails extends Component {
             .then((res) => { return res.json(); })
             .then((res) => {
                 console.log(res);
-                this.setState({ world: { ...this.state.world, status: res.status } });
+                if(!res.detail){
+                    this.setState({ world: { ...this.state.world, status: res.status } });
+                }
             })
     }
 

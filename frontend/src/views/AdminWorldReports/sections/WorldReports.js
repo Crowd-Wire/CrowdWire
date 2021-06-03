@@ -53,7 +53,10 @@ export default function WorldReports(props) {
             })
             .then((res) => {
                 console.log(res);
-                setReports(res);
+                if(!res.detail){
+                    setReports(res);
+                }
+                
             })
     }
 

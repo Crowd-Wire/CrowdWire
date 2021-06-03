@@ -39,8 +39,7 @@ export default function AdminUsers() {
         })
         .then((res) =>{
             // TODO: handle errors
-            console.log(res);
-            setUsers(res);
+            if(!res.detail) setUsers(res);
         })
 
     }, [])
