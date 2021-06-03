@@ -171,8 +171,15 @@ class MapManager {
                 break;
             }
         }
+        const conferenceLayer = this.map.getLayer('Room').tilemapLayer;
+
+        // Remove tiles of tileset from conference layer
+        const findIndex = this.getConferenceGid(cid);
+        if (findIndex)
+            conferenceLayer.replaceByIndex(findIndex, -1, 0, 0, conferenceLayer.width, conferenceLayer.height);
+
         // Remove tileset conference layer
-        arr = this.map.getLayer('Room').tilemapLayer.tileset;
+        arr = conferenceLayer.tileset;
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
         
@@ -181,7 +188,7 @@ class MapManager {
                 break;
             }
         }
-        (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(this.map.getLayer('Room').tilemapLayer.tileset);
+        (<any>conferenceLayer).setTilesets(conferenceLayer.tileset);
     }
 
     saveMap(): void {
