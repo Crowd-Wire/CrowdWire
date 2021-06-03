@@ -539,6 +539,20 @@
          "tilecount":256,
          "tileheight":32,
          "tilewidth":32
+        }, 
+        {
+         "columns":1,
+         "firstgid":287,
+         "image":"tilesets\/_conference.png",
+         "imageheight":32,
+         "imagewidth":32,
+         "margin":0,
+         "name":"_conference",
+         "spacing":0,
+         "tilecount":1,
+         "tileheight":32,
+         "tilewidth":32,
+         "transparentcolor":"#ff0000"
         }],
  "tilewidth":32,
  "type":"map",

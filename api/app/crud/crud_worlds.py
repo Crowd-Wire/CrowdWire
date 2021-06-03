@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Tuple, Union, Dict, Any, List
-
+from app.redis import redis_connector
+from pydantic import UUID4
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
@@ -63,15 +64,15 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         return WorldInDBWithUserPermissions(**world.__dict__), ""
 
     @cache(model="World")
-    async def get_available_for_guests(self, db: Session, world_id: int) -> Tuple[Optional[World], str]:
+    async def get_available_for_guests(self, db: Session, world_id: int, user_id: Optional[UUID4])\
+            -> Tuple[Optional[World], str]:
 
         world_obj = db.query(World).filter(
             World.world_id == world_id,
-            World.public.is_(True),
-            World.allow_guests.is_(True),
-            World.status != consts.WORLD_DELETED_STATUS
+            World.status == consts.WORLD_NORMAL_STATUS
         ).first()
-        if not world_obj:
+        world_user = await redis_connector.get_world_user_data(world_id=world_id, user_id=user_id)
+        if not world_obj or not world_obj.allow_guests or (not world_obj.public and not world_user):
             return None, strings.WORLD_NOT_FOUND
         return world_obj, ""
 
@@ -137,12 +138,11 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         db.commit()
 
         # Create Default Roles for a World
-        default_role = crud_role.create_default(db=db, world_id=db_world.world_id)
+        crud_role.create_default(db=db, world_id=db_world.world_id)
 
         world_user, msg = await crud_world_user.join_world(db=db, _world=db_world, _user=user)
         if world_user is None:
             return None, msg
-        logger.debug(default_role)
 
         return db_world, strings.WORLD_CREATED_SUCCESS
 

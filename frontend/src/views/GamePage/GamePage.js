@@ -98,8 +98,6 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
-            console.log(res)
-
             if (res.detail){
               toast.dark(
                 <span>
@@ -197,7 +195,7 @@ const GamePage = (props) => {
               <div className={classes.gameWindow}>
                 {/* Game */}
                 <RoomCall />
-                <Phaser />
+                <Phaser scene='GameScene' />
               </div>
             </div>
           )

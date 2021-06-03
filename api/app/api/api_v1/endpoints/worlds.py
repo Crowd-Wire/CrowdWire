@@ -42,28 +42,29 @@ async def join_world_by_link(
         result=Depends(deps.get_current_user_for_invite)
 ):
     user, world_obj = result
+
     # If it's not the first time the user has joined the world, get it from redis(cache)
     world_user = await redis_connector.get_world_user_data(world_obj.world_id, user.user_id)
     if world_user:
-        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'world_map': world_obj.world_map}})
         return world_user
     if not is_guest_user(user):
         # Otherwise, goes to PostgreSQL database, for registered users
         world_user, role = await crud.crud_world_user.join_world(db=db, _world=world_obj, _user=user)
         delattr(world_user, 'role_id')
         setattr(world_user, 'role', role)
-        setattr(world_user, 'map', world_obj.world_map)
+        setattr(world_user, 'world_map', world_obj.world_map)
         return world_user
     else:
         # Saves on Redis for Guest Users
         logger.debug('not cached:/')
         world_default_role = crud.crud_role.get_world_default(db=db, world_id=world_obj.world_id)
-        world_user, msg = await redis_connector.join_new_guest_user(world_id=world_obj.world_id, user_id=user.user_id,
-                                                                    role=world_default_role,
-                                                                    max_users=world_obj.max_users)
+        world_user, msg = await redis_connector.join_new_guest_user(
+            world_id=world_obj.world_id, max_users=world_obj.max_users, user_id=user.user_id, role=world_default_role)
+
         if world_user is None:
             raise HTTPException(status_code=400, detail=msg)
-        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'world_map': world_obj.world_map}})
     return world_user
 
 
@@ -102,17 +103,18 @@ async def join_world(
             # pydantic schema is waiting for a role object not a role id
             delattr(world_user, 'role_id')
             setattr(world_user, 'role', role)
-            setattr(world_user, 'map', world_obj.world_map)
+            setattr(world_user, 'world_map', world_obj.world_map)
 
         else:
 
             # adds the world map to the data from the world_user
-            world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
+            world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'world_map': world_obj.world_map}})
 
     else:
 
         # guests cannot join worlds that dont allow guests
-        world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id)
+        world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id,
+                                                                        user_id=user.user_id)
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 
@@ -128,8 +130,7 @@ async def join_world(
                 raise HTTPException(status_code=400, detail=msg)
 
         # adds the world map to the data from the world_user
-        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'map': world_obj.world_map}})
-
+        world_user = schemas.World_UserWithRoleAndMap(**{**world_user.dict(), **{'world_map': world_obj.world_map}})
     return world_user
 
 
