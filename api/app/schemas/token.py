@@ -7,6 +7,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     expire_date: str
+    is_superuser: bool = False
 
 
 class TokenGuest(Token):
