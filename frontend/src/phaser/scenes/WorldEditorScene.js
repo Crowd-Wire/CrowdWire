@@ -197,12 +197,12 @@ class WorldEditorScene extends Scene {
                 if (activeLayer) {
                     // TilemapLayer exists
 
-                    const x = Math.Snap.To(worldPoint.x, 32),
-                        y = Math.Snap.To(worldPoint.y, 32);
+                    const x = Math.Snap.Floor(worldPoint.x, 32),
+                        y = Math.Snap.Floor(worldPoint.y, 32);
 
-                    this.preview.setPosition(x, y);
+                    this.preview.setPosition(x + 16, y + 16);
 
-                    if (x < 0 || this.map.widthInPixels < x || y < 0 || this.map.heightInPixels < y)
+                    if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
                     
                     // Rounds down to nearest tile
@@ -273,12 +273,12 @@ class WorldEditorScene extends Scene {
                 if (activeObjectGroup) {
                     // ObjectGroup exists
 
-                    const x = Math.Snap.To(worldPoint.x, 16),
-                        y = Math.Snap.To(worldPoint.y, 16);
+                    const x = Math.Snap.Floor(worldPoint.x, 16),
+                        y = Math.Snap.Floor(worldPoint.y, 16);
 
                     this.preview.setPosition(x, y);
 
-                    if (x < 0 || this.map.widthInPixels < x || y < 0 || this.map.heightInPixels < y)
+                    if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
 
                     const activeObject = useWorldEditorStore.getState().active.object;
@@ -354,7 +354,7 @@ class WorldEditorScene extends Scene {
         const sprite = scene.add.sprite(0, 0, '__DEFAULT')
 
         const rec = scene.add.rectangle(0, 0, 32, 32)
-            .setStrokeStyle(1, 0x00ff00, 1);
+            .setStrokeStyle(2, 0x00ff00, 1);
 
         this.addSprite(sprite)
             .addRectangle(rec);
@@ -382,13 +382,13 @@ class WorldEditorScene extends Scene {
     }
 
     setError() {
-        this.getRectangle().setStrokeStyle(1, 0xff0000);
+        this.getRectangle().setStrokeStyle(2, 0xff0000);
         this.getSprite().setTint(0xff0000);
         return this;
     }
 
     setValid() {
-        this.getRectangle().setStrokeStyle(1, 0x0000ff);
+        this.getRectangle().setStrokeStyle(2, 0x0000ff);
         this.getSprite().setTint(0xffffff);
         return this;
     }
