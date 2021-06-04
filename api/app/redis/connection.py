@@ -184,6 +184,18 @@ class RedisConnector:
         value = await self.get(key)
         return int(value) if value else 0
 
+    async def get_online_users_platform(self) -> int:
+        """
+        Returns the number of online users currently in the platform
+        """
+        total = 0
+
+        keys = await self.scan_match_all('world:*:online_users')
+        for key in keys:
+            total += int(await self.get(key))
+
+        return total
+
     async def update_online_users(self, world_id: int, offset: int):
         key = f"world:{world_id}:online_users"
         return await self.incrby(key, offset)

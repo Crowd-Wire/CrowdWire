@@ -132,7 +132,7 @@ class SearchAllMaps extends Component {
 		const { classes } = this.props;
 		return (
 			<>
-				<Container style={{ height: '100%'}}>
+				<Container style={{ height: '100%', marginBottom: 30 }}>
 					<Row sm={12} style={{paddingBottom: 60}}>
 						<Col sm={12} style={{textAlign: "center"}}>
 							<IntroText />

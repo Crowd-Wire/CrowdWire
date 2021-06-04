@@ -33,7 +33,6 @@ import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
-import useAuthStore from "stores/useAuthStore";
 
 /**
  * Public and protected routes list 
