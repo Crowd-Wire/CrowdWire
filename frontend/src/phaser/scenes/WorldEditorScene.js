@@ -43,7 +43,7 @@ class WorldEditorScene extends Scene {
             .filter((tileset) => tileset.name.startsWith('_conferenceC'))
             .forEach((tileset, index) => {
                 const cid = tileset.name.substr(12);
-                conferences[cid] = {name: `Conference ${index}`, color: `#${intToHex(cyrb53Hash(cid))}`};
+                conferences[cid] = { name: `Conference ${index}`, color: `#${intToHex(cyrb53Hash(cid))}` };
             });
         useWorldEditorStore.getState().setState({ conferences });
 
@@ -64,12 +64,12 @@ class WorldEditorScene extends Scene {
             .setZoom(1.5).centerToBounds();
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
-        const grid1 = this.add.grid(width/2, height/2, width, height, 32, 32)
+        const grid1 = this.add.grid(width / 2, height / 2, width, height, 32, 32)
             .setOutlineStyle(0x000000, 0.9)
             .setDepth(1001);
         grid1.showOutline = false;
 
-        const grid2 = this.add.grid(width/2, height/2, width, height, 16, 16)
+        const grid2 = this.add.grid(width / 2, height / 2, width, height, 16, 16)
             .setOutlineStyle(0x000000, 0.2)
             .setDepth(1001);
         grid2.showOutline = false;
@@ -99,13 +99,13 @@ class WorldEditorScene extends Scene {
             (tool) => { this.tool = tool }, state => state.tool));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
-            this.handleLayersChange, state => [{...state.layers}, state.highlight]));
+            this.handleLayersChange, state => [{ ...state.layers }, state.highlight]));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
             this.handleConferencesChange, state => Object.keys(state.conferences)));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
-            (grid) => {grid1.showOutline = grid2.showOutline = grid }, state => state.grid));
+            (grid) => { grid1.showOutline = grid2.showOutline = grid }, state => state.grid));
 
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
@@ -163,7 +163,7 @@ class WorldEditorScene extends Scene {
 
         while (queue.length > 0) {
             const { x, y } = queue.shift(),
-                destinations = [{ x: x-1, y }, { x: x+1, y }, { x, y: y-1 }, { x, y: y+1 }];
+                destinations = [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }];
 
             for (const dest of destinations) {
                 const { x, y } = dest,
@@ -228,9 +228,8 @@ class WorldEditorScene extends Scene {
 
                     this.preview.setPosition(x + 16, y + 16);
                     if ([ToolType.DRAW, ToolType.FILL, ToolType.SELECT].includes(this.tool.type)
-                            && activeGid) {
+                        && activeGid) {
                         const tileset = activeLayer.gidMap[activeGid];
-                        console.log(activeGid - tileset.firstgid);
                         this.preview.setTexture(tileset.image.key, activeGid - tileset.firstgid);
                     } else {
                         this.preview.setTexture('__DEFAULT');
@@ -284,9 +283,11 @@ class WorldEditorScene extends Scene {
                         y = Math.Snap.Floor(worldPoint.y, 16);
 
                     const activeObject = useWorldEditorStore.getState().active.object;
-                    
+                    const rec = this.mapManager.objectBody[activeObject];
+
                     this.preview.setPosition(x + 16, y + 16)
-                        .setTexture(activeObject || '__DEFAULT');
+                        .setTexture(activeObject || '__DEFAULT')
+                        .setBounds(rec);
 
                     if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
@@ -349,7 +350,7 @@ class WorldEditorScene extends Scene {
  * @param {number} x - The start horizontal position in the scene.
  * @param {number} y - The start vertical position in the scene.
  */
- class PreviewSprite extends GameObjects.Container {
+class PreviewSprite extends GameObjects.Container {
 
     constructor(scene, x, y) {
         super(scene, x, y);
@@ -363,6 +364,9 @@ class WorldEditorScene extends Scene {
             .setAlpha(0.7);
 
         const rec = scene.add.rectangle(0, 0, 32, 32)
+            .setOrigin(0)
+            .setPosition(-sprite.width / 2, -sprite.height / 2)
+            .setSize(sprite.width, sprite.height)
             .setStrokeStyle(2, 0x00ff00, 1);
 
         this.addSprite(sprite)
@@ -374,8 +378,7 @@ class WorldEditorScene extends Scene {
     }
 
     addSprite(sprite) {
-        this.addAt(sprite, 0);
-        return this;
+        return this.addAt(sprite, 0);
     }
 
     getSprite() {
@@ -383,8 +386,7 @@ class WorldEditorScene extends Scene {
     }
 
     addRectangle(bounds) {
-        this.addAt(bounds, 1);
-        return this;
+        return this.addAt(bounds, 1);;
     }
 
     getRectangle() {
@@ -393,6 +395,22 @@ class WorldEditorScene extends Scene {
 
     setTexture(key, frame) {
         this.getSprite().setTexture(this.scene.textures.get(key), frame);
+        return this;
+    }
+
+    setBounds(rec) {
+        const { width, height } = this.getSprite().getBounds();
+        if (!rec) {
+            this.body.setOffset(-width / 2, -height / 2)
+                .setSize(width, height);
+            this.getRectangle().setPosition(-width / 2, -height / 2)
+                .setSize(width, height);
+        } else {
+            this.body.setOffset(rec.x - width / 2, rec.y - height / 2)
+                .setSize(rec.width, rec.height);
+            this.getRectangle().setPosition(rec.x - width / 2, rec.y - height / 2)
+                .setSize(rec.width, rec.height);
+        }
         return this;
     }
 

@@ -340,8 +340,7 @@ class Player extends Phaser.GameObjects.Container {
     }
 
     addSprite(sprite) {
-        this.addAt(sprite, 0);
-        return this;
+        return this.addAt(sprite, 0);
     }
 
     getSprite() {
@@ -349,8 +348,7 @@ class Player extends Phaser.GameObjects.Container {
     }
 
     addText(text) {
-        this.addAt(text, 1);
-        return this;
+        return this.addAt(text, 1);
     }
 
     getText() {
