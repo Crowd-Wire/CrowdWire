@@ -88,6 +88,7 @@ class WorldEditorScene extends Scene {
         }, false);
 
         this.preview = new PreviewSprite(this, 0, 0);
+        this.mouseClick = true;
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
@@ -110,9 +111,6 @@ class WorldEditorScene extends Scene {
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
-
-        console.log(this.preview, this.objectGroups['ObjectCollision'])
-        // this.physics.add.overlap(this.preview, this.objectGroups['ObjectCollision']);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -302,20 +300,23 @@ class WorldEditorScene extends Scene {
                         this.preview.body.height - 2,
                         true, true
                     );
-
                     if (hovered.length < 2) {
                         if (this.input.manager.activePointer.isDown) {
-                            
+                            if (this.mouseClick) {
+                                let obj = this.add.sprite(this.preview.x, this.preview.y, activeObject);
+                                activeObjectGroup.add(obj);
+                                const { width, height, offset } = this.preview.body;
+                                obj.body.setSize(width, height)
+                                    .setOffset(
+                                        offset.x + this.preview.getSprite().width / 2,
+                                        offset.y + this.preview.getSprite().height / 2);
+                                this.mouseClick = false;
+                            }
+                        } else {
+                            this.mouseClick = true;
                         }
                         return true;
                     }
-                    // let obj = this.add.sprite(x, y, activeObject);
-                    // obj = this.physics.add.sprite(obj);
-                    // this.physics.add.overlap(obj, this.objectGroups['ObjectCollision']);
-
-                    // console.log(obj)
-                    // console.log(obj.body.touching.none)
-                    // activeObjectGroup.add(obj);
                     return false;
                 }
                 throw Error(`Unknown layer name ${activeLayerName}`)
