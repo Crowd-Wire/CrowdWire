@@ -65,11 +65,11 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
             backgroundSize: 'contain, cover',
             backgroundRepeat: "no-repeat",
           };
-          useWorldEditorStore.getState().addTile(gid, { style });
+          useWorldEditorStore.getState().addTile(image, { style });
           objects.push(
             <div
               key={gid}
-              onClick={() => this.handleClick(gid)}
+              onClick={() => this.handleClick(image)}
               style={{
                 width: 32,
                 height: 32,

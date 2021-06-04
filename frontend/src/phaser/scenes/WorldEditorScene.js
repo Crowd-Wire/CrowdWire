@@ -1,4 +1,4 @@
-import Phaser, { Scene } from 'phaser';
+import Phaser, { Scene, GameObjects } from 'phaser';
 
 import MapManager from "../MapManager.ts";
 import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore.ts";
@@ -63,7 +63,7 @@ class WorldEditorScene extends Scene {
             .setBackgroundColor("#0C1117")
             .setZoom(1.5).centerToBounds();
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
-        
+
         const grid1 = this.add.grid(width/2, height/2, width, height, 32, 32)
             .setOutlineStyle(0x000000, 0.9)
             .setDepth(1001);
@@ -138,7 +138,7 @@ class WorldEditorScene extends Scene {
                 activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.4);
                 return;
             }
-            
+
             const activeObjectGroup = this.objectGroups[name];
             if (activeObjectGroup) {
                 activeObjectGroup.setVisible(layer.visible);
@@ -150,18 +150,18 @@ class WorldEditorScene extends Scene {
 
     fillBFS(layer, tileId, x, y, tint) {
         const replaceId = layer.getTileAt(x, y, true).index;
-        
+
         if (tileId === replaceId) {
             // Nothing to do, avoid loop
             return;
         }
-        
+
         const queue = [{ x, y }];
-    
+
         while (queue.length > 0) {
             const { x, y } = queue.shift(),
                 destinations = [{ x: x-1, y }, { x: x+1, y }, { x, y: y-1 }, { x, y: y+1 }];
-    
+
             for (const dest of destinations) {
                 const { x, y } = dest,
                     tile = layer.getTileAt(x, y, true);
@@ -178,24 +178,24 @@ class WorldEditorScene extends Scene {
     updateEdit = () => {
         if (!this.tool)
             return;
-        
+
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
             const activeLayerName = useWorldEditorStore.getState().activeLayer;
-            
+
             let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
             // Rounds down to nearest tile
-            let tileX = this.map.worldToTileX(worldPoint['x']);
-            let tileY = this.map.worldToTileY(worldPoint['y']);
-            
+            let tileX = this.map.worldToTileX(worldPoint.x);
+            let tileY = this.map.worldToTileY(worldPoint.y);
+
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
 
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
-                    // Layer exists
+                    // TilemapLayer exists
 
-                    const activeTile = useWorldEditorStore.getState().active.tile 
+                    const activeTile = useWorldEditorStore.getState().active.tile
                         || useWorldEditorStore.getState().active.conference;
 
                     let activeGid, tint = 0xffffff;
@@ -245,7 +245,11 @@ class WorldEditorScene extends Scene {
 
                 const activeObjectGroup = this.objectGroups[activeLayerName];
                 if (activeObjectGroup) {
-                    console.log('yo');
+                    // ObjectGroup exists
+
+                    const activeObject = useWorldEditorStore.getState().active.object;
+                    const obj = this.add.sprite(worldPoint.x, worldPoint.y, activeObject);
+                    activeObjectGroup.add(obj);
                     return;
                 }
             }

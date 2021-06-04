@@ -165,7 +165,7 @@ class MapManager {
         let arr = this.map.tilesets;
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
-        
+
             if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
@@ -182,7 +182,7 @@ class MapManager {
         arr = conferenceLayer.tileset;
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
-        
+
             if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
