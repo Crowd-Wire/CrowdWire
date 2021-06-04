@@ -11,10 +11,9 @@ import { API_BASE } from "config";
 
 
 interface TilesTabState {
-  tilesets: any[],
-  filterType: string,
+  filterType: string;
+  tilesetTiles: Record<string, React.ReactNode[]>;
 }
-
 
 const tileStyle = {
   transform: "scale(1.5)",
@@ -23,13 +22,13 @@ const tileStyle = {
   backgroundRepeat: "no-repeat",
 }
 
+
 class TilesTab extends Component<{}, TilesTabState> {
 
   state = {
-    tilesets: [],
     filterType: '',
+    tilesetTiles: {},
   }
-  mapManager: MapManager;
   subscriptions: any[] = [];
 
   constructor(props) {
@@ -49,20 +48,54 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleReady = () => {
-    this.mapManager = new MapManager();
-    this.forceUpdate()
+    const mapManager = new MapManager();
+
+    const tilesetTiles = {};
+    for (const tileset of mapManager.map.tilesets) {
+      if (tileset.total != 0 && !tileset.name.startsWith('_')) {
+        // Not an object and not private
+        const tiles = [],
+          tilesetURL = mapManager.tilesetURL[tileset.name],
+          { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
+
+        for (let i = 0; i < rows; i++)
+          for (let j = 0; j < columns; j++) {
+            const id = (firstgid + i * columns + j).toString();
+            const imageURL = API_BASE + "static/maps/" + tilesetURL;
+            const style = {
+              backgroundImage: `url(${imageURL})`,
+              backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
+            };
+            useWorldEditorStore.getState().addTile(id, { style });
+            tiles.push(
+              <div
+                key={id}
+                onClick={() => this.handleClick(id)}
+                style={{
+                  width: tileWidth,
+                  height: tileHeight,
+                  ...style,
+                  ...tileStyle,
+                }}
+              ></div>
+            );
+          }
+        tilesetTiles[tileset.name] = tiles;
+      }
+    }
+    this.setState({ tilesetTiles });
   }
 
   handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
     this.setState({ filterType: event.target.value });
   }
 
-  handleClick = (tileId: string) => {
-    useWorldEditorStore.getState().setPaintTool({ tileId });
+  handleClick = (id: string) => {
+    useWorldEditorStore.getState().setState({ activeTile: id });
   }
 
   render() {
-    const { filterType } = this.state;
+    const { filterType, tilesetTiles } = this.state;
 
     return (
       <>
@@ -75,51 +108,22 @@ class TilesTab extends Component<{}, TilesTabState> {
             inputProps={{
               id: 'select-tileset',
             }}
-            style={{minWidth: '15ch'}}
+            style={{ minWidth: '15ch' }}
           >
             <option aria-label="None" value="" />
             {
-              this.mapManager && this.mapManager.map.tilesets.map((tileset, index) => (
-                tileset.total != 0 && <option key={index} value={tileset.name}>{tileset.name}</option>
+              Object.keys(tilesetTiles).map((name, index) => (
+                <option key={index} value={name}>{name}</option>
               ))
             }
           </Select>
         </FormControl>
         <hr />
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-          {
-            this.mapManager && this.mapManager.map.tilesets.map((tileset) => {
-              if (tileset.total != 0 && !tileset.name.startsWith('_')) {
-                // Not an object and not private
-                const tiles = [];
-
-                const tilesetURL = this.mapManager.tilesetURL[tileset.name];
-                const { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
-
-                for (let i = 0; i < rows; i++)
-                  for (let j = 0; j < columns; j++) {
-                    const id = firstgid + i * columns + j;
-                    const imageURL = API_BASE + "static/maps/" + tilesetURL;
-                    tiles.push(
-                      <div
-                        key={id}
-                        id={`tile-${id}`}
-                        onClick={() => this.handleClick(id.toString())}
-                        style={{
-                          display: tileset.name.startsWith(filterType) ? '' : 'none',
-                          width: tileWidth,
-                          height: tileHeight,
-                          backgroundImage: `url(${imageURL})`,
-                          backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
-                          ...tileStyle
-                        }}
-                      ></div>
-                    );
-                  }
-                return tiles;
-              }
-            })
-          }
+        {
+          filterType ? 
+            tilesetTiles[filterType] : Object.values(tilesetTiles)
+        }
         </div>
       </>
     )

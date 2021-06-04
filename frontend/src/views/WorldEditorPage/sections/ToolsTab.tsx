@@ -15,9 +15,10 @@ import {
 
 interface ToolsTabState {
   toolType: string;
+  tileStyle: Record<string, string>;
 }
 
-const tileStyle = {
+const tileStaticStyle = {
   width: 32,
   height: 32,
   transform: "scale(2.5)",
@@ -35,11 +36,12 @@ class ToolsTab extends Component<{}, ToolsTabState> {
 
     this.state = {
       toolType: PaintToolType.DRAW,
+      tileStyle: {},
     }
     useWorldEditorStore.getState().setPaintTool({ type: PaintToolType.DRAW });
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
-      this.handleTileChange, state => state.paintTool.tileId));
+      this.handleTileChange, state => state.activeTile));
   }
 
   componentWillUnmount() {
@@ -49,13 +51,9 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   handleTileChange = (tileId, prevTileId) => {
     if (tileId === prevTileId)
       return;
-    const tileElem: any = document.getElementById(`tile-${tileId}`).cloneNode(true);
-    tileElem.removeAttribute('id');
-    tileElem.style["transform"] = "scale(2.5)";
-    tileElem.style["display"] = "";
-    tileElem.style["margin"] = "15px";
-    const tileContainer = document.getElementById("tile-container");
-    tileContainer.replaceChild(tileElem, tileContainer.childNodes[0]);
+
+    const tileStyle = tileId ? useWorldEditorStore.getState().tiles[tileId].style : {};
+    this.setState({ tileStyle });
   }
 
   handlePaintToolChange = (toolType: PaintToolType) => {
@@ -64,13 +62,12 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   render() {
-    const { toolType } = this.state;
+    const { toolType, tileStyle } = this.state;
 
     return (
       <>
-        <div id="tile-container" style={{ display: 'flex', justifyContent: 'center', margin: '25px 0' }}>
-          <div style={tileStyle}></div>
-          <div id="tile-null" style={{ ...tileStyle, display: 'none' }}></div>
+        <div style={{ display: 'flex', justifyContent: 'center', margin: '25px 0' }}>
+          <div style={{ ...tileStaticStyle, ...tileStyle }}></div>
         </div>
 
         <hr />

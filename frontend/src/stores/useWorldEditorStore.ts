@@ -11,6 +11,13 @@ export enum PaintToolType {
     PICK = "PICK",
 }
 
+export interface PaintTool {
+    type?: PaintToolType;
+}
+
+interface Tile {
+    style?: Record<string, string>;
+}
 export interface Conference {
     name: string;
     color: string;
@@ -22,21 +29,18 @@ interface Layer {
     active?: boolean;
 }
 
-export interface PaintTool {
-    type?: PaintToolType;
-    tileId?: string;
-}
-
 const useWorldEditorStore = create(
     combine(
         {   
             ready: false,
             grid: false,
             highlight: false,
+            activeTile: null,
             activeLayer: null,
             activeConference: null,
-            conferences: {} as Record<string, Conference>,
+            tiles: {} as Record<string, Tile>,
             layers: {} as Record<string, Layer>,
+            conferences: {} as Record<string, Conference>,
             paintTool: {} as PaintTool,
         },
         (set) => ({
@@ -48,6 +52,13 @@ const useWorldEditorStore = create(
             setPaintTool: (settings: PaintTool) => {
                 return set((s) => {
                     return { paintTool: {...s.paintTool, ...settings} };
+                });
+            },
+            addTile: (id: string, tile: Tile) => {
+                return set((s) => {
+                    const tiles = s.tiles;
+                    tiles[id] = tile;
+                    return { tiles };
                 });
             },
             addLayers: (layers: Record<string, Layer>) => {
