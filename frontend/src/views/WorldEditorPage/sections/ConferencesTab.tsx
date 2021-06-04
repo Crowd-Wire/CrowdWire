@@ -129,12 +129,10 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   subscriptions: any[];
   mapManager: MapManager;
-  flag: boolean;
 
   constructor(props) {
     super(props);
     this.subscriptions = [];
-    this.flag = false;
 
     this.state = {
       activeConference: null,
@@ -148,19 +146,10 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
-    
+
     const { conferences, activeConference } = useWorldEditorStore.getState();
     ConferencesTab.curConference = Object.keys(conferences).length;
     this.setState({ conferences, activeConference });
-  }
-
-  componentDidUpdate() {
-    const activeConference = this.state.activeConference;
-    if (this.flag) {
-        console.log(activeConference, useWorldEditorStore.getState().paintTool.tileId)
-        useWorldEditorStore.getState().setPaintTool({ tileId: activeConference });
-        this.flag = false;
-    }
   }
 
   componentWillUnmount() {
@@ -174,8 +163,14 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       name: `Conference #${id}`,
       color: `#${intToHex(cyrb53Hash(id, 129))}`
     }
-    this.setState({conferences});
+    const color = conferences[id].color;
+    const style = {
+      backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
+      border: `1px solid ${color}`
+    };
+    useWorldEditorStore.getState().addTile(id, { style });
     useWorldEditorStore.getState().setState({ conferences });
+    this.setState({ conferences });
   }
 
   handleReady = () => {
@@ -190,41 +185,25 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       delete conferences[id];
       if (id === activeConference) {
         activeConference = null;
-        useWorldEditorStore.getState().setPaintTool({ tileId: null });
+        useWorldEditorStore.getState().setState({ activeTile: null });
       }
       this.setState({ conferences, activeConference });
       useWorldEditorStore.getState().setState({ conferences, activeConference });
     } else {
       const conferences = this.state.conferences;
       conferences[id].name = name;
-      this.flag = true;
+
+      useWorldEditorStore.getState().setState(
+        { conferences, activeConference: id, activeTile: id });
       this.setState({ conferences, activeConference: id });
-      useWorldEditorStore.getState().setState({ conferences, activeConference: id });
     }
   }
 
   render() {
     const { activeConference, conferences } = this.state;
-    const color = conferences[activeConference]?.color;
-
-    const conferenceTileStyles = color && {
-      display: 'none',
-      width: 32,
-      height: 32,
-      transform: "scale(2.5)",
-      backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
-      border: `1px solid ${color}`,
-      margin: "40px auto",
-      boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-    };
 
     return (
       <>
-        <div
-          id={`tile-${activeConference}`}
-          style={conferenceTileStyles}
-        ></div>
-
         {Object.entries(conferences).map(([id, conference], index) => (
           <ConferenceItem
             key={index}
@@ -238,7 +217,6 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
           onClick={this.addConference}
           style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
         />
-
       </>
     );
   }

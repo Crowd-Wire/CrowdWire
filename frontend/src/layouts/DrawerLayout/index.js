@@ -23,13 +23,8 @@ const useStyles = theme => ({
 const DrawerLayout = (props) => {
 
   const { classes, ...rest } = props;
-  const history = createBrowserHistory();
-  const loc = useLocation();
-  const [worldInfo, setWorldInfo] = React.useState("");
 
-  const [focus, setFocus] = React.useState(false);
   const [joined, setJoined] = React.useState(false);
-  const [fMap, setFMap] = React.useState(null);
 
   
   // handler = (id) => {

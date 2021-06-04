@@ -86,8 +86,10 @@ export default function UserReports() {
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
-                setReports(res);
+                if(!res.detail){
+                    setReports(res);
+                }
+                
             })
     }
 
@@ -104,7 +106,7 @@ export default function UserReports() {
     }, [page]);
 
     return (
-        <div style={{ marginTop: '100px' }}>
+        <div style={{ paddingTop: '100px' }}>
             <Input className="mx-3"
                 type="number"
                 id="world_id"

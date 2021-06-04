@@ -146,7 +146,7 @@ class SearchAllMaps extends Component {
 						this.state.maps.map((m, i) => {
 							if(i !== this.limit)
 								return (
-									<MapCard key={i} focusMap={this.focusMap} map={m} />
+									<MapCard key={i} focusMap={this.focusMap} baseUrl={'../../'} map={m} banned={false}/>
 								)
 						})
 						:
@@ -157,6 +157,7 @@ class SearchAllMaps extends Component {
 					<hr />
 
 					<Paginator hasNext={this.state.maps.length === this.limit + 1} page={this.state.page} changePage={(page) => {this.changePage(page)}} />
+					<Row style={{height:"15px"}}/>
 				</Container>
 			</>
 		);

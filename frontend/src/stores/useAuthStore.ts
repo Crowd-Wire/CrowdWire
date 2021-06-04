@@ -15,10 +15,12 @@ const useAuthStore = createStore(
             expire_date: String as null,
             guest_uuid: String as null,
             last_location: String as null,
-            login: (token: string, expire_date: string) => {
+            is_superuser: false,
+            login: (token: string, expire_date: string, is_superuser: boolean) => {
                 set((state) => ({
                     token:token,
-                    expire_date:expire_date
+                    expire_date:expire_date,
+                    is_superuser: is_superuser
                 }))
             },
             joinGuest: (token: string, expire_date: string, guest_uuid: string) => {

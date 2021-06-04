@@ -16,6 +16,7 @@ class MapManager {
     private mapJson: any;
     private state: MapManagerState;
     private worldId: number;
+    private conferenceMap: Record<number, string>;
 
     public tilesetKeys: string[];
     public objectKeys: string[];
@@ -28,6 +29,7 @@ class MapManager {
             const worldUser = useWorldUserStore.getState().world_user;
             this.worldId = worldUser.world_id;
             this.mapJson = JSON.parse(worldUser.world_map);
+            this.conferenceMap = {};
             MapManager._instance = this;
         }
         return MapManager._instance;
@@ -141,13 +143,21 @@ class MapManager {
         (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(tilesets);
     }
 
-    getConferenceId(cid: string): number {
+    getConferenceGid(cid: string): number {
+        if (this.conferenceMap[cid])
+            return this.conferenceMap[cid];
+
         for (const tileset of this.map.getLayer('Room').tilemapLayer.tileset) {
             if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
+                this.conferenceMap[cid] = tileset.firstgid;
                 return tileset.firstgid;
             }
         }
-        return -1;
+        return null;
+    }
+
+    getConferenceCid(gid: number): string {
+        return Object.keys(this.conferenceMap).find(cid => this.conferenceMap[cid] === gid);
     }
 
     removeConference(cid: string): void {
@@ -161,8 +171,15 @@ class MapManager {
                 break;
             }
         }
+        const conferenceLayer = this.map.getLayer('Room').tilemapLayer;
+
+        // Remove tiles of tileset from conference layer
+        const findIndex = this.getConferenceGid(cid);
+        if (findIndex)
+            conferenceLayer.replaceByIndex(findIndex, -1, 0, 0, conferenceLayer.width, conferenceLayer.height);
+
         // Remove tileset conference layer
-        arr = this.map.getLayer('Room').tilemapLayer.tileset;
+        arr = conferenceLayer.tileset;
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
         
@@ -171,7 +188,7 @@ class MapManager {
                 break;
             }
         }
-        (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(this.map.getLayer('Room').tilemapLayer.tileset);
+        (<any>conferenceLayer).setTilesets(conferenceLayer.tileset);
     }
 
     saveMap(): void {

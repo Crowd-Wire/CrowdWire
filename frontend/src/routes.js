@@ -43,7 +43,7 @@ import AdminUsers from "views/AdminUsers/AdminUsers";
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-const routes = (token, guest_uuid, last_location) => [
+const routes = (token, guest_uuid, last_location,is_superuser) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -100,7 +100,7 @@ const routes = (token, guest_uuid, last_location) => [
 	},
 	{
 		path: "/admin",
-		element: token ? <AdminLayout /> : <Navigate to="/login" />,
+		element: is_superuser ? <AdminLayout /> : <Navigate to={"/dashboard/search/joined"}/>,
 		children: [
 			{ path: "/dashboard", element: <AdminDashboard/>},
             { path: "/worlds/reports", element: <AdminWorldReports /> },

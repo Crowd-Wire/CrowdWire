@@ -87,6 +87,37 @@ class UserService {
 
     }
 
+    getUserReports(world_id, reporter_id, reported_id, order_by, order, reviewed, page, limit) {
+    
+        let url="users/reports/";
+        let query = [];
+        
+        if (world_id)
+            query.push('world_id=' + world_id);
+        if (reporter_id !== null)
+            query.push('reporter_id=' + reporter_id)
+        if (reported_id !== null)
+            query.push('reported_id=' + reported_id)
+        if (order_by !== null)
+            query.push("order_by=" + order_by);
+        if (order !== null)
+            query.push("order=" + order);
+        if (reviewed !== null)
+            query.push("reviewed="+reviewed);
+        if (page !== null)
+            query.push("page=" + page);
+        if (limit !== null)
+            query.push("limit=" + limit);
+        if (query.length !== 0)
+            url = url.concat('?' + query.join('&'));
+        return fetch(API_BASE + url, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization": "Bearer " + AuthenticationService.getToken()
+            }
+        })
+    };
     updateUserPassword(old_password, new_password) {
         let json_body = {};
         if (old_password){
