@@ -123,7 +123,7 @@ class MapManager {
                 }
             })
         console.log(this.map)
-        return { group, collisionGroup };
+        return { 'Object': group, 'ObjectCollision': collisionGroup };
     }
 
     /**

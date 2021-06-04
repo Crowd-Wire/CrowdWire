@@ -45,8 +45,8 @@ class GameScene extends Phaser.Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        const { collisionGroup } = mapManager.buildObjects(this);
-        this.collisionGroup = collisionGroup;
+        this.objectGroups = mapManager.buildObjects(this);
+        // this.collisionGroup = collisionGroup;
 
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
@@ -111,7 +111,7 @@ class GameScene extends Phaser.Scene {
         this.sprite = this.add.sprite(0, 0, 'tilesets/objects/movel.png');
         this.add.existing(this.sprite);
         this.physics.add.existing(this.sprite);
-        this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
+        this.physics.add.collider(this.sprite, [this.collisionLayer, this.objectGroups['ObjectCollision']]);
         this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
 
 
@@ -290,7 +290,7 @@ class Player extends Phaser.GameObjects.Container {
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        scene.physics.add.collider(this, [scene.collisionLayer, scene.collisionGroup]);
+        scene.physics.add.collider(this, [scene.collisionLayer, scene.objectGroups['ObjectCollision']]);
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, 'player', 6)

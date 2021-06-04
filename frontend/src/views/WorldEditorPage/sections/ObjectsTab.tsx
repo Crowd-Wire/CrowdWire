@@ -17,9 +17,8 @@ interface ObjectsTabState {
 
 const objectStyle = {
   transform: "scale(1.5)",
-  margin: 25,
+  margin: 15,
   boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
-  backgroundRepeat: "no-repeat",
 }
 
 
@@ -64,6 +63,7 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
             backgroundImage: `url(${API_BASE + "static/maps/" + image})`,
             backgroundPosition: 'center',
             backgroundSize: 'contain, cover',
+            backgroundRepeat: "no-repeat",
           };
           useWorldEditorStore.getState().addTile(gid, { style });
           objects.push(
@@ -71,8 +71,8 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
               key={gid}
               onClick={() => this.handleClick(gid)}
               style={{
-                width: 48,
-                height: 48,
+                width: 32,
+                height: 32,
                 ...style,
                 ...objectStyle,
               }}

@@ -29,8 +29,7 @@ class WorldEditorScene extends Scene {
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        const { group, collisionGroup } = this.mapManager.buildObjects(this);
-        Object.assign(this, { group, collisionGroup });
+        this.objectGroups = this.mapManager.buildObjects(this);
 
         // Initialize layers on store
         const layers = {};
@@ -133,17 +132,18 @@ class WorldEditorScene extends Scene {
     handleLayersChange = ([layers, highlight]) => {
         Object.entries(layers).forEach(([name, layer]) => {
             const activeLayer = this.map.getLayer(name)?.tilemapLayer;
-    
             if (activeLayer) {
                 // Layer exists
                 activeLayer.setVisible(layer.visible);
                 activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.4);
-            } else if (name === 'Object') {
-                this.group.setVisible(layer.visible);
-                this.group.setAlpha(layer.active || !highlight ? 1 : 0.4);
-            } else if (name === 'ObjectCollision') {
-                this.collisionGroup.setVisible(layer.visible);
-                this.collisionGroup.setAlpha(layer.active || !highlight ? 1 : 0.4);
+                return;
+            }
+            
+            const activeObjectGroup = this.objectGroups[name];
+            if (activeObjectGroup) {
+                activeObjectGroup.setVisible(layer.visible);
+                activeObjectGroup.setAlpha(layer.active || !highlight ? 1 : 0.4);
+                return;
             }
         });
     }
@@ -181,21 +181,22 @@ class WorldEditorScene extends Scene {
         
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
-            const activeLayerName = useWorldEditorStore.getState().activeLayer,
-                activeTile = useWorldEditorStore.getState().active.tile || useWorldEditorStore.getState().active.conference;
-
+            const activeLayerName = useWorldEditorStore.getState().activeLayer;
+            
             let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
             // Rounds down to nearest tile
             let tileX = this.map.worldToTileX(worldPoint['x']);
             let tileY = this.map.worldToTileY(worldPoint['y']);
             
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
+
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
-    
                 if (activeLayer) {
                     // Layer exists
+
+                    const activeTile = useWorldEditorStore.getState().active.tile 
+                        || useWorldEditorStore.getState().active.conference;
 
                     let activeGid, tint = 0xffffff;
                     if (activeTile && activeTile[0] === 'C') {
@@ -228,7 +229,6 @@ class WorldEditorScene extends Scene {
                             break;
                         case ToolType.PICK:
                             if (clickedGid != -1) {
-                                // FAIL gives error when pick outside?
                                 useWorldEditorStore.getState().setActive('tile', clickedCid || clickedGid);
                             }
                             break;
@@ -240,6 +240,13 @@ class WorldEditorScene extends Scene {
                         case ToolType.SELECT:
                             break;
                     }
+                    return;
+                }
+
+                const activeObjectGroup = this.objectGroups[activeLayerName];
+                if (activeObjectGroup) {
+                    console.log('yo');
+                    return;
                 }
             }
         }
