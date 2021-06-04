@@ -1,4 +1,4 @@
-import Phaser, { Scene, GameObjects } from 'phaser';
+import Phaser, { Scene, GameObjects, Math } from 'phaser';
 
 import MapManager from "../MapManager.ts";
 import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore.ts";
@@ -87,8 +87,11 @@ class WorldEditorScene extends Scene {
             out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
 
+        this.preview = new PreviewSprite(this, 0, 0);
+
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
+        // Create the world borders
         // this.physics.world.bounds.width = this.map.widthInPixels;
         // this.physics.world.bounds.height = this.map.heightInPixels;
 
@@ -179,14 +182,13 @@ class WorldEditorScene extends Scene {
         if (!this.tool)
             return;
 
-        // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
-        if (this.input.manager.activePointer.isDown && this.input.isOver) {
-            const activeLayerName = useWorldEditorStore.getState().activeLayer;
+        if (this.input.isOver) {
+            // Mouse is over canvas
 
-            let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-            // Rounds down to nearest tile
-            let tileX = this.map.worldToTileX(worldPoint.x);
-            let tileY = this.map.worldToTileY(worldPoint.y);
+            this.preview.setVisible(true);
+
+            const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
+                activeLayerName = useWorldEditorStore.getState().activeLayer;
 
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
@@ -194,6 +196,18 @@ class WorldEditorScene extends Scene {
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
                     // TilemapLayer exists
+
+                    const x = Math.Snap.To(worldPoint.x, 32),
+                        y = Math.Snap.To(worldPoint.y, 32);
+
+                    this.preview.setPosition(x, y);
+
+                    if (x < 0 || this.map.widthInPixels < x || y < 0 || this.map.heightInPixels < y)
+                        return false;
+                    
+                    // Rounds down to nearest tile
+                    const tileX = this.map.worldToTileX(x),
+                        tileY = this.map.worldToTileY(y);
 
                     const activeTile = useWorldEditorStore.getState().active.tile
                         || useWorldEditorStore.getState().active.conference;
@@ -217,43 +231,72 @@ class WorldEditorScene extends Scene {
                         clickedGid = clickedTile.index;
                     }
 
+                    const isDown = this.input.manager.activePointer.isDown;
                     switch (this.tool.type) {
                         case ToolType.DRAW:
                             if (activeGid) {
-                                activeLayer.fill(activeGid, tileX, tileY, 1, 1);
-                                clickedTile && (clickedTile.tint = tint);
+                                if (isDown) {
+                                    activeLayer.fill(activeGid, tileX, tileY, 1, 1);
+                                    clickedTile && (clickedTile.tint = tint);
+                                }
+                                return true;
                             }
                             break;
                         case ToolType.ERASE:
-                            activeLayer.fill(-1, tileX, tileY, 1, 1);
-                            break;
+                            if (isDown) {
+                                activeLayer.fill(-1, tileX, tileY, 1, 1);
+                            }
+                            return true;
                         case ToolType.PICK:
                             if (clickedGid != -1) {
-                                useWorldEditorStore.getState().setActive('tile', clickedCid || clickedGid);
+                                if (isDown) {
+                                    useWorldEditorStore.getState().setActive('tile', clickedCid || clickedGid);
+                                }
+                                return true;
                             }
                             break;
                         case ToolType.FILL:
                             if (activeGid) {
-                                this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
+                                if (isDown) {
+                                    this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
+                                }
+                                return true;
                             }
                             break;
                         case ToolType.SELECT:
                             break;
                     }
-                    return;
+                    return false;
                 }
 
                 const activeObjectGroup = this.objectGroups[activeLayerName];
                 if (activeObjectGroup) {
                     // ObjectGroup exists
 
+                    const x = Math.Snap.To(worldPoint.x, 16),
+                        y = Math.Snap.To(worldPoint.y, 16);
+
+                    this.preview.setPosition(x, y);
+
+                    if (x < 0 || this.map.widthInPixels < x || y < 0 || this.map.heightInPixels < y)
+                        return false;
+
                     const activeObject = useWorldEditorStore.getState().active.object;
-                    const obj = this.add.sprite(worldPoint.x, worldPoint.y, activeObject);
-                    activeObjectGroup.add(obj);
-                    return;
+                    let obj = this.add.sprite(x, y, activeObject);
+                    obj = this.physics.add.sprite(obj);
+                    this.physics.add.overlap(obj, this.objectGroups['ObjectCollision']);
+
+                    console.log(obj)
+                    console.log(obj.body.touching.none)
+                    // activeObjectGroup.add(obj);
+                    return false;
                 }
             }
+            this.preview.setPosition(worldPoint.x, worldPoint.y);
+        } else {
+            this.preview.setVisible(false);
         }
+        return false;
     }
 
     updateCamera = () => {
@@ -285,7 +328,69 @@ class WorldEditorScene extends Scene {
 
     update() {
         this.updateCamera();
-        this.updateEdit();
+        this.updateEdit() ? this.preview.setValid() : this.preview.setError();
+    }
+}
+
+
+/**
+ * The preview sprite of the current tool object.
+ * 
+ * @constructor
+ * @param {Scene} scene - The scene that has the sprite.
+ * @param {number} x - The start horizontal position in the scene.
+ * @param {number} y - The start vertical position in the scene.
+ */
+ class PreviewSprite extends GameObjects.Container {
+
+    constructor(scene, x, y) {
+        super(scene, x, y);
+
+        // Add container to the scene
+        scene.add.existing(this);
+        scene.physics.add.existing(this);
+
+        // add sprite and text to scene and then container
+        const sprite = scene.add.sprite(0, 0, '__DEFAULT')
+
+        const rec = scene.add.rectangle(0, 0, 32, 32)
+            .setStrokeStyle(1, 0x00ff00, 1);
+
+        this.addSprite(sprite)
+            .addRectangle(rec);
+
+        this.body.setSize(32, 32)
+            .setOffset(-16, -16);
+    }
+
+    addSprite(sprite) {
+        this.addAt(sprite, 0);
+        return this;
+    }
+
+    getSprite() {
+        return this.getAt(0);
+    }
+
+    addRectangle(bounds) {
+        this.addAt(bounds, 1);
+        return this;
+    }
+
+    getRectangle() {
+        return this.getAt(1);
+    }
+
+    setError() {
+        this.getRectangle().setStrokeStyle(1, 0xff0000);
+        this.getSprite().setTint(0xff0000);
+        return this;
+    }
+
+    setValid() {
+        this.getRectangle().setStrokeStyle(1, 0x0000ff);
+        this.getSprite().setTint(0xffffff);
+        return this;
     }
 }
 

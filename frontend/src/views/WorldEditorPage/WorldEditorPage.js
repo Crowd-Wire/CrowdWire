@@ -53,14 +53,14 @@ class WorldEditorPage extends React.Component {
       loading: true,
       grid: [
         {
-          size: 50,
+          size: 40,
           grid: [
             { size: 25, tabs: [6] },
             { size: 50, tabs: [1, 2, 3] },
             { size: 25, tabs: [5, 4] },
           ]
         },
-        { size: 50, tabs: [0] },
+        { size: 60, tabs: [0] },
         // { size: 50, tabs: [1, 2] }
       ]
     }
