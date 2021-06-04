@@ -41,19 +41,30 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
-      this.handleTileChange, state => state.active.tile));
+      this.handleActiveChange, state => Object.entries(state.active)));
   }
 
   componentWillUnmount() {
     this.subscriptions.forEach((unsub) => unsub());
   }
 
-  handleTileChange = (tileId, prevTileId) => {
-    if (tileId === prevTileId)
-      return;
-
-    const tileStyle = tileId ? useWorldEditorStore.getState().tiles[tileId].style : {};
-    this.setState({ tileStyle });
+  handleActiveChange = (active: string[][]) => {
+    for (const [key, value] of active) {
+      if (value) {
+        let tileStyle = {};
+        switch (key) {
+          case 'tile':
+          case 'object':
+          case 'conference':
+            tileStyle = useWorldEditorStore.getState().tiles[value].style;
+            break;
+          case 'wall':
+            break;
+        }
+        this.setState({ tileStyle });
+        break;
+      }
+    }
   }
 
   handlePaintToolChange = (toolType: ToolType) => {

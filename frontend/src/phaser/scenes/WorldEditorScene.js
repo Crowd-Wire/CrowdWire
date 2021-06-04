@@ -182,7 +182,7 @@ class WorldEditorScene extends Scene {
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
             const activeLayerName = useWorldEditorStore.getState().activeLayer,
-                activeTile = useWorldEditorStore.getState().active.tile;
+                activeTile = useWorldEditorStore.getState().active.tile || useWorldEditorStore.getState().active.conference;
 
             let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
