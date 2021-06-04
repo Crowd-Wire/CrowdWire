@@ -86,7 +86,6 @@ export default function UserReports() {
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
                 if(!res.detail){
                     setReports(res);
                 }

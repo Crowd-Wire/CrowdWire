@@ -71,7 +71,6 @@ class AdminWorldDetails extends Component {
         WorldService.banWorld(this.state.world.world_id, this.state.world.status == 0 ? 1 : 0)
             .then((res) => { return res.json(); })
             .then((res) => {
-                console.log(res);
                 if(!res.detail){
                     this.setState({ world: { ...this.state.world, status: res.status } });
                 }

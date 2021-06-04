@@ -30,7 +30,6 @@ export default function AdminUserDetails() {
     const navigation = useNavigate();
     const classes = useStyles();
     React.useEffect(() => {
-        console.log(window.location.pathname)
         if(window.location.pathname.split("/").length===4){
             let now_url = window.location.pathname;
             setUrlID(now_url.split("/")[3]);
@@ -63,7 +62,6 @@ export default function AdminUserDetails() {
                 return res.json();
             })
             .then((res)=>{
-                console.log(res)
                 if(res===null || res.length===0){
                     setReports(<Typography variant="body1"><em>No reports to be reviewed</em></Typography>)
                     return;

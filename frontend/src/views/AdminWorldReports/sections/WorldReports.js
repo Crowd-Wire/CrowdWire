@@ -52,7 +52,6 @@ export default function WorldReports(props) {
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
                 if(!res.detail){
                     setReports(res);
                 }

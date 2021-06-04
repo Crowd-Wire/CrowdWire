@@ -113,7 +113,6 @@ export default function WorldsList() {
     }, [])
 
     const handleSearch = (newRequest) => {
-        console.log(banned)
         if(newRequest){
             if(page !== 1)
                 setPage(1)
@@ -219,7 +218,6 @@ export default function WorldsList() {
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 {worlds && worlds.length !== 0 ?
                     worlds.map((m, i) => {
-                        console.log(m)
                         return (<MapCard key={i} baseUrl={""} map={m} banned={banned}/>)
                     })
                     :

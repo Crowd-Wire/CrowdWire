@@ -37,7 +37,6 @@ class AuthenticationService {
         else if(type==="AUTH"){
             useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.is_superuser);
         }
-        console.log(useAuthStore.getState().token)
     }
 
     logout(){

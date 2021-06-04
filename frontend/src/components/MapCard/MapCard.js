@@ -48,7 +48,6 @@ export default function MapCard(props){
     }
 
     React.useEffect(()=>{
-        console.log(map)
         if(map.status === 1){
             setStatus(
             <span style={{fontWeight: 600, color: '#f51137', float: 'right', top: 0}}>

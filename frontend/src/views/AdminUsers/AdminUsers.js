@@ -232,8 +232,6 @@ export default function AdminUsers() {
             <div>
                 <List className={classes2.root}>
                 {users.map((u, i) => {
-                    // TODO: create card?? table?? 
-                    console.log(u)
                     return(
                         <>
                             <ListItem alignItems="flex-start" onClick={()=>navigation(""+u.user_id)} className={classes2.item}>
