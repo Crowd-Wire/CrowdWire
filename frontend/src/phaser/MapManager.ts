@@ -58,7 +58,7 @@ class MapManager {
             } else {
                 // tile layer
                 const tilesetName = tileset.name;
-                scene.load.image(tilesetName, API_BASE + "static/maps/" + tileset.image);
+                scene.load.spritesheet(tilesetName, API_BASE + "static/maps/" + tileset.image, { frameWidth: 32, frameHeight: 32 });
                 this.tilesetKeys.push(tilesetName);
                 this.tilesetURL[tilesetName] = tileset.image;
             }

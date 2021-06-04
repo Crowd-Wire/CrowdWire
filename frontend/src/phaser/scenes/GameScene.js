@@ -293,7 +293,7 @@ class Player extends Phaser.GameObjects.Container {
         scene.physics.add.collider(this, [scene.collisionLayer, scene.objectGroups['ObjectCollision']]);
 
         // add sprite and text to scene and then container
-        const sprite = scene.add.sprite(0, 0, 'player', 6)
+        const sprite = scene.add.sprite(0, 0, 'player', 0)
             .setOrigin(0.5)
             .setScale(2);
         const text = scene.add.bitmapText(0, -32, 'atari', '', 16)

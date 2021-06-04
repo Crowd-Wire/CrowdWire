@@ -185,13 +185,13 @@ class WorldEditorScene extends Scene {
         if (this.input.isOver) {
             // Mouse is over canvas
 
-            this.preview.setVisible(true);
-
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
                 activeLayerName = useWorldEditorStore.getState().activeLayer;
 
             if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
                 // Layer selected and not blocked
+
+                this.preview.setVisible(true);
 
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
@@ -200,11 +200,6 @@ class WorldEditorScene extends Scene {
                     const x = Math.Snap.Floor(worldPoint.x, 32),
                         y = Math.Snap.Floor(worldPoint.y, 32);
 
-                    this.preview.setPosition(x + 16, y + 16);
-
-                    if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
-                        return false;
-                    
                     // Rounds down to nearest tile
                     const tileX = this.map.worldToTileX(x),
                         tileY = this.map.worldToTileY(y);
@@ -230,6 +225,19 @@ class WorldEditorScene extends Scene {
                         clickedCid = this.mapManager.getConferenceCid(clickedTile.index);
                         clickedGid = clickedTile.index;
                     }
+
+                    this.preview.setPosition(x + 16, y + 16);
+                    if ([ToolType.DRAW, ToolType.FILL, ToolType.SELECT].includes(this.tool.type)
+                            && activeGid) {
+                        const tileset = activeLayer.gidMap[activeGid];
+                        console.log(activeGid - tileset.firstgid);
+                        this.preview.setTexture(tileset.image.key, activeGid - tileset.firstgid);
+                    } else {
+                        this.preview.setTexture('__DEFAULT');
+                    }
+
+                    if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
+                        return false;
 
                     const isDown = this.input.manager.activePointer.isDown;
                     switch (this.tool.type) {
@@ -268,7 +276,6 @@ class WorldEditorScene extends Scene {
                     }
                     return false;
                 }
-
                 const activeObjectGroup = this.objectGroups[activeLayerName];
                 if (activeObjectGroup) {
                     // ObjectGroup exists
@@ -276,26 +283,27 @@ class WorldEditorScene extends Scene {
                     const x = Math.Snap.Floor(worldPoint.x, 16),
                         y = Math.Snap.Floor(worldPoint.y, 16);
 
-                    this.preview.setPosition(x, y);
+                    const activeObject = useWorldEditorStore.getState().active.object;
+                    
+                    this.preview.setPosition(x + 16, y + 16)
+                        .setTexture(activeObject || '__DEFAULT');
 
                     if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
 
-                    const activeObject = useWorldEditorStore.getState().active.object;
-                    let obj = this.add.sprite(x, y, activeObject);
-                    obj = this.physics.add.sprite(obj);
-                    this.physics.add.overlap(obj, this.objectGroups['ObjectCollision']);
+                    // let obj = this.add.sprite(x, y, activeObject);
+                    // obj = this.physics.add.sprite(obj);
+                    // this.physics.add.overlap(obj, this.objectGroups['ObjectCollision']);
 
-                    console.log(obj)
-                    console.log(obj.body.touching.none)
+                    // console.log(obj)
+                    // console.log(obj.body.touching.none)
                     // activeObjectGroup.add(obj);
                     return false;
                 }
+                throw Error(`Unknown layer name ${activeLayerName}`)
             }
-            this.preview.setPosition(worldPoint.x, worldPoint.y);
-        } else {
-            this.preview.setVisible(false);
         }
+        this.preview.setVisible(false);
         return false;
     }
 
@@ -352,12 +360,14 @@ class WorldEditorScene extends Scene {
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, '__DEFAULT')
+            .setAlpha(0.7);
 
         const rec = scene.add.rectangle(0, 0, 32, 32)
             .setStrokeStyle(2, 0x00ff00, 1);
 
         this.addSprite(sprite)
-            .addRectangle(rec);
+            .addRectangle(rec)
+            .setDepth(1001);
 
         this.body.setSize(32, 32)
             .setOffset(-16, -16);
@@ -379,6 +389,11 @@ class WorldEditorScene extends Scene {
 
     getRectangle() {
         return this.getAt(1);
+    }
+
+    setTexture(key, frame) {
+        this.getSprite().setTexture(this.scene.textures.get(key), frame);
+        return this;
     }
 
     setError() {
