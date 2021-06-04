@@ -62,9 +62,10 @@ class ToolsTab extends Component<{}, ToolsTabState> {
             break;
         }
         this.setState({ tileStyle });
-        break;
+        return;
       }
     }
+    this.setState({ tileStyle: {} });
   }
 
   handlePaintToolChange = (toolType: ToolType) => {
