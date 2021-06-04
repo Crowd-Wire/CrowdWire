@@ -11,6 +11,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ReportIcon from '@material-ui/icons/Report';
 import MapIcon from '@material-ui/icons/Map';
+import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,6 +50,8 @@ export default function AdminUsers() {
     const [userReports, setUserReports] = useState(0);
     const [worldReports, setWorldReports] = useState(0);
     const [onlineUsers, setOnlineUsers] = useState(0);
+    const navigation = useNavigate();
+
     
     useEffect(() => {
       StatisticService.getStatistics()
@@ -74,23 +77,23 @@ export default function AdminUsers() {
         <div className={classes.root}>
           <Grid container spacing={3}>
             <Grid item xs={4} className={classes.item}>
-              <Card glass hoverType={"down"} outlined bordered className={classes.card}>
+              <Card onClick={() => navigation('/admin/users')} glass hoverType={"down"} outlined bordered className={classes.card}>
                 <div>
                   <Row xs={12} style={{position: 'absolute', top: 15, width: '100%', marginRight: 0, marginLeft: 0}}>
-                    <Col xs={9}>
-                      <Typography variant="h6" component="h6" gutterBottom>
+                    <Col xs={9} style={{top: 5}}>
+                      <Typography variant="h6" component="h6" gutterBottom  style={{fontWeight: 600, color: 'white'}}>
                         Total Users
                       </Typography>
                     </Col>
                     <Col xs={3}>
                         <Avatar style={{backgroundColor: '#002f75'}}>
-                          <PersonIcon/>
+                          <PersonIcon style={{fontWeight: 600, color: 'white'}}/>
                         </Avatar>
                     </Col>
                   </Row>
                   <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
-                      <Typography variant="h3" component="h3" gutterBottom>
+                      <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {users}
                       </Typography>
                     </Col>
@@ -99,24 +102,24 @@ export default function AdminUsers() {
               </Card>
             </Grid>
             <Grid item xs={4} className={classes.item}>
-              <Card glass hoverType={"down"} outlined bordered className={classes.card}>
+              <Card onClick={() => navigation('/admin/worlds')} glass hoverType={"down"} outlined bordered className={classes.card}>
                 <div>
                   <Row xs={12} style={{position: 'absolute', top: 15, width: '100%', marginRight: 0, marginLeft: 0}}>
-                    <Col xs={9}>
-                      <Typography variant="h6" component="h6" gutterBottom>
+                    <Col xs={9} style={{top: 5}}>
+                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'white'}}>
                         Total Worlds
                       </Typography>
                     </Col>
                     <Col xs={3}>
-                        <Avatar style={{backgroundColor: '#002f75'}}>
-                          <MapIcon/>
+                        <Avatar style={{backgroundColor: '#0059ff'}}>
+                          <MapIcon style={{fontWeight: 600, color: 'white'}}/>
                         </Avatar>
                     </Col>
                   </Row>
                   <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
-                      <Typography variant="h3" component="h3" gutterBottom>
-                        {users}
+                      <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
+                        {worlds}
                       </Typography>
                     </Col>
                   </Row>
@@ -127,20 +130,20 @@ export default function AdminUsers() {
               <Card glass hoverType={"down"} outlined bordered className={classes.card}>
                 <div>
                   <Row xs={12} style={{position: 'absolute', top: 15, width: '100%', marginRight: 0, marginLeft: 0}}>
-                    <Col xs={9}>
-                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: '#4caf50'}}>
+                    <Col xs={9} style={{top: 5}}>
+                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'white'}}>
                         Online Users
                       </Typography>
                     </Col>
                     <Col xs={3}>
-                        <Avatar style={{backgroundColor: '#002f75'}}>
-                          <FiberManualRecordIcon style={{fontWeight: 600, color: '#4caf50'}}/>
+                        <Avatar style={{backgroundColor: '#4caf50'}}>
+                          <FiberManualRecordIcon style={{fontWeight: 600, color: 'white'}}/>
                         </Avatar>
                     </Col>
                   </Row>
                   <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
-                      <Typography variant="h3" component="h3" gutterBottom>
+                      <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {onlineUsers}
                       </Typography>
                     </Col>
@@ -149,23 +152,23 @@ export default function AdminUsers() {
               </Card>
             </Grid>
             <Grid item xs={4} className={classes.item}>
-              <Card glass hoverType={"up"} outlined bordered className={classes.card}>
+              <Card onClick={() => navigation('/admin/users/reports')} glass hoverType={"up"} outlined bordered className={classes.card}>
                 <div>
                   <Row xs={12} style={{position: 'absolute', top: 15, width: '100%', marginRight: 0, marginLeft: 0}}>
-                    <Col xs={9}>
-                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'black'}}>
+                    <Col xs={9} style={{top: 5}}>
+                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'white'}}>
                         User Reports
                       </Typography>
                     </Col>
                     <Col xs={3}>
-                        <Avatar style={{backgroundColor: 'black'}}>
-                          <ReportIcon style={{fontWeight: 600, color: 'red'}} />
+                        <Avatar style={{backgroundColor: 'rgb(232 0 0)'}}>
+                          <ReportIcon style={{fontWeight: 600, color: 'white'}} />
                         </Avatar>
                     </Col>
                   </Row>
                   <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
-                      <Typography variant="h3" component="h3" gutterBottom>
+                      <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {userReports}
                       </Typography>
                     </Col>
@@ -174,23 +177,23 @@ export default function AdminUsers() {
               </Card>
             </Grid>
             <Grid item xs={4} className={classes.item}>
-              <Card glass hoverType={"up"} outlined bordered className={classes.card}>
+              <Card onClick={() => navigation('/admin/worlds/reports')} glass hoverType={"up"} outlined bordered className={classes.card}>
                 <div>
                   <Row xs={12} style={{position: 'absolute', top: 15, width: '100%', marginRight: 0, marginLeft: 0}}>
-                    <Col xs={9}>
-                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'black'}}>
+                    <Col xs={9} style={{top: 5}}>
+                      <Typography variant="h6" component="h6" gutterBottom style={{fontWeight: 600, color: 'white'}}>
                         World Reports
                       </Typography>
                     </Col>
                     <Col xs={3}>
-                        <Avatar style={{backgroundColor: 'black'}}>
-                          <ReportIcon style={{fontWeight: 600, color: 'red'}}/>
+                        <Avatar style={{backgroundColor: 'rgb(216 71 71)'}}>
+                          <ReportIcon style={{fontWeight: 600, color: 'white'}}/>
                         </Avatar>
                     </Col>
                   </Row>
                   <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
-                      <Typography variant="h3" component="h3" gutterBottom>
+                      <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {worldReports}
                       </Typography>
                     </Col>

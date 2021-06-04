@@ -37,10 +37,11 @@ const useAuthStore = createStore(
                     guest_uuid: null
                 }))
             },
-            updateToken: (token: string, expire_date: string) => {
+            updateToken: (token: string, expire_date: string, is_superuser: boolean) => {
                 set((state) => ({
-                        token: token,
-                        expire_date: expire_date
+                    token: token,
+                    expire_date: expire_date,
+                    is_superuser: is_superuser
                 }))
             },
             setLastLocation: (loc) => {

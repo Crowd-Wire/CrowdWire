@@ -58,7 +58,7 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
 	},
 	{
 		path: "/",
-		element: token ? <Navigate to={last_location ? last_location : "/dashboard/search/public"}/> : <Outlet/>,
+		element: token ? <Navigate to={ last_location ? last_location : "/dashboard/search/public"}/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },

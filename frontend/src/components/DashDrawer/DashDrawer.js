@@ -18,6 +18,12 @@ import useAuthStore from "stores/useAuthStore.ts";
 import created_worlds from "assets/img/save-the-planet.svg";
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import userStats from "assets/img/polling.svg";
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import Popover from "@material-ui/core/Popover";
+import Row from "react-bootstrap/Row";
+import MapIcon from '@material-ui/icons/Map';
+import PersonIcon from '@material-ui/icons/Person';
+
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
@@ -84,8 +90,34 @@ export default function DashDrawer(props){
   const [open, setOpen] = React.useState(false);
   const addWorld = theme.spacing(2)+100;
   const definitions = theme.spacing(2)+50;
-  const stats = theme.spacing(2)+150;
-  const userstats = theme.spacing(2)+200;
+  const stats = theme.spacing(2)+200;
+  const userstats = theme.spacing(2)+150;
+  const dashboard = theme.spacing(2)+250;
+  const [anchorElUsers, setAnchorElUsers] = React.useState(null);
+  const [anchorElWorlds, setAnchorElWorlds] = React.useState(null);
+
+  const pop_open_users = Boolean(anchorElUsers);
+  const pop_id_users = pop_open_users ? 'right-popover' : undefined;
+
+  const handlePopClickUsers = (event) => {
+    setAnchorElUsers(event.currentTarget);
+  };
+
+  const handlePopCloseUsers = () => {
+    setAnchorElUsers(null);
+  };
+
+  const pop_open_worlds = Boolean(anchorElWorlds);
+  const pop_id_worlds = pop_open_worlds ? 'right-popover' : undefined;
+
+  const handlePopClickWorlds = (event) => {
+    setAnchorElWorlds(event.currentTarget);
+  };
+
+  const handlePopCloseWorlds = () => {
+    setAnchorElWorlds(null);
+  };
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -117,14 +149,33 @@ export default function DashDrawer(props){
       navigation("/dashboard/user");
   }
 
-  const onClickPlatformStats = () => {
+  const onClickPlatformWorldStats = () => {
+    handlePopCloseWorlds()
     if(location.pathname!=="/admin/worlds")
       navigation("/admin/worlds");
   }
 
+  const onClickPlatformWorldReports = () => {
+    handlePopCloseWorlds()
+    if(location.pathname!=="/admin/worlds/reports")
+      navigation("/admin/worlds/reports");
+  }
+
   const onClickPlatformUserStats = () => {
+    handlePopCloseUsers()
     if(location.pathname!=="/admin/users")
       navigation("/admin/users");
+  }
+
+  const onClickPlatformUserReports = () => {
+    handlePopCloseUsers()
+    if(location.pathname!=="/admin/users/reports")
+      navigation("/admin/users/reports");
+  }
+
+  const onClickPlatformDashboard = () => {
+    if(location.pathname!=="/admin/dashboard")
+      navigation("/admin/dashboard");
   }
 
   const handleDrawerClose = () => {
@@ -222,27 +273,103 @@ export default function DashDrawer(props){
           { !st.is_superuser ?
             <></>
             :
-          <ListItem onClick={onClickPlatformUserStats} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Platform User Statistics" style={{position: "fixed", bottom: userstats}}>
-          <ListItemIcon>
-              <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-          </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="USER STATISTICS"
-            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-          </ListItem>
-          }
+            <>
+              <ListItem onClick={onClickPlatformDashboard} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+                button key="Admin Dashboard" style={{position: "fixed", bottom: dashboard}}>
+              <ListItemIcon>
+                <DashboardIcon className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="PLATFORM DASHBOARD"
+                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+              </ListItem>
 
-          { !st.is_superuser ?
-            <></>
-            :
-          <ListItem onClick={onClickPlatformStats} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Platform World Statistics" style={{position: "fixed", bottom: stats}}>
-          <ListItemIcon>
-              <EqualizerIcon className={classes.iconDrawer}/>
-          </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="WORLD STATISTICS"
-            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-          </ListItem>
+
+              <ListItem onClick={handlePopClickWorlds} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+                button key="Platform World Statistics" style={{position: "fixed", bottom: stats}}>
+              <ListItemIcon>
+                  <MapIcon className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="WORLD"
+                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+              </ListItem>
+
+              <Popover
+                id={pop_id_worlds}
+                open={pop_open_worlds}
+                anchorEl={anchorElWorlds}
+                onClose={handlePopCloseWorlds}
+                anchorOrigin={{
+                  vertical: "center",
+                  horizontal: "right"
+                }}
+                transformOrigin={{
+                  vertical: "center",
+                  horizontal: "left"
+                }}
+              >
+                <>
+                  <Row style={{width: 210, background: 'rgb(12 19 43)', paddingLeft: 15}}>
+                    <ListItem onClick={onClickPlatformWorldStats} button key="Pop Platform World Statistics">
+                      <ListItemIcon>
+                          <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      </ListItemIcon>
+                      <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
+                    </ListItem>
+                  </Row>
+                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
+                    <ListItem onClick={onClickPlatformWorldReports} button key="Pop Platform World Reports">
+                    <ListItemIcon>
+                        <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
+                    </ListItem>
+                  </Row>
+                </>
+              </Popover>
+
+              <ListItem onClick={handlePopClickUsers} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
+                button key="Platform User Statistics" style={{position: "fixed", bottom: userstats}}>
+              <ListItemIcon>
+                <PersonIcon className={classes.iconDrawer}/>
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="USER STATISTICS"
+                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+              </ListItem>
+
+              <Popover
+                id={pop_id_users}
+                open={pop_open_users}
+                anchorEl={anchorElUsers}
+                onClose={handlePopCloseUsers}
+                anchorOrigin={{
+                  vertical: "center",
+                  horizontal: "right"
+                }}
+                transformOrigin={{
+                  vertical: "center",
+                  horizontal: "left"
+                }}
+              >
+                <>
+                  <Row style={{width: 210, background: 'rgb(12 19 43)', paddingLeft: 15}}>
+                    <ListItem onClick={onClickPlatformUserStats} button key="Pop Platform User Statistics">
+                      <ListItemIcon>
+                          <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      </ListItemIcon>
+                      <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
+                    </ListItem>
+                  </Row>
+                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
+                    <ListItem onClick={onClickPlatformUserReports} button key="Pop Platform User Reports">
+                    <ListItemIcon>
+                        <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
+                    </ListItem>
+                  </Row>
+                </>
+              </Popover>
+            </>
           }
           { st.guest_uuid ?
             <></>
