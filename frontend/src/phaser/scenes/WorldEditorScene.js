@@ -218,7 +218,6 @@ class WorldEditorScene extends Scene {
 
                     switch (this.paintTool.type) {
                         case PaintToolType.DRAW:
-                            console.log(activeGid, tint)
                             if (activeGid) {
                                 activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                 clickedTile && (clickedTile.tint = tint);
@@ -228,7 +227,7 @@ class WorldEditorScene extends Scene {
                             activeLayer.fill(-1, tileX, tileY, 1, 1);
                             break;
                         case PaintToolType.PICK:
-                            if (clickedCid > -1) {
+                            if (clickedCid != -1) {
                                 useWorldEditorStore.getState().setState({ activeTile: clickedCid })
                             }
                             break;
