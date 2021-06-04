@@ -1,7 +1,7 @@
-import Phaser, { Scene, Tilemaps } from 'phaser';
+import Phaser, { Scene } from 'phaser';
 
 import MapManager from "../MapManager.ts";
-import useWorldEditorStore, { PaintToolType } from "stores/useWorldEditorStore.ts";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore.ts";
 import { cyrb53Hash, intToHex } from "utils/color.js";
 
 const sceneConfig = {
@@ -15,7 +15,7 @@ class WorldEditorScene extends Scene {
 
     constructor() {
         super(sceneConfig);
-        this.paintTool = { type: PaintToolType.DRAW };
+        this.tool = { type: ToolType.DRAW };
         this.subscriptions = [];
     }
 
@@ -94,7 +94,7 @@ class WorldEditorScene extends Scene {
         // this.physics.world.bounds.height = this.map.heightInPixels;
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
-            (paintTool) => { this.paintTool = paintTool }, state => state.paintTool));
+            (tool) => { this.tool = tool }, state => state.tool));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
             this.handleLayersChange, state => [{...state.layers}, state.highlight]));
@@ -176,13 +176,13 @@ class WorldEditorScene extends Scene {
     }
 
     updateEdit = () => {
-        if (!this.paintTool)
+        if (!this.tool)
             return;
         
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver) {
             const activeLayerName = useWorldEditorStore.getState().activeLayer,
-                activeTile = useWorldEditorStore.getState().activeTile;
+                activeTile = useWorldEditorStore.getState().active.tile;
 
             let worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
 
@@ -212,31 +212,32 @@ class WorldEditorScene extends Scene {
                     const clickedTile = activeLayer.getTileAt(tileX, tileY, true);
                     if (clickedTile) {
                         // Check if index is from a conference tile and set active tile accordingly
-                        clickedCid = this.mapManager.getConferenceCid(clickedTile.index) || clickedTile.index;
+                        clickedCid = this.mapManager.getConferenceCid(clickedTile.index);
                         clickedGid = clickedTile.index;
                     }
 
-                    switch (this.paintTool.type) {
-                        case PaintToolType.DRAW:
+                    switch (this.tool.type) {
+                        case ToolType.DRAW:
                             if (activeGid) {
                                 activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                 clickedTile && (clickedTile.tint = tint);
                             }
                             break;
-                        case PaintToolType.ERASE:
+                        case ToolType.ERASE:
                             activeLayer.fill(-1, tileX, tileY, 1, 1);
                             break;
-                        case PaintToolType.PICK:
-                            if (clickedCid != -1) {
-                                useWorldEditorStore.getState().setState({ activeTile: clickedCid })
+                        case ToolType.PICK:
+                            if (clickedGid != -1) {
+                                // FAIL gives error when pick outside?
+                                useWorldEditorStore.getState().setActive('tile', clickedCid || clickedGid);
                             }
                             break;
-                        case PaintToolType.FILL:
+                        case ToolType.FILL:
                             if (activeGid) {
                                 this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
                             }
                             break;
-                        case PaintToolType.SELECT:
+                        case ToolType.SELECT:
                             break;
                     }
                 }

@@ -48,7 +48,7 @@ class MapManager {
                 tileset.tiles.forEach((tile) => {
                     const tilesetName = tile.image;
                     scene.load.image(tilesetName, API_BASE + "static/maps/" + tile.image);
-                    this.objectKeys.push(tilesetName);//tileset.name
+                    this.objectKeys.push(tilesetName);
                     if ('objectgroup' in tile) {
                         // custom object collider
                         const { x, y, width, height } = tile.objectgroup.objects[0];

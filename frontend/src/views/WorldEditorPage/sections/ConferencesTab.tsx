@@ -3,7 +3,6 @@ import React, { Component, useState } from "react";
 import classNames from "classnames";
 import Input from '@material-ui/core/Input';
 
-import MapManager from "phaser/MapManager";
 import useWorldEditorStore, { Conference } from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
@@ -128,7 +127,6 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   static curConference: number = 0;
 
   subscriptions: any[];
-  mapManager: MapManager;
 
   constructor(props) {
     super(props);
@@ -146,10 +144,6 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
-
-    const { conferences, activeConference } = useWorldEditorStore.getState();
-    ConferencesTab.curConference = Object.keys(conferences).length;
-    this.setState({ conferences, activeConference });
   }
 
   componentWillUnmount() {
@@ -174,8 +168,9 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   }
 
   handleReady = () => {
-    this.mapManager = new MapManager();
-    this.forceUpdate();
+    const { conferences, active } = useWorldEditorStore.getState();
+    ConferencesTab.curConference = Object.keys(conferences).length;
+    this.setState({ conferences, activeConference: active.conference });
   }
 
   handleChange = (id: string, name: string, del?: boolean): void => {
@@ -183,18 +178,20 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       const conferences = this.state.conferences;
       let activeConference = this.state.activeConference;
       delete conferences[id];
+      useWorldEditorStore.getState().setState({ conferences });
+      this.setState({ conferences });
+
       if (id === activeConference) {
         activeConference = null;
-        useWorldEditorStore.getState().setState({ activeTile: null });
+        useWorldEditorStore.getState().remActive('conference');
+        this.setState({ activeConference });
       }
-      this.setState({ conferences, activeConference });
-      useWorldEditorStore.getState().setState({ conferences, activeConference });
     } else {
       const conferences = this.state.conferences;
       conferences[id].name = name;
 
-      useWorldEditorStore.getState().setState(
-        { conferences, activeConference: id, activeTile: id });
+      useWorldEditorStore.getState().setState({ conferences });
+      useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });
     }
   }

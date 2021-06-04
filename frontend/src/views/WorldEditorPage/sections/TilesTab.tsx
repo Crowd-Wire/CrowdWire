@@ -91,7 +91,7 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleClick = (id: string) => {
-    useWorldEditorStore.getState().setState({ activeTile: id });
+    useWorldEditorStore.getState().setActive('tile', id);
   }
 
   render() {
