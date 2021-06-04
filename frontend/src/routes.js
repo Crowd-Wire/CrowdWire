@@ -27,6 +27,7 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
+import AdminDashboard from 'views/AdminDashboard/AdminDashboard.tsx';
 import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
 import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
@@ -101,6 +102,7 @@ const routes = (token, guest_uuid, last_location) => [
 		path: "/admin",
 		element: token ? <AdminLayout /> : <Navigate to="/login" />,
 		children: [
+			{ path: "/dashboard", element: <AdminDashboard/>},
             { path: "/worlds/reports", element: <AdminWorldReports /> },
 			{ path: "/worlds", element: <AdminWorlds />},
 			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
