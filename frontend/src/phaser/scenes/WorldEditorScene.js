@@ -110,6 +110,9 @@ class WorldEditorScene extends Scene {
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
+
+        console.log(this.preview, this.objectGroups['ObjectCollision'])
+        // this.physics.add.overlap(this.preview, this.objectGroups['ObjectCollision']);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -292,6 +295,20 @@ class WorldEditorScene extends Scene {
                     if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
 
+                    const hovered = this.physics.overlapRect(
+                        this.preview.body.x + 1,
+                        this.preview.body.y + 1,
+                        this.preview.body.width - 2,
+                        this.preview.body.height - 2,
+                        true, true
+                    );
+
+                    if (hovered.length < 2) {
+                        if (this.input.manager.activePointer.isDown) {
+                            
+                        }
+                        return true;
+                    }
                     // let obj = this.add.sprite(x, y, activeObject);
                     // obj = this.physics.add.sprite(obj);
                     // this.physics.add.overlap(obj, this.objectGroups['ObjectCollision']);
