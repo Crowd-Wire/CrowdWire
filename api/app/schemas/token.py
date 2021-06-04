@@ -9,6 +9,7 @@ class Token(BaseModel):
     expire_date: str
     is_superuser: bool = False
 
+
 class TokenGuest(Token):
     # It is useful to return the uuid to the client
     # so that we can refresh tokens for a Guest
