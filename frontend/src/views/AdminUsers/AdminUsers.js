@@ -143,8 +143,14 @@ export default function AdminUsers() {
     }
 
     const handleSearch = () =>{
-        // make the request
-        console.log("search")
+        UserService.search(email, normal, banned, orderBy, order, 1, 10)
+        .then((res) =>{
+            return res.json();
+        })
+        .then((res) =>{
+            // TODO: handle errors
+            if(!res.detail) setUsers(res);
+        })
     }
 
     
@@ -196,7 +202,7 @@ export default function AdminUsers() {
                             <MenuItem value={""}>
                                 <em>OrderBy</em>
                             </MenuItem>
-                            <MenuItem value={"timestamp"}>Date</MenuItem>
+                            <MenuItem value={"register_date"}>Date</MenuItem>
                         </Select>
                     </FormControl>
 

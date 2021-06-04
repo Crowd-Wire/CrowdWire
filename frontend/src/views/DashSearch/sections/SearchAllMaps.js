@@ -146,7 +146,7 @@ class SearchAllMaps extends Component {
 						this.state.maps.map((m, i) => {
 							if(i !== this.limit)
 								return (
-									<MapCard key={i} focusMap={this.focusMap} baseUrl={'../../'} map={m} />
+									<MapCard key={i} focusMap={this.focusMap} baseUrl={'../../'} map={m} banned={false}/>
 								)
 						})
 						:

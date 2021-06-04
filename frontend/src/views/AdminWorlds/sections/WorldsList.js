@@ -37,7 +37,6 @@ export default function WorldsList() {
     const [creator, setCreator] = React.useState(null);
     const [normal, setNormal] = React.useState(true);
     const [banned, setBanned] = React.useState(false);
-    const [deleted, setDeleted] = React.useState(false);
     const [orderBy, setOrderBy] = React.useState("");
     const [order, setOrder] = React.useState("");
     const [page, setPage] = React.useState(1);
@@ -69,10 +68,6 @@ export default function WorldsList() {
         setBanned(!banned);
     }
 
-    const handleDeleted = () => {
-        setDeleted(!deleted);
-    }
-
     const handleOrderBy = (event) => {
         setOrderBy(event.target.value);
     }
@@ -85,13 +80,12 @@ export default function WorldsList() {
         setPage(page1);
     }
 
-    const request = (search, tags, banned, deleted, normal, creator, order_by, order, page, limit) => {
-        WorldService.searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit)
+    const request = (search, tags, banned, normal, creator, order_by, order, page, limit) => {
+        WorldService.searchAdmin(search, tags, banned, normal, creator, order_by, order, page, limit)
             .then((res) => {
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
                 if(! res.detail){
                     setWorlds(res);
                 }
@@ -104,7 +98,7 @@ export default function WorldsList() {
     }, [page]);
 
     React.useEffect(() => {
-        request("", [], null, null, true, null, null, null, 1, limit);
+        request("", [], null, true, null, null, null, 1, limit);
         TagService.getAll()
             .then((res) => {
                 if (res.status == 200)
@@ -119,14 +113,15 @@ export default function WorldsList() {
     }, [])
 
     const handleSearch = (newRequest) => {
+        console.log(banned)
         if(newRequest){
             if(page !== 1)
                 setPage(1)
             else
-                request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, 1, limit);  
+                request(world, selectedTags, banned, normal, creator, orderBy, order, 1, limit);  
         }
 
-        request(world, selectedTags, banned, deleted, normal, creator, orderBy, order, page, limit);
+        request(world, selectedTags, banned, normal, creator, orderBy, order, page, limit);
     }
 
 
@@ -196,19 +191,6 @@ export default function WorldsList() {
                         }
                         label="Show Banned"
                     />
-
-                    <FormControlLabel
-                        className={classes.checkboxes}
-                        control={
-                            <Checkbox
-                                checked={deleted}
-                                onChange={handleDeleted}
-                                name="deleted"
-                                color="primary"
-                            />
-                        }
-                        label="Show Deleted"
-                    />
                 </Col>
                 <Col sm={12} md={5} style={{marginLeft:"auto", marginRight:"auto"}}>
                     <Autocomplete
@@ -237,7 +219,8 @@ export default function WorldsList() {
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 {worlds && worlds.length !== 0 ?
                     worlds.map((m, i) => {
-                        return (<MapCard key={i} baseUrl={""} map={m} />)
+                        console.log(m)
+                        return (<MapCard key={i} baseUrl={""} map={m} banned={banned}/>)
                     })
                     :
                     <Typography style={{ marginLeft: "auto", marginRight: "auto" }}>No worlds with these specifications.</Typography>

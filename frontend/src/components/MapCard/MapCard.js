@@ -37,6 +37,7 @@ const useStyles = makeStyles((theme) => ({
 export default function MapCard(props){
     const {baseUrl, map, focusMap, ...other } = props;
     const history = useNavigate();
+    const [status, setStatus] = React.useState(null);
     const routeChange = () =>{
       let path = `/world/`+map.world_id; 
       history(path);
@@ -46,6 +47,25 @@ export default function MapCard(props){
         history(""+baseUrl+map.world_id, {state:map.world_id});
     }
 
+    React.useEffect(()=>{
+        console.log(map)
+        if(map.status === 1){
+            setStatus(
+            <span style={{fontWeight: 600, color: '#f51137', float: 'right', top: 0}}>
+                {map.online_users ? map.online_users: "Banned"}
+                <FiberManualRecordIcon />
+            </span>
+            );
+            return;
+        }
+        else if(map.status === 0)
+        setStatus(
+            <span style={{fontWeight: 600, color: '#4caf50', float: 'right', top: 0}}>
+                {map.online_users ? map.online_users: 0}
+                <FiberManualRecordIcon />
+            </span>
+        );
+    },[props.map])
     const classes = useStyles();
     return(
         <>
@@ -63,10 +83,7 @@ export default function MapCard(props){
                             title={map.name}
                         />
                         <CardContent style={{height: 80}}>
-                            <span style={{fontWeight: 600, color: '#4caf50', float: 'right', top: 0}}>
-                                {map.online_users ? map.online_users: 0}
-                                <FiberManualRecordIcon />
-                            </span>
+                            {status}
                             <Typography gutterBottom variant="h5" component="h2">
                             {   map.name}
                             </Typography>

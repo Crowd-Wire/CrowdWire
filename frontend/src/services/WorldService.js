@@ -3,7 +3,7 @@ import AuthenticationService from "./AuthenticationService";
 
 class WorldService {
 
-    search(search, tags, visibility, banned, deleted, normal, creator, order_by, order, page, limit) {
+    search(search, tags, visibility, banned, normal, creator, order_by, order, page, limit) {
         /*
             search: string,
             tags: List[string]
@@ -25,9 +25,6 @@ class WorldService {
 
         if(banned !== null)
             query.push('banned=' + banned);
-
-        if(deleted !== null)
-            query.push('deleted=' + deleted);
 
         if(normal !== null)
             query.push('normal=' + normal);
@@ -59,13 +56,13 @@ class WorldService {
     }
 
     searchUsers(search, tags, visibility, order_by, order, page, limit){
+        return this.search(search, tags, visibility, false, null, null, order_by, order, page, limit);
         // makes it easier to call the function
-        return this.search(search, tags, visibility, null, null, null, null, order_by, order, page, limit);
     }
 
-    searchAdmin(search, tags, banned, deleted, normal, creator, order_by, order, page, limit){
+    searchAdmin(search, tags, banned, normal, creator, order_by, order, page, limit){
         // makes it easier to call the function
-        return this.search(search, tags, null, banned, deleted, normal, creator, order_by, order, page, limit);
+        return this.search(search, tags, null, banned, normal, creator, order_by, order, page, limit);
     }
 
 

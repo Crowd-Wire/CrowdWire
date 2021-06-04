@@ -52,7 +52,7 @@ class AdminWorldDetails extends Component {
             }).then(() => {
                 // retrieves the most recent reports
                 if(this.state.world){
-                if (this.state.world.status !== 2)
+                //if (this.state.world.status !== 2)
                     WorldService.getAllReports(
                         world_id, null, null, this.state.world.status == 0 ? false : true,
                         'timestamp', 'desc', 1, 3)
