@@ -164,17 +164,12 @@ class WorldEditorScene extends Scene {
 
         while (queue.length > 0) {
             const { x, y } = queue.shift(),
-                destinations = [{ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 }];
+                tile = layer.getTileAt(x, y, true);
 
-            for (const dest of destinations) {
-                const { x, y } = dest,
-                    tile = layer.getTileAt(x, y, true);
-
-                if (tile && tile.index === replaceId) {
-                    layer.fill(tileId, x, y, 1, 1);
-                    tint && (tile.tint = tint);
-                    queue.push(dest);
-                }
+            if (tile && tile.index === replaceId) {
+                layer.fill(tileId, x, y, 1, 1);
+                tint && (tile.tint = tint);
+                queue.push({ x: x - 1, y }, { x: x + 1, y }, { x, y: y - 1 }, { x, y: y + 1 });
             }
         }
     }
@@ -227,7 +222,7 @@ class WorldEditorScene extends Scene {
                         clickedGid = clickedTile.index;
                     }
 
-                    this.preview.setPosition(x + 16, y + 16);
+                    this.preview.setPosition(x + 16, y + 16).setTint(tint);
                     if ([ToolType.DRAW, ToolType.FILL, ToolType.SELECT].includes(this.tool.type)
                         && activeGid) {
                         const tileset = activeLayer.gidMap[activeGid];
@@ -288,34 +283,37 @@ class WorldEditorScene extends Scene {
 
                     this.preview.setPosition(x + 16, y + 16)
                         .setTexture(activeObject || '__DEFAULT')
-                        .setBounds(rec);
+                        .setBounds(rec)
+                        .setTint(0xffffff);
 
                     if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
                         return false;
 
-                    const hovered = this.physics.overlapRect(
-                        this.preview.body.x + 1,
-                        this.preview.body.y + 1,
-                        this.preview.body.width - 2,
-                        this.preview.body.height - 2,
-                        true, true
-                    );
-                    if (hovered.length < 2) {
-                        if (this.input.manager.activePointer.isDown) {
-                            if (this.mouseClick) {
-                                let obj = this.add.sprite(this.preview.x, this.preview.y, activeObject);
-                                activeObjectGroup.add(obj);
-                                const { width, height, offset } = this.preview.body;
-                                obj.body.setSize(width, height)
-                                    .setOffset(
-                                        offset.x + this.preview.getSprite().width / 2,
-                                        offset.y + this.preview.getSprite().height / 2);
-                                this.mouseClick = false;
+                    if (activeObject) {
+                        const hovered = this.physics.overlapRect(
+                            this.preview.body.x + 1,
+                            this.preview.body.y + 1,
+                            this.preview.body.width - 2,
+                            this.preview.body.height - 2,
+                            true, true
+                        );
+                        if (hovered.length < 2) {
+                            if (this.input.manager.activePointer.isDown) {
+                                if (this.mouseClick) {
+                                    let obj = this.add.sprite(this.preview.x, this.preview.y, activeObject);
+                                    activeObjectGroup.add(obj);
+                                    const { width, height, offset } = this.preview.body;
+                                    obj.body.setSize(width, height)
+                                        .setOffset(
+                                            offset.x + this.preview.getSprite().width / 2,
+                                            offset.y + this.preview.getSprite().height / 2);
+                                    this.mouseClick = false;
+                                }
+                            } else {
+                                this.mouseClick = true;
                             }
-                        } else {
-                            this.mouseClick = true;
+                            return true;
                         }
-                        return true;
                     }
                     return false;
                 }
@@ -369,6 +367,7 @@ class WorldEditorScene extends Scene {
  * @param {number} y - The start vertical position in the scene.
  */
 class PreviewSprite extends GameObjects.Container {
+    tint = 0xffffff;
 
     constructor(scene, x, y) {
         super(scene, x, y);
@@ -416,6 +415,11 @@ class PreviewSprite extends GameObjects.Container {
         return this;
     }
 
+    setTint(tint) {
+        this.tint = tint;
+        return this;
+    }
+
     setBounds(rec) {
         const { width, height } = this.getSprite().getBounds();
         if (!rec) {
@@ -434,13 +438,13 @@ class PreviewSprite extends GameObjects.Container {
 
     setError() {
         this.getRectangle().setStrokeStyle(2, 0xff0000);
-        this.getSprite().setTint(0xff0000);
+        this.getSprite().setTint(this.tint + 0xff0000);
         return this;
     }
 
     setValid() {
         this.getRectangle().setStrokeStyle(2, 0x0000ff);
-        this.getSprite().setTint(0xffffff);
+        this.getSprite().setTint(this.tint);
         return this;
     }
 }
