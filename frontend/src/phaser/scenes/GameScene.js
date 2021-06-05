@@ -303,16 +303,12 @@ class Player extends Phaser.GameObjects.Container {
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
         const avatar_number = avatar_chosen[2]
 
-        const col = avatar_sprite_sheet === '4' ?
-                        3*(avatar_number-1)%6
-                    :  3*(avatar_number-1)%12
-        const row = avatar_sprite_sheet === '4' ?
-                        (avatar_number === '3' || avatar_number === '4') ?
-                            4*8
-                        :   0
-                    :   (avatar_number === '1' || avatar_number === '2' || avatar_number === '3' || avatar_number === '4') ?
+        const col = 3*(avatar_number-1)%12
+        const row = (avatar_number === '1' || avatar_number === '2' || avatar_number === '3' || avatar_number === '4') ?
                             0
                         :   4 * 12
+        console.log(col)
+        console.log(row)
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, avatar_sprite_sheet, 1 + col + row)
@@ -349,19 +345,19 @@ class Player extends Phaser.GameObjects.Container {
         });
         this.getSprite().anims.create({
             key: 'left',
-            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+(avatar_sprite_sheet !== '4' ? 12 : 8), 1 + col + row+(avatar_sprite_sheet !== '4' ? 12 : 8), 2 + col + row+(avatar_sprite_sheet !== '4' ? 12 : 8)] }),
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+12, 1 + col + row+12, 2 + col + row+12] }),
             frameRate: 10,
             repeat: -1
         });
         this.getSprite().anims.create({
             key: 'right',
-            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+(avatar_sprite_sheet !== '4' ? 24 : 16), 1 + col + row+(avatar_sprite_sheet !== '4' ? 24 : 16), 2 + col + row+(avatar_sprite_sheet !== '4' ? 24 : 16)] }),
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+24, 1 + col + row+24, 2 + col + row+24] }),
             frameRate: 10,
             repeat: -1
         });
         this.getSprite().anims.create({
             key: 'up',
-            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+(avatar_sprite_sheet !== '4' ? 36 : 24), 1 + col + row+(avatar_sprite_sheet !== '4' ? 36 : 24), 2 + col + row+(avatar_sprite_sheet !== '4' ? 36 : 24)] }),
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+36, 1 + col + row+36, 2 + col + row+36] }),
             frameRate: 10,
             repeat: -1
         });

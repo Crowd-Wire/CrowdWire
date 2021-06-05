@@ -39,13 +39,13 @@ AVATAR_3_8 = "avatars_3_8"
 
 AVATAR_4_1 = "avatars_4_1"
 AVATAR_4_2 = "avatars_4_2"
-AVATAR_4_3 = "avatars_4_3"
-AVATAR_4_4 = "avatars_4_4"
+AVATAR_4_5 = "avatars_4_5"
+AVATAR_4_6 = "avatars_4_6"
 
 AVATARS_LIST = [AVATAR_1_1, AVATAR_1_2, AVATAR_1_3, AVATAR_1_4, AVATAR_1_5, AVATAR_1_6, AVATAR_1_7, AVATAR_1_8,
                 AVATAR_2_1, AVATAR_2_2, AVATAR_2_3, AVATAR_2_4, AVATAR_2_5, AVATAR_2_6, AVATAR_2_7, AVATAR_2_8,
                 AVATAR_3_1, AVATAR_3_2, AVATAR_3_3, AVATAR_3_4, AVATAR_3_5, AVATAR_3_6, AVATAR_3_7, AVATAR_3_8,
-                AVATAR_4_1, AVATAR_4_2, AVATAR_4_3, AVATAR_4_4]
+                AVATAR_4_1, AVATAR_4_2, AVATAR_4_5, AVATAR_4_6]
 
 # Role default permissions
 role_default_permissions = ['talk', 'walk', 'chat']
