@@ -154,7 +154,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     const conferences = this.state.conferences;
     const id = `C${ConferencesTab.curConference++}`;
     conferences[id] = {
-      name: `Conference #${id}`,
+      name: `Conference ${id}`,
       color: `#${intToHex(cyrb53Hash(id, 129))}`
     }
     const color = conferences[id].color;

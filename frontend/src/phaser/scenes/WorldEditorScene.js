@@ -43,7 +43,7 @@ class WorldEditorScene extends Scene {
             .filter((tileset) => tileset.name.startsWith('_conferenceC'))
             .forEach((tileset, index) => {
                 const cid = tileset.name.substr(12);
-                conferences[cid] = { name: `Conference ${index}`, color: `#${intToHex(cyrb53Hash(cid))}` };
+                conferences[cid] = { name: `Conference C${index}`, color: `#${intToHex(cyrb53Hash(cid))}` };
             });
         useWorldEditorStore.getState().setState({ conferences });
 
@@ -291,7 +291,7 @@ class WorldEditorScene extends Scene {
                         y = Math.Snap.Floor(worldPoint.y, 16);
 
                     const activeObject = useWorldEditorStore.getState().active.object;
-                    const rec = this.mapManager.objectProps[activeObject].body;
+                    const rec = this.mapManager.objectProps[activeObject]?.body;
 
                     this.preview.setPosition(x + 16, y + 16)
                         .setTexture(activeObject || '__DEFAULT')

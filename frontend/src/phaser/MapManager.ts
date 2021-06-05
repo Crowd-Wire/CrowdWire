@@ -203,7 +203,7 @@ class MapManager {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
-        console.log(new MapParser(this).toJson());
+        console.log(JSON.stringify(new MapParser(this).toJson()));
 
     }
 
@@ -246,8 +246,8 @@ class MapParser {
         const { name, properties } = layer,
             objects = this.objectGroups[name].children.entries.map((obj, index) => {
                 const { name, x, y, height, width, angle, data } = obj as GameObjects.Sprite,
-                    properties = Object.entries(data.list).map(([name, value]) =>
-                        ({ name, type: typeof value, value }));
+                    properties = data ? Object.entries(data.list).map(([name, value]) =>
+                        ({ name, type: typeof value, value })) : [];
                 return {
                     gid: id + index,
                     height,
@@ -288,7 +288,7 @@ class MapParser {
         const { firstgid, name, imageHeight, imageSpacing, imageWidth, total } = collection,
             tiles = collection.images.map((obj) => {
                 let objectgroup;
-                const rec = this.objectProps['name']?.body;
+                const rec = this.objectProps[name]?.body;
                 if (rec) {
                     const { x, y, width, height } = rec;
                     objectgroup = {
@@ -340,7 +340,7 @@ class MapParser {
     private tilesetImageToJson(tileset: Tilemaps.Tileset) {
         const { columns, firstgid, name, tileHeight, tileWidth,
             tileMargin, tileSpacing, tileProperties, total } = tileset,
-            image = this.tileLayerProps['name'].image,
+            image = this.tileLayerProps[name].image,
             tiles = Object.entries(tileProperties).map(([name, value], id) =>
                 ({ id, properties: { name, type: typeof value, value } }));
         return {
