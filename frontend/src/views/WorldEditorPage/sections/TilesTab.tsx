@@ -52,11 +52,16 @@ class TilesTab extends Component<{}, TilesTabState> {
 
     const tilesetTiles = {};
     for (const tileset of mapManager.map.tilesets) {
-      if (tileset.total != 0 && !tileset.name.startsWith('_')) {
-        // Not an object and not private
+      if (!tileset.name.startsWith('_')) {
+        // Not private
         const tiles = [],
           tilesetURL = mapManager.tilesetURL[tileset.name],
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
+        
+        if (!tilesetURL) {
+          // Not a tileset
+          break;
+        }
 
         for (let i = 0; i < rows; i++)
           for (let j = 0; j < columns; j++) {
