@@ -91,19 +91,18 @@ class CRUDStatistics:
 
         return data
 
-    def get_online_users_overtime(self, db: Session, start_date: date, end_date: date):
+    def get_online_users_overtime(self, db: Session, start_date: datetime, end_date: datetime):
 
-        data = {}
+        data = []
         # temp_date = datetime.combine(date.today(), datetime.min.time())
-        n_days = end_date - start_date
-        for i in range(n_days.days):
-            temp_start = end_date - timedelta(days=i)
-            temp_end = end_date - timedelta(days=i - 1)
+        n_hours = int((end_date - start_date).total_seconds() // 3600)
+        for i in range(n_hours + 1):
+            temp_start = start_date + timedelta(hours=i)
+            temp_end = start_date + timedelta(hours=i + 1)
             users = db.query(func.count(distinct(Event.user_id))).filter(
                 Event.event_type == protocol.JOIN_PLAYER,
                 Event.timestamp.between(temp_start, temp_end)).scalar()
-            data[str(temp_start)] = users
-
+            data.append({str(temp_start): users})
         return data
 
 

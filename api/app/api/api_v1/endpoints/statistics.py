@@ -1,5 +1,5 @@
 from typing import Union
-from datetime import date
+from datetime import date, datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import models, schemas, crud
@@ -40,8 +40,8 @@ async def get_world_statistics(
 
 @router.get("/charts")
 def get_platform_charts(
-        start_date: date,
-        end_date: date = date.today(),
+        start_date: datetime,
+        end_date: datetime = datetime.today(),
         db: Session = Depends(deps.get_db),
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ):
