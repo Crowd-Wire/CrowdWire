@@ -297,16 +297,11 @@ class Player extends Phaser.GameObjects.Container {
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
         } else {
-            console.log(usePlayerStore.getState().users_info)
-            console.log(user_id)
-            console.log(typeof(user_id))
             avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
         const avatar_number = avatar_chosen[2]
-        console.log(avatar_sprite_sheet)
-        console.log(avatar_number)
 
         const col = avatar_sprite_sheet === '4' ?
                         3*(avatar_number-1)%6
@@ -346,8 +341,6 @@ class Player extends Phaser.GameObjects.Container {
 
         this.body.onWorldBounds = true; // not sure if this is important
         
-        console.log(col)
-        console.log(row)
         this.getSprite().anims.create({
             key: 'down',
             frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row, 1 + col + row, 2 + col + row] }),
