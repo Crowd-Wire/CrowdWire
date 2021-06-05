@@ -279,7 +279,7 @@ export default function DashDrawer(props){
               <ListItemIcon>
                 <DashboardIcon className={classes.iconDrawer}/>
               </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="PLATFORM DASHBOARD"
+              <ListItemText style={{ color: '#FFFFFF' }} primary="DASHBOARD"
                 className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
               </ListItem>
 
@@ -332,7 +332,7 @@ export default function DashDrawer(props){
               <ListItemIcon>
                 <PersonIcon className={classes.iconDrawer}/>
               </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="USER STATISTICS"
+              <ListItemText style={{ color: '#FFFFFF' }} primary="USER"
                 className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
               </ListItem>
 
