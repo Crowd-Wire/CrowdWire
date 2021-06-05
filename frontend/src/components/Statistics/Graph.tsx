@@ -63,7 +63,6 @@ export const Graph = () => {
             return res.json();
         })
         .then((res) =>{
-          console.log(res)
           if (res){
             for (let i = 0; i < res.length; i++) {
               for (const [key, value] of Object.entries(res[i])) {
@@ -80,7 +79,6 @@ export const Graph = () => {
                   return res.json();
               })
               .then((res) =>{
-                console.log(res)
                 if (res){
                   for (let i = 0; i < res.length; i++) {
                     for (const [key, value] of Object.entries(res[i])) {
