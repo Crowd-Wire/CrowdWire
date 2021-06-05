@@ -1,5 +1,5 @@
 from typing import Union
-from datetime import date, datetime
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app import models, schemas, crud

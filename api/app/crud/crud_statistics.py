@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta, date
-
+from datetime import datetime, timedelta
 from app.core.consts import WebsocketProtocol as protocol
 from sqlalchemy.orm import Session
 from sqlalchemy import func, distinct
