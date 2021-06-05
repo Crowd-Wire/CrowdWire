@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta, date
+
+from app.core.consts import WebsocketProtocol as protocol
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, distinct
 from app.redis import redis_connector
 from app.core import consts
 from app import schemas
-from app.models import World, User, Report_User, Report_World, World_User
+from app.models import World, User, Report_User, Report_World, World_User, Event
 
 """
 Statistics dont follow the same CRUD Rules from the Base Class
@@ -57,6 +60,51 @@ class CRUDStatistics:
             **{'total_users': total_users, 'online_users': online_users, 'reports': reports,
                'total_n_joins': total_n_joins, 'world_id': world_id}
         )
+
+    def get_users_registers_overtime(self, db: Session):
+        """
+        Retrieves the number of registers over the past the week
+        """
+
+        users_data = {}
+
+        temp_date = datetime.combine(date.today(), datetime.min.time())
+        for i in range(7):
+            start_date = temp_date - timedelta(days=i)
+            end_date = temp_date - timedelta(days=i - 1)
+            users = db.query(func.count(User.user_id)).filter(User.register_date.between(start_date, end_date)).scalar()
+            users_data[str(start_date)] = users
+
+        return users_data
+
+    def get_user_join_world_overtime(self, db: Session, world_id: int):
+
+        data = {}
+        temp_date = datetime.combine(date.today(), datetime.min.time())
+        for i in range(7):
+            start_date = temp_date - timedelta(days=i)
+            end_date = temp_date - timedelta(days=i - 1)
+            users = db.query(World_User).filter(World_User.world_id == world_id,
+                                                World_User.join_date.between(start_date, end_date)) \
+                .with_entities(func.count()).scalar()
+            data[str(start_date)] = users
+
+        return data
+
+    def get_online_users_overtime(self, db: Session, start_date: date, end_date: date):
+
+        data = {}
+        # temp_date = datetime.combine(date.today(), datetime.min.time())
+        n_days = end_date - start_date
+        for i in range(n_days.days):
+            temp_start = end_date - timedelta(days=i)
+            temp_end = end_date - timedelta(days=i - 1)
+            users = db.query(func.count(distinct(Event.user_id))).filter(
+                Event.event_type == protocol.JOIN_PLAYER,
+                Event.timestamp.between(temp_start, temp_end)).scalar()
+            data[str(temp_start)] = users
+
+        return data
 
 
 crud_statistics = CRUDStatistics()
