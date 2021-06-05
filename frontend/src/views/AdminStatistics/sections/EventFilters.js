@@ -40,7 +40,10 @@ export default function EventFilters(props){
     const inputLabel = React.useRef(null);
     const [labelWidth, setLabelWidth] = useState(0);
     React.useEffect(() => {
-    setLabelWidth(inputLabel.current.offsetWidth);
+        setLabelWidth(inputLabel.current.offsetWidth);
+        props.handler(
+            eventstypes,world,startDate,endDate,ordering
+        )
     }, []);
     const handleWorldIdChange = event => {
         setWorld(event.target.value);

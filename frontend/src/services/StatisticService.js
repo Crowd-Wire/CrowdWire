@@ -18,7 +18,7 @@ class StatisticService {
         let query = "?start_date=" + start_date
         if (end_date)
             query += "&end_date=" + end_date
-        return fetch(API_BASE + 'statistics/charts' + query, {
+        return fetch(API_BASE + 'statistics/charts/active-users' + query, {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -26,27 +26,12 @@ class StatisticService {
             }
         })
     }
-
-
-    getNewWorldJoinsCharts(start_date, end_date) {
-        let query = "?start_date=" + start_date
-        if (end_date)
-            query += "&end_date=" + end_date
-        return fetch(API_BASE + 'statistics/charts' + query, {
-            method: 'GET',
-            mode: 'cors',
-            headers: {
-                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
-            }
-        })
-    }
-
 
     getNewRegisteredUsersCharts(start_date, end_date) {
         let query = "?start_date=" + start_date
         if (end_date)
             query += "&end_date=" + end_date
-        return fetch(API_BASE + 'statistics/charts' + query, {
+        return fetch(API_BASE + 'statistics/charts/new-users' + query, {
             method: 'GET',
             mode: 'cors',
             headers: {

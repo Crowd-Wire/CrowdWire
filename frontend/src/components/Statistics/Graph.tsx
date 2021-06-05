@@ -37,48 +37,80 @@ export const Graph = () => {
     {
       label: "Active Users",
       datums: [],
-    }
+    },
+    {
+      label: "New Users",
+      datums: [],
+    },
   ])
-  const [activeUsers, setActiveUsers] = useState(undefined);
   const [loading, setLoading] = useState(1)
   const [axes, setAxes] = useState([])
   const navigation = useNavigate();
-  const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(new Date());
-
+  const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
-    const datums = []
+    startDate.setDate(startDate.getDate() - 7)
+  }, [])
 
-    StatisticService.getActiveOnlineUsersCharts("2021-06-01T00:00:00.000")
+  useEffect(() => {
+    const datums1 = []
+    const datums2 = []
+
+    StatisticService.getActiveOnlineUsersCharts(startDate.toISOString(), endDate.toISOString())
         .then((res) =>{
-            if (res.status === 200)
-              return res.json();
+          if (res.status === 200)
+            return res.json();
         })
         .then((res) =>{
-          console.log(res)
           if (res){
             for (let i = 0; i < res.length; i++) {
               for (const [key, value] of Object.entries(res[i])) {
                 //@ts-ignore
                 let key_final = key.replace(" ", 'T')
-                key_final = key_final.substring(0, key_final.length-3)
-                key_final += 'Z'
-                datums.push({x: new Date(key), y: value})
+                key_final = key_final.substring(0, key_final.length-15)
+                key_final += '00.000Z'
+                datums1.push({x: new Date(key_final), y: value})
               }
             }
+            StatisticService.getNewRegisteredUsersCharts(startDate.toISOString(), endDate.toISOString())
+              .then((res) =>{
+                if (res.status === 200)
+                  return res.json();
+              })
+              .then((res) =>{
+                if (res){
+                  for (let i = 0; i < res.length; i++) {
+                    for (const [key, value] of Object.entries(res[i])) {
+                      //@ts-ignore
+                      let key_final = key.replace(" ", 'T')
+                      key_final = key_final.substring(0, key_final.length-15)
+                      key_final += '00.000Z'
+                      datums2.push({x: new Date(key_final), y: value})
+                    }
+                  }
+                  setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
+            
+                  setData([
+                    {
+                      label: "Active Users",
+                      datums: datums1,
+                    },
+                    {
+                      label: "New Users",
+                      datums: datums2,
+                    }
+                  ])
+                
+                  setLoading(0)
       
-            setData([
-              {
-                label: "Active Users",
-                datums: datums,
-              }
-            ])
-            setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
-            setLoading(0)
+                }
+              })
           }
         })
-  }, []);
+    
+
+  }, [startDate, endDate]);
 
   if (loading) {
     return (
@@ -97,7 +129,7 @@ export const Graph = () => {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          padding: '12px',
+          padding: '18px',
           height: '100%',
           width: '100%',
           background: 'rgba(0, 27, 45, 0.9)'
@@ -121,8 +153,8 @@ export const Graph = () => {
           }}>
           <MuiThemeProvider theme={customTheme}>
             <MuiPickersUtilsProvider  utils={DateFnsUtils}>
-              <DateTimePicker label="Start Date" value={startDate} onChange={setStartDate} style={{color: 'white'}}/>
-              <DateTimePicker label="End Date" value={endDate} onChange={setEndDate} style={{color: 'white'}}/>
+                <DateTimePicker label="Start Date" value={startDate} onChange={setStartDate} style={{color: 'white'}}/>
+                <DateTimePicker label="End Date" value={endDate} onChange={setEndDate} style={{color: 'white'}}/>
             </MuiPickersUtilsProvider>
           </MuiThemeProvider>
         </div>
