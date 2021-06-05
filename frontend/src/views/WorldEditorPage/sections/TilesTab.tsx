@@ -55,10 +55,10 @@ class TilesTab extends Component<{}, TilesTabState> {
       if (!tileset.name.startsWith('_')) {
         // Not private
         const tiles = [],
-          tilesetURL = mapManager.tilesetURL[tileset.name],
+          tilesetImage = mapManager.tileLayerProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
         
-        if (!tilesetURL) {
+        if (!tilesetImage) {
           // Not a tileset
           break;
         }
@@ -66,7 +66,7 @@ class TilesTab extends Component<{}, TilesTabState> {
         for (let i = 0; i < rows; i++)
           for (let j = 0; j < columns; j++) {
             const id = (firstgid + i * columns + j).toString();
-            const imageURL = API_BASE + "static/maps/" + tilesetURL;
+            const imageURL = API_BASE + "static/maps/" + tilesetImage;
             const style = {
               backgroundImage: `url(${imageURL})`,
               backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,

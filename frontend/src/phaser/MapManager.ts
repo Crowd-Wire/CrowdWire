@@ -10,6 +10,14 @@ enum MapManagerState {
 }
 
 
+interface TileLayerProps {
+    image: string,
+}
+
+interface ObjectProps {
+    body?: Geom.Rectangle,
+}
+
 class MapManager {
     static _instance: MapManager;
 
@@ -18,11 +26,10 @@ class MapManager {
     private worldId: number;
     private conferenceMap: Record<number, string>;
 
-    public tilesetKeys: string[];
-    public objectKeys: string[];
-    public tilesetURL: Record<string, string>;
-    public objectBody: Record<string, Geom.Rectangle>;
     public map: Tilemaps.Tilemap;
+    public tileLayerProps: Record<string, TileLayerProps>;
+    public objectProps: Record<string, ObjectProps>;
+    public objectGroups: Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup>;
 
     constructor() {
         if (!MapManager._instance) {
@@ -38,29 +45,26 @@ class MapManager {
     loadMap(scene: Scene): void {
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
-        this.tilesetKeys = [];
-        this.objectKeys = [];
-        this.tilesetURL = {};
-        this.objectBody = {};
+        this.tileLayerProps = {};
+        this.objectProps = {};
         this.mapJson.tilesets.forEach((tileset) => {
             if ('grid' in tileset) {
-                // object layer
+                // Object layer
                 tileset.tiles.forEach((tile) => {
-                    const tilesetName = tile.image;
-                    scene.load.image(tilesetName, API_BASE + "static/maps/" + tile.image);
-                    this.objectKeys.push(tilesetName);
+                    const name = tile.image;
+                    scene.load.image(name, API_BASE + "static/maps/" + tile.image);
+                    this.objectProps[name] = {};
                     if ('objectgroup' in tile) {
-                        // custom object collider
+                        // Custom object collider
                         const { x, y, width, height } = tile.objectgroup.objects[0];
-                        this.objectBody[tilesetName] = { x, y, width, height } as Geom.Rectangle;
+                        this.objectProps[name].body = { x, y, width, height } as Geom.Rectangle;
                     }
                 })
             } else {
-                // tile layer
-                const tilesetName = tileset.name;
-                scene.load.spritesheet(tilesetName, API_BASE + "static/maps/" + tileset.image, { frameWidth: 32, frameHeight: 32 });
-                this.tilesetKeys.push(tilesetName);
-                this.tilesetURL[tilesetName] = tileset.image;
+                // Tile layer
+                const { name, image } = tileset;
+                scene.load.spritesheet(name, API_BASE + "static/maps/" + image, { frameWidth: 32, frameHeight: 32 });
+                this.tileLayerProps[name] = { image };
             }
         })
         this.state = MapManagerState.LOADED;
@@ -72,16 +76,16 @@ class MapManager {
 
         this.map = scene.add.tilemap('map');
 
-        // add tileset images
+        // Add tileset images
         const tilesets: Tilemaps.Tileset[] = []
-        this.tilesetKeys.forEach((key) => {
+        Object.keys(this.tileLayerProps).forEach((key) => {
             tilesets.push(this.map.addTilesetImage(key));
         });
-        this.objectKeys.forEach((key) => {
+        Object.keys(this.objectProps).forEach((key) => {
             this.map.addTilesetImage(key);
         });
 
-        // create tile layers with tileset images
+        // Create tile layers with tileset images
         this.map.layers.forEach((layer) => {
             this.map.createLayer(layer.name, tilesets);
         })
@@ -106,24 +110,28 @@ class MapManager {
         // sprites in the group don't move via gravity or by player collisions
         const collisionGroup = scene.physics.add.staticGroup(
             collisionObjects,
-        );
+        ).setName('ObjectCollision');
 
         const group = scene.physics.add.group(
             objects,
-        );
+        ).setName('Object');
 
         (<GameObjects.Sprite[]>collisionGroup.getChildren().concat(group.getChildren()))
             .forEach((obj) => {
-                if (obj.texture.key in this.objectBody) {
+                const rec = this.objectProps[obj.texture.key]?.body
+                if (rec) {
                     // has custom collider
-                    const { x, y, width, height } = this.objectBody[obj.texture.key];
+                    const { x, y, width, height } = rec;
                     const body = obj.body as Phaser.Physics.Arcade.Body;
                     body.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(body.y);
                 }
             })
         console.log(this.map)
-        return { 'Object': group, 'ObjectCollision': collisionGroup };
+        this.objectGroups = { 'Object': group, 'ObjectCollision': collisionGroup };
+
+        console.log(this.objectGroups)
+        return this.objectGroups;
     }
 
     /**
@@ -195,8 +203,195 @@ class MapManager {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
-        console.log('Save', this.worldId)
+        console.log(new MapParser(this).toJson());
+
     }
+
+
+}
+
+
+class MapParser {
+    private map: Tilemaps.Tilemap;
+    private tileLayerProps: Record<string, TileLayerProps>;
+    private objectProps: Record<string, ObjectProps>;
+    private objectGroups: Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup>;
+
+    constructor(mapManager: MapManager) {
+        this.map = mapManager.map;
+        this.tileLayerProps = mapManager.tileLayerProps;
+        this.objectProps = mapManager.objectProps;
+        this.objectGroups = mapManager.objectGroups;
+    }
+
+    private tileLayerToJson(id: number, layer: Tilemaps.LayerData) {
+        const { name, height, width, properties } = layer,
+            data = layer.data.flat().map((tile) => tile.index > 0 ? tile.index : 0)
+        return {
+            data,
+            height,
+            id,
+            name,
+            opacity: 1,
+            properties,
+            type: 'tilelayer',
+            visible: true,
+            width,
+            x: 0,
+            y: 0,
+        }
+    }
+
+    private objectLayerToJson(id: number, layer: Tilemaps.ObjectLayer) {
+        const { name, properties } = layer,
+            objects = this.objectGroups[name].children.entries.map((obj, index) => {
+                const { name, x, y, height, width, angle, data } = obj as GameObjects.Sprite,
+                    properties = Object.entries(data.list).map(([name, value]) =>
+                        ({ name, type: typeof value, value }));
+                return {
+                    gid: id + index,
+                    height,
+                    id: 21,
+                    name,
+                    properties,
+                    rotation: angle,
+                    type: '',
+                    visible: true,
+                    width,
+                    x,
+                    y,
+                }
+            });
+        return {
+            draworder: 'topdown',
+            id,
+            name,
+            objects,
+            opacity: 1,
+            properties,
+            type: 'objectgroup',
+            visible: true,
+            x: 0,
+            y: 0,
+        }
+    }
+
+    private layersToJson(): any[] {
+        const { layers, objects } = this.map;
+        let id = 1;
+        const tileLayers: any[] = layers.map((layer) => this.tileLayerToJson(id++, layer));
+        const objectLayers: any[] = objects.map((layer) => this.objectLayerToJson(id++, layer));
+        return tileLayers.concat(objectLayers);
+    }
+
+    private collectionImageToJson(collection: Tilemaps.ImageCollection) {
+        const { firstgid, name, imageHeight, imageSpacing, imageWidth, total } = collection,
+            tiles = collection.images.map((obj) => {
+                let objectgroup;
+                const rec = this.objectProps['name']?.body;
+                if (rec) {
+                    const { x, y, width, height } = rec;
+                    objectgroup = {
+                        draworder: 'index',
+                        name: '',
+                        objects: [
+                            {
+                                height,
+                                id: 2,
+                                name: '',
+                                rotation: 0,
+                                type: '',
+                                visible: true,
+                                width,
+                                x,
+                                y,
+                            }],
+                        opacity: 1,
+                        type: 'objectgroup',
+                        visible: true,
+                        x: 0,
+                        y: 0,
+                    }
+                }
+                return {
+                    id: obj.gid - firstgid,
+                    image: obj.image,
+                    objectgroup,
+                    // imageheight,
+                    // imagewidth,
+                    properties: [],
+                    type: ''
+                }
+            })
+        return {
+            // columns,
+            firstgid,
+            grid: { height: 1, orientation: "orthogonal", width: 1 },
+            // margin,
+            name,
+            spacing: imageSpacing,
+            tilecount: total,
+            tileheight: imageHeight,
+            tiles,
+            tilewidth: imageWidth,
+        }
+    }
+
+    private tilesetImageToJson(tileset: Tilemaps.Tileset) {
+        const { columns, firstgid, name, tileHeight, tileWidth,
+            tileMargin, tileSpacing, tileProperties, total } = tileset,
+            image = this.tileLayerProps['name'].image,
+            tiles = Object.entries(tileProperties).map(([name, value], id) =>
+                ({ id, properties: { name, type: typeof value, value } }));
+        return {
+            columns,
+            firstgid,
+            image,
+            // imageheight,
+            // imagewidth,
+            margin: tileMargin,
+            name,
+            properties: [],
+            spacing: tileSpacing,
+            tilecount: total,
+            tileheight: tileHeight,
+            tiles,
+            tilewidth: tileWidth,
+            transparentcolor: '#ff0000'
+        }
+    }
+
+    private tilesetsToJson() {
+        const { tilesets, imageCollections } = this.map;
+        const tilesetImages: any[] = tilesets.filter((tileset) => tileset.name in this.tileLayerProps)
+            .map((tileset) => this.tilesetImageToJson(tileset));
+        const collectionImages: any[] = imageCollections
+            .map((collection) => this.collectionImageToJson(collection));
+        return tilesetImages.concat(collectionImages);
+    }
+
+    toJson(): any {
+        const { width, height, tileWidth, tileHeight, properties, renderOrder } = this.map;
+        return {
+            compressionlevel: -1,
+            height,
+            infinite: false,
+            layers: this.layersToJson(),
+            nextlayerid: 8,
+            nextobjectid: 24,
+            orientation: "orthogonal",
+            properties,
+            renderorder: renderOrder,
+            tiledversion: "1.4.2",
+            tileheight: tileHeight,
+            tilesets: this.tilesetsToJson(),
+            tilewidth: tileWidth,
+            type: "map",
+            version: 1.4,
+            width,
+        }
+    }
+
 }
 
 export default MapManager;

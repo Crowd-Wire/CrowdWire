@@ -124,26 +124,26 @@ class EditorNavbar extends React.Component {
               Zoom Out <span>E</span>
             </Dropdown.Item>
             <Dropdown.Divider />
-            <Dropdown.Item 
-              className={classes.dropdownItem} eventKey="3" name="grid" 
+            <Dropdown.Item
+              className={classes.dropdownItem} eventKey="3" name="grid"
               onClick={this.handleChange}
             >
-              Show Grid 
+              Show Grid
               {grid ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
             </Dropdown.Item>
-            <Dropdown.Item 
-              className={classes.dropdownItem} eventKey="4" name="highlight" 
+            <Dropdown.Item
+              className={classes.dropdownItem} eventKey="4" name="highlight"
               onClick={this.handleChange}
             >
-              Highlight Selected Layers 
+              Highlight Selected Layers
               {highlight ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
         <div style={{ flexGrow: 1 }}></div>
-        <div 
-          className={classNames(classes.navbarItem, {[classes.navbarItemDisable]: !save })} 
-          onClick={save && this.handleSave}
+        <div
+          className={classNames(classes.navbarItem, { [classes.navbarItemDisable]: !save })}
+          onClick={() => { save && this.handleSave() }}
         >
           Save
         </div>

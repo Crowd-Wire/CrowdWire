@@ -291,7 +291,7 @@ class WorldEditorScene extends Scene {
                         y = Math.Snap.Floor(worldPoint.y, 16);
 
                     const activeObject = useWorldEditorStore.getState().active.object;
-                    const rec = this.mapManager.objectBody[activeObject];
+                    const rec = this.mapManager.objectProps[activeObject].body;
 
                     this.preview.setPosition(x + 16, y + 16)
                         .setTexture(activeObject || '__DEFAULT')
@@ -311,7 +311,6 @@ class WorldEditorScene extends Scene {
                                 this.flag && console.log(i, j)
                                 const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
                                 if (tile) {
-                                    console.log(tile.x, tile.y)
                                     return false;
                                 }
                             }
