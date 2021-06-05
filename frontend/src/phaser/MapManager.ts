@@ -15,6 +15,7 @@ interface TileLayerProps {
 }
 
 interface ObjectProps {
+    gid: number;
     body?: Geom.Rectangle,
 }
 
@@ -53,7 +54,7 @@ class MapManager {
                 tileset.tiles.forEach((tile) => {
                     const name = tile.image;
                     scene.load.image(name, API_BASE + "static/maps/" + tile.image);
-                    this.objectProps[name] = {};
+                    this.objectProps[name] = { gid: tileset.firstgid + tile.id };
                     if ('objectgroup' in tile) {
                         // Custom object collider
                         const { x, y, width, height } = tile.objectgroup.objects[0];
@@ -245,21 +246,22 @@ class MapParser {
     private objectLayerToJson(id: number, layer: Tilemaps.ObjectLayer) {
         const { name, properties } = layer,
             objects = this.objectGroups[name].children.entries.map((obj, index) => {
-                const { name, x, y, height, width, angle, data } = obj as GameObjects.Sprite,
+                const { name, x, y, height, width, angle, data, texture } = obj as GameObjects.Sprite,
                     properties = data ? Object.entries(data.list).map(([name, value]) =>
-                        ({ name, type: typeof value, value })) : [];
+                        ({ name, type: typeof value, value })) : [],
+                    gid = this.objectProps[texture.key].gid;
                 return {
-                    gid: id + index,
+                    gid,
                     height,
-                    id: 21,
+                    // id,
                     name,
                     properties,
                     rotation: angle,
                     type: '',
                     visible: true,
                     width,
-                    x,
-                    y,
+                    x: x - width / 2,
+                    y: y + height / 2,
                 }
             });
         return {
@@ -288,7 +290,7 @@ class MapParser {
         const { firstgid, name, imageHeight, imageSpacing, imageWidth, total } = collection,
             tiles = collection.images.map((obj) => {
                 let objectgroup;
-                const rec = this.objectProps[name]?.body;
+                const rec = this.objectProps[obj.image]?.body;
                 if (rec) {
                     const { x, y, width, height } = rec;
                     objectgroup = {
@@ -377,8 +379,8 @@ class MapParser {
             height,
             infinite: false,
             layers: this.layersToJson(),
-            nextlayerid: 8,
-            nextobjectid: 24,
+            // nextlayerid,
+            // nextobjectid,
             orientation: "orthogonal",
             properties,
             renderorder: renderOrder,
