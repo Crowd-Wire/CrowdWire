@@ -53,7 +53,6 @@ export default function AdminUsers() {
     const [userReports, setUserReports] = useState(0);
     const [worldReports, setWorldReports] = useState(0);
     const [onlineUsers, setOnlineUsers] = useState(0);
-    const [activeUsers, setActiveUsers] = useState(undefined);
     const navigation = useNavigate();
 
     
@@ -157,7 +156,7 @@ export default function AdminUsers() {
             </Grid>
             <Grid item xs={12} style={{paddingTop: 50, paddingBottom: 50}} >
               <Card glass outlined bordered style={{height: 400, overflow: 'hidden', width: '100%'}}>
-                <Graph active_users={activeUsers}/>
+                <Graph />
               </Card>
             </Grid>
             <Grid item xs={4} className={classes.item}>

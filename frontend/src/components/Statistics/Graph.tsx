@@ -8,6 +8,29 @@ import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
+import StatisticService from 'services/StatisticService';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core'
+
+
+export const customTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#0359ff',
+    }
+  },
+  overrides: {
+    MuiInputBase: {
+      input: {
+        color: 'white'
+      },
+    },
+    MuiFormLabel: {
+      root: {
+        color: 'white',
+      },
+    },
+  }
+})
 
 export const Graph = () => {
   const [data, setData] = useState([
@@ -21,9 +44,12 @@ export const Graph = () => {
   const [axes, setAxes] = useState([])
   const navigation = useNavigate();
   const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(new Date());
 
 
   useEffect(() => {
+    const datums = []
+
     StatisticService.getActiveOnlineUsersCharts("2021-06-01T00:00:00.000")
         .then((res) =>{
             if (res.status === 200)
@@ -31,31 +57,28 @@ export const Graph = () => {
         })
         .then((res) =>{
           console.log(res)
-          setActiveUsers(res)
+          if (res){
+            for (let i = 0; i < res.length; i++) {
+              for (const [key, value] of Object.entries(res[i])) {
+                //@ts-ignore
+                let key_final = key.replace(" ", 'T')
+                key_final = key_final.substring(0, key_final.length-3)
+                key_final += 'Z'
+                datums.push({x: new Date(key), y: value})
+              }
+            }
+      
+            setData([
+              {
+                label: "Active Users",
+                datums: datums,
+              }
+            ])
+            setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
+            setLoading(0)
+          }
         })
-
-    const datums = []
-    if (active_users) {
-      for (let i = 0; i < active_users.length; i++) {
-        for (const [key, value] of Object.entries(active_users[i])) {
-          //@ts-ignore
-          let key_final = key.replace(" ", 'T')
-          key_final = key_final.substring(0, key_final.length-3)
-          key_final += 'Z'
-          datums.push({x: new Date(key), y: value})
-        }
-      }
-
-      setData([
-        {
-          label: "Active Users",
-          datums: datums,
-        }
-      ])
-      setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
-      setLoading(0)
-    }
-  }, [active_users]);
+  }, []);
 
   if (loading) {
     return (
@@ -84,17 +107,24 @@ export const Graph = () => {
           style={{
             flex: '0 0 auto',
             padding: '10px',
+            paddingBottom: 0
           }}
         >
           <Typography variant="h6" component="h6" gutterBottom  style={{fontWeight: 600, color: 'white'}}>
-            Active Online Users
+            Platform Activity
           </Typography>
-          <MuiPickersUtilsProvider  utils={DateFnsUtils}>
-            <DateTimePicker label="Start Date" value={startDate} onChange={setStartDate} />
-          </MuiPickersUtilsProvider>
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
-            <DateTimePicker label="End Date" value={endDate} onChange={setEndDate} />
-          </MuiPickersUtilsProvider>
+        </div>
+        <div
+          style={{
+            flex: '0 0 auto',
+            margin: 'auto'
+          }}>
+          <MuiThemeProvider theme={customTheme}>
+            <MuiPickersUtilsProvider  utils={DateFnsUtils}>
+              <DateTimePicker label="Start Date" value={startDate} onChange={setStartDate} style={{color: 'white'}}/>
+              <DateTimePicker label="End Date" value={endDate} onChange={setEndDate} style={{color: 'white'}}/>
+            </MuiPickersUtilsProvider>
+          </MuiThemeProvider>
         </div>
         <div
           style={{
