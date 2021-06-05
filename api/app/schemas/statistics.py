@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Any
 
 
 class GlobalStatistics(BaseModel):
@@ -15,3 +16,4 @@ class WorldStatistics(BaseModel):
     online_users: int
     reports: int
     total_n_joins: int
+    user_joined_overtime: List[Any]
