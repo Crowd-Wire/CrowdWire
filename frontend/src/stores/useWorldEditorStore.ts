@@ -47,6 +47,7 @@ const useWorldEditorStore = create(
             ready: false,
             grid: false,
             highlight: false,
+            save: false,
             activeLayer: null,
             active: {} as Active,
             tiles: {} as Record<string, Tile>,

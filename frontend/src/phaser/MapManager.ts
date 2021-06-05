@@ -191,9 +191,11 @@ class MapManager {
         (<any>conferenceLayer).setTilesets(conferenceLayer.tileset);
     }
 
-    saveMap(): void {
+    async saveMap(): Promise<void> {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
+
+        console.log('Save', this.worldId)
     }
 }
 

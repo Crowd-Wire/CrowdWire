@@ -12,6 +12,10 @@ const editorNavbarStyle = {
         padding: '0 20px',
         cursor: 'pointer',
     },
+    navbarItemDisable: {
+        opacity: 0.5,
+        cursor: 'default',
+    },
     dropdownItem: {
         display: 'flex',
         fontSize: 15,

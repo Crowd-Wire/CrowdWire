@@ -42,7 +42,6 @@ const toast_props = {
 }
 
 
-
 class WorldEditorPage extends React.Component {
 
   constructor(props) {

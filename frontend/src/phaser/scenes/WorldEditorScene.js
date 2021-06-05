@@ -47,9 +47,6 @@ class WorldEditorScene extends Scene {
             });
         useWorldEditorStore.getState().setState({ conferences });
 
-        // Emit READY to dependent components
-        useWorldEditorStore.getState().setState({ ready: true });
-
         const width = this.map.widthInPixels,
             height = this.map.heightInPixels,
             margin = 100,
@@ -89,6 +86,7 @@ class WorldEditorScene extends Scene {
 
         this.preview = new PreviewSprite(this, 0, 0);
         this.mouseClick = true;
+        this.save = false;
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
@@ -108,9 +106,15 @@ class WorldEditorScene extends Scene {
         this.subscriptions.push(useWorldEditorStore.subscribe(
             (grid) => { grid1.showOutline = grid2.showOutline = grid }, state => state.grid));
 
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (save) => { this.save = save }, state => state.save));
+
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
+
+        // Emit READY to dependent components
+        useWorldEditorStore.getState().setState({ ready: true });
 
         this.flag = false;
         this.input.keyboard.on('keydown-P', () => {
@@ -244,6 +248,7 @@ class WorldEditorScene extends Scene {
                         case ToolType.DRAW:
                             if (activeGid) {
                                 if (isDown) {
+                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
                                 }
@@ -252,6 +257,7 @@ class WorldEditorScene extends Scene {
                             break;
                         case ToolType.ERASE:
                             if (isDown) {
+                                !this.save && useWorldEditorStore.getState().setState({ save: true });
                                 activeLayer.fill(-1, tileX, tileY, 1, 1);
                             }
                             return true;
@@ -266,6 +272,7 @@ class WorldEditorScene extends Scene {
                         case ToolType.FILL:
                             if (activeGid) {
                                 if (isDown) {
+                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
                                 }
                                 return true;
@@ -297,7 +304,7 @@ class WorldEditorScene extends Scene {
                         // Check object on world bounds
                         if (x < 0 || this.map.widthInPixels < x + width || y < 0 || this.map.heightInPixels < y + height)
                             return false;
-                        
+
                         // Check collision with collidable tiles
                         for (let i = x; i < x + width; i += 16)
                             for (let j = y; j < y + height; j += 16) {
@@ -308,13 +315,14 @@ class WorldEditorScene extends Scene {
                                     return false;
                                 }
                             }
-                        
+
                         // Check collision with objects
                         const hovered = this.physics.overlapRect(
                             x + 1, y + 1, width - 2, height - 2, true, true);
                         if (hovered.length < 2) {
                             if (this.input.manager.activePointer.isDown) {
                                 if (this.mouseClick) {
+                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     let obj = this.add.sprite(this.preview.x, this.preview.y, activeObject);
                                     activeObjectGroup.add(obj);
                                     const { width, height, offset } = this.preview.body;

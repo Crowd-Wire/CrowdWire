@@ -168,7 +168,7 @@ class LayersTab extends Component<{}, LayersTabState> {
           .filter(([_, l]) => l.active)
           .map(([name, _]) => name) as string[]
       )
-    })
+    });
   }
 
   componentWillUnmount() {
