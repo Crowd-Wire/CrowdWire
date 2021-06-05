@@ -26,6 +26,7 @@ import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import usePlayerStore from "stores/usePlayerStore";
 
 
 interface State {
@@ -235,8 +236,8 @@ export default class RoomCall extends React.Component<{}, State> {
                      
                       let item = <></>
                       let username = peerId;
-                      if (peerId in useWorldUserStore.getState().users_info) {
-                        username = useWorldUserStore.getState().users_info[peerId].username;
+                      if (peerId in usePlayerStore.getState().users_info) {
+                        username = usePlayerStore.getState().users_info[peerId].username;
                       }
                       if (consumerMedia)
                         item = (

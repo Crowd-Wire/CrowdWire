@@ -284,18 +284,36 @@ class Player extends Phaser.GameObjects.Container {
     lastVelocity;
     ws = getSocket(useWorldUserStore.getState().world_user.world_id);
 
-    constructor(scene, x, y) {
+    constructor(scene, x, y, user_id=null) {
         super(scene, x, y);
 
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
         scene.physics.add.collider(this, [scene.collisionLayer, scene.collisionGroup]);
+        
+        let avatar_chosen_sprite = "avatars_1_1"
+
+        if (user_id == null) {
+            avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
+        } else {
+            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
+        }
+        let avatar_chosen = avatar_chosen_sprite.split('_')
+        const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
+        const avatar_number = avatar_chosen[2]
+
+        const col = 3*(avatar_number-1)%12
+        const row = (avatar_number === '1' || avatar_number === '2' || avatar_number === '3' || avatar_number === '4') ?
+                            0
+                        :   4 * 12
+        console.log(col)
+        console.log(row)
 
         // add sprite and text to scene and then container
-        const sprite = scene.add.sprite(0, 0, 'player', 6)
+        const sprite = scene.add.sprite(0, 0, avatar_sprite_sheet, 1 + col + row)
             .setOrigin(0.5)
-            .setScale(2);
+            .setScale(0.8);
         const text = scene.add.bitmapText(0, -32, 'atari', '', 16)
             .setOrigin(0.5)
             .setCenterAlign()
@@ -311,29 +329,35 @@ class Player extends Phaser.GameObjects.Container {
             .addText(text)
             .add(circle);
 
-        this.body.setSize(sprite.width * 4/3, sprite.height)
-            .setOffset(-sprite.width/2 * 4/3, 0);
+        this.body.setSize(26, 10)
+            .setOffset(-14, 10);
 
         // set some default physics properties
         this.body.setCollideWorldBounds(true);
 
         this.body.onWorldBounds = true; // not sure if this is important
-
+        
         this.getSprite().anims.create({
-            key: 'horizontal',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [1, 7, 1, 13] }),
+            key: 'down',
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row, 1 + col + row, 2 + col + row] }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.getSprite().anims.create({
+            key: 'left',
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+12, 1 + col + row+12, 2 + col + row+12] }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.getSprite().anims.create({
+            key: 'right',
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+24, 1 + col + row+24, 2 + col + row+24] }),
             frameRate: 10,
             repeat: -1
         });
         this.getSprite().anims.create({
             key: 'up',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [2, 8, 2, 14] }),
-            frameRate: 10,
-            repeat: -1
-        });
-        this.getSprite().anims.create({
-            key: 'down',
-            frames: this.getSprite().anims.generateFrameNumbers('player', { frames: [0, 6, 0, 12] }),
+            frames: this.getSprite().anims.generateFrameNumbers(avatar_sprite_sheet, { frames: [col + row+36, 1 + col + row+36, 2 + col + row+36] }),
             frameRate: 10,
             repeat: -1
         });
@@ -400,12 +424,10 @@ class Player extends Phaser.GameObjects.Container {
             this.getSprite().anims.play('down', true);
         }
         else if (velocity.x < 0) {
-            this.getSprite().flipX = true;
-            this.getSprite().anims.play('horizontal', true);
+            this.getSprite().anims.play('left', true);
         }
         else if (velocity.x > 0) {
-            this.getSprite().flipX = false;
-            this.getSprite().anims.play('horizontal', true);
+            this.getSprite().anims.play('right', true);
         } else {
             this.getSprite().anims.stop();
         }
@@ -426,11 +448,11 @@ class RemotePlayer extends Player {
     numUpdates = 0;
 
     constructor(scene, x, y, id) {
-        super(scene, x, y);
+        super(scene, x, y, id);
         this.id = id;
         this.username = id;
-        if (id in useWorldUserStore.getState().users_info)
-            this.username = useWorldUserStore.getState().users_info[id].username
+        if (id in usePlayerStore.getState().users_info)
+            this.username = usePlayerStore.getState().users_info[id].username
         this.getText().setText([
             `${this.username}`,
             'G???',
