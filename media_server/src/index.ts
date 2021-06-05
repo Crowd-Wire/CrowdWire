@@ -55,7 +55,7 @@ async function main() {
     num_rooms += 1;
     console.log(num_rooms * scalability_config.max_consumers_per_worker)
     console.log(scalability_config.max_consumers * 0.5)
-    if (!already_requested && num_rooms * scalability_config.max_consumers_per_worker >= scalability_config.max_consumers * 0.1){
+    if (!already_requested && num_rooms * scalability_config.max_consumers_per_worker * 0.5 >= scalability_config.max_consumers * 0.9){
       console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
       already_requested = true;
       send({

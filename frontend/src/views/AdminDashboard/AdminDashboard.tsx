@@ -12,29 +12,32 @@ import Col from 'react-bootstrap/Col';
 import ReportIcon from '@material-ui/icons/Report';
 import MapIcon from '@material-ui/icons/Map';
 import { useNavigate } from "react-router-dom";
+import { Graph } from "components/Statistics/Graph";
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       flexGrow: 1,
-      paddingTop: 200,
+      paddingTop: 100,
       paddingLeft: 80,
       paddingRight: 80,
+      paddingBottom: 200,
       position: 'absolute',
       top: '50%',
       left: '50%',
-      transform: 'translate(-50%, -50%)',
       width: '100%',
-      height: '100%'
+      height: '100%',
+      transform: 'translate(-50%, -50%)',
     },
     item: {
-      padding: theme.spacing(5),
+      padding: theme.spacing(2),
       textAlign: 'center',
-      height: 200,
-      width: 300,
-      minHeight: 200,
-      minWidth: 350,
-      maxWidth: 360,
+      height: 180,
+      width: 280,
+      minHeight: 180,
+      minWidth: 280,
+      maxWidth: 280,
       margin: 'auto'
     },
     card: {
@@ -70,12 +73,12 @@ export default function AdminUsers() {
             if (res.online_users)
               setOnlineUsers(res.online_users)
         })
-    }, [])
 
+    }, [])
 
     return (
         <div className={classes.root}>
-          <Grid container spacing={3}>
+          <Grid container spacing={1} style={{paddingBottom: 50}}>
             <Grid item xs={4} className={classes.item}>
               <Card onClick={() => navigation('/admin/users')} glass hoverType={"down"} outlined bordered className={classes.card}>
                 <div>
@@ -91,7 +94,7 @@ export default function AdminUsers() {
                         </Avatar>
                     </Col>
                   </Row>
-                  <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
+                  <Row xs={12} style={{top: '60%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
                       <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {users}
@@ -116,7 +119,7 @@ export default function AdminUsers() {
                         </Avatar>
                     </Col>
                   </Row>
-                  <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
+                  <Row xs={12} style={{top: '60%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
                       <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {worlds}
@@ -141,7 +144,7 @@ export default function AdminUsers() {
                         </Avatar>
                     </Col>
                   </Row>
-                  <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
+                  <Row xs={12} style={{top: '60%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
                       <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {onlineUsers}
@@ -149,6 +152,11 @@ export default function AdminUsers() {
                     </Col>
                   </Row>
                 </div>
+              </Card>
+            </Grid>
+            <Grid item xs={12} style={{paddingTop: 50, paddingBottom: 50}} >
+              <Card glass outlined bordered style={{height: 400, overflow: 'hidden', width: '100%'}}>
+                <Graph />
               </Card>
             </Grid>
             <Grid item xs={4} className={classes.item}>
@@ -166,7 +174,7 @@ export default function AdminUsers() {
                         </Avatar>
                     </Col>
                   </Row>
-                  <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
+                  <Row xs={12} style={{top: '60%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
                       <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {userReports}
@@ -191,7 +199,7 @@ export default function AdminUsers() {
                         </Avatar>
                     </Col>
                   </Row>
-                  <Row xs={12} style={{top: '70%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
+                  <Row xs={12} style={{top: '60%', left: '50%', position: 'absolute', transform: 'translate(-50%, -50%)', marginRight: 0, marginLeft: 0}}>
                     <Col xs={12}>
                       <Typography style={{color: 'white'}} variant="h3" component="h3" gutterBottom>
                         {worldReports}
