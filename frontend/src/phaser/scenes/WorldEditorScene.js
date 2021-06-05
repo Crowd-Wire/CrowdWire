@@ -111,6 +111,11 @@ class WorldEditorScene extends Scene {
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
+
+        this.flag = false;
+        this.input.keyboard.on('keydown-P', () => {
+            this.flag = !this.flag;
+        }, this);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -286,17 +291,27 @@ class WorldEditorScene extends Scene {
                         .setBounds(rec)
                         .setTint(0xffffff);
 
-                    if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
-                        return false;
-
                     if (activeObject) {
+                        const { x, y, width, height } = this.preview.body;
+
+                        // Check object on world bounds
+                        if (x < 0 || this.map.widthInPixels < x + width || y < 0 || this.map.heightInPixels < y + height)
+                            return false;
+                        
+                        // Check collision with collidable tiles
+                        for (let i = x; i < x + width; i += 16)
+                            for (let j = y; j < y + height; j += 16) {
+                                this.flag && console.log(i, j)
+                                const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
+                                if (tile) {
+                                    console.log(tile.x, tile.y)
+                                    return false;
+                                }
+                            }
+                        
+                        // Check collision with objects
                         const hovered = this.physics.overlapRect(
-                            this.preview.body.x + 1,
-                            this.preview.body.y + 1,
-                            this.preview.body.width - 2,
-                            this.preview.body.height - 2,
-                            true, true
-                        );
+                            x + 1, y + 1, width - 2, height - 2, true, true);
                         if (hovered.length < 2) {
                             if (this.input.manager.activePointer.isDown) {
                                 if (this.mouseClick) {
@@ -438,7 +453,7 @@ class PreviewSprite extends GameObjects.Container {
 
     setError() {
         this.getRectangle().setStrokeStyle(2, 0xff0000);
-        this.getSprite().setTint(this.tint + 0xff0000);
+        this.getSprite().setTint((this.tint + 0xff0000) % 0xffffff);
         return this;
     }
 

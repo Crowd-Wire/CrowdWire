@@ -245,25 +245,6 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         this.player.update();
         this.updateDepth();
-
-        // if (!globalVar) {
-        //     const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-        //     this.sprite.setPosition(Math.Snap.To(worldPoint.x, 16), Math.Snap.To(worldPoint.y, 16));
-        //     this.sprite.setDepth(this.sprite.body.y);
-        //     this.sprite.body.debugBodyColor = 0xadfefe;
-        //     this.log(this.sprite.body.x, this.sprite.body.y, this.sprite.body.height, this.sprite.width, this.sprite.depth)
-        // }
-
-        // // Convert the mouse position to world position within the camera
-        // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-        // // Draw tiles (only within the groundLayer)
-        // if (this.input.manager.activePointer.isDown) {
-        //     const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
-        //     if (tile)
-        //         tile.setCollision(true);
-        // }
-
         this.updateRangePlayers();
     }
 }
