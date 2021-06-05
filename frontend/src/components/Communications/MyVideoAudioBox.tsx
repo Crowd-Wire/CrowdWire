@@ -88,8 +88,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   useEffect(() => {
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
       let username = d.user_requested;
-      if (d.user_requested in useWorldUserStore.getState().users_info) {
-        username = useWorldUserStore.getState().users_info[d.user_requested].username;
+      if (d.user_requested in usePlayerStore.getState().users_info) {
+        username = usePlayerStore.getState().users_info[d.user_requested].username;
       }
       usePlayerStore.getState().setRequested(d.user_requested, true)
       toast.info(

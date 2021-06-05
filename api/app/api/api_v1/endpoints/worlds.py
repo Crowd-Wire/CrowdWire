@@ -25,7 +25,7 @@ async def get_world(
             db=db, world_id=world_id, user_id=user.user_id)
     else:
         db_world, message = await crud.crud_world.get_available_for_guests(
-            db=db, world_id=world_id
+            db=db, world_id=world_id, user_id=user.user_id
         )
     if not db_world:
         raise HTTPException(status_code=400, detail=message)

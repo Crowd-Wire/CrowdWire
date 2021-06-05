@@ -263,7 +263,7 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
                         >
                         <option aria-label="None" value="" />
                         {users && Object.keys(users).map((user_id, index) => (
-                          <option key={index} value={user_id}>{useWorldUserStore.getState().users_info[user_id].username}</option>
+                          <option key={index} value={user_id}>{usePlayerStore.getState().users_info[user_id].username}</option>
                         ))}
                       </Select>
                       <FormHelperText>Required</FormHelperText>

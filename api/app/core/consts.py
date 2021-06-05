@@ -10,11 +10,42 @@ WORLD_BANNED_STATUS = 1
 WORLD_DELETED_STATUS = 2
 
 # Avatar filenames
-AVATAR_1 = "avatar_1"
-AVATAR_2 = "avatar_2"
-AVATAR_3 = "avatar_3"
+AVATAR_1_1 = "avatars_1_1"
+AVATAR_1_2 = "avatars_1_2"
+AVATAR_1_3 = "avatars_1_3"
+AVATAR_1_4 = "avatars_1_4"
+AVATAR_1_5 = "avatars_1_5"
+AVATAR_1_6 = "avatars_1_6"
+AVATAR_1_7 = "avatars_1_7"
+AVATAR_1_8 = "avatars_1_8"
 
-AVATARS_LIST = [AVATAR_1, AVATAR_2, AVATAR_3]
+AVATAR_2_1 = "avatars_2_1"
+AVATAR_2_2 = "avatars_2_2"
+AVATAR_2_3 = "avatars_2_3"
+AVATAR_2_4 = "avatars_2_4"
+AVATAR_2_5 = "avatars_2_5"
+AVATAR_2_6 = "avatars_2_6"
+AVATAR_2_7 = "avatars_2_7"
+AVATAR_2_8 = "avatars_2_8"
+
+AVATAR_3_1 = "avatars_3_1"
+AVATAR_3_2 = "avatars_3_2"
+AVATAR_3_3 = "avatars_3_3"
+AVATAR_3_4 = "avatars_3_4"
+AVATAR_3_5 = "avatars_3_5"
+AVATAR_3_6 = "avatars_3_6"
+AVATAR_3_7 = "avatars_3_7"
+AVATAR_3_8 = "avatars_3_8"
+
+AVATAR_4_1 = "avatars_4_1"
+AVATAR_4_2 = "avatars_4_2"
+AVATAR_4_3 = "avatars_4_3"
+AVATAR_4_4 = "avatars_4_4"
+
+AVATARS_LIST = [AVATAR_1_1, AVATAR_1_2, AVATAR_1_3, AVATAR_1_4, AVATAR_1_5, AVATAR_1_6, AVATAR_1_7, AVATAR_1_8,
+                AVATAR_2_1, AVATAR_2_2, AVATAR_2_3, AVATAR_2_4, AVATAR_2_5, AVATAR_2_6, AVATAR_2_7, AVATAR_2_8,
+                AVATAR_3_1, AVATAR_3_2, AVATAR_3_3, AVATAR_3_4, AVATAR_3_5, AVATAR_3_6, AVATAR_3_7, AVATAR_3_8,
+                AVATAR_4_1, AVATAR_4_2, AVATAR_4_3, AVATAR_4_4]
 
 # Role default permissions
 role_default_permissions = ['talk', 'walk', 'chat']
