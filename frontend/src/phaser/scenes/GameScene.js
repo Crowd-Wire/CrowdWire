@@ -221,6 +221,7 @@ class GameScene extends Phaser.Scene {
                             if (left) {
                                 GameScene.inRangePlayers.delete(id);
                                 // close media connections to this user
+                                console.log("entao")
                                 useConsumerStore.getState().closePeer(id);
                             };
                             return left;
@@ -297,6 +298,7 @@ class Player extends Phaser.GameObjects.Container {
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
         } else {
+            console.log(usePlayerStore.getState().users_info)
             avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')

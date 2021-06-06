@@ -33,18 +33,21 @@ import logo from '../../assets/crowdwire_white_logo.png';
 import { useWsHandlerStore } from "../../webrtc/stores/useWsHandlerStore";
 import Button from "@material-ui/core/Button";
 import usePlayerStore from 'stores/usePlayerStore';
+import { API_BASE } from "config";
 
 
 interface MyVideoAudioBoxProps {
   username?: string;
   id: string;
+  avatar?: string;
   audioTrack?: MediaStreamTrack;
   videoTrack?: MediaStreamTrack;
 }
 
 export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   username="anonymous", id,
-  audioTrack=null, videoTrack=null
+  audioTrack=null, videoTrack=null,
+  avatar=API_BASE + "static/characters/avatars_1_1.png"
 }) => {
   const myRef = useRef<any>(null);
   const [videoPauseState, setVideoPauseState] = useState(true);
@@ -299,7 +302,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                       style={{display: videoPauseState ? 'block' : 'none'}}/>
                   ) : audioTrack ? (
                     <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                      <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`}/>
+                      <img src={avatar} style={{paddingTop: 15, paddingBottom: 15}}/>
                       <audio autoPlay id={id+"_audio"} ref={myRef}/>
                     </div>
                   ) : ''
@@ -307,7 +310,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 { !videoTrack || !videoPauseState ?
                   (
                   <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%', paddingTop: '15%',  paddingBottom: '15%'}}>
-                    <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+                    <img src={avatar} style={{paddingTop: 15, paddingBottom: 15}}/>
                   </div>
                   )
                 : ''}
