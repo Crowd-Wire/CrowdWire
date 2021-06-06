@@ -9,7 +9,6 @@ enum MapManagerState {
     BUILT = "BUILT",
 }
 
-
 interface TileLayerProps {
     image: string,
     properties?: Record<string, any>;
@@ -19,6 +18,7 @@ interface ObjectProps {
     gid: number;
     body?: Geom.Rectangle,
 }
+
 
 class MapManager {
     static _instance: MapManager;
@@ -148,9 +148,16 @@ class MapManager {
      */
     addConference(cid: string): void {
         // Create tileset
-        const id: number = parseInt(cid.substr(1), 10);
-        const newTileset = new Tilemaps.Tileset(`__CONFERENCE_${cid}`, 100000 + id, 32, 32, 0, 0);
-        newTileset.setImage(this.map.scene.textures.get('__CONFERENCE'))
+        const id = 100000 + parseInt(cid.substr(1), 10),
+            name = `__CONFERENCE_${cid}`;
+        const newTileset = new Tilemaps.Tileset(name, id, 32, 32, 0, 0);
+        newTileset.setImage(this.map.scene.textures.get('__CONFERENCE'));
+        newTileset.tileProperties = { 0: { conference: cid } };
+
+        this.tileLayerProps[name] = { 
+            image: "tilesets/conference.png",
+            properties: { name: 'ok then' },
+        }
 
         // Add tileset to map
         this.map.tilesets.push(newTileset);
@@ -256,7 +263,7 @@ class MapParser {
             objects = this.objectGroups[name].children.entries.map((obj, index) => {
                 const { name, x, y, height, width, angle, data, texture } = obj as GameObjects.Sprite,
                     properties = data ? Object.entries(data.list).map(([name, value]) => (
-                        { name, type: typeof value, value })) : undefined,
+                        { name, type: typeof value === 'number' ? 'int' : typeof value, value })) : undefined,
                     gid = this.objectProps[texture.key].gid;
                 return {
                     gid,
@@ -351,12 +358,16 @@ class MapParser {
         const { columns, firstgid, name, tileHeight, tileWidth,
             tileMargin, tileSpacing, tileProperties, total } = tileset,
             image = this.tileLayerProps[name].image,
-            tiles = Object.entries(tileProperties).map(([name, value], id) => (
-                { id, properties: { name, type: typeof value, value } }));
+            tiles = Object.entries(tileProperties).map(([id, props]) => {
+                const properties = Object.entries(props).map(([name, value]) => (
+                    { name, type: typeof value === 'number' ? 'int' : typeof value, value }
+                ))
+                return { id, properties };
+            });
         let properties = this.tileLayerProps[name].properties;
         if (properties) {
             properties = Object.entries(properties).map(([name, value]) => (
-                {name, type: typeof value, value}));
+                { name, type: typeof value === 'number' ? 'int' : typeof value, value }));
         }
         return {
             columns,
