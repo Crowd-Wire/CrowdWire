@@ -34,7 +34,8 @@ import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
-
+import SendEmailConfirmation from "views/SendEmailConfirmation/SendEmailConfirmation";
+import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail.js';
 /**
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
@@ -53,6 +54,8 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
 			{ path: "/comms", element: <Communications /> },
+			{ path: "/confirm", element: <SendEmailConfirmation /> },
+			{ path: "/confirm/:str", element: <ConfirmEmail />},
 			{ path: "/template-components", element: <ComponentsPage /> },
 		],
 	},
