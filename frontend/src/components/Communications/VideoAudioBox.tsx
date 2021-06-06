@@ -11,10 +11,12 @@ import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import { API_BASE } from "config";
 
 interface VideoAudioBoxProps {
   username?: string;
   id: string;
+  avatar?: string;
   muted?: boolean;
   volume: number;
   audioTrack?: MediaStreamTrack;
@@ -27,7 +29,8 @@ interface VideoAudioBoxProps {
 export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
   username="anonymous", muted=false, id, volume,
   audioTrack=null, videoTrack=null,
-  active, audioToggle, videoToggle
+  active, audioToggle, videoToggle,
+  avatar=API_BASE + "static/characters/avatars_1_1.png"
 }) => {
   const videoRef = useRef<any>(null);
 
@@ -123,7 +126,7 @@ export const VideoAudioBox: React.FC<VideoAudioBoxProps> = ({
             { !videoTrack || !videoState ?
               (
               <div style={{display: 'block', textAlign: 'center', width: '100%', height: '100%', paddingTop: '15%', paddingBottom: '15%'}}>
-                <img src={`${process.env.PUBLIC_URL}/assets/characters/RPG_assets.png`} style={{borderRadius: '50%'}}/>
+               <img src={avatar} style={{paddingTop: 15, paddingBottom: 15}}/>
               </div>
               )
             : '' }

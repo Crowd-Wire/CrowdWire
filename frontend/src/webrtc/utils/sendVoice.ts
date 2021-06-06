@@ -53,14 +53,9 @@ export const sendVoice = async (roomId:string = null) => {
           set({micProducer: producer});
           producer.on("transportclose", () => {
             producer.close();
-            set({mic: null, micStream: null, micProducer: null})
           })
         }).catch((err) => {
           console.log(err)
-          mic.onended = function(event) {
-            useVoiceStore.getState().micProducer.close();
-            set({mic: null, micStream: null, micProducer: null})
-          }
         })
       }
     });

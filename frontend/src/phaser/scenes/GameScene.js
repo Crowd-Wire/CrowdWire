@@ -307,8 +307,6 @@ class Player extends Phaser.GameObjects.Container {
         const row = (avatar_number === '1' || avatar_number === '2' || avatar_number === '3' || avatar_number === '4') ?
                             0
                         :   4 * 12
-        console.log(col)
-        console.log(row)
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, avatar_sprite_sheet, 1 + col + row)
