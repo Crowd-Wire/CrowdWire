@@ -11,7 +11,10 @@ import { makeStyles } from "@material-ui/core";
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
 import MapManager from "phaser/MapManager";
-
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 
 interface ConferenceItemProps {
   id: string;
@@ -50,7 +53,7 @@ const useConferenceItemStyles = makeStyles({
     marginLeft: 'auto',
     width: 16,
     height: 16,
-    marginRight: 10,
+    marginRight: '.75rem',
   }
 })
 
@@ -114,6 +117,56 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
           style={{ cursor: 'pointer' }}
         />
       </div>
+    </div>
+  );
+}
+
+const useConferenceLayerStyles = makeStyles({
+  root: {
+    padding: '.25rem 0',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  icon: {
+    padding: '0 .25rem',
+    "&:last-of-type": {
+      padding: '0 .75rem 0 .25rem',
+    }
+  }
+})
+
+const ConferenceLayer: React.FC<{ children: React.ReactNode[] }> = ({ children }) => {
+  const classes = useConferenceLayerStyles();
+  let visible = useWorldEditorStore(state => state.layers['Room'].visible);
+  let blocked = useWorldEditorStore(state => state.layers['Room'].blocked);
+
+  const handleVisible = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers['Room'].visible = !visible;
+    });
+  }
+
+  const handleBlocked = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers['Room'].blocked = !blocked;
+    });
+  }
+
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        <div className={classes.icon} onClick={handleVisible}>
+          {visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+        </div>
+        <div className={classes.icon} onClick={handleBlocked}>
+          {blocked ? <LockIcon /> : <LockOpenIcon />}
+        </div>
+      </div>
+      {children}
     </div>
   );
 }
@@ -197,6 +250,8 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
       if (id === activeConference) {
         activeConference = null;
+        useWorldEditorStore.getState().setState({ activeLayer: null });
+        useWorldEditorStore.getState().setLayer('Room', { active: false });
         useWorldEditorStore.getState().remActive('conference');
         this.setState({ activeConference });
       }
@@ -210,7 +265,8 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       } else {
         props.properties = { name };
       }
-      useWorldEditorStore.getState().setState({ conferences });
+      useWorldEditorStore.getState().setState({ conferences, activeLayer: 'Room' });
+      useWorldEditorStore.getState().setLayer('Room', { active: true });
       useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });
     }
@@ -220,7 +276,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     const { activeConference, conferences } = this.state;
 
     return (
-      <>
+      <ConferenceLayer>
         {Object.entries(conferences).map(([id, conference], index) => (
           <ConferenceItem
             key={index}
@@ -234,7 +290,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
           onClick={this.addConference}
           style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
         />
-      </>
+      </ConferenceLayer>
     );
   }
 }

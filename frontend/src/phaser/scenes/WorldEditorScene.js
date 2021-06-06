@@ -198,21 +198,27 @@ class WorldEditorScene extends Scene {
             // Mouse is over canvas
 
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
-                activeLayerName = useWorldEditorStore.getState().activeLayer,
+                storeActiveLayer = useWorldEditorStore.getState().activeLayer,
                 activeConference = useWorldEditorStore.getState().active.conference;
 
-            if (activeConference || (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked)) {
-                // Conference selected or layer selected and not blocked
+            this.preview.setVisible(true);
 
-                this.preview.setVisible(true);
+            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['Room'].blocked) ? 'Room' : 
+                (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
+                undefined;
 
-                const activeLayer = activeConference ? 
-                    this.map.getLayer('Room').tilemapLayer : this.map.getLayer(activeLayerName)?.tilemapLayer;
+            if (activeLayerName) {
+                // Conference selected and not blocked 
+                // or other layer selected and not blocked
+
+                const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
                     // TilemapLayer exists
-
+                    
                     const x = Math.Snap.Floor(worldPoint.x, 32),
                         y = Math.Snap.Floor(worldPoint.y, 32);
+                    
+                    this.preview.setPosition(x + 16, y + 16);
 
                     // Rounds down to nearest tile
                     const tileX = this.map.worldToTileX(x),
@@ -223,6 +229,10 @@ class WorldEditorScene extends Scene {
 
                     let activeGid, tint = 0xffffff;
                     if (activeTile && activeTile[0] === 'C') {
+                        if (activeLayerName != 'Room') {
+                            this.preview.setTexture('__DEFAULT');
+                            return false;
+                        }
                         activeGid = this.mapManager.getConferenceGid(activeTile);
                         tint = `0x${useWorldEditorStore.getState().conferences[activeTile].color.substr(1)}`;
 
@@ -240,7 +250,7 @@ class WorldEditorScene extends Scene {
                         clickedGid = clickedTile.index;
                     }
 
-                    this.preview.setPosition(x + 16, y + 16).setTint(tint);
+                    this.preview.setTint(tint);
                     if ([ToolType.DRAW, ToolType.FILL, ToolType.SELECT].includes(this.tool.type)
                         && activeGid) {
                         const tileset = activeLayer.gidMap[activeGid];

@@ -138,7 +138,7 @@ class WorldEditorPage extends React.Component {
           const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
           const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
 
-          console.log(parent, boxAObj, boxBObj)
+          // console.log(parent, boxAObj, boxBObj)
 
           boxAObj.size = parseFloat((newHeightPx / totalHeightPx * totalHeight)).toFixed(2);
           boxBObj.size = totalHeight - boxAObj.size;
@@ -167,7 +167,7 @@ class WorldEditorPage extends React.Component {
           const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
           const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
 
-          console.log(parent, boxAObj, boxBObj)
+          // console.log(parent, boxAObj, boxBObj)
 
           boxAObj.size = parseFloat((newWidthPx / totalWidthPx * totalWidth)).toFixed(2);
           boxBObj.size = totalWidth - boxAObj.size;
