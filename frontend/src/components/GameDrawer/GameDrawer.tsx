@@ -30,7 +30,7 @@ import useMessageStore from 'stores/useMessageStore';
 import usePlayerStore from 'stores/usePlayerStore';
 
 const drawerWidth = 360;
-const sideBarWidth = 80;
+const sideBarWidth = 65;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
       flexDirection: 'column',
       width: sideBarWidth,
       zIndex: 1202,
-      backgroundColor: '#1f344d',
+      backgroundColor: 'rgb(11, 19, 43)',
       height: '100%'
     },
     sideTop: {
@@ -69,8 +69,7 @@ const useStyles = makeStyles((theme: Theme) =>
     drawerPaper: {
       width: drawerWidth,
       paddingLeft: sideBarWidth,
-      backgroundColor: '#3A506B',
-
+      backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',
     },
     drawerHeader: {
       display: 'flex',
@@ -212,7 +211,7 @@ const GameDrawer = () => {
     }
   }
 
-  const iconsStyle = {color: "#fff", fontSize: '2rem'};
+  const iconsStyle = {color: "#fff", fontSize: '1.8rem'};
 
   return (
     <>
@@ -300,7 +299,7 @@ const GameDrawer = () => {
       </Drawer>
     </div>
     { page ?
-      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201, paddingLeft: sideBarWidth, backgroundColor: "#32526a"}}>
+      <div style={{position: "absolute", width: "100vw", height: "100vh", zIndex: 1201, paddingLeft: sideBarWidth, backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',}}>
         <CancelIcon 
           style={{position: "absolute", top: "2rem", right: "2rem", fontSize: "2rem", cursor: "pointer", color: "white"}} 
           onClick={handleClose} 

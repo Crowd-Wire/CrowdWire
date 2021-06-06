@@ -36,7 +36,7 @@ class GameScene extends Phaser.Scene {
 
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Room"))
-                this.roomLayer = layer.tilemapLayer.setVisible(true);
+                this.roomLayer = layer.tilemapLayer.setVisible(false);
             else if (layer.name.startsWith("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
