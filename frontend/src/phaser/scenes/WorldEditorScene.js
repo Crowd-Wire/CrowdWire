@@ -203,9 +203,9 @@ class WorldEditorScene extends Scene {
 
             this.preview.setVisible(true);
 
-            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['Room'].blocked) ? 'Room' : 
+            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['Room'].blocked) ? 'Room' :
                 (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
-                undefined;
+                    undefined;
 
             if (activeLayerName) {
                 // Conference selected and not blocked 
@@ -214,11 +214,11 @@ class WorldEditorScene extends Scene {
                 const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
                     // TilemapLayer exists
-                    
+
                     const x = Math.Snap.Floor(worldPoint.x, 32),
                         y = Math.Snap.Floor(worldPoint.y, 32);
-                    
-                    this.preview.setPosition(x + 16, y + 16);
+
+                    this.preview.setPosition(x + 16, y + 16).setBounds();
 
                     // Rounds down to nearest tile
                     const tileX = this.map.worldToTileX(x),
@@ -306,62 +306,83 @@ class WorldEditorScene extends Scene {
                 if (activeObjectGroup) {
                     // ObjectGroup exists
 
-                    const x = Math.Snap.Floor(worldPoint.x, 16),
-                        y = Math.Snap.Floor(worldPoint.y, 16);
+                    const pointerX = Math.Snap.Floor(worldPoint.x, 16),
+                        pointerY = Math.Snap.Floor(worldPoint.y, 16);
 
                     const activeObject = useWorldEditorStore.getState().active.object;
-                    const rec = this.mapManager.objectProps[activeObject]?.body;
 
-                    this.preview.setPosition(x + 16, y + 16)
-                        .setTexture(activeObject || '__DEFAULT')
-                        .setBounds(rec)
+                    this.preview.setPosition(pointerX + 16, pointerY + 16)
                         .setTint(0xffffff);
 
-                    if (activeObject) {
-                        const { x, y, width, height } = this.preview.body;
-
-                        // Check object on world bounds
-                        if (x < 0 || this.map.widthInPixels < x + width || y < 0 || this.map.heightInPixels < y + height)
-                            return false;
-
-                        // Check collision with collidable tiles
-                        for (let i = x; i < x + width; i += 16)
-                            for (let j = y; j < y + height; j += 16) {
-                                this.flag && console.log(i, j)
-                                const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
-                                if (tile) {
-                                    return false;
-                                }
-                            }
-
+                    const { x, y, width, height } = this.preview.body,
                         // Check collision with objects
-                        const hovered = this.physics.overlapRect(
+                        hovered = this.physics.overlapRect(
                             x + 1, y + 1, width - 2, height - 2, true, true);
-                        if (hovered.length < 2) {
-                            if (this.input.manager.activePointer.isDown) {
-                                if (this.mouseClick) {
-                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
-                                    const obj = this.add.sprite(this.preview.x, this.preview.y, activeObject),
-                                        properties = this.mapManager.objectProps[activeObject].properties;
-                                    if (properties) {
-                                        obj.setData(properties);
-                                        console.log(properties)
-                                    }
-                                    activeObjectGroup.add(obj);
-                                    const { width, height, offset } = this.preview.body;
-                                    obj.body.setSize(width, height)
-                                        .setOffset(
-                                            offset.x + this.preview.getSprite().width / 2,
-                                            offset.y + this.preview.getSprite().height / 2);
-                                    this.mouseClick = false;
 
-                                    console.log(this.objectGroups)
+                    switch (this.tool.type) {
+                        case ToolType.DRAW:
+                            this.preview.setTexture(activeObject || '__DEFAULT');
+
+                            if (activeObject) {
+                                const body = this.mapManager.objectProps[activeObject]?.body;
+                                this.preview.setBounds(body);
+
+                                // Check object on world bounds
+                                if (x < 0 || this.map.widthInPixels < x + width || y < 0 || this.map.heightInPixels < y + height)
+                                    return false;
+
+                                // Check collision with collidable tiles
+                                for (let i = x; i < x + width; i += 16)
+                                    for (let j = y; j < y + height; j += 16) {
+                                        this.flag && console.log(i, j)
+                                        const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
+                                        if (tile) {
+                                            return false;
+                                        }
+                                    }
+
+                                if (hovered.length < 2) {
+                                    if (this.input.manager.activePointer.isDown) {
+                                        if (this.mouseClick) {
+                                            !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                            const obj = this.add.sprite(this.preview.x, this.preview.y, activeObject),
+                                                properties = this.mapManager.objectProps[activeObject].properties;
+                                            if (properties) {
+                                                obj.setData(properties);
+                                                console.log(properties)
+                                            }
+                                            activeObjectGroup.add(obj);
+                                            const { width, height, offset } = this.preview.body;
+                                            obj.body.setSize(width, height)
+                                                .setOffset(
+                                                    offset.x + this.preview.getSprite().width / 2,
+                                                    offset.y + this.preview.getSprite().height / 2);
+                                            this.mouseClick = false;
+                                        }
+                                    } else {
+                                        this.mouseClick = true;
+                                    }
+                                    return true;
                                 }
                             } else {
-                                this.mouseClick = true;
+                                this.preview.setBounds();
+                            }
+                            break;
+                        case ToolType.ERASE:
+                            this.preview.setTexture('__DEFAULT').setBounds();
+
+                            if (hovered.length > 1) {
+                                if (this.input.manager.activePointer.isDown) {
+                                    hovered.forEach((body) => body != this.preview.body && body.gameObject.destroy());
+                                }
+                                console.log(this.objectGroups)
                             }
                             return true;
-                        }
+                        case ToolType.PICK:
+                        case ToolType.FILL:
+                        case ToolType.SELECT:
+                            this.preview.setTexture('__DEFAULT').setBounds();
+                            break;
                     }
                     return false;
                 }

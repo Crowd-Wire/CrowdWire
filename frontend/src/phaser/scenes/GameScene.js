@@ -1,4 +1,4 @@
-import Phaser, { Math } from 'phaser';
+import Phaser, { GameObjects } from 'phaser';
 
 import { getSocket } from "services/socket";
 
@@ -46,6 +46,11 @@ class GameScene extends Phaser.Scene {
 
         this.objectGroups = mapManager.buildObjects(this);
 
+        this.selectedObject = this.add.rectangle()
+            .setStrokeStyle(2, 0xffff00)
+            .setOrigin(0)
+            .setVisible(false);
+
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
         if (Object.keys(last_pos).length !== 0) {
@@ -76,9 +81,9 @@ class GameScene extends Phaser.Scene {
 
         // connect to room
         if (Object.keys(last_pos).length !== 0) {
-            this.ws.joinPlayer({x: last_pos.x, y: last_pos.y});
+            this.ws.joinPlayer({ x: last_pos.x, y: last_pos.y });
         } else {
-            this.ws.joinPlayer({x: 50, y: 50});
+            this.ws.joinPlayer({ x: 50, y: 50 });
         }
 
         // make camera follow player
@@ -104,28 +109,9 @@ class GameScene extends Phaser.Scene {
         this.subscriptions.push(
             usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups })));
 
-        this.sprite = this.add.sprite(0, 0, 'tilesets/objects/movel.png');
-        this.add.existing(this.sprite);
-        this.physics.add.existing(this.sprite);
-        this.physics.add.collider(this.sprite, [this.collisionLayer, this.objectGroups['ObjectCollision']]);
-        this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
-
-
-        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World',
-            { fontFamily: '"Lucida Console", Courier, monospace', fontSize: '16px', color: '#28FE14', backgroundColor: "#000" });
-        this.debugText.setScrollFactor(0).setDepth(1001).setOrigin(0.5);
-
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
-    }
-
-    log() {
-        let text = '';
-        for (let i = 0; i < arguments.length; i++) {
-            text += arguments[i] + ' ';
-        }
-        this.debugText.setText(text);
     }
 
     // TODO: remove after tests
@@ -168,16 +154,15 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    updateConferences = (player) => {
+    updateConferences = () => {
         if (this.roomLayer) {
-            const tile = this.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
-
+            const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
             if (tile) {
                 const conferenceId = tile.properties.conference;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();
-                    player.ws.joinConference(conferenceId);
+                    this.player.ws.joinConference(conferenceId);
                 }
             }
             else {
@@ -185,23 +170,42 @@ class GameScene extends Phaser.Scene {
                     const conferenceId = useWorldUserStore.getState().world_user.in_conference;
                     useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    player.ws.leaveConference(conferenceId);
+                    this.player.ws.leaveConference(conferenceId);
                 }
             }
         }
+    }
 
+    updateInteractables = () => {
+        const playerPos = this.player.body.center,
+            bodies = this.physics
+                .overlapCirc(playerPos.x, playerPos.y, 50, true, true)
+                .filter((b) => b.gameObject instanceof GameObjects.Sprite);
+        if (bodies.length && globalVar) {
+            const closestBody = bodies.reduce((prev, curr) => {
+                return Math.hypot(playerPos.x - prev.center.x, playerPos.y - prev.center.y)
+                    < Math.hypot(playerPos.x - curr.center.x, playerPos.y - curr.center.y) ?
+                    prev : curr;
+            });
+            const { x, y, width, height } = closestBody.gameObject;
+            this.selectedObject.setPosition(x - width / 2, y - height / 2)
+                .setSize(width, height)
+                .setVisible(true);
+        } else {
+            this.selectedObject.setVisible(false);
+        }
     }
 
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
-            // detect surrounding players
-            var bodies = this.physics.overlapCirc(
-                this.player.body.center.x, this.player.body.center.y, 150)
+            // Detect surrounding players
+            const bodies = this.physics.overlapCirc(
+                this.player.body.center.x, this.player.body.center.y, 150);
             if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
                 const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
-                    // wire players
+                    // Wire players
                     this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
                             const entered = !GameScene.inRangePlayers.has(id);
@@ -210,23 +214,19 @@ class GameScene extends Phaser.Scene {
                         })
                     );
                 } else if (rangePlayers.length < GameScene.inRangePlayers.size) {
-                    // unwire players
+                    // Unwire players
                     this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
                             const left = !rangePlayers.includes(id);
                             if (left) {
                                 GameScene.inRangePlayers.delete(id);
-                                // close media connections to this user
+                                // Close media connections to this user
                                 useConsumerStore.getState().closePeer(id);
                             };
                             return left;
                         })
                     );
                 }
-            } else if (bodies.length > 1) {
-                this.player.body.debugBodyColor = 0x0099ff; // blue
-            } else {
-                this.player.body.debugBodyColor = 0xff9900; // orange
             }
         }
     }
@@ -288,8 +288,8 @@ class Player extends Phaser.GameObjects.Container {
             .addText(text)
             .add(circle);
 
-        this.body.setSize(sprite.width * 4/3, sprite.height)
-            .setOffset(-sprite.width/2 * 4/3, 0);
+        this.body.setSize(sprite.width * 4 / 3, sprite.height)
+            .setOffset(-sprite.width / 2 * 4 / 3, 0);
 
         // set some default physics properties
         this.body.setCollideWorldBounds(true);
@@ -360,7 +360,8 @@ class Player extends Phaser.GameObjects.Container {
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
             this.ws.sendMovement(this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
-            this.scene.updateConferences(this);
+            this.scene.updateConferences();
+            this.scene.updateInteractables();
         }
     }
 
