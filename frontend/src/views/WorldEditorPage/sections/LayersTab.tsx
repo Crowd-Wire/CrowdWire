@@ -258,19 +258,6 @@ class LayersTab extends Component<{}, LayersTabState> {
             }).reverse()
           }
         </LayerGroup>
-        <LayerGroup name="Conference Layer" info="This layer is only meant for creating conference areas">
-          {
-            map.layers?.map((layer, index) => {
-              if (layer.name === "Room") {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
-        </LayerGroup>
       </div>
     );
   }

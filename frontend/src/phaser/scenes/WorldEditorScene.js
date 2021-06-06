@@ -76,7 +76,7 @@ class WorldEditorScene extends Scene {
         grid1.showOutline = false;
 
         const grid2 = this.add.grid(width / 2, height / 2, width, height, 16, 16)
-            .setOutlineStyle(0x000000, 0.2)
+            .setOutlineStyle(0x000000, 0.3)
             .setDepth(1001);
         grid2.showOutline = false;
 
@@ -198,14 +198,16 @@ class WorldEditorScene extends Scene {
             // Mouse is over canvas
 
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
-                activeLayerName = useWorldEditorStore.getState().activeLayer;
+                activeLayerName = useWorldEditorStore.getState().activeLayer,
+                activeConference = useWorldEditorStore.getState().active.conference;
 
-            if (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked) {
-                // Layer selected and not blocked
+            if (activeConference || (activeLayerName && !useWorldEditorStore.getState().layers[activeLayerName].blocked)) {
+                // Conference selected or layer selected and not blocked
 
                 this.preview.setVisible(true);
 
-                const activeLayer = this.map.getLayer(activeLayerName)?.tilemapLayer;
+                const activeLayer = activeConference ? 
+                    this.map.getLayer('Room').tilemapLayer : this.map.getLayer(activeLayerName)?.tilemapLayer;
                 if (activeLayer) {
                     // TilemapLayer exists
 
@@ -217,7 +219,7 @@ class WorldEditorScene extends Scene {
                         tileY = this.map.worldToTileY(y);
 
                     const activeTile = useWorldEditorStore.getState().active.tile
-                        || useWorldEditorStore.getState().active.conference;
+                        || activeConference;
 
                     let activeGid, tint = 0xffffff;
                     if (activeTile && activeTile[0] === 'C') {
