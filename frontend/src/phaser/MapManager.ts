@@ -12,6 +12,7 @@ enum MapManagerState {
 
 interface TileLayerProps {
     image: string,
+    properties?: Record<string, any>;
 }
 
 interface ObjectProps {
@@ -63,9 +64,16 @@ class MapManager {
                 })
             } else {
                 // Tile layer
-                const { name, image } = tileset;
+                const { name, image, properties } = tileset;
                 scene.load.spritesheet(name, API_BASE + "static/maps/" + image, { frameWidth: 32, frameHeight: 32 });
                 this.tileLayerProps[name] = { image };
+                if (properties) {
+                    const props = {};
+                    properties.forEach(({ name, type, value }) => {
+                        props[name] = (type === 'int') ? parseInt(value, 10) : value;
+                    });
+                    this.tileLayerProps[name].properties = props;
+                }
             }
         })
         this.state = MapManagerState.LOADED;
@@ -247,8 +255,8 @@ class MapParser {
         const { name, properties } = layer,
             objects = this.objectGroups[name].children.entries.map((obj, index) => {
                 const { name, x, y, height, width, angle, data, texture } = obj as GameObjects.Sprite,
-                    properties = data ? Object.entries(data.list).map(([name, value]) =>
-                        ({ name, type: typeof value, value })) : [],
+                    properties = data ? Object.entries(data.list).map(([name, value]) => (
+                        { name, type: typeof value, value })) : undefined,
                     gid = this.objectProps[texture.key].gid;
                 return {
                     gid,
@@ -321,7 +329,7 @@ class MapParser {
                     objectgroup,
                     // imageheight,
                     // imagewidth,
-                    properties: [],
+                    // properties,
                     type: ''
                 }
             })
@@ -343,8 +351,13 @@ class MapParser {
         const { columns, firstgid, name, tileHeight, tileWidth,
             tileMargin, tileSpacing, tileProperties, total } = tileset,
             image = this.tileLayerProps[name].image,
-            tiles = Object.entries(tileProperties).map(([name, value], id) =>
-                ({ id, properties: { name, type: typeof value, value } }));
+            tiles = Object.entries(tileProperties).map(([name, value], id) => (
+                { id, properties: { name, type: typeof value, value } }));
+        let properties = this.tileLayerProps[name].properties;
+        if (properties) {
+            properties = Object.entries(properties).map(([name, value]) => (
+                {name, type: typeof value, value}));
+        }
         return {
             columns,
             firstgid,
@@ -353,7 +366,7 @@ class MapParser {
             // imagewidth,
             margin: tileMargin,
             name,
-            properties: [],
+            properties,
             spacing: tileSpacing,
             tilecount: total,
             tileheight: tileHeight,
