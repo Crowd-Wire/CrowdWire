@@ -46,7 +46,7 @@ class CRUDStatistics:
                })
 
     async def get_world_statistics(
-            self, db: Session, world_id: int, start_date: datetime = None, end_date: datetime = None
+            self, db: Session, world_id: int
     ) -> schemas.WorldStatistics:
         """
         Retrieves the statistics related to a world
@@ -54,17 +54,12 @@ class CRUDStatistics:
 
         total_users = db.query(World_User).filter(World_User.world_id == world_id).with_entities(func.count()).scalar()
         online_users = await redis_connector.get_online_users(world_id=world_id)
-        reports = db.query(Report_World).filter(Report_World.reported == world_id).with_entities(func.count()).scalar()
+        reports_users = db.query(Report_User).filter(Report_User.world_id == world_id).with_entities(func.count()).scalar()
         total_n_joins = db.query(func.sum(World_User.n_joins)).filter(World_User.world_id == world_id).scalar()
 
-        user_joined_overtime = []
-        if start_date is not None and end_date is not None:
-            user_joined_overtime = self.get_user_join_world_overtime(
-                db=db, start_date=start_date, end_date=end_date, world_id=world_id)
-
         return schemas.WorldStatistics(
-            **{'total_users': total_users, 'online_users': online_users, 'reports': reports,
-               'total_n_joins': total_n_joins, 'world_id': world_id, 'user_joined_overtime': user_joined_overtime}
+            **{'total_users': total_users, 'online_users': online_users, 'reports_users': reports_users,
+               'total_n_joins': total_n_joins, 'world_id': world_id}
         )
 
     def get_users_registers_overtime(self, db: Session, start_date: datetime, end_date: datetime):
