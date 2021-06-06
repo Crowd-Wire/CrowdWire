@@ -86,7 +86,7 @@ class MapManager {
         this.map = scene.add.tilemap('map');
 
         // Add tileset images
-        const tilesets: Tilemaps.Tileset[] = []
+        const tilesets: Tilemaps.Tileset[] = [];
         Object.keys(this.tileLayerProps).forEach((key) => {
             tilesets.push(this.map.addTilesetImage(key));
         });
@@ -149,8 +149,8 @@ class MapManager {
     addConference(cid: string): void {
         // Create tileset
         const id: number = parseInt(cid.substr(1), 10);
-        const newTileset = new Tilemaps.Tileset(`_conference${cid}`, 100000 + id, 32, 32, 0, 0);
-        newTileset.setImage(this.map.scene.textures.get('_conference'))
+        const newTileset = new Tilemaps.Tileset(`__CONFERENCE_${cid}`, 100000 + id, 32, 32, 0, 0);
+        newTileset.setImage(this.map.scene.textures.get('__CONFERENCE'))
 
         // Add tileset to map
         this.map.tilesets.push(newTileset);
@@ -165,7 +165,7 @@ class MapManager {
             return this.conferenceMap[cid];
 
         for (const tileset of this.map.getLayer('Room').tilemapLayer.tileset) {
-            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith('__CONFERENCE_') && tileset.name.includes(cid)) {
                 this.conferenceMap[cid] = tileset.firstgid;
                 return tileset.firstgid;
             }
@@ -183,7 +183,7 @@ class MapManager {
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
 
-            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith('__CONFERENCE_') && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
             }
@@ -200,7 +200,7 @@ class MapManager {
         for (let i = 0; i < arr.length; i++) {
             const tileset = arr[i];
 
-            if (tileset.name.startsWith("_conference") && tileset.name.includes(cid)) {
+            if (tileset.name.startsWith('__CONFERENCE_') && tileset.name.includes(cid)) {
                 arr.splice(i, 1);
                 break;
             }

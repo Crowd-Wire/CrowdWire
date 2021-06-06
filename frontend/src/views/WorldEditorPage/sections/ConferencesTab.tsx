@@ -152,15 +152,15 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   addConference = () => {
     const conferences = this.state.conferences;
-    const id = `C${ConferencesTab.curConference++}`;
+    const id = `C${++ConferencesTab.curConference}`;
     conferences[id] = {
-      name: `Conference ${id}`,
+      name: `Conference C${Object.keys(conferences).length}`,
       color: `#${intToHex(cyrb53Hash(id, 129))}`
-    }
+    };
     const color = conferences[id].color;
     const style = {
       backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
-      border: `1px solid ${color}`
+      border: `1px solid ${color}`,
     };
     useWorldEditorStore.getState().addTile(id, { style });
     useWorldEditorStore.getState().setState({ conferences });
@@ -168,9 +168,20 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   }
 
   handleReady = () => {
-    const { conferences, active } = useWorldEditorStore.getState();
-    ConferencesTab.curConference = Object.keys(conferences).length;
-    this.setState({ conferences, activeConference: active.conference });
+    const { conferences } = useWorldEditorStore.getState();
+    ConferencesTab.curConference = Object.keys(conferences)
+      .map(k => parseInt(k.substr(1), 10))
+      .sort(((a, b) => a - b))
+      .pop() || -1;
+    Object.keys(conferences).forEach((cid) => {
+      const color = conferences[cid].color;
+      const style = {
+        backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
+        border: `1px solid ${color}`
+      };
+      useWorldEditorStore.getState().addTile(cid, { style });
+    });
+    this.setState({ conferences });
   }
 
   handleChange = (id: string, name: string, del?: boolean): void => {

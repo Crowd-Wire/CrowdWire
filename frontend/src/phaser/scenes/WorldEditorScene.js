@@ -40,12 +40,21 @@ class WorldEditorScene extends Scene {
         // Initialize conferences on store
         const conferences = {};
         this.map.tilesets
-            .filter((tileset) => tileset.name.startsWith('_conferenceC'))
+            .filter((tileset) => tileset.name.startsWith('__CONFERENCE_'))
             .forEach((tileset, index) => {
-                const cid = tileset.name.substr(12);
-                conferences[cid] = { name: `Conference C${index}`, color: `#${intToHex(cyrb53Hash(cid))}` };
+                const cid = tileset.name.match(/__CONFERENCE_(C\d+)/)[1];
+                const name = this.mapManager.tileLayerProps[tileset.name].properties?.name || `Conference C${index}`;
+                conferences[cid] = { name, color: `#${intToHex(cyrb53Hash(cid))}` };
             });
         useWorldEditorStore.getState().setState({ conferences });
+
+        // Paint conference tiles
+        this.map.getLayer('Room').tilemapLayer
+            .filterTiles((tile) => tile.index != -1)
+            .forEach((tile) => {
+                const cid = tile.properties.conference;
+                tile.tint = `0x${intToHex(cyrb53Hash(cid))}`;
+            });
 
         const width = this.map.widthInPixels,
             height = this.map.heightInPixels,
