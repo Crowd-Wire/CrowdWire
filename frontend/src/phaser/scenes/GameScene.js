@@ -30,14 +30,13 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-
         const mapManager = new MapManager();
 
         this.map = mapManager.buildMap(this);
 
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Room"))
-                this.roomLayer = layer.tilemapLayer.setVisible(false);
+                this.roomLayer = layer.tilemapLayer.setVisible(true);
             else if (layer.name.startsWith("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
@@ -46,7 +45,6 @@ class GameScene extends Phaser.Scene {
         })
 
         this.objectGroups = mapManager.buildObjects(this);
-        // this.collisionGroup = collisionGroup;
 
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
@@ -55,7 +53,6 @@ class GameScene extends Phaser.Scene {
         } else {
             this.player = new Player(this, 50, 50);
         }
-
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -72,8 +69,7 @@ class GameScene extends Phaser.Scene {
             left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
             right: Phaser.Input.Keyboard.KeyCodes.D,
             right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            in: Phaser.Input.Keyboard.KeyCodes.Q,
-            out: Phaser.Input.Keyboard.KeyCodes.E,
+            play: Phaser.Input.Keyboard.KeyCodes.X,
         }, false);
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
@@ -177,7 +173,7 @@ class GameScene extends Phaser.Scene {
             const tile = this.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
 
             if (tile) {
-                const conferenceId = tile.properties.id;
+                const conferenceId = tile.properties.conference;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();

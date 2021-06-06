@@ -97,10 +97,10 @@ class WorldEditorPage extends React.Component {
     var dragginHandler;
 
     /* tests */
-    document.addEventListener('keyup', (e) => {
-      if (e.key === 'r') this.gridRemoveTabs([4, 2], [2]);
-      if (e.key === 't') this.gridRemoveTabs([2], [0, 0]);
-    });
+    // document.addEventListener('keyup', (e) => {
+    //   if (e.key === 'r') this.gridRemoveTabs([4, 2], [2]);
+    //   if (e.key === 't') this.gridRemoveTabs([2], [0, 0]);
+    // });
 
     document.addEventListener('mousedown', (e) => {
       handlers.forEach((h) => {
