@@ -17,7 +17,8 @@ interface TileLayerProps {
 
 interface ObjectProps {
     gid: number;
-    body?: Geom.Rectangle,
+    body?: Geom.Rectangle;
+    properties?: Record<string, any>;
 }
 
 
@@ -61,6 +62,13 @@ class MapManager {
                         // Custom object collider
                         const { x, y, width, height } = tile.objectgroup.objects[0];
                         this.objectProps[name].body = { x, y, width, height } as Geom.Rectangle;
+                    }
+                    if ('properties' in tile) {
+                        const props = {};
+                        tile.properties.forEach(({ name, type, value }) => {
+                            props[name] = (type === 'int') ? parseInt(value, 10) : value;
+                        });
+                        this.objectProps[name].properties = props;
                     }
                 })
             } else {
@@ -128,13 +136,16 @@ class MapManager {
 
         (<GameObjects.Sprite[]>collisionGroup.getChildren().concat(group.getChildren()))
             .forEach((obj) => {
-                const rec = this.objectProps[obj.texture.key]?.body
-                if (rec) {
+                const { body, properties } = this.objectProps[obj.texture.key]
+                if (body) {
                     // has custom collider
-                    const { x, y, width, height } = rec;
-                    const body = obj.body as Phaser.Physics.Arcade.Body;
-                    body.setOffset(x, y).setSize(width, height, false);
-                    obj.setDepth(body.y);
+                    const { x, y, width, height } = body;
+                    const objBody = obj.body as Phaser.Physics.Arcade.Body;
+                    objBody.setOffset(x, y).setSize(width, height, false);
+                    obj.setDepth(objBody.y);
+                }
+                if (properties) {
+                    obj.setData(properties);
                 }
             })
         console.log(this.map)
@@ -305,10 +316,10 @@ class MapParser {
         const { firstgid, name, imageHeight, imageSpacing, imageWidth, total } = collection,
             tiles = collection.images.map((obj) => {
                 let objectgroup;
-                const rec = this.objectProps[obj.image]?.body,
-                    { width, height } = this.map.scene.textures.get(obj.image).frames['__BASE']
-                if (rec) {
-                    const { x, y, width, height } = rec;
+                let { body, properties } = this.objectProps[obj.image] || {},
+                    { width, height } = this.map.scene.textures.get(obj.image).frames['__BASE'];
+                if (body) {
+                    const { x, y, width, height } = body;
                     objectgroup = {
                         draworder: 'index',
                         name: '',
@@ -331,13 +342,18 @@ class MapParser {
                         y: 0,
                     }
                 }
+                if (properties) {
+                    properties = Object.entries(properties).map(([name, value]) => (
+                        { name, type: typeof value === 'number' ? 'int' : typeof value, value }
+                    ));
+                }
                 return {
                     id: obj.gid - firstgid,
                     image: obj.image,
                     objectgroup,
                     imageheight: height,
                     imagewidth: width,
-                    // properties,
+                    properties,
                     // type
                 }
             })

@@ -87,7 +87,7 @@ class BootScene extends Phaser.Scene {
         // mapManager.fetchMap().then(() => mapManager.loadMap(this));
         mapManager.loadMap(this);
 
-        this.load.image('__CONFERENCE', API_BASE + "static/maps/tilesets/conference.png")
+        this.load.image('__CONFERENCE', API_BASE + "static/maps/tilesets/tiles/conference.png")
         this.load.spritesheet('player', API_BASE + "static/characters/RPG_assets.png", { frameWidth: 16, frameHeight: 16 });
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/fonts/bitmap/gem.xml`);
     }

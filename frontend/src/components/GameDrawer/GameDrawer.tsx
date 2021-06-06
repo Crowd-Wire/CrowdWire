@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme: Theme) =>
     drawerPaper: {
       width: drawerWidth,
       paddingLeft: sideBarWidth,
-      backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',
+      backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 200%)',
     },
     drawerHeader: {
       display: 'flex',

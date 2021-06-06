@@ -341,7 +341,12 @@ class WorldEditorScene extends Scene {
                             if (this.input.manager.activePointer.isDown) {
                                 if (this.mouseClick) {
                                     !this.save && useWorldEditorStore.getState().setState({ save: true });
-                                    let obj = this.add.sprite(this.preview.x, this.preview.y, activeObject);
+                                    const obj = this.add.sprite(this.preview.x, this.preview.y, activeObject),
+                                        properties = this.mapManager.objectProps[activeObject].properties;
+                                    if (properties) {
+                                        obj.setData(properties);
+                                        console.log(properties)
+                                    }
                                     activeObjectGroup.add(obj);
                                     const { width, height, offset } = this.preview.body;
                                     obj.body.setSize(width, height)
@@ -349,6 +354,8 @@ class WorldEditorScene extends Scene {
                                             offset.x + this.preview.getSprite().width / 2,
                                             offset.y + this.preview.getSprite().height / 2);
                                     this.mouseClick = false;
+
+                                    console.log(this.objectGroups)
                                 }
                             } else {
                                 this.mouseClick = true;
