@@ -5,7 +5,7 @@ import GameDrawer from 'components/GameDrawer/GameDrawer';
 import Phaser from "./Sections/Phaser.js";
 
 import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
-import WorldService from "../../services/WorldService";
+import WorldService from "../../services/WorldService.ts";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
 import useWorldUserStore from '../../stores/useWorldUserStore';

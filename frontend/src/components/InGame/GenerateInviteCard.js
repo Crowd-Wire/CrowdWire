@@ -1,7 +1,7 @@
 import {Card, InputGroup, Button, FormControl} from 'react-bootstrap';
 import React from 'react';
 import {useState} from 'react';
-import WorldService from 'services/WorldService';
+import WorldService from 'services/WorldService.ts';
 import {URL_BASE} from 'config';
 import useWorldUserStore from 'stores/useWorldUserStore';
 

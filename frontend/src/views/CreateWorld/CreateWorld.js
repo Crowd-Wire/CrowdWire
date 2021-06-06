@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 import WorldDetails from 'views/CreateWorld/sections/WorldDetails.js';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import img from 'assets/img/bg8.png';
-import WorldService from 'services/WorldService.js';
+import WorldService from 'services/WorldService.ts';
 import { createBrowserHistory } from 'history';
 import IconButton from '@material-ui/core/IconButton';
 

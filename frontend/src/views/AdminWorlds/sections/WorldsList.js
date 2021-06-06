@@ -1,5 +1,5 @@
 import React from 'react';
-import WorldService from '../../../services/WorldService.js';
+import WorldService from '../../../services/WorldService.ts';
 import TagService from '../../../services/TagService.js';
 import { Checkbox } from '@material-ui/core';
 import FormGroup from '@material-ui/core/FormGroup';

@@ -26,7 +26,7 @@ import { toast } from 'react-toastify';
 import logo from 'assets/crowdwire_white_logo.png';
 import useWorldUserStore from 'stores/useWorldUserStore';
 import { getSocket } from "services/socket.js";
-import WorldService from "services/WorldService";
+import WorldService from "services/WorldService.ts";
 import EditorNavbar from "./sections/EditorNavbar";
 
 

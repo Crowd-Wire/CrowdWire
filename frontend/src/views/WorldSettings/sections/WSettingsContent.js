@@ -6,7 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import RolePanel from 'views/WorldSettings/sections/RolePanel.js';
 import KickBanPanel from 'views/WorldSettings/sections/KickBanPanel.js';
-import WorldService from 'services/WorldService.js';
+import WorldService from 'services/WorldService.ts';
 class WSettingsContent extends Component {
 
 

@@ -210,7 +210,20 @@ class LayersTab extends Component<{}, LayersTabState> {
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         onClick={(e) => this.handleActiveLayer(e, null)}
       >
-        <LayerGroup name="Collision Layers" info="Every tile and object on these layers is collidable">
+        <LayerGroup name="Float Layers" info="Every tile on these layers float over everything">
+          {
+            map.layers?.map((layer, index) => {
+              if (layer.name.includes("Float")) {
+                return (
+                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
+                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
+                  </div>
+                );
+              }
+            }).reverse()
+          }
+        </LayerGroup>
+        <LayerGroup name="Collision Layers" info="Every tiles and objects on these layers are collidable">
           {
             map.objects?.map((layer, index) => {
               if (layer.name.includes("Collision")) {

@@ -1,6 +1,7 @@
 import { GameObjects, Scene, Tilemaps, Physics, Geom } from "phaser";
 import { API_BASE } from "config";
 
+import WorldService from "services/WorldService";
 import useWorldUserStore from "stores/useWorldUserStore";
 
 
@@ -154,7 +155,7 @@ class MapManager {
         newTileset.setImage(this.map.scene.textures.get('__CONFERENCE'));
         newTileset.tileProperties = { 0: { conference: cid } };
 
-        this.tilesetProps[name] = { 
+        this.tilesetProps[name] = {
             image: "tilesets/conference.png",
             properties: properties || {},
         }
@@ -215,15 +216,13 @@ class MapManager {
         (<any>conferenceLayer).setTilesets(conferenceLayer.tileset);
     }
 
-    async saveMap(): Promise<void> {
+    saveMap(): Promise<Response> {
         if (this.state !== MapManagerState.BUILT)
             throw Error(`Illegal call to function with the current state ${this.state}`);
 
-        console.log(JSON.stringify(new MapParser(this).toJson()));
-
+        const saveJson = JSON.stringify(new MapParser(this).toJson());
+        return WorldService.putWorld(this.worldId, { worldMap: saveJson });
     }
-
-
 }
 
 
@@ -241,8 +240,9 @@ class MapParser {
     }
 
     private tileLayerToJson(id: number, layer: Tilemaps.LayerData) {
-        const { name, height, width, properties } = layer,
-            data = layer.data.flat().map((tile) => tile.index > 0 ? tile.index : 0)
+        const { name, height, width } = layer,
+            data = layer.data.flat().map((tile) => tile.index > 0 ? tile.index : 0),
+            properties = layer.properties.length > 0 ? layer.properties : undefined;
         return {
             data,
             height,
@@ -305,7 +305,8 @@ class MapParser {
         const { firstgid, name, imageHeight, imageSpacing, imageWidth, total } = collection,
             tiles = collection.images.map((obj) => {
                 let objectgroup;
-                const rec = this.objectProps[obj.image]?.body;
+                const rec = this.objectProps[obj.image]?.body,
+                    { width, height } = this.map.scene.textures.get(obj.image).frames['__BASE']
                 if (rec) {
                     const { x, y, width, height } = rec;
                     objectgroup = {
@@ -334,17 +335,17 @@ class MapParser {
                     id: obj.gid - firstgid,
                     image: obj.image,
                     objectgroup,
-                    // imageheight,
-                    // imagewidth,
+                    imageheight: height,
+                    imagewidth: width,
                     // properties,
-                    type: ''
+                    // type
                 }
             })
         return {
-            // columns,
+            columns: 0,
             firstgid,
             grid: { height: 1, orientation: "orthogonal", width: 1 },
-            // margin,
+            margin: 0,
             name,
             spacing: imageSpacing,
             tilecount: total,
@@ -358,6 +359,7 @@ class MapParser {
         const { columns, firstgid, name, tileHeight, tileWidth,
             tileMargin, tileSpacing, tileProperties, total } = tileset,
             image = this.tilesetProps[name].image,
+            { width, height } = tileset.image.frames['__BASE'],
             tiles = Object.entries(tileProperties).map(([id, props]) => {
                 const properties = Object.entries(props).map(([name, value]) => (
                     { name, type: typeof value === 'number' ? 'int' : typeof value, value }
@@ -373,15 +375,15 @@ class MapParser {
             columns,
             firstgid,
             image,
-            // imageheight,
-            // imagewidth,
+            imageheight: height,
+            imagewidth: width,
             margin: tileMargin,
             name,
             properties,
             spacing: tileSpacing,
             tilecount: total,
             tileheight: tileHeight,
-            tiles,
+            tiles: tiles.length > 0 ? tiles : undefined,
             tilewidth: tileWidth,
             transparentcolor: '#ff0000'
         }

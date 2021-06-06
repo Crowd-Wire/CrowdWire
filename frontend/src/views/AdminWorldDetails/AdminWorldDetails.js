@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import WorldService from 'services/WorldService.js';
+import WorldService from 'services/WorldService.ts';
 import WorldReportCard from 'components/WorldReportCard/WorldReportCard.js';
 import { Row, Col } from 'react-bootstrap';
 import { withStyles } from '@material-ui/core/styles';

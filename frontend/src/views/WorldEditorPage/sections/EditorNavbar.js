@@ -59,8 +59,8 @@ class EditorNavbar extends React.Component {
   }
 
   handleExit = () => {
-    if (this.askSave) {
-      toast.warning("Save changes before exiting!", {
+    if (this.state.save && this.askSave) {
+      toast.warning("Don't forget to save before exiting!", {
         position: toast.POSITION.TOP_CENTER,
         toastId: 'toast-save'
       });
