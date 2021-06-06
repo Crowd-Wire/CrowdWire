@@ -55,7 +55,7 @@ class TilesTab extends Component<{}, TilesTabState> {
       if (!tileset.name.startsWith('_')) {
         // Not private
         const tiles = [],
-          tilesetImage = mapManager.tileLayerProps[tileset.name]?.image,
+          tilesetImage = mapManager.tilesetProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
         
         if (!tilesetImage) {

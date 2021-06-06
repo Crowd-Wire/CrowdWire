@@ -10,6 +10,7 @@ import { makeStyles } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
+import MapManager from "phaser/MapManager";
 
 
 interface ConferenceItemProps {
@@ -126,6 +127,7 @@ interface ConferencesTabState {
 class ConferencesTab extends Component<{}, ConferencesTabState> {
   static curConference: number = 0;
 
+  mapManager: MapManager;
   subscriptions: any[];
 
   constructor(props) {
@@ -168,6 +170,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
   }
 
   handleReady = () => {
+    this.mapManager = new MapManager();
     const { conferences } = useWorldEditorStore.getState();
     ConferencesTab.curConference = Object.keys(conferences)
       .map(k => parseInt(k.substr(1), 10))
@@ -201,6 +204,12 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       const conferences = this.state.conferences;
       conferences[id].name = name;
 
+      const props = this.mapManager.tilesetProps['__CONFERENCE_' + id];
+      if (props.properties) {
+        props.properties.name = name;
+      } else {
+        props.properties = { name };
+      }
       useWorldEditorStore.getState().setState({ conferences });
       useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });

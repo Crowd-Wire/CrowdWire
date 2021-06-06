@@ -29,7 +29,7 @@ class MapManager {
     private conferenceMap: Record<number, string>;
 
     public map: Tilemaps.Tilemap;
-    public tileLayerProps: Record<string, TileLayerProps>;
+    public tilesetProps: Record<string, TileLayerProps>;
     public objectProps: Record<string, ObjectProps>;
     public objectGroups: Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup>;
 
@@ -47,7 +47,7 @@ class MapManager {
     loadMap(scene: Scene): void {
         scene.load.tilemapTiledJSON('map', this.mapJson);
 
-        this.tileLayerProps = {};
+        this.tilesetProps = {};
         this.objectProps = {};
         this.mapJson.tilesets.forEach((tileset) => {
             if ('grid' in tileset) {
@@ -66,13 +66,13 @@ class MapManager {
                 // Tile layer
                 const { name, image, properties } = tileset;
                 scene.load.spritesheet(name, API_BASE + "static/maps/" + image, { frameWidth: 32, frameHeight: 32 });
-                this.tileLayerProps[name] = { image };
+                this.tilesetProps[name] = { image };
                 if (properties) {
                     const props = {};
                     properties.forEach(({ name, type, value }) => {
                         props[name] = (type === 'int') ? parseInt(value, 10) : value;
                     });
-                    this.tileLayerProps[name].properties = props;
+                    this.tilesetProps[name].properties = props;
                 }
             }
         })
@@ -87,7 +87,7 @@ class MapManager {
 
         // Add tileset images
         const tilesets: Tilemaps.Tileset[] = [];
-        Object.keys(this.tileLayerProps).forEach((key) => {
+        Object.keys(this.tilesetProps).forEach((key) => {
             tilesets.push(this.map.addTilesetImage(key));
         });
         Object.keys(this.objectProps).forEach((key) => {
@@ -146,7 +146,7 @@ class MapManager {
     /**
      * Create a new tileset to represent the new conference tiles
      */
-    addConference(cid: string): void {
+    addConference(cid: string, properties?: any): void {
         // Create tileset
         const id = 100000 + parseInt(cid.substr(1), 10),
             name = `__CONFERENCE_${cid}`;
@@ -154,9 +154,9 @@ class MapManager {
         newTileset.setImage(this.map.scene.textures.get('__CONFERENCE'));
         newTileset.tileProperties = { 0: { conference: cid } };
 
-        this.tileLayerProps[name] = { 
+        this.tilesetProps[name] = { 
             image: "tilesets/conference.png",
-            properties: { name: 'ok then' },
+            properties: properties || {},
         }
 
         // Add tileset to map
@@ -229,13 +229,13 @@ class MapManager {
 
 class MapParser {
     private map: Tilemaps.Tilemap;
-    private tileLayerProps: Record<string, TileLayerProps>;
+    private tilesetProps: Record<string, TileLayerProps>;
     private objectProps: Record<string, ObjectProps>;
     private objectGroups: Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup>;
 
     constructor(mapManager: MapManager) {
         this.map = mapManager.map;
-        this.tileLayerProps = mapManager.tileLayerProps;
+        this.tilesetProps = mapManager.tilesetProps;
         this.objectProps = mapManager.objectProps;
         this.objectGroups = mapManager.objectGroups;
     }
@@ -357,14 +357,14 @@ class MapParser {
     private tilesetImageToJson(tileset: Tilemaps.Tileset) {
         const { columns, firstgid, name, tileHeight, tileWidth,
             tileMargin, tileSpacing, tileProperties, total } = tileset,
-            image = this.tileLayerProps[name].image,
+            image = this.tilesetProps[name].image,
             tiles = Object.entries(tileProperties).map(([id, props]) => {
                 const properties = Object.entries(props).map(([name, value]) => (
                     { name, type: typeof value === 'number' ? 'int' : typeof value, value }
                 ))
                 return { id, properties };
             });
-        let properties = this.tileLayerProps[name].properties;
+        let properties = this.tilesetProps[name].properties;
         if (properties) {
             properties = Object.entries(properties).map(([name, value]) => (
                 { name, type: typeof value === 'number' ? 'int' : typeof value, value }));
@@ -389,7 +389,7 @@ class MapParser {
 
     private tilesetsToJson() {
         const { tilesets, imageCollections } = this.map;
-        const tilesetImages: any[] = tilesets.filter((tileset) => tileset.name in this.tileLayerProps)
+        const tilesetImages: any[] = tilesets.filter((tileset) => tileset.name in this.tilesetProps)
             .map((tileset) => this.tilesetImageToJson(tileset));
         const collectionImages: any[] = imageCollections
             .map((collection) => this.collectionImageToJson(collection));

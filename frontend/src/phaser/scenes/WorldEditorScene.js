@@ -43,7 +43,7 @@ class WorldEditorScene extends Scene {
             .filter((tileset) => tileset.name.startsWith('__CONFERENCE_'))
             .forEach((tileset, index) => {
                 const cid = tileset.name.match(/__CONFERENCE_(C\d+)/)[1];
-                const name = this.mapManager.tileLayerProps[tileset.name].properties?.name || `Conference C${index}`;
+                const name = this.mapManager.tilesetProps[tileset.name].properties?.name || `Conference C${index}`;
                 conferences[cid] = { name, color: `#${intToHex(cyrb53Hash(cid))}` };
             });
         useWorldEditorStore.getState().setState({ conferences });
@@ -136,7 +136,7 @@ class WorldEditorScene extends Scene {
             // Add conference
             for (const cid of conferences) {
                 if (prevConferences.indexOf(cid) < 0) {
-                    this.mapManager.addConference(cid);
+                    this.mapManager.addConference(cid, { name: conferences.name });
                     break;
                 }
             }
@@ -160,7 +160,6 @@ class WorldEditorScene extends Scene {
                 activeLayer.setAlpha(layer.active || !highlight ? 1 : 0.4);
                 return;
             }
-
             const activeObjectGroup = this.objectGroups[name];
             if (activeObjectGroup) {
                 activeObjectGroup.setVisible(layer.visible);
@@ -177,7 +176,6 @@ class WorldEditorScene extends Scene {
             // Nothing to do, avoid loop
             return;
         }
-
         const queue = [{ x, y }];
 
         while (queue.length > 0) {
