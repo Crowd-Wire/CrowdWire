@@ -76,7 +76,6 @@ class FillTilesScene extends Phaser.Scene {
         // this.input.isOver is necessary to avoid interacting with the canvas through overlaying html elements
         if (this.input.manager.activePointer.isDown && this.input.isOver)
         {
-            console.log("clicou-me primeiro")
             // Fill the tiles within an area with sign posts (tile id = 46)
             this.map.fill(1, pointerTileX, pointerTileY, 6, 6);
         }

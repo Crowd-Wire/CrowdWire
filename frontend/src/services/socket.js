@@ -157,7 +157,6 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
             break;
         case "PLAYERS_SNAPSHOT":
-            console.log("here")
             usePlayerStore.getState().connectPlayers(data.snapshot, data.players_data);
             break;
         case "WIRE_PLAYER":

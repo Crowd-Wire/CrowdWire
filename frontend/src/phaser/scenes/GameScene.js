@@ -221,7 +221,6 @@ class GameScene extends Phaser.Scene {
                             if (left) {
                                 GameScene.inRangePlayers.delete(id);
                                 // close media connections to this user
-                                console.log("entao")
                                 useConsumerStore.getState().closePeer(id);
                             };
                             return left;
@@ -298,7 +297,6 @@ class Player extends Phaser.GameObjects.Container {
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
         } else {
-            console.log(usePlayerStore.getState().users_info)
             avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')
@@ -309,8 +307,6 @@ class Player extends Phaser.GameObjects.Container {
         const row = (avatar_number === '1' || avatar_number === '2' || avatar_number === '3' || avatar_number === '4') ?
                             0
                         :   4 * 12
-        console.log(col)
-        console.log(row)
 
         // add sprite and text to scene and then container
         const sprite = scene.add.sprite(0, 0, avatar_sprite_sheet, 1 + col + row)
