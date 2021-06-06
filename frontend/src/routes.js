@@ -34,6 +34,7 @@ import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
+import WorldStatistics from "views/WorldStatistics/WorldStatistics";
 
 /**
  * Public and protected routes list 
@@ -95,6 +96,7 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
+			{ path: "/:id/statistics", element: <WorldStatistics/>},
             { path: "/:id/editor", element: <WorldEditorPage /> },
 		],
 	},
@@ -106,6 +108,7 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
 			{ path: "/worlds", element: <AdminWorlds />},
 			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
+			{ path: "/worlds/:id/statistics", element: <WorldStatistics/>},
 			{ path: "/statistics", element: <AdminStatistics/>},
 			{ path: "/users", element: <AdminUsers/>},
 			{ path: "/users/reports", element: <AdminUserReports/>},

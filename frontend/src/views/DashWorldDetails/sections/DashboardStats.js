@@ -14,6 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';
 import Button from "components/CustomButtons/Button.js";
+import { useNavigate } from 'react-router-dom';
 
 
 class DashboardStats extends Component{
@@ -23,7 +24,8 @@ class DashboardStats extends Component{
         this.state = {
             show: false,
             nav: false,
-            open: false
+            open: false,
+            page: false
         }
     }
 
@@ -44,6 +46,10 @@ class DashboardStats extends Component{
         this.setState({show: false});        
     }
 
+    changePage = () => {
+        this.setState({stats: true})
+    }
+
     hideModalandDelete = () => {
         WorldService.deleteWorld(this.props.details.world_id);
         this.setState({show: false});
@@ -62,9 +68,21 @@ class DashboardStats extends Component{
         if(this.state.nav){
             return <Navigate to={"/world/"+this.props.details.world_id+"/settings"}></Navigate>
         }
+        if (this.state.stats){
+            return <Navigate to={"/world/"+this.props.details.world_id+"/statistics"}></Navigate>
+        }
         return(
             <>    
                 <div style={{width: "100%", paddingLeft: 15}}>
+                    { this.props.isCreator || this.props.canManage ? 
+                        <Row sm={12}>
+                            {/* <Link to={"/world/"+this.props.details.world_id+"/statistics"}> */}
+                            <Button color="warning" onClick={() => this.changePage()} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Check Statistics</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
                     { this.props.canManage ? 
                         <Row sm={12}>
                             <Button color="primary" onClick={() => {this.showWorldManagement()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>

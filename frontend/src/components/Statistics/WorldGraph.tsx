@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Chart } from 'react-charts';
 import PersonIcon from '@material-ui/icons/Person';
 import Typography from '@material-ui/core/Typography';
-import NavigateNextIcon from '@material-ui/icons/NavigateNext';
 import { useNavigate } from "react-router-dom";
 import { DateTimePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
@@ -31,20 +30,15 @@ export const customTheme = createMuiTheme({
   }
 })
 
-export const Graph = () => {
+export const WorldGraph = ({world_id}) => {
   const [data, setData] = useState([
     {
-      label: "Active Users",
+      label: "Users Joined",
       datums: [],
-    },
-    {
-      label: "New Users",
-      datums: [],
-    },
+    }
   ])
   const [loading, setLoading] = useState(1)
   const [axes, setAxes] = useState([])
-  const navigation = useNavigate();
   const [endDate, setEndDate] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
 
@@ -54,11 +48,10 @@ export const Graph = () => {
 
   useEffect(() => {
     const datums1 = []
-    const datums2 = []
-
     startDate.setSeconds(0,0)
     endDate.setSeconds(0,0)
-    StatisticService.getActiveOnlineUsersCharts(startDate.toISOString(), endDate.toISOString())
+
+    StatisticService.getWorldCharts(world_id, startDate.toISOString(), endDate.toISOString())
         .then((res) =>{
           if (res.status === 200)
             return res.json();
@@ -70,39 +63,20 @@ export const Graph = () => {
                 datums1.push({x: new Date(new Date(key).toISOString()), y: value})
               }
             }
-            StatisticService.getNewRegisteredUsersCharts(startDate.toISOString(), endDate.toISOString())
-              .then((res) =>{
-                if (res.status === 200)
-                  return res.json();
-              })
-              .then((res) =>{
-                if (res){
-                  for (let i = 0; i < res.length; i++) {
-                    for (const [key, value] of Object.entries(res[i])) {
-                      datums2.push({x:  new Date(new Date(key).toISOString()), y: value})
-                    }
-                  }
-                  setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
             
-                  setData([
-                    {
-                      label: "Active Users",
-                      datums: datums1,
-                    },
-                    {
-                      label: "New Users",
-                      datums: datums2,
-                    }
-                  ])
+            setAxes([{ primary: true, type: 'time', position: 'bottom' },{ type: 'linear', position: 'left' }])
+
+            setData([
+              {
+                label: "Users Joined",
+                datums: datums1,
+              }
+            ])
                 
-                  setLoading(0)
-      
-                }
-              })
+            setLoading(0)
           }
         })
     
-
   }, [startDate, endDate]);
 
   if (loading) {
@@ -136,7 +110,7 @@ export const Graph = () => {
           }}
         >
           <Typography variant="h6" component="h6" gutterBottom  style={{fontWeight: 600, color: 'white'}}>
-            Platform Activity
+            World Activity
           </Typography>
         </div>
         <div
@@ -183,17 +157,6 @@ export const Graph = () => {
                 </span>
               )
             }}/>
-        </div>
-        <div
-          style={{
-            flex: '0 0 auto',
-            padding: '10px',
-          }}
-        >
-          <Typography variant="h6" onClick={() => navigation('/admin/statistics')}  component="h6" gutterBottom 
-            style={{cursor: 'pointer', fontWeight: 600, color: '#2b9bfd', float: 'right', paddingTop: 20, marginBottom: -25}}>
-            <NavigateNextIcon /> Check Out More Statistics
-          </Typography>
         </div>
       </div>
       <br />
