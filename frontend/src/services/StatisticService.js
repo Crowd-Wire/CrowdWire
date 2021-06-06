@@ -14,6 +14,54 @@ class StatisticService {
         })
     }
 
+    getActiveOnlineUsersCharts(start_date, end_date=undefined) {
+        let query = "?start_date=" + start_date
+        if (end_date)
+            query += "&end_date=" + end_date
+        return fetch(API_BASE + 'statistics/charts/active-users' + query, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
+        })
+    }
+
+    getNewRegisteredUsersCharts(start_date, end_date) {
+        let query = "?start_date=" + start_date
+        if (end_date)
+            query += "&end_date=" + end_date
+        return fetch(API_BASE + 'statistics/charts/new-users' + query, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
+        })
+    }
+
+    getWorldStats(world_id) {
+        return fetch(API_BASE + 'statistics/worlds/' + world_id + '/', {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
+        })
+    }
+
+    getWorldCharts(world_id, start_date, end_date) {
+        let query = "?start_date=" + start_date
+        if (end_date)
+            query += "&end_date=" + end_date
+        return fetch(API_BASE + 'statistics/worlds/' + world_id + '/charts/'+ query, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()  
+            }
+        })
+    }
 }
 
 export default new StatisticService();

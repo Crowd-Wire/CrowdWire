@@ -13,5 +13,5 @@ class WorldStatistics(BaseModel):
     world_id: int
     total_users: int
     online_users: int
-    reports: int
+    reports_users: int
     total_n_joins: int

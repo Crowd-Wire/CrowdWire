@@ -36,6 +36,8 @@ import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
 import SendEmailConfirmation from "views/SendEmailConfirmation/SendEmailConfirmation";
 import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail.js';
+import WorldStatistics from "views/WorldStatistics/WorldStatistics";
+
 /**
  * Public and protected routes list 
  * Based on https://stackoverflow.com/questions/62384395/protected-route-with-react-router-v6
@@ -98,6 +100,7 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
+			{ path: "/:id/statistics", element: <WorldStatistics/>},
             { path: "/:id/editor", element: <WorldEditorPage /> },
 		],
 	},
@@ -109,6 +112,7 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
             { path: "/worlds/reports", element: <AdminWorldReports /> },
 			{ path: "/worlds", element: <AdminWorlds />},
 			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
+			{ path: "/worlds/:id/statistics", element: <WorldStatistics/>},
 			{ path: "/statistics", element: <AdminStatistics/>},
 			{ path: "/users", element: <AdminUsers/>},
 			{ path: "/users/reports", element: <AdminUserReports/>},

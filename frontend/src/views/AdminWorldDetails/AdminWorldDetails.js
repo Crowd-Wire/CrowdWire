@@ -123,7 +123,7 @@ class AdminWorldDetails extends Component {
                                                         <Button onClick={this.handleBan} size="small" variant="contained" color={this.state.world.status == 0 ? "primary" : 'secondary'}>
                                                             {this.state.world.status == 0 ? "Ban" : "Unban"}
                                                         </Button>
-                                                        <Link to="/admin/statistics"><Button size="small" variant="contained" color="primary">View statistics</Button></Link>
+                                                        <Link to={"/admin/worlds/"+this.state.world.world_id+"/statistics"}><Button size="small" variant="contained" color="primary">View statistics</Button></Link>
                                                     </CardActions>
                                                 </>
                                             }
