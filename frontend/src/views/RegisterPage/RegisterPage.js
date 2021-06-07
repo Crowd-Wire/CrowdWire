@@ -27,6 +27,7 @@ import Typography from "@material-ui/core/Typography"
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from 'react-router-dom';
+import  { withRouter } from 'utils/wrapper.js'
 
 const useStyles = makeStyles(styles);
 
@@ -44,6 +45,7 @@ class RegisterPage extends React.Component {
       cPassHelperText: "",
       birthdayHelperText: ""
     }
+    this.navigate = props.navigate;
   }
 
 
@@ -135,16 +137,12 @@ class RegisterPage extends React.Component {
       )
       .then(
         (res) => {
-          console.log(res.status);
+          if (res.ok) {
+            this.navigate('/confirm')
+          }
           return res.json();
         }
-        )
-      .then(
-        (res) => {
-          console.log(res);
-          this.handleLogin(document.getElementById("email").value, document.getElementById("pass").value); 
-      }
-    )
+      )
     .catch(
       (error) => {
         console.log(error);
@@ -316,4 +314,4 @@ class RegisterPage extends React.Component {
   }
 }
 
-export default withStyles(styles)(RegisterPage);
+export default withRouter(withStyles(styles)(RegisterPage));

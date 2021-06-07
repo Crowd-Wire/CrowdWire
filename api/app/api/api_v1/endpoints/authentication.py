@@ -30,7 +30,7 @@ async def register(
     if not user:
         raise HTTPException(status_code=400, detail=message)
 
-    await send_email('brunosb@ua.pt', user.user_id)
+    await send_email(user_data.email, user.user_id)
 
     return {'status': 'ok'}
 
