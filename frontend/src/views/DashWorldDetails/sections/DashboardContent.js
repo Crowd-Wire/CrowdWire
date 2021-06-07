@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import DashboardStats from 'views/DashWorldDetails/sections/DashboardStats.js'
 import BookmarksIcon from '@material-ui/icons/Bookmarks';
-import WorldService from 'services/WorldService.js';
+import WorldService from 'services/WorldService.ts';
 import { Navigate } from 'react-router-dom';
 import EditIcon from '@material-ui/icons/Edit';
 import Button from "components/CustomButtons/Button.js";

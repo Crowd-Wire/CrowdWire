@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import WorldService from 'services/WorldService';
+import WorldService from 'services/WorldService.ts';
 import Paginator from 'components/Paginator/Paginator.js';
 import Typography from '@material-ui/core/Typography';
 import useAuthStore from "stores/useAuthStore";

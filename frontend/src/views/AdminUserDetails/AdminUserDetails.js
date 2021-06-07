@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Grid, Container, Card, CardContent, Divider, CardHeader, Typography } from '@material-ui/core';
 import UserService from 'services/UserService';
 import ReportService from 'services/ReportService';
-import WorldService from 'services/WorldService';
+import WorldService from 'services/WorldService.ts';
 import MapCard from 'components/MapCard/MapCard.js';
 import UserReportCard from 'components/UserReportCard/UserReportCard.js';
 import { makeStyles } from '@material-ui/core/styles';

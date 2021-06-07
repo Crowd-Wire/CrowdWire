@@ -7,7 +7,7 @@ import React from 'react';
 import { API_BASE } from "config";
 
 
-const AvatarCarousel = ({avatar=API_BASE + "avatars_1_1"}) => {
+const AvatarCarousel = ({ avatar }) => {
     return (
         <img key={avatar} src={API_BASE + "static/characters/" + avatar + '.png'} style={{width: 130}}/>
     );

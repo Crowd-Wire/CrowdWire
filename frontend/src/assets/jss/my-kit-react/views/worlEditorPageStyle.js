@@ -8,14 +8,14 @@ const worldEditorPageStyle = {
         flexDirection: 'row'
     },
     handlerCol: {
-        width: 20,
+        width: 10,
         padding: '0',
         cursor: 'ew-resize',
         flex: '0 0 auto',
         zIndex: 10,
     },
     handlerRow: {
-        height: 20,
+        height: 10,
         padding: '0',
         cursor: 'ns-resize',
         flex: '0 0 auto',

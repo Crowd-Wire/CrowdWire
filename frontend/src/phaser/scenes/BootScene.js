@@ -87,6 +87,7 @@ class BootScene extends Phaser.Scene {
         // mapManager.fetchMap().then(() => mapManager.loadMap(this));
         mapManager.loadMap(this);
 
+        this.load.image('__CONFERENCE', API_BASE + "static/maps/tilesets/tiles/conference.png");
         // this.load.spritesheet('player', API_BASE + "static/characters/RPG_assets.png", { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('avatars_1', API_BASE + "static/characters/avatars_1.png", { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('avatars_2', API_BASE + "static/characters/avatars_2.png", { frameWidth: 48, frameHeight: 48 });

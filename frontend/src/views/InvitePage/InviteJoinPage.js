@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AuthenticationService from "../../services/AuthenticationService";
-import WorldService from "../../services/WorldService";
+import WorldService from "../../services/WorldService.ts";
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import {

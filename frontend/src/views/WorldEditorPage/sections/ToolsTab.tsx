@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import useWorldEditorStore, { PaintToolType } from "stores/useWorldEditorStore";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore";
 
 import Button from '@material-ui/core/Button';
 import ButtonGroup from '@material-ui/core/ButtonGroup';
@@ -35,30 +35,42 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     this.subscriptions = [];
 
     this.state = {
-      toolType: PaintToolType.DRAW,
+      toolType: ToolType.DRAW,
       tileStyle: {},
     }
-    useWorldEditorStore.getState().setPaintTool({ type: PaintToolType.DRAW });
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
-      this.handleTileChange, state => state.activeTile));
+      this.handleActiveChange, state => Object.entries(state.active)));
   }
 
   componentWillUnmount() {
     this.subscriptions.forEach((unsub) => unsub());
   }
 
-  handleTileChange = (tileId, prevTileId) => {
-    if (tileId === prevTileId)
-      return;
-
-    const tileStyle = tileId ? useWorldEditorStore.getState().tiles[tileId].style : {};
-    this.setState({ tileStyle });
+  handleActiveChange = (active: string[][]) => {
+    for (const [key, value] of active) {
+      if (value) {
+        let tileStyle = {};
+        switch (key) {
+          case 'tile':
+          case 'object':
+          case 'conference':
+            tileStyle = useWorldEditorStore.getState().tiles[value].style;
+            break;
+          case 'wall':
+            break;
+        }
+        this.setState({ tileStyle });
+        return;
+      }
+    }
+    this.setState({ tileStyle: {} });
   }
 
-  handlePaintToolChange = (toolType: PaintToolType) => {
+  handlePaintToolChange = (toolType: ToolType) => {
     this.setState({ toolType });
-    useWorldEditorStore.getState().setPaintTool({ type: toolType });
+    useWorldEditorStore.getState().setTool({ type: toolType });
   }
 
   render() {
@@ -76,11 +88,11 @@ class ToolsTab extends Component<{}, ToolsTabState> {
           <ButtonGroup variant="contained" color="default" aria-label="contained primary button group">
             {
               [
-                { type: PaintToolType.DRAW, Icon: FaPencilAlt },
-                { type: PaintToolType.ERASE, Icon: FaEraser },
-                { type: PaintToolType.FILL, Icon: FaFill },
-                { type: PaintToolType.SELECT, Icon: FaRegSquare },
-                { type: PaintToolType.PICK, Icon: FaEyeDropper },
+                { type: ToolType.DRAW, Icon: FaPencilAlt },
+                { type: ToolType.ERASE, Icon: FaEraser },
+                { type: ToolType.FILL, Icon: FaFill },
+                { type: ToolType.SELECT, Icon: FaRegSquare },
+                { type: ToolType.PICK, Icon: FaEyeDropper },
               ].map(({ type, Icon }, index) => {
                 return (
                   <Button

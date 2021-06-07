@@ -3,7 +3,6 @@ import React, { Component, useState } from "react";
 import classNames from "classnames";
 import Input from '@material-ui/core/Input';
 
-import MapManager from "phaser/MapManager";
 import useWorldEditorStore, { Conference } from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
@@ -11,7 +10,11 @@ import { makeStyles } from "@material-ui/core";
 
 import AddIcon from '@material-ui/icons/Add';
 import RemoveIcon from '@material-ui/icons/Remove';
-
+import MapManager from "phaser/MapManager";
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import LockIcon from '@material-ui/icons/Lock';
+import LockOpenIcon from '@material-ui/icons/LockOpen';
 
 interface ConferenceItemProps {
   id: string;
@@ -50,7 +53,7 @@ const useConferenceItemStyles = makeStyles({
     marginLeft: 'auto',
     width: 16,
     height: 16,
-    marginRight: 10,
+    marginRight: '.75rem',
   }
 })
 
@@ -118,6 +121,56 @@ const ConferenceItem: React.FC<ConferenceItemProps> = (
   );
 }
 
+const useConferenceLayerStyles = makeStyles({
+  root: {
+    padding: '.25rem 0',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  icon: {
+    padding: '0 .25rem',
+    "&:last-of-type": {
+      padding: '0 .75rem 0 .25rem',
+    }
+  }
+})
+
+const ConferenceLayer: React.FC<{ children: React.ReactNode[] }> = ({ children }) => {
+  const classes = useConferenceLayerStyles();
+  let visible = useWorldEditorStore(state => state.layers['__Conference'].visible);
+  let blocked = useWorldEditorStore(state => state.layers['__Conference'].blocked);
+
+  const handleVisible = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers['__Conference'].visible = !visible;
+    });
+  }
+
+  const handleBlocked = (event) => {
+    event.stopPropagation();
+    useWorldEditorStore.setState(state => {
+      state.layers['__Conference'].blocked = !blocked;
+    });
+  }
+
+  return (
+    <div className={classes.root}>
+      <div className={classes.header}>
+        <div className={classes.icon} onClick={handleVisible}>
+          {visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
+        </div>
+        <div className={classes.icon} onClick={handleBlocked}>
+          {blocked ? <LockIcon /> : <LockOpenIcon />}
+        </div>
+      </div>
+      {children}
+    </div>
+  );
+}
+
 interface ConferencesTabState {
   activeConference: string;
   conferences: Record<string, Conference>;
@@ -127,8 +180,8 @@ interface ConferencesTabState {
 class ConferencesTab extends Component<{}, ConferencesTabState> {
   static curConference: number = 0;
 
-  subscriptions: any[];
   mapManager: MapManager;
+  subscriptions: any[];
 
   constructor(props) {
     super(props);
@@ -146,10 +199,6 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
         this.handleReady, state => state.ready));
-
-    const { conferences, activeConference } = useWorldEditorStore.getState();
-    ConferencesTab.curConference = Object.keys(conferences).length;
-    this.setState({ conferences, activeConference });
   }
 
   componentWillUnmount() {
@@ -158,15 +207,15 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   addConference = () => {
     const conferences = this.state.conferences;
-    const id = `C${ConferencesTab.curConference++}`;
+    const id = `C${++ConferencesTab.curConference}`;
     conferences[id] = {
-      name: `Conference #${id}`,
+      name: `Conference C${Object.keys(conferences).length}`,
       color: `#${intToHex(cyrb53Hash(id, 129))}`
-    }
+    };
     const color = conferences[id].color;
     const style = {
       backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
-      border: `1px solid ${color}`
+      border: `1px solid ${color}`,
     };
     useWorldEditorStore.getState().addTile(id, { style });
     useWorldEditorStore.getState().setState({ conferences });
@@ -175,7 +224,20 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
   handleReady = () => {
     this.mapManager = new MapManager();
-    this.forceUpdate();
+    const { conferences } = useWorldEditorStore.getState();
+    ConferencesTab.curConference = Object.keys(conferences)
+      .map(k => parseInt(k.substr(1), 10))
+      .sort(((a, b) => a - b))
+      .pop() || -1;
+    Object.keys(conferences).forEach((cid) => {
+      const color = conferences[cid].color;
+      const style = {
+        backgroundColor: `rgba(${Object.values(hexToRGB(color)).join(',')},0.4)`,
+        border: `1px solid ${color}`
+      };
+      useWorldEditorStore.getState().addTile(cid, { style });
+    });
+    this.setState({ conferences });
   }
 
   handleChange = (id: string, name: string, del?: boolean): void => {
@@ -183,18 +245,29 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       const conferences = this.state.conferences;
       let activeConference = this.state.activeConference;
       delete conferences[id];
+      useWorldEditorStore.getState().setState({ conferences });
+      this.setState({ conferences });
+
       if (id === activeConference) {
         activeConference = null;
-        useWorldEditorStore.getState().setState({ activeTile: null });
+        useWorldEditorStore.getState().setState({ activeLayer: null });
+        useWorldEditorStore.getState().setLayer('__Conference', { active: false });
+        useWorldEditorStore.getState().remActive('conference');
+        this.setState({ activeConference });
       }
-      this.setState({ conferences, activeConference });
-      useWorldEditorStore.getState().setState({ conferences, activeConference });
     } else {
       const conferences = this.state.conferences;
       conferences[id].name = name;
 
-      useWorldEditorStore.getState().setState(
-        { conferences, activeConference: id, activeTile: id });
+      const props = this.mapManager.tilesetProps['__CONFERENCE_' + id];
+      if (props.properties) {
+        props.properties.name = name;
+      } else {
+        props.properties = { name };
+      }
+      useWorldEditorStore.getState().setState({ conferences, activeLayer: '__Conference' });
+      useWorldEditorStore.getState().setLayer('__Conference', { active: true });
+      useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });
     }
   }
@@ -203,7 +276,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     const { activeConference, conferences } = this.state;
 
     return (
-      <>
+      <ConferenceLayer>
         {Object.entries(conferences).map(([id, conference], index) => (
           <ConferenceItem
             key={index}
@@ -217,7 +290,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
           onClick={this.addConference}
           style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
         />
-      </>
+      </ConferenceLayer>
     );
   }
 }

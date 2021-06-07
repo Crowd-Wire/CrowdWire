@@ -1,16 +1,15 @@
 import { API_BASE } from "config";
-import AuthenticationService from "./AuthenticationService";
+import AuthenticationService from "./AuthenticationService.js";
 
 class WorldService {
 
-    search(search, tags, visibility, banned, normal, creator, order_by, order, page, limit) {
+    search(search, tags, visibility, banned, normal, creator, order_by, order, page, limit): Promise<Response> {
         /*
             search: string,
             tags: List[string]
             visibility: boolean
             page: int
         */
-
         let url = 'worlds/';
         let query = [];
     
@@ -55,23 +54,20 @@ class WorldService {
         })
     }
 
-    searchUsers(search, tags, visibility, order_by, order, page, limit){
+    searchUsers(search, tags, visibility, order_by, order, page, limit): Promise<Response> {
         return this.search(search, tags, visibility, false, null, null, order_by, order, page, limit);
         // makes it easier to call the function
     }
 
-    searchAdmin(search, tags, banned, normal, creator, order_by, order, page, limit){
+    searchAdmin(search, tags, banned, normal, creator, order_by, order, page, limit): Promise<Response> {
         // makes it easier to call the function
         return this.search(search, tags, null, banned, normal, creator, order_by, order, page, limit);
     }
 
-
-    getWorldDetails(path) {
-
+    getWorldDetails(path): Promise<Response> {
         /*
             id:int
         */
-
         let url = 'worlds/' + path;
         return fetch(API_BASE + url, {
             method: 'GET',
@@ -82,13 +78,11 @@ class WorldService {
         })
     }
 
-    deleteWorld(id) {
+    deleteWorld(id): Promise<Response> {
         /*
             id:int
         */
-
         let url = 'worlds/' + id;
-        let query = [];
         return fetch(API_BASE + url, {
             method: 'DELETE',
             mode: 'cors',
@@ -98,7 +92,7 @@ class WorldService {
         })
     }
 
-    create(wName, accessibility, guests, maxUsers, tag_array, desc) {
+    create(wName, accessibility, guests, maxUsers, tag_array, desc): Promise<Response> {
         return fetch(API_BASE + "static/maps/default_map.json")
             .then((res) => res.json())
             .then((worldMap) => 
@@ -128,7 +122,15 @@ class WorldService {
      * 
      * Unrecognized parameters will be ignored and undefined values will be removed by JSON.stringify.
      */
-    putWorld(world_id, { wName, accessibility, guests, maxUsers, tag_array, desc, worldMap, world_picture }) {
+    putWorld(world_id: number, body: { 
+            wName?: string, 
+            accessibility?: boolean, 
+            guests?: boolean, 
+            maxUsers?: number, 
+            tag_array?: string[], 
+            desc?: string, 
+            worldMap?: string, 
+            world_picture?: string }): Promise<Response> {
         return fetch(API_BASE + 'worlds/' + world_id, {
             method: 'PUT',
             mode: 'cors',
@@ -137,14 +139,14 @@ class WorldService {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                name: wName,
-                public: accessibility,
-                allow_guests: guests,
-                world_map: worldMap,
-                max_users: maxUsers,
-                tags: tag_array,
-                description: desc,
-                profile_image: world_picture
+                name: body.wName,
+                public: body.accessibility,
+                allow_guests: body.guests,
+                world_map: body.worldMap,
+                max_users: body.maxUsers,
+                tags: body.tag_array,
+                description: body.desc,
+                profile_image: body.world_picture
             })
         })
     }

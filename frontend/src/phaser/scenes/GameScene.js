@@ -1,4 +1,4 @@
-import Phaser, { Math } from 'phaser';
+import Phaser, { GameObjects } from 'phaser';
 
 import { getSocket } from "services/socket";
 
@@ -30,24 +30,29 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
-
         const mapManager = new MapManager();
 
         this.map = mapManager.buildMap(this);
 
         this.map.layers.forEach((layer) => {
-            if (layer.name.startsWith("Room"))
+            if (layer.name.startsWith('__Conference'))
                 this.roomLayer = layer.tilemapLayer.setVisible(false);
-            else if (layer.name.startsWith("Collision"))
+            else if (layer.name.includes("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name.startsWith("Float"))
+            else if (layer.name.includes("Float"))
                 layer.tilemapLayer.setDepth(1000);
         })
 
-        const { collisionGroup } = mapManager.buildObjects(this);
-        this.collisionGroup = collisionGroup;
+        this.objectGroups = mapManager.buildObjects(this);
 
+        this.selectedObject = this.add.sprite(0, 0, '__DEFAULT')
+            .setScale(1.1)
+            .setOrigin(0.5)
+            .setTintFill(0xffff00)
+            .setVisible(false);
+        this.interact = null;
+        
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
         if (Object.keys(last_pos).length !== 0) {
@@ -55,7 +60,6 @@ class GameScene extends Phaser.Scene {
         } else {
             this.player = new Player(this, 50, 50);
         }
-
 
         // create the map borders
         this.physics.world.bounds.width = this.map.widthInPixels;
@@ -72,17 +76,16 @@ class GameScene extends Phaser.Scene {
             left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
             right: Phaser.Input.Keyboard.KeyCodes.D,
             right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            in: Phaser.Input.Keyboard.KeyCodes.Q,
-            out: Phaser.Input.Keyboard.KeyCodes.E,
+            interact: Phaser.Input.Keyboard.KeyCodes.X,
         }, false);
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
         if (Object.keys(last_pos).length !== 0) {
-            this.ws.joinPlayer({x: last_pos.x, y: last_pos.y});
+            this.ws.joinPlayer({ x: last_pos.x, y: last_pos.y });
         } else {
-            this.ws.joinPlayer({x: 50, y: 50});
+            this.ws.joinPlayer({ x: 50, y: 50 });
         }
 
         // make camera follow player
@@ -108,28 +111,9 @@ class GameScene extends Phaser.Scene {
         this.subscriptions.push(
             usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups })));
 
-        this.sprite = this.add.sprite(0, 0, 'tilesets/objects/movel.png');
-        this.add.existing(this.sprite);
-        this.physics.add.existing(this.sprite);
-        this.physics.add.collider(this.sprite, [this.collisionLayer, this.collisionGroup]);
-        this.sprite.body.setOffset(0, 64).setSize(64, 16, false);
-
-
-        this.debugText = this.add.text(this.cameras.main.centerX - 400, 180, 'Hello World',
-            { fontFamily: '"Lucida Console", Courier, monospace', fontSize: '16px', color: '#28FE14', backgroundColor: "#000" });
-        this.debugText.setScrollFactor(0).setDepth(1001).setOrigin(0.5);
-
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
         });
-    }
-
-    log() {
-        let text = '';
-        for (let i = 0; i < arguments.length; i++) {
-            text += arguments[i] + ' ';
-        }
-        this.debugText.setText(text);
     }
 
     // TODO: remove after tests
@@ -172,16 +156,15 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    updateConferences = (player) => {
+    updateConferences = () => {
         if (this.roomLayer) {
-            const tile = this.roomLayer.getTileAtWorldXY(player.body.center.x, player.body.center.y);
-
+            const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
             if (tile) {
-                const conferenceId = tile.properties.id;
+                const conferenceId = tile.properties.conference;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();
-                    player.ws.joinConference(conferenceId);
+                    this.player.ws.joinConference(conferenceId);
                 }
             }
             else {
@@ -189,23 +172,45 @@ class GameScene extends Phaser.Scene {
                     const conferenceId = useWorldUserStore.getState().world_user.in_conference;
                     useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    player.ws.leaveConference(conferenceId);
+                    this.player.ws.leaveConference(conferenceId);
                 }
             }
         }
+    }
 
+    updateInteractables = () => {
+        const playerPos = this.player.body.center,
+            bodies = this.physics
+                .overlapCirc(playerPos.x, playerPos.y, 50, true, true)
+                .filter((b) => b.gameObject instanceof GameObjects.Sprite && b.gameObject.data?.list.interact);
+        if (bodies.length) {
+            const closestBody = bodies.reduce((prev, curr) => {
+                return Math.hypot(playerPos.x - prev.center.x, playerPos.y - prev.center.y)
+                    < Math.hypot(playerPos.x - curr.center.x, playerPos.y - curr.center.y) ?
+                    prev : curr;
+            });
+            const { x, y, width, height } = closestBody.gameObject;
+            this.selectedObject.setTexture(closestBody.gameObject.texture)
+                .setPosition(x, y)
+                .setSize(width, height)
+                .setVisible(true);
+            this.interact = closestBody.gameObject.data.list.interact;
+        } else {
+            this.selectedObject.setVisible(false);
+            this.interact = null;
+        }
     }
 
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
-            // detect surrounding players
-            var bodies = this.physics.overlapCirc(
-                this.player.body.center.x, this.player.body.center.y, 150)
+            // Detect surrounding players
+            const bodies = this.physics.overlapCirc(
+                this.player.body.center.x, this.player.body.center.y, 150);
             if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
                 const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
                     .map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
-                    // wire players
+                    // Wire players
                     this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
                             const entered = !GameScene.inRangePlayers.has(id);
@@ -214,57 +219,38 @@ class GameScene extends Phaser.Scene {
                         })
                     );
                 } else if (rangePlayers.length < GameScene.inRangePlayers.size) {
-                    // unwire players
+                    // Unwire players
                     this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
                             const left = !rangePlayers.includes(id);
                             if (left) {
                                 GameScene.inRangePlayers.delete(id);
-                                // close media connections to this user
+                                // Close media connections to this user
                                 useConsumerStore.getState().closePeer(id);
                             };
                             return left;
                         })
                     );
                 }
-            } else if (bodies.length > 1) {
-                this.player.body.debugBodyColor = 0x0099ff; // blue
-            } else {
-                this.player.body.debugBodyColor = 0xff9900; // orange
             }
         }
     }
 
     updateDepth() {
-        this.player.depth = this.player.y;
+        this.player.depth = this.player.y + this.player.height/2;
         Object.values(this.remotePlayers).forEach((player) => {
-            player.depth = player.y;
+            player.depth = player.y + player.height/2;
         });
     }
 
     update(time, delta) {
         this.player.update();
         this.updateDepth();
-
-        // if (!globalVar) {
-        //     const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-        //     this.sprite.setPosition(Math.Snap.To(worldPoint.x, 16), Math.Snap.To(worldPoint.y, 16));
-        //     this.sprite.setDepth(this.sprite.body.y);
-        //     this.sprite.body.debugBodyColor = 0xadfefe;
-        //     this.log(this.sprite.body.x, this.sprite.body.y, this.sprite.body.height, this.sprite.width, this.sprite.depth)
-        // }
-
-        // // Convert the mouse position to world position within the camera
-        // const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-
-        // // Draw tiles (only within the groundLayer)
-        // if (this.input.manager.activePointer.isDown) {
-        //     const tile = this.collisionLayer.putTileAtWorldXY(243, worldPoint.x, worldPoint.y);
-        //     if (tile)
-        //         tile.setCollision(true);
-        // }
-
         this.updateRangePlayers();
+
+        if (this.cursors.interact.isDown) {
+            console.log(this.interact);
+        }
     }
 }
 
@@ -279,7 +265,7 @@ class GameScene extends Phaser.Scene {
  * @param {number} y - The start vertical position in the scene.
  */
 class Player extends Phaser.GameObjects.Container {
-    speed = 300;  // 900 is the upperbound ig
+    speed = 200;  // 900 is the upperbound ig
     step = 0;
     lastVelocity;
     ws = getSocket(useWorldUserStore.getState().world_user.world_id);
@@ -290,7 +276,7 @@ class Player extends Phaser.GameObjects.Container {
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        scene.physics.add.collider(this, [scene.collisionLayer, scene.collisionGroup]);
+        scene.physics.add.collider(this, [scene.collisionLayer, scene.objectGroups['ObjectCollision']]);
         
         let avatar_chosen_sprite = "avatars_1_1"
 
@@ -362,8 +348,7 @@ class Player extends Phaser.GameObjects.Container {
     }
 
     addSprite(sprite) {
-        this.addAt(sprite, 0);
-        return this;
+        return this.addAt(sprite, 0);
     }
 
     getSprite() {
@@ -371,8 +356,7 @@ class Player extends Phaser.GameObjects.Container {
     }
 
     addText(text) {
-        this.addAt(text, 1);
-        return this;
+        return this.addAt(text, 1);
     }
 
     getText() {
@@ -407,7 +391,8 @@ class Player extends Phaser.GameObjects.Container {
         if (!this.lastVelocity || !this.body.velocity.equals(this.lastVelocity)) {
             this.ws.sendMovement(this.body.position.clone().subtract(this.body.offset), this.body.velocity);
             this.lastVelocity = this.body.velocity.clone();
-            this.scene.updateConferences(this);
+            this.scene.updateConferences();
+            this.scene.updateInteractables();
         }
     }
 

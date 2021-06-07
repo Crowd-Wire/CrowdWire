@@ -5,7 +5,7 @@ import useAuthStore from "stores/useAuthStore";
 import Row from 'react-bootstrap/Row';
 
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps";
-import WorldService from "services/WorldService";
+import WorldService from "services/WorldService.ts";
 import EventService from "services/EventService";
 import EventFilters from "./sections/EventFilters";
 import EventResults from "./sections/EventResults";

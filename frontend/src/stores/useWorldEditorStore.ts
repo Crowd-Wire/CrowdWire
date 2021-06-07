@@ -2,7 +2,7 @@ import create from "zustand";
 import { combine } from "zustand/middleware";
 
 
-export enum PaintToolType {
+export enum ToolType {
     NONE = "",
     DRAW = "DRAW",
     FILL = "FILL",
@@ -11,37 +11,51 @@ export enum PaintToolType {
     PICK = "PICK",
 }
 
-export interface PaintTool {
-    type?: PaintToolType;
+export interface Tool {
+    type: ToolType;
 }
 
 interface Tile {
-    style?: Record<string, string>;
+    style: Record<string, string>;
 }
+
+interface Object extends Tile { }
+
+interface Wall { }
+
 export interface Conference {
     name: string;
     color: string;
 }
 
 interface Layer {
-    visible?: boolean;
-    blocked?: boolean;
-    active?: boolean;
+    visible: boolean;
+    blocked: boolean;
+    active: boolean;
+}
+
+interface Active {
+    tile: string;
+    object: string;
+    wall: string;
+    conference: string;
 }
 
 const useWorldEditorStore = create(
     combine(
-        {   
+        {
             ready: false,
             grid: false,
             highlight: false,
-            activeTile: null,
+            save: false,
             activeLayer: null,
-            activeConference: null,
+            active: {} as Active,
             tiles: {} as Record<string, Tile>,
+            // objects: {} as Record<string, Object>,
+            // walls: {} as Record<string, Wall>,
             layers: {} as Record<string, Layer>,
             conferences: {} as Record<string, Conference>,
-            paintTool: {} as PaintTool,
+            tool: { type: ToolType.DRAW } as Tool,
         },
         (set) => ({
             setState: (state: any) => {
@@ -49,9 +63,39 @@ const useWorldEditorStore = create(
                     return { ...state };
                 });
             },
-            setPaintTool: (settings: PaintTool) => {
+            setActive: (key: 'tile' | 'object' | 'wall' | 'conference', value: string) => {
+                return set(() => {
+                    if (value) {
+                        const active: Active = {
+                            tile: null,
+                            object: null,
+                            wall: null,
+                            conference: null,
+                        };
+                        active[key] = value;
+                        return { active };
+                    }
+                });
+            },
+            setTool: (partialTool: Partial<Tool>) => {
                 return set((s) => {
-                    return { paintTool: {...s.paintTool, ...settings} };
+                    return { tool: { ...s.tool, ...partialTool } };
+                });
+            },
+            setLayer: (name: string, partialLayer: Partial<Layer>) => {
+                return set((s) => {
+                    const layers = { ...s.layers };
+                    layers[name] = { ...layers[name], ...partialLayer };
+                    return { layers };
+                });
+            },
+            setLayers: (partialLayer: Partial<Layer>) => {
+                return set((s) => {
+                    const layers = { ...s.layers };
+                    Object.keys(layers).map((name) => {
+                        layers[name] = { ...layers[name], ...partialLayer }
+                    })
+                    return { layers };
                 });
             },
             addTile: (id: string, tile: Tile) => {
@@ -66,20 +110,11 @@ const useWorldEditorStore = create(
                     return { layers };
                 });
             },
-            setLayer: (name: string, settings: Layer) => {
+            remActive: (key: 'tile' | 'object' | 'wall' | 'conference') => {
                 return set((s) => {
-                    const layers = {...s.layers};
-                    layers[name] = {...layers[name], ...settings};
-                    return { layers };
-                });
-            },
-            setLayers: (settings: Layer) => {
-                return set((s) => {
-                    const layers = {...s.layers};
-                    Object.keys(layers).map((name) => {
-                        layers[name] = {...layers[name], ...settings}
-                    })
-                    return { layers };
+                    const active = s.active;
+                    active[key] = null;
+                    return { active };
                 });
             },
         })

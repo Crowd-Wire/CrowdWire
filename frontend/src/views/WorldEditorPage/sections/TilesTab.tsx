@@ -52,16 +52,21 @@ class TilesTab extends Component<{}, TilesTabState> {
 
     const tilesetTiles = {};
     for (const tileset of mapManager.map.tilesets) {
-      if (tileset.total != 0 && !tileset.name.startsWith('_')) {
-        // Not an object and not private
+      if (!tileset.name.startsWith('_')) {
+        // Not private
         const tiles = [],
-          tilesetURL = mapManager.tilesetURL[tileset.name],
+          tilesetImage = mapManager.tilesetProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
+        
+        if (!tilesetImage) {
+          // Not a tileset
+          break;
+        }
 
         for (let i = 0; i < rows; i++)
           for (let j = 0; j < columns; j++) {
             const id = (firstgid + i * columns + j).toString();
-            const imageURL = API_BASE + "static/maps/" + tilesetURL;
+            const imageURL = API_BASE + "static/maps/" + tilesetImage;
             const style = {
               backgroundImage: `url(${imageURL})`,
               backgroundPosition: `${-tileHeight * j}px ${-tileWidth * i}px`,
@@ -91,7 +96,7 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleClick = (id: string) => {
-    useWorldEditorStore.getState().setState({ activeTile: id });
+    useWorldEditorStore.getState().setActive('tile', id);
   }
 
   render() {

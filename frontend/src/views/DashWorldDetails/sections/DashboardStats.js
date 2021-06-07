@@ -9,7 +9,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import Slide from '@material-ui/core/Slide';
-import WorldService from "services/WorldService";
+import WorldService from "services/WorldService.ts";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';

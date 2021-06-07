@@ -26,7 +26,7 @@ import { toast } from 'react-toastify';
 import logo from 'assets/crowdwire_white_logo.png';
 import useWorldUserStore from 'stores/useWorldUserStore';
 import { getSocket } from "services/socket.js";
-import WorldService from "services/WorldService";
+import WorldService from "services/WorldService.ts";
 import EditorNavbar from "./sections/EditorNavbar";
 
 
@@ -42,7 +42,6 @@ const toast_props = {
 }
 
 
-
 class WorldEditorPage extends React.Component {
 
   constructor(props) {
@@ -53,14 +52,14 @@ class WorldEditorPage extends React.Component {
       loading: true,
       grid: [
         {
-          size: 50,
+          size: 40,
           grid: [
             { size: 25, tabs: [6] },
             { size: 50, tabs: [1, 2, 3] },
             { size: 25, tabs: [5, 4] },
           ]
         },
-        { size: 50, tabs: [0] },
+        { size: 60, tabs: [0] },
         // { size: 50, tabs: [1, 2] }
       ]
     }
@@ -98,10 +97,10 @@ class WorldEditorPage extends React.Component {
     var dragginHandler;
 
     /* tests */
-    document.addEventListener('keyup', (e) => {
-      if (e.key === 'r') this.gridRemoveTabs([4, 2], [2]);
-      if (e.key === 't') this.gridRemoveTabs([2], [0, 0]);
-    });
+    // document.addEventListener('keyup', (e) => {
+    //   if (e.key === 'r') this.gridRemoveTabs([4, 2], [2]);
+    //   if (e.key === 't') this.gridRemoveTabs([2], [0, 0]);
+    // });
 
     document.addEventListener('mousedown', (e) => {
       handlers.forEach((h) => {
@@ -139,7 +138,7 @@ class WorldEditorPage extends React.Component {
           const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
           const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
 
-          console.log(parent, boxAObj, boxBObj)
+          // console.log(parent, boxAObj, boxBObj)
 
           boxAObj.size = parseFloat((newHeightPx / totalHeightPx * totalHeight)).toFixed(2);
           boxBObj.size = totalHeight - boxAObj.size;
@@ -168,7 +167,7 @@ class WorldEditorPage extends React.Component {
           const boxAObj = parent.grid[boxAPath[boxAPath.length - 1]];
           const boxBObj = parent.grid[boxAPath[boxAPath.length - 1] + 1];
 
-          console.log(parent, boxAObj, boxBObj)
+          // console.log(parent, boxAObj, boxBObj)
 
           boxAObj.size = parseFloat((newWidthPx / totalWidthPx * totalWidth)).toFixed(2);
           boxBObj.size = totalWidth - boxAObj.size;
@@ -247,7 +246,7 @@ class WorldEditorPage extends React.Component {
             <div
               key={`0${index}`}
               className={classNames(handler, "handler")}
-              style={{ [margin]: '-10px' }}
+              style={{ [margin]: '-5px' }}
             ></div>
             : null
           ,
@@ -255,7 +254,7 @@ class WorldEditorPage extends React.Component {
             key={index}
             data-path={path.concat(index)}
             data-size={item.size}
-            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
+            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-5px' : 0 }}
             className={wrapper}
           >
             {

@@ -1,6 +1,6 @@
 import React from 'react';
 import WorldReportCard from '../../../components/WorldReportCard/WorldReportCard.js';
-import WorldService from '../../../services/WorldService.js';
+import WorldService from '../../../services/WorldService.ts';
 import { Checkbox } from '@material-ui/core';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
