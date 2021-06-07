@@ -1,6 +1,7 @@
 import Phaser, { Scene, GameObjects, Math } from 'phaser';
 
 import MapManager from "../MapManager.ts";
+import WallManager from "../WallManager.ts";
 import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore.ts";
 import { cyrb53Hash, intToHex } from "utils/color.js";
 
@@ -21,15 +22,15 @@ class WorldEditorScene extends Scene {
 
     create() {
         this.mapManager = new MapManager();
-
+        
         this.map = this.mapManager.buildMap(this);
-
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Float"))
-                layer.tilemapLayer.setDepth(1000);
+            layer.tilemapLayer.setDepth(1000);
         })
-
         this.objectGroups = this.mapManager.buildObjects(this);
+
+        this.wallManager = new WallManager(this.map.getLayer('__Collision'));
 
         // Initialize layers on store
         const layers = {};
@@ -270,6 +271,11 @@ class WorldEditorScene extends Scene {
                                     !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
+
+                                    this.flag && console.log( 'WALL', this.wallManager.checkPlace(0, tileX, tileY) );
+                                    this.flag && console.log( 'WINDOW', this.wallManager.checkPlace(1, tileX, tileY) );
+                                    this.flag && console.log( 'DOOR1', this.wallManager.checkPlace(2, tileX, tileY) );
+                                    this.flag && console.log( 'DOOR2', this.wallManager.checkPlace(3, tileX, tileY) );
                                 }
                                 return true;
                             }
