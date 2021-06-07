@@ -35,12 +35,12 @@ class GameScene extends Phaser.Scene {
         this.map = mapManager.buildMap(this);
 
         this.map.layers.forEach((layer) => {
-            if (layer.name.startsWith("Room"))
+            if (layer.name.startsWith('__Conference'))
                 this.roomLayer = layer.tilemapLayer.setVisible(false);
-            else if (layer.name.startsWith("Collision"))
+            else if (layer.name.includes("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name.startsWith("Float"))
+            else if (layer.name.includes("Float"))
                 layer.tilemapLayer.setDepth(1000);
         })
 
@@ -237,9 +237,9 @@ class GameScene extends Phaser.Scene {
     }
 
     updateDepth() {
-        this.player.depth = this.player.y;
+        this.player.depth = this.player.y + this.player.height/2;
         Object.values(this.remotePlayers).forEach((player) => {
-            player.depth = player.y;
+            player.depth = player.y + player.height/2;
         });
     }
 

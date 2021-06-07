@@ -213,7 +213,7 @@ class LayersTab extends Component<{}, LayersTabState> {
         <LayerGroup name="Float Layers" info="Every tile on these layers float over everything">
           {
             map.layers?.map((layer, index) => {
-              if (layer.name.includes("Float")) {
+              if (!layer.name.startsWith('_') && layer.name.includes("Float")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
                     <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
@@ -226,7 +226,7 @@ class LayersTab extends Component<{}, LayersTabState> {
         <LayerGroup name="Collision Layers" info="Every tiles and objects on these layers are collidable">
           {
             map.objects?.map((layer, index) => {
-              if (layer.name.includes("Collision")) {
+              if (!layer.name.startsWith('_') && layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
                     <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
@@ -237,7 +237,7 @@ class LayersTab extends Component<{}, LayersTabState> {
           }
           {
             map.layers?.map((layer, index) => {
-              if (layer.name.includes("Collision")) {
+              if (!layer.name.startsWith('_') && layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
                     <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
@@ -250,7 +250,7 @@ class LayersTab extends Component<{}, LayersTabState> {
         <LayerGroup name="Ground Layers" info="These layers are non collidable">
           {
             map.objects?.map((layer, index) => {
-              if (!layer.name.includes("Collision")) {
+              if (!layer.name.startsWith('_') && !layer.name.includes("Collision")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
                     <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
@@ -261,7 +261,7 @@ class LayersTab extends Component<{}, LayersTabState> {
           }
           {
             map.layers?.map((layer, index) => {
-              if (layer.name.includes("Ground")) {
+              if (!layer.name.startsWith('_') && layer.name.includes("Ground")) {
                 return (
                   <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
                     <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />

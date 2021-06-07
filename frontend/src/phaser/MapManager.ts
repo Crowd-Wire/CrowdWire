@@ -175,15 +175,15 @@ class MapManager {
         this.map.tilesets.push(newTileset);
 
         // Add tileset to conference layer
-        const tilesets = this.map.getLayer('Room').tilemapLayer.tileset.concat(newTileset);
-        (<any>this.map.getLayer('Room').tilemapLayer).setTilesets(tilesets);
+        const tilesets = this.map.getLayer('__Conference').tilemapLayer.tileset.concat(newTileset);
+        (<any>this.map.getLayer('__Conference').tilemapLayer).setTilesets(tilesets);
     }
 
     getConferenceGid(cid: string): number {
         if (this.conferenceMap[cid])
             return this.conferenceMap[cid];
 
-        for (const tileset of this.map.getLayer('Room').tilemapLayer.tileset) {
+        for (const tileset of this.map.getLayer('__Conference').tilemapLayer.tileset) {
             if (tileset.name.startsWith('__CONFERENCE_') && tileset.name.includes(cid)) {
                 this.conferenceMap[cid] = tileset.firstgid;
                 return tileset.firstgid;
@@ -207,7 +207,7 @@ class MapManager {
                 break;
             }
         }
-        const conferenceLayer = this.map.getLayer('Room').tilemapLayer;
+        const conferenceLayer = this.map.getLayer('__Conference').tilemapLayer;
 
         // Remove tiles of tileset from conference layer
         const findIndex = this.getConferenceGid(cid);

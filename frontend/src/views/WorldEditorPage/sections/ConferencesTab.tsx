@@ -139,20 +139,20 @@ const useConferenceLayerStyles = makeStyles({
 
 const ConferenceLayer: React.FC<{ children: React.ReactNode[] }> = ({ children }) => {
   const classes = useConferenceLayerStyles();
-  let visible = useWorldEditorStore(state => state.layers['Room'].visible);
-  let blocked = useWorldEditorStore(state => state.layers['Room'].blocked);
+  let visible = useWorldEditorStore(state => state.layers['__Conference'].visible);
+  let blocked = useWorldEditorStore(state => state.layers['__Conference'].blocked);
 
   const handleVisible = (event) => {
     event.stopPropagation();
     useWorldEditorStore.setState(state => {
-      state.layers['Room'].visible = !visible;
+      state.layers['__Conference'].visible = !visible;
     });
   }
 
   const handleBlocked = (event) => {
     event.stopPropagation();
     useWorldEditorStore.setState(state => {
-      state.layers['Room'].blocked = !blocked;
+      state.layers['__Conference'].blocked = !blocked;
     });
   }
 
@@ -251,7 +251,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       if (id === activeConference) {
         activeConference = null;
         useWorldEditorStore.getState().setState({ activeLayer: null });
-        useWorldEditorStore.getState().setLayer('Room', { active: false });
+        useWorldEditorStore.getState().setLayer('__Conference', { active: false });
         useWorldEditorStore.getState().remActive('conference');
         this.setState({ activeConference });
       }
@@ -265,8 +265,8 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       } else {
         props.properties = { name };
       }
-      useWorldEditorStore.getState().setState({ conferences, activeLayer: 'Room' });
-      useWorldEditorStore.getState().setLayer('Room', { active: true });
+      useWorldEditorStore.getState().setState({ conferences, activeLayer: '__Conference' });
+      useWorldEditorStore.getState().setLayer('__Conference', { active: true });
       useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });
     }

@@ -49,7 +49,7 @@ class WorldEditorScene extends Scene {
         useWorldEditorStore.getState().setState({ conferences });
 
         // Paint conference tiles
-        this.map.getLayer('Room').tilemapLayer
+        this.map.getLayer('__Conference').tilemapLayer
             .filterTiles((tile) => tile.index != -1)
             .forEach((tile) => {
                 const cid = tile.properties.conference;
@@ -71,7 +71,7 @@ class WorldEditorScene extends Scene {
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
         const grid1 = this.add.grid(width / 2, height / 2, width, height, 32, 32)
-            .setOutlineStyle(0x000000, 0.9)
+            .setOutlineStyle(0x000000, 0.8)
             .setDepth(1001);
         grid1.showOutline = false;
 
@@ -203,7 +203,7 @@ class WorldEditorScene extends Scene {
 
             this.preview.setVisible(true);
 
-            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['Room'].blocked) ? 'Room' :
+            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['__Conference'].blocked) ? '__Conference' :
                 (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
                     undefined;
 
@@ -229,7 +229,7 @@ class WorldEditorScene extends Scene {
 
                     let activeGid, tint = 0xffffff;
                     if (activeTile && activeTile[0] === 'C') {
-                        if (activeLayerName != 'Room') {
+                        if (activeLayerName != '__Conference') {
                             this.preview.setTexture('__DEFAULT');
                             return false;
                         }
@@ -337,7 +337,7 @@ class WorldEditorScene extends Scene {
                                 for (let i = x; i < x + width; i += 16)
                                     for (let j = y; j < y + height; j += 16) {
                                         this.flag && console.log(i, j)
-                                        const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
+                                        const tile = this.map.getLayer('__Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
                                         if (tile && !onWall) {
                                             return false;
                                         }
@@ -354,14 +354,15 @@ class WorldEditorScene extends Scene {
                                                 properties = this.mapManager.objectProps[activeObject].properties;
                                             if (properties) {
                                                 obj.setData(properties);
-                                                console.log(properties)
                                             }
+                                            console.log(this.preview.y)
                                             activeObjectGroup.add(obj);
                                             const { width, height, offset } = this.preview.body;
                                             obj.body.setSize(width, height)
                                                 .setOffset(
                                                     offset.x + this.preview.getSprite().width / 2,
                                                     offset.y + this.preview.getSprite().height / 2);
+                                            obj.setDepth(this.preview.y + obj.height / 2);
                                             this.mouseClick = false;
                                         }
                                     } else {
