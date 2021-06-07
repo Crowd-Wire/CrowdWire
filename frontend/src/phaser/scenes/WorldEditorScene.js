@@ -124,11 +124,6 @@ class WorldEditorScene extends Scene {
 
         // Emit READY to dependent components
         useWorldEditorStore.getState().setState({ ready: true });
-
-        this.flag = false;
-        this.input.keyboard.on('keydown-P', () => {
-            this.flag = !this.flag;
-        }, this);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -336,7 +331,6 @@ class WorldEditorScene extends Scene {
                                 // Check collision with collidable tiles
                                 for (let i = x; i < x + width; i += 16)
                                     for (let j = y; j < y + height; j += 16) {
-                                        this.flag && console.log(i, j)
                                         const tile = this.map.getLayer('__Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
                                         if (tile && !onWall) {
                                             return false;

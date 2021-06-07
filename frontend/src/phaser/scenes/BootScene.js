@@ -94,6 +94,7 @@ class BootScene extends Phaser.Scene {
         this.load.spritesheet('avatars_3', API_BASE + "static/characters/avatars_3.png", { frameWidth: 48, frameHeight: 48 });
         this.load.spritesheet('avatars_4', API_BASE + "static/characters/avatars_4.png", { frameWidth: 48, frameHeight: 48 });
         this.load.bitmapFont('atari', `${process.env.PUBLIC_URL}/fonts/bitmap/gem.png`, `${process.env.PUBLIC_URL}/fonts/bitmap/gem.xml`);
+        this.load.plugin('rexvirtualjoystickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoystickplugin.min.js', true);
     }
 }
 

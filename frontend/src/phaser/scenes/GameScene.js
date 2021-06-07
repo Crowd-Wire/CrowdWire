@@ -1,4 +1,5 @@
 import Phaser, { GameObjects } from 'phaser';
+import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
 
 import { getSocket } from "services/socket";
 
@@ -7,7 +8,7 @@ import usePlayerStore from "stores/usePlayerStore.ts";
 import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 import useWorldUserStore from "stores/useWorldUserStore";
 import MapManager from '../MapManager';
-
+import { isDesktop } from 'utils/isDesktop';
 
 const sceneConfig = {
     active: false,
@@ -67,18 +68,33 @@ class GameScene extends Phaser.Scene {
 
         // listen to the arrow keys
         // this.cursors = this.input.keyboard.createCursorKeys();
-        this.cursors = this.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
-            up2: Phaser.Input.Keyboard.KeyCodes.UP,
-            down: Phaser.Input.Keyboard.KeyCodes.S,
-            down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
-            right: Phaser.Input.Keyboard.KeyCodes.D,
-            right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            interact: Phaser.Input.Keyboard.KeyCodes.X,
-        }, false);
+        if (isDesktop() && false) {
+            this.cursors = this.input.keyboard.addKeys({
+                up: Phaser.Input.Keyboard.KeyCodes.W,
+                up2: Phaser.Input.Keyboard.KeyCodes.UP,
+                down: Phaser.Input.Keyboard.KeyCodes.S,
+                down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
+                left: Phaser.Input.Keyboard.KeyCodes.A,
+                left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
+                right: Phaser.Input.Keyboard.KeyCodes.D,
+                right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+                interact: Phaser.Input.Keyboard.KeyCodes.X,
+            }, false);
+        } else {
 
+            const joystick = new VirtualJoystick(this, {
+                x: 500,
+                y: 500,
+                base: this.add.circle(0, 0, 50, 0x0B132B, 0.5).setDepth(1100),
+                // thumb: thumbGameObject,
+                // dir: '8dir',
+                // forceMin: 16,
+                // fixed: true,
+                // enable: true
+            });
+            joystick.setPosition(300 ,300).setScrollFactor(0);
+            this.cursors = joystick.createCursorKeys();
+        }
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
@@ -248,7 +264,7 @@ class GameScene extends Phaser.Scene {
         this.updateDepth();
         this.updateRangePlayers();
 
-        if (this.cursors.interact.isDown) {
+        if (this.cursors.interact?.isDown) {
             console.log(this.interact);
         }
     }
@@ -280,11 +296,12 @@ class Player extends Phaser.GameObjects.Container {
         
         let avatar_chosen_sprite = "avatars_1_1"
 
-        if (user_id == null) {
-            avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
-        } else {
-            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
-        }
+        // if (user_id == null) {
+        //     avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
+        // } else {
+        //     avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
+        // }
+        avatar_chosen_sprite = "avatars_1_1"
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
         const avatar_number = avatar_chosen[2]
@@ -374,13 +391,13 @@ class Player extends Phaser.GameObjects.Container {
         this.body.setVelocity(0);
 
         // get resultant direction
-        if (this.scene.cursors.left.isDown || this.scene.cursors.left2.isDown)
+        if (this.scene.cursors.left.isDown || this.scene.cursors.left2?.isDown)
             direction.x += -1;
-        if (this.scene.cursors.right.isDown || this.scene.cursors.right2.isDown)
+        if (this.scene.cursors.right.isDown || this.scene.cursors.right2?.isDown)
             direction.x += 1;
-        if (this.scene.cursors.up.isDown || this.scene.cursors.up2.isDown)
+        if (this.scene.cursors.up.isDown || this.scene.cursors.up2?.isDown)
             direction.y += -1;
-        if (this.scene.cursors.down.isDown || this.scene.cursors.down2.isDown)
+        if (this.scene.cursors.down.isDown || this.scene.cursors.down2?.isDown)
             direction.y += 1;
 
         // set normalized velocity (player doesn't move faster on diagonals)
