@@ -196,7 +196,7 @@ const GamePage = (props) => {
                     </Row>
                     <Row sm={12}>
                       <Col style={{textAlign: 'center'}}>
-                        <Carousel />
+                        <Carousel avatar={avatar} />
                       </Col>
                     </Row>
                     <Row sm={12} style={{paddingTop: 30}}>
