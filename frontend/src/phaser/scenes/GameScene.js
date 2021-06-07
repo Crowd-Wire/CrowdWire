@@ -46,11 +46,13 @@ class GameScene extends Phaser.Scene {
 
         this.objectGroups = mapManager.buildObjects(this);
 
-        this.selectedObject = this.add.rectangle()
-            .setStrokeStyle(2, 0xffff00)
-            .setOrigin(0)
+        this.selectedObject = this.add.sprite(0, 0, '__DEFAULT')
+            .setScale(1.1)
+            .setOrigin(0.5)
+            .setTintFill(0xffff00)
             .setVisible(false);
-
+        this.interact = null;
+        
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
         if (Object.keys(last_pos).length !== 0) {
@@ -74,7 +76,7 @@ class GameScene extends Phaser.Scene {
             left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
             right: Phaser.Input.Keyboard.KeyCodes.D,
             right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            play: Phaser.Input.Keyboard.KeyCodes.X,
+            interact: Phaser.Input.Keyboard.KeyCodes.X,
         }, false);
 
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
@@ -180,19 +182,22 @@ class GameScene extends Phaser.Scene {
         const playerPos = this.player.body.center,
             bodies = this.physics
                 .overlapCirc(playerPos.x, playerPos.y, 50, true, true)
-                .filter((b) => b.gameObject instanceof GameObjects.Sprite);
-        if (bodies.length && globalVar) {
+                .filter((b) => b.gameObject instanceof GameObjects.Sprite && b.gameObject.data?.list.interact);
+        if (bodies.length) {
             const closestBody = bodies.reduce((prev, curr) => {
                 return Math.hypot(playerPos.x - prev.center.x, playerPos.y - prev.center.y)
                     < Math.hypot(playerPos.x - curr.center.x, playerPos.y - curr.center.y) ?
                     prev : curr;
             });
             const { x, y, width, height } = closestBody.gameObject;
-            this.selectedObject.setPosition(x - width / 2, y - height / 2)
+            this.selectedObject.setTexture(closestBody.gameObject.texture)
+                .setPosition(x, y)
                 .setSize(width, height)
                 .setVisible(true);
+            this.interact = closestBody.gameObject.data.list.interact;
         } else {
             this.selectedObject.setVisible(false);
+            this.interact = null;
         }
     }
 
@@ -242,6 +247,10 @@ class GameScene extends Phaser.Scene {
         this.player.update();
         this.updateDepth();
         this.updateRangePlayers();
+
+        if (this.cursors.interact.isDown) {
+            console.log(this.interact);
+        }
     }
 }
 

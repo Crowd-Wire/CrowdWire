@@ -246,7 +246,7 @@ class WorldEditorPage extends React.Component {
             <div
               key={`0${index}`}
               className={classNames(handler, "handler")}
-              style={{ [margin]: '-10px' }}
+              style={{ [margin]: '-5px' }}
             ></div>
             : null
           ,
@@ -254,7 +254,7 @@ class WorldEditorPage extends React.Component {
             key={index}
             data-path={path.concat(index)}
             data-size={item.size}
-            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-10px' : 0 }}
+            style={{ [dimension]: `${item.size}%`, [margin]: (index > 0) ? '-5px' : 0 }}
             className={wrapper}
           >
             {

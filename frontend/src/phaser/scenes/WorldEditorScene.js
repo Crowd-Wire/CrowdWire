@@ -324,7 +324,9 @@ class WorldEditorScene extends Scene {
                             this.preview.setTexture(activeObject || '__DEFAULT');
 
                             if (activeObject) {
-                                const body = this.mapManager.objectProps[activeObject]?.body;
+                                const body = this.mapManager.objectProps[activeObject].body,
+                                    onWall = this.mapManager.objectProps[activeObject].properties?.onWall;
+
                                 this.preview.setBounds(body);
 
                                 // Check object on world bounds
@@ -336,7 +338,10 @@ class WorldEditorScene extends Scene {
                                     for (let j = y; j < y + height; j += 16) {
                                         this.flag && console.log(i, j)
                                         const tile = this.map.getLayer('Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
-                                        if (tile) {
+                                        if (tile && !onWall) {
+                                            return false;
+                                        }
+                                        if (!tile && onWall) {
                                             return false;
                                         }
                                     }

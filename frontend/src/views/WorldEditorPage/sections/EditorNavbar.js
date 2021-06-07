@@ -104,9 +104,6 @@ class EditorNavbar extends React.Component {
               New Blank World
             </Dropdown.Item>
             <Dropdown.Item className={classes.dropdownItem} eventKey="1">
-              Load World
-            </Dropdown.Item>
-            <Dropdown.Item className={classes.dropdownItem} eventKey="1">
               Resize World
             </Dropdown.Item>
           </Dropdown.Menu>
