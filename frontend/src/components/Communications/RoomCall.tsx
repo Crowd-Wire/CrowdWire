@@ -26,6 +26,8 @@ import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import usePlayerStore from "stores/usePlayerStore";
+import { API_BASE } from "config";
 
 
 interface State {
@@ -73,12 +75,11 @@ export default class RoomCall extends React.Component<{}, State> {
     }, (state) => state.media);
   }
   myUsername: string = useWorldUserStore.getState().world_user.username;
+  avatar: string = API_BASE + "static/characters/" + useWorldUserStore.getState().world_user.avatar + '.png'
   myId: string = useWorldUserStore.getState().world_user.user_id;
   accessMic: boolean = false;
   accessVideo: boolean = false;
   socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
-  myVideoRef = createRef<any>();
-  comp_height = '25%';
 
   setNavigatorToStream = () => {
     if (this.accessVideo || this.accessMic) {
@@ -235,8 +236,10 @@ export default class RoomCall extends React.Component<{}, State> {
                      
                       let item = <></>
                       let username = peerId;
-                      if (peerId in useWorldUserStore.getState().users_info) {
-                        username = useWorldUserStore.getState().users_info[peerId].username;
+                      let avatar= "avatars_1_1";
+                      if (peerId in usePlayerStore.getState().users_info) {
+                        username = usePlayerStore.getState().users_info[peerId].username;
+                        avatar = usePlayerStore.getState().users_info[peerId].avatar;
                       }
                       if (consumerMedia)
                         item = (
@@ -254,6 +257,7 @@ export default class RoomCall extends React.Component<{}, State> {
                         (<Carousel.Item key={peerId + "_crs_item"}>
                             <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
                               <VideoAudioBox
+                                avatar={API_BASE + "static/characters/" + avatar + '.png'}
                                 active={active}
                                 username={username}
                                 id={peerId}
@@ -281,6 +285,7 @@ export default class RoomCall extends React.Component<{}, State> {
             />
             : ''}
           <MyVideoAudioBox
+            avatar = {this.avatar}
             username={this.myUsername}
             id={this.myId}
             audioTrack={this.state.mic}

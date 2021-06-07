@@ -27,13 +27,14 @@ import InviteJoinPage from "views/InvitePage/InviteJoinPage.js";
 import DashboardContent from "views/DashWorldDetails/sections/DashboardContent.js";
 import SearchAllMaps from "views/DashSearch/sections/SearchAllMaps.js";
 import AdminWorldReports from 'views/AdminWorldReports/AdminWorldReports.js';
+import AdminDashboard from 'views/AdminDashboard/AdminDashboard.tsx';
 import AdminWorlds from "views/AdminWorlds/AdminWorlds.js";
 import AdminStatistics from 'views/AdminStatistics/AdminStatistics.js'
 import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
-import useAuthStore from "stores/useAuthStore";
+import WorldStatistics from "views/WorldStatistics/WorldStatistics";
 
 /**
  * Public and protected routes list 
@@ -43,7 +44,7 @@ import useAuthStore from "stores/useAuthStore";
  * 
  * @param       isAuth       a boolean to check if the user is authorized
  */
-const routes = (token, guest_uuid, last_location) => [
+const routes = (token, guest_uuid, last_location,is_superuser) => [
 	{
 		path: "/",
 		element: <MainLayout />,
@@ -58,7 +59,7 @@ const routes = (token, guest_uuid, last_location) => [
 	},
 	{
 		path: "/",
-		element: token ? <Navigate to={last_location ? last_location : "/dashboard/search/public"}/> : <Outlet/>,
+		element: token ? <Navigate to={ last_location ? last_location : "/dashboard/search/public"}/> : <Outlet/>,
 		children: [
             { path: "/login", element: <LoginPage/> },
 			{ path: "/register", element: <RegisterPage/> },
@@ -95,16 +96,19 @@ const routes = (token, guest_uuid, last_location) => [
 		children: [
             { path: "/:id", element: <GamePage /> },
 			{ path: "/:id/settings", element: <WorldSettings /> },
+			{ path: "/:id/statistics", element: <WorldStatistics/>},
             { path: "/:id/editor", element: <WorldEditorPage /> },
 		],
 	},
 	{
 		path: "/admin",
-		element: token ? <AdminLayout /> : <Navigate to="/login" />,
+		element: is_superuser ? <AdminLayout /> : <Navigate to={"/dashboard/search/joined"}/>,
 		children: [
+			{ path: "/dashboard", element: <AdminDashboard/>},
             { path: "/worlds/reports", element: <AdminWorldReports /> },
 			{ path: "/worlds", element: <AdminWorlds />},
 			{ path: "/worlds/:id", element: <AdminWorldDetails/>},
+			{ path: "/worlds/:id/statistics", element: <WorldStatistics/>},
 			{ path: "/statistics", element: <AdminStatistics/>},
 			{ path: "/users", element: <AdminUsers/>},
 			{ path: "/users/reports", element: <AdminUserReports/>},

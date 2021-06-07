@@ -10,6 +10,7 @@ import NativeSelect from '@material-ui/core/NativeSelect';
 import { getSocket } from 'services/socket';
 import useMessageStore from 'stores/useMessageStore';
 import useWorldUserStore from "stores/useWorldUserStore";
+import usePlayerStore from "stores/usePlayerStore";
 
 import style from "assets/jss/my-kit-react/components/GameDrawer/chatStyle.js";
 
@@ -61,9 +62,9 @@ const Chat = (props) => {
               let color = 'white';
               if (from == useWorldUserStore.getState().world_user.user_id)
                 from = useWorldUserStore.getState().world_user.username
-              else if (from in useWorldUserStore.getState().users_info) {
-                color = useWorldUserStore.getState().users_info[from].color
-                from  = useWorldUserStore.getState().users_info[from].username
+              else if (from in usePlayerStore.getState().users_info) {
+                color = usePlayerStore.getState().users_info[from].color
+                from  = usePlayerStore.getState().users_info[from].username
               }
               return (
                 <div key={index} className={classes.message}>

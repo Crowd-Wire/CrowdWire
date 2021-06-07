@@ -42,7 +42,7 @@ export default function UserReportCard(props) {
     return (
         <>
         { visible ? 
-            <Card>
+            <Card style={{marginTop:"5px", marginBottom:"15px"}}>
                 <CardActionArea onClick={goToDetails}>
                     <CardContent>
                         <Typography gutterBottom variant="h5" component="h2">

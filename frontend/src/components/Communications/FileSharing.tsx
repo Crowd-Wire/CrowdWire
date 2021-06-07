@@ -27,6 +27,7 @@ import logo from 'assets/crowdwire_white_logo.png';
 import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
 import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 import useWorldUserStore from "stores/useWorldUserStore";
+import usePlayerStore from "stores/usePlayerStore";
 import { sendFile } from 'webrtc/utils/sendFile';
 import Popover from "@material-ui/core/Popover";
 import styles from "assets/jss/material-kit-react/views/componentsSections/javascriptStyles.js";
@@ -240,8 +241,8 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
           useWsHandlerStore.getState().addWsListener(`DOWNLOAD_REQUEST`, (d) => {
             if (!sendingFile) {
               let username = d.user_id;
-              if (d.user_id in useWorldUserStore.getState().users_info) {
-                username = useWorldUserStore.getState().users_info[d.user_id].username;
+              if (d.user_id in usePlayerStore.getState().users_info) {
+                username = usePlayerStore.getState().users_info[d.user_id].username;
               }
               toast.info(
                 <span>
@@ -357,8 +358,8 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                     <List dense={true} className={classes.root}>
                       { listOfFiles.map((file, index) => {
                         let owner = file.owner;
-                        if (file.owner in useWorldUserStore.getState().users_info)
-                          owner = useWorldUserStore.getState().users_info[file.owner].username
+                        if (file.owner in usePlayerStore.getState().users_info)
+                          owner = usePlayerStore.getState().users_info[file.owner].username
                         else if (file.owner == myUserId && useWorldUserStore.getState().world_user)
                           owner = useWorldUserStore.getState().world_user.username
                         return (

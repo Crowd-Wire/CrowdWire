@@ -55,15 +55,10 @@ export const sendVideo = async (roomId:string = null) => {
           set({camProducer: producer})
           producer.on("transportclose", () => {
             producer.close();
-            set({cam: null, camStream: null, camProducer: null})
           })
         })
         .catch((err) => {
           console.log(err)
-          cam.onended = function(event) {
-            useVideoStore.getState().camProducer.close();
-            set({cam: null, camStream: null, camProducer: null})
-          }
         })
       }
     });

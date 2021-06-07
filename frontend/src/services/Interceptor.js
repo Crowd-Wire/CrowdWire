@@ -19,11 +19,9 @@ export const interceptor = fetchIntercept.register({
     response: async function (response) {
         if(response.status === 401)
         {
-            useAuthStore.getState().setLastLocation(window.location.href.replace(URL_BASE, ''))
             if(!AuthenticationService.getToken()){
                 return Promise.reject("No authentication token");
             }
-            console.log(originalRequest);
             let config = originalRequest.config || {};
             let url = originalRequest.url;
             if(url.includes('token'))
@@ -40,8 +38,6 @@ export const interceptor = fetchIntercept.register({
                             return data.json();
                         }).then( (data) => {
                             if(data){
-                                console.log("data");
-                                console.log(data);
                                 if(!useAuthStore.getState().guest_uuid)
                                     AuthenticationService.setToken(data,"AUTH");
                                 else

@@ -25,7 +25,7 @@ async def get_world(
             db=db, world_id=world_id, user_id=user.user_id)
     else:
         db_world, message = await crud.crud_world.get_available_for_guests(
-            db=db, world_id=world_id
+            db=db, world_id=world_id, user_id=user.user_id
         )
     if not db_world:
         raise HTTPException(status_code=400, detail=message)
@@ -293,12 +293,11 @@ async def search_world(
             db=db, search=search, tags=tags, is_guest=True, page=page, limit=limit, visibility=visibility,
             order_by=order_by, order=order)
 
+    if list_world_objs is None:
+        raise HTTPException(status_code=400, detail=msg)
     for world in list_world_objs:
         online_users = await redis_connector.get_online_users(world_id=world.world_id)
         setattr(world, 'online_users', online_users)
-
-    if list_world_objs is None:
-        raise HTTPException(status_code=400, detail=msg)
     return list_world_objs
 
 

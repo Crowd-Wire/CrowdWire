@@ -59,7 +59,7 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
-	limit = 1;
+	limit = 6;
 
 	constructor(props){
 		super(props)
@@ -132,7 +132,7 @@ class SearchAllMaps extends Component {
 		const { classes } = this.props;
 		return (
 			<>
-				<Container style={{ height: '100%' }}>
+				<Container style={{ height: '100%', marginBottom: 30 }}>
 					<Row sm={12} style={{paddingBottom: 60}}>
 						<Col sm={12} style={{textAlign: "center"}}>
 							<IntroText />
@@ -146,7 +146,7 @@ class SearchAllMaps extends Component {
 						this.state.maps.map((m, i) => {
 							if(i !== this.limit)
 								return (
-									<MapCard key={i} focusMap={this.focusMap} map={m} />
+									<MapCard key={i} focusMap={this.focusMap} baseUrl={'../../'} map={m} banned={false}/>
 								)
 						})
 						:
@@ -157,6 +157,7 @@ class SearchAllMaps extends Component {
 					<hr />
 
 					<Paginator hasNext={this.state.maps.length === this.limit + 1} page={this.state.page} changePage={(page) => {this.changePage(page)}} />
+					<Row style={{height:"15px"}}/>
 				</Container>
 			</>
 		);

@@ -31,7 +31,7 @@ const GamePage = (props) => {
   const navigation = useNavigate();
   const [choosingSettings, setChoosingSettings] = useState(true)
   const [username, setUsername] = useState('')
-  const [avatar, setAvatar] = useState("https://picsum.photos/800/600?random=1")
+  const [avatar, setAvatar] = useState("avatars_1_1")
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -85,11 +85,10 @@ const GamePage = (props) => {
     if (user_username === "") {
       user_username = username;
     }
-    console.log(avatar)
     WorldService.updateWorldUser(
       window.location.pathname.split('/')[2],
       useWorldUserStore.getState().world_user.user_id,
-      'avatar_1',
+      avatar,
       user_username
     )
       .then((res) => {
@@ -98,8 +97,6 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
-            console.log(res)
-
             if (res.detail){
               toast.dark(
                 <span>
@@ -166,15 +163,40 @@ const GamePage = (props) => {
                           defaultValue={avatar}
                           onChange={(event, value) => {setAvatar(event.target.value)}}
                           >
-                          <option value={'https://picsum.photos/800/600?random=1'}>Avatar 1</option>
-                          <option value={'https://picsum.photos/800/600?random=2'}>Avatar 2</option>
-                          <option value={'https://picsum.photos/800/600?random=3'}>Avatar 3</option>
+                          <option value={'avatars_1_1'}>Avatar 1</option>
+                          <option value={'avatars_1_2'}>Leandro</option>
+                          <option value={'avatars_1_3'}>Lionel</option>
+                          <option value={'avatars_1_4'}>Leonardo</option>
+                          <option value={'avatars_1_5'}>BSS</option>
+                          <option value={'avatars_1_6'}>Sasha</option>
+                          <option value={'avatars_1_7'}>Avatar 7</option>
+                          <option value={'avatars_1_8'}>Avatar 8</option>
+                          <option value={'avatars_2_1'}>Avatar 9</option>
+                          <option value={'avatars_2_2'}>Avatar 10</option>
+                          <option value={'avatars_2_3'}>Avatar 11</option>
+                          <option value={'avatars_2_4'}>Avatar 12</option>
+                          <option value={'avatars_2_5'}>Avatar 12</option>
+                          <option value={'avatars_2_6'}>Avatar 13</option>
+                          <option value={'avatars_2_7'}>Edu</option>
+                          <option value={'avatars_2_8'}>Eduarda</option>
+                          <option value={'avatars_3_1'}>Avatar 16</option>
+                          <option value={'avatars_3_2'}>Avatar 17</option>
+                          <option value={'avatars_3_3'}>Avatar 18</option>
+                          <option value={'avatars_3_4'}>Teixeira</option>
+                          <option value={'avatars_3_5'}>Avatar 20</option>
+                          <option value={'avatars_3_6'}>Avatar 21</option>
+                          <option value={'avatars_3_7'}>Avatar 22</option>
+                          <option value={'avatars_3_8'}>Avatar 23</option>
+                          <option value={'avatars_4_1'}>Avatar 24</option>
+                          <option value={'avatars_4_2'}>Avatar 25</option>
+                          <option value={'avatars_4_5'}>Avatar 26</option>
+                          <option value={'avatars_4_6'}>Avatar 27</option>
                         </Select>
                       </Col>
                     </Row>
                     <Row sm={12}>
                       <Col style={{textAlign: 'center'}}>
-                        <Carousel avatar={avatar}/>
+                        <Carousel />
                       </Col>
                     </Row>
                     <Row sm={12} style={{paddingTop: 30}}>

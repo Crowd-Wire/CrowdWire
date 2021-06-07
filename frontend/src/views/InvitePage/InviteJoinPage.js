@@ -22,15 +22,12 @@ export default function InviteJoinPage(props){
     useEffect(() => {
         if(AuthenticationService.getToken()){
             let invite = qs.get("invite");
-            console.log(invite)
             if(invite){
                 WorldService.inviteJoin(invite)
                 .then((res) => {
                     return res.json();
                 })
                 .then((res) => {
-                    console.log(res)
-                    console.log(res && res.world_id, res, res.world_id)
                     if(res && res.world_id)
                         navigate("/world/"+res.world_id);
                     else {

@@ -110,6 +110,7 @@ def login_access_token(
         "access_token": access_token,
         "token_type": "bearer",
         "expire_date": str(expires),
+        "is_superuser": user.is_superuser
     }
 
 
@@ -157,7 +158,8 @@ def reset_token(
             "access_token": access_token,
             "token_type": 'bearer',
             "expire_date": str(expires),
-            "guest_uuid": current_user.user_id
+            "guest_uuid": current_user.user_id,
+            "is_superuser": current_user.is_superuser
         }
 
     access_token, expires = security.create_access_token(current_user.user_id)
@@ -166,6 +168,7 @@ def reset_token(
         "access_token": access_token,
         "token_type": "bearer",
         "expire_date": str(expires),
+        "is_superuser": current_user.is_superuser
     }
 
 

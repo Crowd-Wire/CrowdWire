@@ -24,6 +24,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import AuthenticationService from "services/AuthenticationService";
 import { toast } from 'react-toastify';
 import Typography from "@material-ui/core/Typography"
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import { Link } from 'react-router-dom';
 
 const useStyles = makeStyles(styles);
 
@@ -172,7 +175,6 @@ class RegisterPage extends React.Component {
                     <CardHeader style={{ backgroundColor: "#5BC0BE" }} className={this.props.classes.cardHeader}>
                       <h4>Register</h4>
                     </CardHeader>
-                    <p className={this.props.classes.divider}>Or Be Classical</p>
                     <CardBody>
                       <CustomInput
                         helperText={this.state.emailHelperText}
@@ -267,7 +269,7 @@ class RegisterPage extends React.Component {
                       <br/>
                       <TextField
                         helperText={this.state.birthdayHelperText}
-                        style={{ marginLeft: "auto", marginRight: "auto" }}
+                        style={{ marginLeft: "auto", marginRight: "auto", width: '100%' }}
                         id="date"
                         label="Birthday"
                         type="date"
@@ -278,13 +280,31 @@ class RegisterPage extends React.Component {
                         }}
                       />
                     </CardBody>
-                    <CardFooter className={this.props.classes.cardFooter}>
-                      <Button size="md"
+                    <CardFooter className={this.props.classes.cardFooter} style={{ paddingTop: 20 }}>
+                      <Button
                         onClick={this.handleSubmit} 
+                        onClick={this.handleSubmit} 
+                        style={{ 
+                          backgroundColor: "#5BC0BE", marginLeft: "auto", 
+                          marginRight: "auto",
+                        }} 
+                        size="md"
                       >
                         Submit
                       </Button>
+                      <br />
                     </CardFooter>
+                    <Row style={{marginLeft: "auto", marginRight: "auto"}}>
+                      <Col sm={12} md={12} lg={12}>
+                        <Row>
+                          <Link to="/login" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                            <Button onClick={() => {}}  simple color="primary" size="sm" style={{ marginLeft: "auto", marginRight: "auto" }}>
+                              Go Back to Login
+                            </Button>
+                          </Link>
+                        </Row>
+                      </Col>
+                    </Row>
                   </form>
                 </Card>
               </GridItem>

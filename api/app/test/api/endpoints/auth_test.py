@@ -61,7 +61,7 @@ class TestAuth(TestCase):
 
         with patch("app.crud.crud_users.CRUDUser.authenticate") as mock_post:
 
-            mock_post.return_value = User(status=0), ""
+            mock_post.return_value = User(status=0, is_superuser=True), ""
 
             response = client.post(
                 "/login",

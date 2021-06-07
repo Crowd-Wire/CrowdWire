@@ -52,8 +52,10 @@ export default function WorldReports(props) {
                 return res.json();
             })
             .then((res) => {
-                console.log(res);
-                setReports(res);
+                if(!res.detail){
+                    setReports(res);
+                }
+                
             })
     }
 
@@ -112,7 +114,7 @@ export default function WorldReports(props) {
     }
 
     return (
-        <div style={{ paddingTop: '100px', height:"100%"}}>
+        <div style={{ paddingTop: '30px', height:"100%"}}>
             <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                 <Col md={4}>
                     <Input className="mx-3"
@@ -131,7 +133,7 @@ export default function WorldReports(props) {
                     />
 
                 </Col>
-                <Col md={4}>
+                <Col md={3}>
                     <FormControlLabel
                         className={classes.formControl}
                         control={
@@ -158,7 +160,7 @@ export default function WorldReports(props) {
                         label="Show Banned"
                     />
                 </Col>
-                <Col md={4}>
+                <Col md={3}>
                     <FormControl className={classes.formControl}>
                         <Select
                             labelId="orderBy-label"
@@ -190,10 +192,8 @@ export default function WorldReports(props) {
                         </Select>
                     </FormControl>
                 </Col>
-            </Row>
-            <Row className="my-2" style={{marginLeft:"auto", marginRight:"auto"}}>
-                <Col md="3">
-                    <Button onClick={() => {handleSubmit(1)}}>Search</Button>
+                <Col md={2}>
+                    <Button onClick={handleSubmit}>Search</Button>
                 </Col>
             </Row>
             <hr/>
@@ -212,6 +212,7 @@ export default function WorldReports(props) {
             </div>
             <hr />
             <Paginator hasNext={reports.length === limit + 1} page={page} changePage={(page) => {changePage(page)}} />
+            <Row style={{height:"15px"}}/>
         </div>
     )
 }

@@ -107,6 +107,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                  disabled={newState.is_default}
                   checked={newState.obj_int}
                   onChange={handleChange}
                   name="obj_int"
@@ -187,6 +188,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                disabled={newState.is_default}
                 checked={newState.talk_conf}
                 onChange={handleChange}
                 name="talk_conf"
@@ -202,6 +204,7 @@ export default function UserPermissions(props) {
             <FormControlLabel
               control={
                 <Checkbox
+                disabled={newState.is_default}
                 checked={newState.world_mute}
                 onChange={handleChange}
                 name="world_mute"
