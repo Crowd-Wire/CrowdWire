@@ -18,7 +18,6 @@ const useMessageStore = create(
                 return set((s) => {
                     const messages = [...s.messages];
                     messages.push(message)
-                    console.log(messages)
                     return { messages };
                 });
             },

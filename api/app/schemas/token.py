@@ -7,6 +7,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     expire_date: str
+    is_superuser: bool = False
 
 
 class TokenGuest(Token):
@@ -27,3 +28,7 @@ class InviteTokenPayload(BaseModel):
     # is of type int and not UUID4(the type for guest users)
     inviter: int
     world_id: int
+
+
+class GoogleToken(BaseModel):
+    token: str

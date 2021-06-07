@@ -9,12 +9,16 @@ export const useVideoStore = create(
       camProducer: null as any | null,
     },
     (set) => ({
-      nullify: () =>
-        set({
-          cam: null,
-          camStream: null,
-          camProducer: null,
-        }),
+      nullify: () => {
+        set((s) => {
+          if (s.cam) s.cam.stop()
+          return {
+            cam: null,
+            camStream: null,
+            camProducer: null,
+          }
+        })
+      },
       set,
     })
   )

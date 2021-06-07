@@ -46,18 +46,21 @@ export const sendVideo = async (roomId:string = null) => {
   if (cam) {
     console.log("creating producer...");
     sendTransports.forEach(function (sendTransport) {
-      sendTransport.produce({
-        track: cam,
-        appData: { mediaTag: "video" },
-      })
-      .then((producer) => {set({camProducer: producer})})
-      .catch((err) => {
-        console.log(err)
-        cam.onended = function(event) {
-          useVideoStore.getState().camProducer.close();
-          set({cam: null, camStream: null, camProducer: null})
-        }
-      })
+      if (sendTransport) {
+        sendTransport.produce({
+          track: cam,
+          appData: { mediaTag: "video" },
+        })
+        .then((producer) => {
+          set({camProducer: producer})
+          producer.on("transportclose", () => {
+            producer.close();
+          })
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+      }
     });
 
   }

@@ -65,12 +65,7 @@ const GameUITabs = (props) => {
         </Tabs>
       </CardHeader>
       <CardBody classes={{ cardBody: classes.cardBody }} >
-        {tabs.map((prop, key) => {
-          if (key === value) {
-            return <div key={key}>{prop.tabContent}</div>;
-          }
-          return null;
-        })}
+        {tabs[value].tabContent}
       </CardBody>
     </Card>
   )

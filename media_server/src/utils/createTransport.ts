@@ -11,7 +11,8 @@ export const transportToOptions = ({
   iceParameters,
   iceCandidates,
   dtlsParameters,
-}: WebRtcTransport) => ({ id, iceParameters, iceCandidates, dtlsParameters });
+  sctpParameters
+}: WebRtcTransport) => ({ id, iceParameters, iceCandidates, dtlsParameters, sctpParameters });
 
 export type TransportOptions = ReturnType<typeof transportToOptions>;
 
@@ -31,6 +32,7 @@ export const createTransport = async (
     enableUdp: true,
     enableTcp: true,
     preferUdp: true,
+    enableSctp: true,
     initialAvailableOutgoingBitrate: initialAvailableOutgoingBitrate,
     appData: { peerId, clientDirection: direction },
   });

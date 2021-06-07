@@ -1,7 +1,8 @@
 import { API_BASE } from "config";
 
-class AuthenticationService {
+import useAuthStore from "stores/useAuthStore.ts";
 
+class AuthenticationService {
     login(email, password) {
         return fetch(API_BASE + 'login', {
             method: 'POST',
@@ -26,17 +27,21 @@ class AuthenticationService {
         })
     }
     getToken() {
-        if(localStorage.getItem("auth")!==null)
-            return JSON.parse(localStorage.getItem("auth"))["token"];
-        return null;
+        return useAuthStore.getState().token;
     }
 
-    setToken(auth) {
-        localStorage.setItem("auth",JSON.stringify(
-            {"token":auth.access_token,
-            "expire_date":auth.expire_date}
-            )
-        );
+    setToken(auth, type) {
+        if(type==="GUEST"){
+            useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
+        }
+        else if(type==="AUTH"){
+            useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.is_superuser);
+        }
+    }
+
+    logout(){
+        useAuthStore.getState().leave();
+
     }
 
     refreshToken(){
@@ -50,12 +55,24 @@ class AuthenticationService {
     }
 
     joinAsGuest(){
-        return fetch(API_BASE + 'join-guest/', {
+        console.log(API_BASE)
+        return fetch(API_BASE + 'join-guest', {
             method: 'POST',
-            mode: 'cors'
+            mode: 'cors',
+            headers: {
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
         })
     }
 
+    googleAuth(token){
+        return fetch(API_BASE + 'login/google',{ 
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({token: token})
+        })
+    }
 }
 
 export default new AuthenticationService();

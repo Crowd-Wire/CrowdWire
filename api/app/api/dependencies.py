@@ -7,13 +7,13 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 from loguru import logger
 from datetime import datetime, timedelta
-
+from app.core import consts
 from app import crud, models, schemas
 from app.core import security
 from app.core.config import settings
 from app.db.session import SessionLocal
 
-from app.crud import crud_user
+from app.crud import crud_user, crud_world
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login")
 reusable_oauth2_optional = OAuth2PasswordBearer(tokenUrl="/login", auto_error=False)
@@ -43,6 +43,29 @@ def get_current_user_optional(
     return None
 
 
+def get_confirm_email_token(
+        token: str,
+        db: Session = Depends(get_db),
+) -> models.User:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        logger.debug(payload)
+        token_data = schemas.TokenPayload(**payload)
+    except (jwt.JWTError, ValidationError) as e:
+        logger.debug(e)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid Token",
+        )
+
+    user = crud.crud_user.is_pending(db=db, user_id=int(token_data.sub))
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist or is already confirmed")
+    return user
+
+
 def get_current_user(
         db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
 ) -> Union[models.User, schemas.GuestUser]:
@@ -60,7 +83,7 @@ def get_current_user(
         )
     if not token_data.is_guest_user:
         user = crud.crud_user.get(db, id=token_data.sub)
-        if not user:
+        if not user or user.status != consts.USER_NORMAL_STATUS:
             raise HTTPException(status_code=404, detail="User not found")
         return user
 
@@ -96,6 +119,8 @@ async def get_websockets_user(
         websocket: WebSocket,
         *,
         token: str,
+        world_id: int,
+        db: Session = Depends(get_db)
 ) -> str:
     try:
         payload = jwt.decode(
@@ -107,7 +132,25 @@ async def get_websockets_user(
         logger.debug(e)
         raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
 
-    return str(token_data.sub)
+    # checks if the user has access to that world
+    # he might try to connect to the websockets directly
+    if token_data.is_guest_user:
+        world_obj, msg = await crud_world.get_available_for_guests(db=db, world_id=world_id, user_id=token_data.sub)
+    else:
+        world_obj, msg = await crud_world.get_available(db=db, world_id=world_id, user_id=token_data.sub)
+
+    logger.debug(token_data.sub)
+    logger.debug(world_obj)
+    if not world_obj:
+        raise await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+
+    if not token_data.is_guest_user:
+        user = crud.crud_user.get(db, id=token_data.sub)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return user
+
+    return schemas.GuestUser(is_guest_user=True, user_id=token_data.sub)
 
 
 # TODO: Verify is not a Guest User instance that is injected as a Dependency

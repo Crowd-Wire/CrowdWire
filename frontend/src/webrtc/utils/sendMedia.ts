@@ -42,12 +42,20 @@ export const sendMedia = async (roomId:string = null) => {
     try {
       console.log("creating producer...");
       sendTransports.forEach(function (sendTransport) {
-        sendTransport.produce({
-          track: media,
-          appData: { mediaTag: "media" },
-        })
-        .then((producer) => {set({mediaProducer: producer})})
-        .catch((err) => console.log(err))
+        if (sendTransport) {
+          sendTransport.produce({
+            track: media,
+            appData: { mediaTag: "media" },
+          })
+          .then((producer) => {
+            set({mediaProducer: producer});
+            producer.on("transportclose", () => {
+              producer.close();
+              set({media: null, mediaStream: null, mediaProducer: null});
+            })
+          })
+          .catch((err) => console.log(err))
+        }
       });
       media.onended = function(event) {
         useMediaStore.getState().mediaProducer.close();

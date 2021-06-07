@@ -1,30 +1,23 @@
 from datetime import timedelta
 from typing import Any, Union
-
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from authlib.integrations.starlette_client import OAuth, OAuthError
-from starlette.config import Config
-from starlette.requests import Request
 from app import crud, models, schemas
 from app.api import dependencies
 from app.core import security, strings
-
-# from app.core.security import get_password_hash
-# from app.utils import (
-# generate_password_reset_token,
-# send_reset_password_email,
-# verify_password_reset_token,
-# )
+from google.oauth2 import id_token
+from google.auth.transport import requests
 from app.core.config import settings
-from app.utils import is_guest_user
+from app.utils import is_guest_user, send_email
+# from app.core.security import get_password_hash
+
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=schemas.Token)
-def register(
+@router.post("/register")
+async def register(
         user_data: schemas.UserCreate,
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
@@ -37,12 +30,30 @@ def register(
     if not user:
         raise HTTPException(status_code=400, detail=message)
 
+    await send_email('brunosb@ua.pt', user.user_id)
+
+    return {'status': 'ok'}
+
+
+@router.get('/confirm/{token}')
+def confirm_email(
+        db: Session = Depends(dependencies.get_db),
+        user: models.User = Depends(dependencies.get_confirm_email_token)
+):
+    """
+    Receives a token and confirms the user registration in the app.
+    Returns the access token so that there is no need for it to login.
+    """
+    user, msg = crud.crud_user.confirm_email(db=db, user_id=user.user_id)
+    if user is None:
+        raise HTTPException(status_code=400, detail=msg)
+
     access_token, expires = security.create_access_token(user.user_id)
 
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "expire_date": str(expires)
+        "expire_date": str(expires),
     }
 
 
@@ -99,6 +110,7 @@ def login_access_token(
         "access_token": access_token,
         "token_type": "bearer",
         "expire_date": str(expires),
+        "is_superuser": user.is_superuser
     }
 
 
@@ -146,7 +158,8 @@ def reset_token(
             "access_token": access_token,
             "token_type": 'bearer',
             "expire_date": str(expires),
-            "guest_uuid": current_user.user_id
+            "guest_uuid": current_user.user_id,
+            "is_superuser": current_user.is_superuser
         }
 
     access_token, expires = security.create_access_token(current_user.user_id)
@@ -155,48 +168,19 @@ def reset_token(
         "access_token": access_token,
         "token_type": "bearer",
         "expire_date": str(expires),
+        "is_superuser": current_user.is_superuser
     }
 
 
-# Google Login
-
-# TODO: change this to get the secrets from the environment variables
-config = Config('.env')
-oauth = OAuth(config)
-
-CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
-
-oauth.register(
-    name='google',
-    client_id=settings.CLIENT_ID,
-    client_secret=settings.CLIENT_SECRET,
-    server_metadata_url=CONF_URL,
-    client_kwargs={
-        'scope': 'openid email profile'
-    }
-)
-
-
-@router.route('/login/google')
-async def google_login(request: Request):
-    """
-    The request will be redirected to google and the result will be sent to /auth/google endpoint
-    """
-    redirect_uri = request.url_for('auth')
-    return await oauth.google.authorize_redirect(request, redirect_uri)
-
-
-@router.get('/auth/google')
-async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
+@router.post('/login/google')
+async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.get_db)):
     """
     Receives the information from the google operation and returns the application token.
     """
     try:
-        token = await oauth.google.authorize_access_token(request)
-    except OAuthError:
+        user = id_token.verify_oauth2_token(token.token, requests.Request(), settings.CLIENT_ID)
+    except Exception:
         return {"error": "Invalid Authentication"}
-
-    user = await oauth.google.parse_id_token(request, token)
 
     user_db, msg = crud.crud_user.google_auth(db=db, user=user)
 
@@ -210,53 +194,3 @@ async def auth(request: Request, db: Session = Depends(dependencies.get_db)):
         "token_type": "bearer",
         "expire_date": str(expires)
     }
-
-    return "token"
-
-"""
-@router.post("/password-recovery/{email}", response_model=schemas.Msg)
-def recover_password(email: str, db: Session = Depends(dependencies.get_db)) -> Any:
-    """
-# Password Recovery
-"""
-    user = crud.user.get_by_email(db, email=email)
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system.",
-        )
-    password_reset_token = generate_password_reset_token(email=email)
-    #send_reset_password_email(
-    #    email_to=user.email, email=email, token=password_reset_token
-    #)
-    return {"msg": "Password recovery email sent"}
-
-"""
-"""
-@router.post("/reset-password/", response_model=schemas.Msg)
-def reset_password(
-    token: str = Body(...),
-    new_password: str = Body(...),
-    db: Session = Depends(dependencies.get_db),
-) -> Any:
-    """
-# Reset password
-"""
-    email = verify_password_reset_token(token)
-    if not email:
-        raise HTTPException(status_code=400, detail="Invalid token")
-    user = crud.user.get_by_email(db, email=email)
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system.",
-        )
-    elif not crud.user.is_active(user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    hashed_password = get_password_hash(new_password)
-    user.hashed_password = hashed_password
-    db.add(user)
-    db.commit()
-    return {"msg": "Password updated successfully"}
-"""

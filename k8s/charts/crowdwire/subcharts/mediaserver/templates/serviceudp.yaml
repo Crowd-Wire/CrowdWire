@@ -1,0 +1,414 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+spec:
+  type: NodePort
+  externalIPs:
+    - 193.136.92.151
+  ports:
+    - name : udp0
+      port: 40000
+      targetPort: 40000
+      protocol: UDP
+    - name : udp1
+      port: 40001
+      targetPort: 40001
+      protocol: UDP
+    - name : udp2
+      port: 40002
+      targetPort: 40002
+      protocol: UDP
+    - name : udp3
+      port: 40003
+      targetPort: 40003
+      protocol: UDP
+    - name : udp4
+      port: 40004
+      targetPort: 40004
+      protocol: UDP
+    - name : udp5
+      port: 40005
+      targetPort: 40005
+      protocol: UDP
+    - name : udp6
+      port: 40006
+      targetPort: 40006
+      protocol: UDP
+    - name : udp7
+      port: 40007
+      targetPort: 40007
+      protocol: UDP
+    - name : udp8
+      port: 40008
+      targetPort: 40008
+      protocol: UDP
+    - name : udp9
+      port: 40009
+      targetPort: 40009
+      protocol: UDP
+    - name : udp10
+      port: 40010
+      targetPort: 40010
+      protocol: UDP
+    - name : udp11
+      port: 40011
+      targetPort: 40011
+      protocol: UDP
+    - name : udp12
+      port: 40012
+      targetPort: 40012
+      protocol: UDP
+    - name : udp13
+      port: 40013
+      targetPort: 40013
+      protocol: UDP
+    - name : udp14
+      port: 40014
+      targetPort: 40014
+      protocol: UDP
+    - name : udp15
+      port: 40015
+      targetPort: 40015
+      protocol: UDP
+    - name : udp16
+      port: 40016
+      targetPort: 40016
+      protocol: UDP
+    - name : udp17
+      port: 40017
+      targetPort: 40017
+      protocol: UDP
+    - name : udp18
+      port: 40018
+      targetPort: 40018
+      protocol: UDP
+    - name : udp19
+      port: 40019
+      targetPort: 40019
+      protocol: UDP
+    - name : udp20
+      port: 40020
+      targetPort: 40020
+      protocol: UDP
+    - name : udp21
+      port: 40021
+      targetPort: 40021
+      protocol: UDP
+    - name : udp22
+      port: 40022
+      targetPort: 40022
+      protocol: UDP
+    - name : udp23
+      port: 40023
+      targetPort: 40023
+      protocol: UDP
+    - name : udp24
+      port: 40024
+      targetPort: 40024
+      protocol: UDP
+    - name : udp25
+      port: 40025
+      targetPort: 40025
+      protocol: UDP
+    - name : udp26
+      port: 40026
+      targetPort: 40026
+      protocol: UDP
+    - name : udp27
+      port: 40027
+      targetPort: 40027
+      protocol: UDP
+    - name : udp28
+      port: 40028
+      targetPort: 40028
+      protocol: UDP
+    - name : udp29
+      port: 40029
+      targetPort: 40029
+      protocol: UDP
+    - name : udp30
+      port: 40030
+      targetPort: 40030
+      protocol: UDP
+    - name : udp31
+      port: 40031
+      targetPort: 40031
+      protocol: UDP
+    - name : udp32
+      port: 40032
+      targetPort: 40032
+      protocol: UDP
+    - name : udp33
+      port: 40033
+      targetPort: 40033
+      protocol: UDP
+    - name : udp34
+      port: 40034
+      targetPort: 40034
+      protocol: UDP
+    - name : udp35
+      port: 40035
+      targetPort: 40035
+      protocol: UDP
+    - name : udp36
+      port: 40036
+      targetPort: 40036
+      protocol: UDP
+    - name : udp37
+      port: 40037
+      targetPort: 40037
+      protocol: UDP
+    - name : udp38
+      port: 40038
+      targetPort: 40038
+      protocol: UDP
+    - name : udp39
+      port: 40039
+      targetPort: 40039
+      protocol: UDP
+    - name : udp40
+      port: 40040
+      targetPort: 40040
+      protocol: UDP
+    - name : udp41
+      port: 40041
+      targetPort: 40041
+      protocol: UDP
+    - name : udp42
+      port: 40042
+      targetPort: 40042
+      protocol: UDP
+    - name : udp43
+      port: 40043
+      targetPort: 40043
+      protocol: UDP
+    - name : udp44
+      port: 40044
+      targetPort: 40044
+      protocol: UDP
+    - name : udp45
+      port: 40045
+      targetPort: 40045
+      protocol: UDP
+    - name : udp46
+      port: 40046
+      targetPort: 40046
+      protocol: UDP
+    - name : udp47
+      port: 40047
+      targetPort: 40047
+      protocol: UDP
+    - name : udp48
+      port: 40048
+      targetPort: 40048
+      protocol: UDP
+    - name : udp49
+      port: 40049
+      targetPort: 40049
+      protocol: UDP
+    - name : udp50
+      port: 40050
+      targetPort: 40050
+      protocol: UDP
+    - name : udp51
+      port: 40051
+      targetPort: 40051
+      protocol: UDP
+    - name : udp52
+      port: 40052
+      targetPort: 40052
+      protocol: UDP
+    - name : udp53
+      port: 40053
+      targetPort: 40053
+      protocol: UDP
+    - name : udp54
+      port: 40054
+      targetPort: 40054
+      protocol: UDP
+    - name : udp55
+      port: 40055
+      targetPort: 40055
+      protocol: UDP
+    - name : udp56
+      port: 40056
+      targetPort: 40056
+      protocol: UDP
+    - name : udp57
+      port: 40057
+      targetPort: 40057
+      protocol: UDP
+    - name : udp58
+      port: 40058
+      targetPort: 40058
+      protocol: UDP
+    - name : udp59
+      port: 40059
+      targetPort: 40059
+      protocol: UDP
+    - name : udp60
+      port: 40060
+      targetPort: 40060
+      protocol: UDP
+    - name : udp61
+      port: 40061
+      targetPort: 40061
+      protocol: UDP
+    - name : udp62
+      port: 40062
+      targetPort: 40062
+      protocol: UDP
+    - name : udp63
+      port: 40063
+      targetPort: 40063
+      protocol: UDP
+    - name : udp64
+      port: 40064
+      targetPort: 40064
+      protocol: UDP
+    - name : udp65
+      port: 40065
+      targetPort: 40065
+      protocol: UDP
+    - name : udp66
+      port: 40066
+      targetPort: 40066
+      protocol: UDP
+    - name : udp67
+      port: 40067
+      targetPort: 40067
+      protocol: UDP
+    - name : udp68
+      port: 40068
+      targetPort: 40068
+      protocol: UDP
+    - name : udp69
+      port: 40069
+      targetPort: 40069
+      protocol: UDP
+    - name : udp70
+      port: 40070
+      targetPort: 40070
+      protocol: UDP
+    - name : udp71
+      port: 40071
+      targetPort: 40071
+      protocol: UDP
+    - name : udp72
+      port: 40072
+      targetPort: 40072
+      protocol: UDP
+    - name : udp73
+      port: 40073
+      targetPort: 40073
+      protocol: UDP
+    - name : udp74
+      port: 40074
+      targetPort: 40074
+      protocol: UDP
+    - name : udp75
+      port: 40075
+      targetPort: 40075
+      protocol: UDP
+    - name : udp76
+      port: 40076
+      targetPort: 40076
+      protocol: UDP
+    - name : udp77
+      port: 40077
+      targetPort: 40077
+      protocol: UDP
+    - name : udp78
+      port: 40078
+      targetPort: 40078
+      protocol: UDP
+    - name : udp79
+      port: 40079
+      targetPort: 40079
+      protocol: UDP
+    - name : udp80
+      port: 40080
+      targetPort: 40080
+      protocol: UDP
+    - name : udp81
+      port: 40081
+      targetPort: 40081
+      protocol: UDP
+    - name : udp82
+      port: 40082
+      targetPort: 40082
+      protocol: UDP
+    - name : udp83
+      port: 40083
+      targetPort: 40083
+      protocol: UDP
+    - name : udp84
+      port: 40084
+      targetPort: 40084
+      protocol: UDP
+    - name : udp85
+      port: 40085
+      targetPort: 40085
+      protocol: UDP
+    - name : udp86
+      port: 40086
+      targetPort: 40086
+      protocol: UDP
+    - name : udp87
+      port: 40087
+      targetPort: 40087
+      protocol: UDP
+    - name : udp88
+      port: 40088
+      targetPort: 40088
+      protocol: UDP
+    - name : udp89
+      port: 40089
+      targetPort: 40089
+      protocol: UDP
+    - name : udp90
+      port: 40090
+      targetPort: 40090
+      protocol: UDP
+    - name : udp91
+      port: 40091
+      targetPort: 40091
+      protocol: UDP
+    - name : udp92
+      port: 40092
+      targetPort: 40092
+      protocol: UDP
+    - name : udp93
+      port: 40093
+      targetPort: 40093
+      protocol: UDP
+    - name : udp94
+      port: 40094
+      targetPort: 40094
+      protocol: UDP
+    - name : udp95
+      port: 40095
+      targetPort: 40095
+      protocol: UDP
+    - name : udp96
+      port: 40096
+      targetPort: 40096
+      protocol: UDP
+    - name : udp97
+      port: 40097
+      targetPort: 40097
+      protocol: UDP
+    - name : udp98
+      port: 40098
+      targetPort: 40098
+      protocol: UDP
+    - name : udp99
+      port: 40099
+      targetPort: 40099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}
+    

@@ -5,10 +5,14 @@ import {
   MediaKind,
   RtpCapabilities,
   RtpParameters,
+  SctpStreamParameters,
+  SctpParameters,
 } from "mediasoup/lib/types";
 import { MediaSendDirection } from "src/types";
 import { TransportOptions } from "./createTransport";
 import { Consumer } from "./createConsumer";
+import { DataConsumer } from "./createDataConsumer";
+
 
 const retryInterval = 5000;
 export interface HandlerDataMap {
@@ -34,9 +38,18 @@ export interface HandlerDataMap {
     rtpCapabilities: RtpCapabilities;
     appData: any;
   };
+  "@send-file": {
+    roomId: string;
+    peerId: string;
+    transportId: string;
+    direction: MediaSendDirection;
+    sctpStreamParameters: SctpStreamParameters;
+    appData: any;
+  };
   "@connect-transport": {
     roomId: string;
     dtlsParameters: DtlsParameters;
+    sctpParameters: SctpParameters;
     peerId: string;
     direction: MediaSendDirection;
   };
@@ -69,6 +82,7 @@ export type HandlerMap = {
 };
 
 type SendTrackDoneOperationName = `@send-track-${MediaSendDirection}-done`;
+type SendFileDoneOperationName = `@send-file-${MediaSendDirection}-done`;
 type ConnectTransportDoneOperationName = `@connect-transport-${MediaSendDirection}-done`;
 
 type OutgoingMessageDataMap = {
@@ -97,6 +111,10 @@ type OutgoingMessageDataMap = {
     peerId: string;
     kind: string;
   } & Consumer;
+  "new-peer-data-producer": {
+    roomId: string;
+    peerId: string;
+  } & DataConsumer;
   you_left_room: {
     roomId: string;
     kicked: boolean;
@@ -111,7 +129,7 @@ type OutgoingMessageDataMap = {
     peerId: string;
     routerRtpCapabilities: RtpCapabilities;
     recvTransportOptions: TransportOptions;
-    sendTransportOptions: TransportOptions;
+    //sendTransportOptions: TransportOptions;
   };
 } & {
   [Key in SendTrackDoneOperationName]: {
@@ -120,8 +138,14 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId?: string;
   };
-} &
-  {
+} & {
+  [Key in SendFileDoneOperationName]: {
+    error?: string;
+    id?: string;
+    roomId: string;
+    peerId?: string;
+  };
+} & {
     [Key in ConnectTransportDoneOperationName]: {
       error?: string;
       roomId: string;
@@ -161,9 +185,31 @@ export const startRabbit = async (handler: HandlerMap) => {
     console.error("Rabbit connection closed with error: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
   });
+
+  const k8s = require('@kubernetes/client-node');
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  
+  const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+  let mediaserver_counter = 0;
+  await k8sApi.listNamespacedPod('default').then(async function(res: any)  {
+  //console.log(typeof(res.body));
+  //console.log(payload)
+ //console.log(payload.get('V1PodList'))
+  for(let i =0; i< res.body.items.length; i ++){
+      let pod = res.body.items[i];
+      if (pod.metadata.name.includes('crowdwire-mediaserver')){
+        mediaserver_counter++;
+        console.log("Found pod")
+      }
+    }
+    
+  }).catch((err: any) => {console.log(err);});
   const channel = await conn.createChannel();
   const sendQueue = "rest_api_queue";
-  const receiveQueue = "media_server_queue";
+  const receiveQueue = "media_server_" + String(mediaserver_counter);
+  console.log(receiveQueue)
   await Promise.all([
     channel.assertQueue(receiveQueue),
     channel.assertQueue(sendQueue),

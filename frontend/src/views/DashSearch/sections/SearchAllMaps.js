@@ -1,14 +1,32 @@
-import React, { useState, Component } from "react";
-import { makeStyles, withStyles } from "@material-ui/core/styles";
+import React, { Component } from "react";
+import { withStyles } from "@material-ui/core/styles";
 import Container from '@material-ui/core/Container';
 import MapCard from 'components/MapCard/MapCard.js';
+import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import MapFilters from 'components/MapFilters/MapFilters.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import WorldService from 'services/WorldService';
-import Pagination from '@material-ui/lab/Pagination';
+import WorldService from 'services/WorldService.ts';
+import Paginator from 'components/Paginator/Paginator.js';
 import Typography from '@material-ui/core/Typography';
+import useAuthStore from "stores/useAuthStore";
+import IntroText from 'components/IntroText/IntroText';
+import { useParams } from "react-router-dom";
 
+export const withRouter = (Component) => {
+  const Wrapper = (props) => {
+    const params = useParams();
+    
+    return (
+      <Component
+	  	params={params}
+        {...props}
+        />
+    );
+  };
+  
+  return Wrapper;
+};
 
 const useStyles = theme => ({
 	root: {
@@ -41,34 +59,34 @@ const useStyles = theme => ({
 
 class SearchAllMaps extends Component {
 
+	limit = 6;
+
 	constructor(props){
 		super(props)
-	}
-	state = {
-		maps: [],
-		search: "",
-		tags: [],
-		page: 1
+		this.type = props.params.type;
+		this.joined = this.props.joined;
+		this.state = {
+			maps: [],
+			search: "",
+			tags: [],
+			page: 1
+		}
 	}
 
 	focusMap(id){
 		this.props.handler(id);
-		
 	}
-
-	joined = this.props.joined;
-
 
 	search_handler = () => {
-		WorldService.search(this.state.search, this.state.tags, this.props.joined, this.state.page)
-			.then((res) => { console.log(res);console.log(res.json());return res.json() })
+		WorldService.searchUsers(this.state.search, this.state.tags, this.type, null, null, this.state.page, this.limit)
+			.then((res) => { return res.json() })
       		.then((res) => { this.setState({ maps: res }) })
-			.catch((err) => { console.log(err) });
+			.catch((err) => { useAuthStore.getState().leave() });
 	}
 
-	changePage = async (event, page) => {
+	changePage = async (page) => {
 		await this.setState({page: page});
-		this.search_handler(this.state.prevSearch, this.state.prevTags);
+		this.search_handler();
 	}
 
 	changeTags = async (value) => {
@@ -80,7 +98,7 @@ class SearchAllMaps extends Component {
 	}
 
 	componentDidMount(){
-		WorldService.search("", [], this.props.joined, 1)
+		WorldService.searchUsers("", [], this.type, null, null, 1, this.limit)
 			.then((res) => {
 				if(res.status == 200) 
 					return res.json()
@@ -88,13 +106,15 @@ class SearchAllMaps extends Component {
 			.then((res) => {
 				if(res)
 					this.setState({ maps: res }) 
-			});
+			}).catch((error) => {useAuthStore.getState().leave()});
 	}
-	async componentDidUpdate(){
-		if(this.joined!=this.props.joined){
-			this.joined = this.props.joined;
-			await this.setState({prevSearch: "", prevTags: []});
-			WorldService.search("", [], this.props.joined, this.state.page)
+	async componentDidUpdate(prevProps, prevState){
+		// TODO: there might be a bug here because of the page variable when calling the service
+		// TODO: add the order_by filters
+		if(this.type != this.props.params.type) {
+			this.type = this.props.params.type;
+			await this.setState({search: "", tags: []});
+			WorldService.searchUsers("", [], this.type, null, null, this.state.page, this.limit)
 				.then((res) => {
 					if(res.status == 200) 
 						return res.json()
@@ -103,38 +123,45 @@ class SearchAllMaps extends Component {
 					if(res)
 						this.setState({ maps: res }) 
 					this.setState({search:"", tags: []});
-				});
+				}).catch((error) => {useAuthStore.getState().leave()});
 		}
+
 	}
 
 	render() {
 		const { classes } = this.props;
 		return (
 			<>
-				<Container style={{ overflowX: "hidden" }}>
-					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={this.search_handler} />
+				<Container style={{ height: '100%', marginBottom: 30 }}>
+					<Row sm={12} style={{paddingBottom: 60}}>
+						<Col sm={12} style={{textAlign: "center"}}>
+							<IntroText />
+						</Col>
+					</Row>
+					<MapFilters changeTags={this.changeTags} changeSearch={this.changeSearch} search={this.state.search} tag_array={this.state.tags} handler={() => {this.changePage(1)}} />
 					<hr />
-					<Row>
+
+					<Row style={{marginTop: 50, marginBottom: 50}}>
 						{this.state.maps!==null && this.state.maps.length!==0 ? 
 						this.state.maps.map((m, i) => {
-							return (<MapCard focusMap={this.focusMap} map={m} />)
+							if(i !== this.limit)
+								return (
+									<MapCard key={i} focusMap={this.focusMap} baseUrl={'../../'} map={m} banned={false}/>
+								)
 						})
 						:
-						<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
-					}
+							<Typography style={{marginLeft:"auto", marginRight:"auto"}}>No worlds with these specifications.</Typography>
+						}
+
 					</Row>
 					<hr />
-					{this.state.maps===null || this.state.maps.length===0 ?
-						<></>
-						:
-						<Row style={{marginBottom:"30px"}}>
-							<Pagination onChange={(event,page) => {this.changePage(event, page)}} style={{marginLeft:"auto", marginRight:"auto"}} count={10} />
-						</Row>
-					}
+
+					<Paginator hasNext={this.state.maps.length === this.limit + 1} page={this.state.page} changePage={(page) => {this.changePage(page)}} />
+					<Row style={{height:"15px"}}/>
 				</Container>
 			</>
 		);
 
 	}
 }
-export default withStyles(useStyles)(SearchAllMaps);
+export default withRouter(withStyles(useStyles)(SearchAllMaps));

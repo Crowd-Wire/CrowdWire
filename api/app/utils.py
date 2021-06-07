@@ -1,15 +1,15 @@
 from uuid import uuid4
-from datetime import datetime, timedelta
-from typing import Optional, Union
-# import emails
-# from emails.template import JinjaTemplate
-from jose import jwt
-
+from datetime import timedelta
+from typing import Union, Any
 from app import schemas, models
 from app.core.config import settings
 from app.core.consts import AVATARS_LIST
+from app.core.security import create_access_token
 from random import choice
 from loguru import logger
+from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from pydantic import EmailStr, BaseModel
+from typing import List, Dict
 
 
 def choose_avatar():
@@ -21,6 +21,10 @@ def choose_avatar():
 
 
 def is_guest_user(obj: Union[schemas.GuestUser, models.User]) -> bool:
+    """
+    Checks if an obj is a GuestSchema or a User Model
+    @return: a guest or a user
+    """
     return isinstance(obj, schemas.GuestUser)
 
 
@@ -30,101 +34,41 @@ def generate_guest_username(user_id: uuid4) -> str:
     return f'Guest_{sub_uuid}'
 
 
-"""
-def send_email(
+# TODO: Remove this function usage!
+def row2dict(model) -> dict:
+    return {c.name: str(getattr(model, c.name)) for c in model.__table__.columns}
+
+
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
+    body: Dict[str, Any]
+
+
+conf = ConnectionConfig(
+    MAIL_USERNAME=settings.EMAIL_USER,
+    MAIL_PASSWORD=settings.EMAIL_PASSWORD,
+    MAIL_FROM=settings.EMAIL_FROM,
+    MAIL_PORT=587,
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_TLS=True,
+    MAIL_SSL=False,
+)
+
+
+async def send_email(
     email_to: str,
-    subject_template: str = "",
-    html_template: str = "",
-    environment: Dict[str, Any] = {},
+    user_id: int
 ) -> None:
-    assert settings.EMAILS_ENABLED, "no provided configuration for email variables"
-    message = emails.Message(
-        subject=JinjaTemplate(subject_template),
-        html=JinjaTemplate(html_template),
-        mail_from=(settings.EMAILS_FROM_NAME, settings.EMAILS_FROM_EMAIL),
-    )
-    smtp_options = {"host": settings.SMTP_HOST, "port": settings.SMTP_PORT}
-    if settings.SMTP_TLS:
-        smtp_options["tls"] = True
-    if settings.SMTP_USER:
-        smtp_options["user"] = settings.SMTP_USER
-    if settings.SMTP_PASSWORD:
-        smtp_options["password"] = settings.SMTP_PASSWORD
-    response = message.send(to=email_to, render=environment, smtp=smtp_options)
-    logging.info(f"send email result: {response}")
+    access_token, expires = create_access_token(user_id, expires_delta=timedelta(settings.EMAIL_EXPIRE))
+    html = f"<h3>Hello {email_to}</h3> " \
+           f"<a href={settings.FRONTEND_URL + '?confirm=' + access_token}> Confirm </a>"
 
-
-def send_test_email(email_to: str) -> None:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Test email"
-    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "test_email.html") as f:
-        template_str = f.read()
-    send_email(
-        email_to=email_to,
-        subject_template=subject,
-        html_template=template_str,
-        environment={"project_name": settings.PROJECT_NAME, "email": email_to},
+    message = MessageSchema(
+        subject="Crowdwire",
+        recipients=[email_to],
+        body=html,
+        subtype="html"
     )
 
-
-def send_reset_password_email(email_to: str, email: str, token: str) -> None:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - Password recovery for user {email}"
-    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "reset_password.html") as f:
-        template_str = f.read()
-    server_host = settings.SERVER_HOST
-    link = f"{server_host}/reset-password?token={token}"
-    send_email(
-        email_to=email_to,
-        subject_template=subject,
-        html_template=template_str,
-        environment={
-            "project_name": settings.PROJECT_NAME,
-            "username": email,
-            "email": email_to,
-            "valid_hours": settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS,
-            "link": link,
-        },
-    )
-
-
-def send_new_account_email(email_to: str, username: str, password: str) -> None:
-    project_name = settings.PROJECT_NAME
-    subject = f"{project_name} - New account for user {username}"
-    with open(Path(settings.EMAIL_TEMPLATES_DIR) / "new_account.html") as f:
-        template_str = f.read()
-    link = settings.SERVER_HOST
-    send_email(
-        email_to=email_to,
-        subject_template=subject,
-        html_template=template_str,
-        environment={
-            "project_name": settings.PROJECT_NAME,
-            "username": username,
-            "password": password,
-            "email": email_to,
-            "link": link,
-        },
-    )
-"""
-
-
-def generate_password_reset_token(email: str) -> str:
-    delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)
-    now = datetime.utcnow()
-    expires = now + delta
-    exp = expires.timestamp()
-    encoded_jwt = jwt.encode(
-        {"exp": exp, "nbf": now, "sub": email},
-        settings.SECRET_KEY,
-        algorithm="HS256",
-    )
-    return encoded_jwt
-
-
-def verify_password_reset_token(token: str) -> Optional[str]:
-    try:
-        decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        return decoded_token["email"]
-    except jwt.JWTError:
-        return None
+    fm = FastMail(conf)
+    await fm.send_message(message)

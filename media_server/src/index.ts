@@ -1,16 +1,18 @@
 import "dotenv/config";
 import debugModule from "debug";
-import { Producer, Router, Worker } from "mediasoup/lib/types";
+import { DataProducer, Producer, Router, Worker } from "mediasoup/lib/types";
 import * as Sentry from "@sentry/node";
 import { MyRooms } from "./MyRoomState";
 import { closePeer } from "./utils/closePeer";
 import { createConsumer } from "./utils/createConsumer";
+import { createDataConsumer } from "./utils/createDataConsumer";
 import { createTransport, transportToOptions } from "./utils/createTransport";
 import { deleteRoom } from "./utils/deleteRoom";
 import { startMediasoup } from "./utils/startMediasoup";
 import { HandlerMap, startRabbit } from "./utils/startRabbit";
+import { scalability_config } from "./scalability_config";
 
-const log = debugModule("crowdwire:index");
+// const log = debugModule("crowdwire:index");
 const errLog = debugModule("crowdwire:ERROR");
 
 const rooms: MyRooms = {};
@@ -28,7 +30,9 @@ async function main() {
   let workers: {
     worker: Worker;
     router: Router;
-  }[];
+  } [];
+  let num_rooms: number = 0;
+  let already_requested: boolean = false;
   try {
     workers = await startMediasoup();
   } catch (err) {
@@ -44,9 +48,20 @@ async function main() {
     return w;
   };
 
-  const createRoom = () => {
-    const { worker, router } = getNextWorker();
 
+
+  const createRoom = (send: any) => {
+    const { worker, router } = getNextWorker();
+    num_rooms += 1;
+    console.log(num_rooms * scalability_config.max_consumers_per_worker)
+    console.log(scalability_config.max_consumers * 0.5)
+    if (!already_requested && num_rooms * scalability_config.max_consumers_per_worker * 0.5 >= scalability_config.max_consumers * 0.9){
+      console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
+      already_requested = true;
+      send({
+        'topic': 'CREATE_NEW_REPLICA'
+      });
+      }
     return { worker, router, state: {} };
   };
 
@@ -55,7 +70,7 @@ async function main() {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
         peer?.producer?.get('audio')?.close();
-        // peer?.sendTransport?.close();
+        peer?.sendTransport?.close();
       }
     },
     ['remove-user-from-groups']: ({ roomIds, peerId }) => {
@@ -67,6 +82,7 @@ async function main() {
             delete rooms[roomId].state[peerId];
           }
           if (Object.keys(rooms[roomId].state).length === 0) {
+            num_rooms -= 1;
             deleteRoom(roomId, rooms);
           }
         }
@@ -77,6 +93,7 @@ async function main() {
         for (const peer of Object.values(rooms[roomId].state)) {
           closePeer(peer);
         }
+        num_rooms -= 1;
         deleteRoom(roomId, rooms);
       }
     },
@@ -84,8 +101,10 @@ async function main() {
       if (roomId in rooms) {
         const peer = rooms[roomId].state[peerId];
         if (pause)
+          //@ts-ignore
           peer?.producer?.get(kind)?.pause();
         else
+          //@ts-ignore
           peer?.producer?.get(kind)?.resume();
       }
     },
@@ -102,6 +121,7 @@ async function main() {
           delete rooms[roomId].state[peerId];
         }
         if (Object.keys(rooms[roomId].state).length === 0) {
+          num_rooms -= 1;
           deleteRoom(roomId, rooms);
         }
         send({ uid, topic: "you_left_room", d: { roomId, kicked: !!kicked } });
@@ -132,28 +152,42 @@ async function main() {
         const peerState = state[theirPeerId];
         if (theirPeerId === myPeerId || !peerState ||
           (!peerState.producer?.has('audio') && !peerState.producer?.has('video')
-          && !peerState.producer?.has('media'))) {
+          && !peerState.producer?.has('media') && !peerState.producer?.has('file'))) {
           continue;
         }
         try {
           const { producer } = peerState;
           for (let [key, value] of producer.entries()) {
-            consumerParametersArr.push(
-              {'consumer': await createConsumer(
-                router,
-                value,
-                rtpCapabilities,
-                transport,
-                myPeerId,
-                state[theirPeerId]
-              ), 'kind': key}
-            );
+            if (key != 'file') {
+              consumerParametersArr.push(
+                {'consumer': await createConsumer(
+                  router,
+                  //@ts-ignore
+                  value,
+                  rtpCapabilities,
+                  transport,
+                  myPeerId,
+                  state[theirPeerId]
+                ), 'kind': key}
+              );
+            } else {
+              consumerParametersArr.push(
+                {'consumer': await createDataConsumer(
+                  //@ts-ignore
+                  producer,
+                  transport,
+                  myPeerId,
+                  state[theirPeerId]
+                ), 'kind': key}
+              );
+            }
           }
         } catch (e) {
           errLog(e.message);
           continue;
         }
       }
+
       send({
         topic: "@get-recv-tracks-done",
         uid,
@@ -194,7 +228,7 @@ async function main() {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
             if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontends to get update, but this can be removed
+              // @todo give some time for frontend to get update, but this can be removed
               send({
                 rid: roomId,
                 topic: "close_consumer",
@@ -211,7 +245,7 @@ async function main() {
         });
         
         if (!state[myPeerId].producer) {
-          state[myPeerId].producer = new Map<string, Producer>();
+          state[myPeerId].producer = new Map<string, Producer|DataProducer>();
           state[myPeerId].producer!.set(appData.mediaTag, producer);
         } else {
           state[myPeerId].producer!.set(appData.mediaTag, producer);
@@ -271,8 +305,113 @@ async function main() {
         return;
       }
     },
+    ["@send-file"]: async (
+      {
+        roomId,
+        transportId,
+        direction,
+        peerId: myPeerId,
+        sctpStreamParameters,
+        appData,
+      },
+      uid,
+      send,
+      errBack
+    ) => {
+      if (!(roomId in rooms)) {
+        errBack();
+        return;
+      }
+      const { state } = rooms[roomId];
+      const { sendTransport, producer: previousProducer, consumers } =
+        state[myPeerId];
+      const transport = sendTransport;
+      
+      if (!transport) {
+        errBack();
+        return;
+      }
+      try {
+        if (previousProducer && previousProducer.has(appData.mediaTag)) {
+          previousProducer.get(appData.mediaTag)!.close();
+          consumers.forEach((c) => {
+            if (c.appData.mediaTag == appData.mediaTag ) c.close()
+              // @todo give some time for frontend to get update, but this can be removed
+              send({
+                rid: roomId,
+                topic: "close_consumer",
+                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
+              });
+          })
+        }
+
+        const producer = await transport.produceData({
+          sctpStreamParameters,
+          appData: { ...appData, peerId: myPeerId, transportId },
+        });
+        
+        if (!state[myPeerId].producer) {
+          state[myPeerId].producer = new Map<string, Producer|DataProducer>();
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
+        } else {
+          state[myPeerId].producer!.set(appData.mediaTag, producer);
+        }
+
+        for (const theirPeerId of Object.keys(state)) {
+          if (theirPeerId === myPeerId) {
+            continue;
+          }
+
+          const peerTransport = state[theirPeerId]?.recvTransport;
+          if (!peerTransport) {
+            continue;
+          }
+          try {
+            const d = await createDataConsumer(
+              producer,
+              peerTransport,
+              myPeerId,
+              state[theirPeerId]
+            );
+
+            send({
+              uid: theirPeerId,
+              topic: "new-peer-data-producer",
+              d: { ...d, roomId, peerId: myPeerId },
+            });
+          } catch (e) {
+            errLog(e.message);
+          }
+        }
+        send({
+          topic: `@send-file-${direction}-done` as const,
+          uid,
+          d: {
+            id: producer.id,
+            roomId,
+            peerId: myPeerId,
+          },
+        });
+      } catch (e) {
+        send({
+          topic: `@send-file-${direction}-done` as const,
+          uid,
+          d: {
+            error: e.message,
+            roomId,
+            peerId: myPeerId,
+          },
+        });
+        // send({
+        //   topic: "error",
+        //   d: "error connecting to voice server | " + e.message,
+        //   uid,
+        // });
+        return;
+      }
+    },
     ["@connect-transport"]: async (
-      { roomId, dtlsParameters, peerId, direction },
+      { roomId, dtlsParameters, sctpParameters, peerId, direction },
       uid,
       send,
       errBack
@@ -292,10 +431,9 @@ async function main() {
         return;
       }
 
-      log("connect-transport", peerId, transport.appData);
-
+      console.log("connect-transport", peerId, transport.appData);
       try {
-        await transport.connect({ dtlsParameters });
+        await transport.connect({ dtlsParameters, sctpParameters });
       } catch (e) {
         console.log(e);
         send({
@@ -312,16 +450,16 @@ async function main() {
     },
     ["create-room"]: async ({ roomId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
       send({ topic: "room-created", d: { roomId }, uid });
     },
-    ["add-speaker"]: async ({ roomId, peerId }, uid, send, errBack) => {
+    ["add-speaker"]: async ({ roomId, peerId }, uid, send) => {
       if (!rooms[roomId]?.state[peerId]) {
-        errBack();
         return;
       }
-      log("add-speaker", peerId);
+
+      console.log("add-speaker", peerId);
 
       const { router } = rooms[roomId];
       const sendTransport = await createTransport("send", router, peerId);
@@ -340,19 +478,22 @@ async function main() {
     },
     ["join-as-speaker"]: async ({ roomId, peerId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
-      log("join-as-new-speaker", peerId);
 
+      console.log("join-as-new-speaker", peerId);
+      
       const { state, router } = rooms[roomId];
+
+      if (state[peerId]) {
+        closePeer(state[peerId]);
+      }
+
       const [recvTransport, sendTransport] = await Promise.all([
         createTransport("recv", router, peerId),
         createTransport("send", router, peerId),
       ]);
       
-      if (state[peerId]) {
-        closePeer(state[peerId]);
-      }
       rooms[roomId].state[peerId] = {
         recvTransport: recvTransport,
         sendTransport: sendTransport,
@@ -374,22 +515,25 @@ async function main() {
     },
     ["join-as-new-peer"]: async ({ roomId, peerId }, uid, send) => {
       if (!(roomId in rooms)) {
-        rooms[roomId] = createRoom();
+        rooms[roomId] = createRoom(send);
       }
-      log("join-as-new-peer", peerId);
-      const { state, router } = rooms[roomId];
-      const [recvTransport, sendTransport] = await Promise.all([
-        createTransport("recv", router, peerId),
-        createTransport("send", router, peerId),
-      ]);
       
+      console.log("join-as-new-peer", peerId);
+
+      const { state, router } = rooms[roomId];
+      const [recvTransport] = await Promise.all([
+        createTransport("recv", router, peerId)
+        // createTransport("send", router, peerId),
+      ]);
+
       if (state[peerId]) {
         closePeer(state[peerId]);
       }
 
       rooms[roomId].state[peerId] = {
         recvTransport: recvTransport,
-        sendTransport: sendTransport,
+        // sendTransport: sendTransport,
+        sendTransport: null,
         consumers: [],
         producer: null,
       };
@@ -401,7 +545,7 @@ async function main() {
           peerId,
           routerRtpCapabilities: rooms[roomId].router.rtpCapabilities,
           recvTransportOptions: transportToOptions(recvTransport),
-          sendTransportOptions: transportToOptions(sendTransport),
+          // sendTransportOptions: transportToOptions(sendTransport),
         },
         uid,
       });

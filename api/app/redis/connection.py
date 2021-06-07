@@ -1,5 +1,5 @@
 import pickle
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple
 
 import aioredis
 from app.core.config import settings
@@ -8,6 +8,7 @@ from app.utils import generate_guest_username, choose_avatar
 from app import schemas, models
 from uuid import uuid4
 from loguru import logger
+from app.core import strings
 
 
 class RedisConnector:
@@ -22,9 +23,12 @@ class RedisConnector:
             [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
             password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
-        # self.master = await aioredis.create_connection('redis://localhost/0')
         # uncomment this to reset redis everytime
-        await self.master.execute('flushall')
+        # self.master = await aioredis.create_connection('redis://localhost/0')
+        # await self.master.execute('flushall')
+
+        if not (await redis_connector.key_exists('media_server_1')):
+            await redis_connector.hset('media_server_1', 'num_rooms', 0)
 
     async def execute(self, *args, **kwargs) -> any:
         return await self.master.execute(*args, **kwargs)
@@ -40,6 +44,9 @@ class RedisConnector:
 
     async def set(self, key: str, value: str) -> any:
         return await self.master.execute('set', key, value)
+
+    async def incrby(self, key: str, value: int):
+        return await self.master.execute('incrby', key, value)
 
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
@@ -65,6 +72,22 @@ class RedisConnector:
         """Adds one or more members to a set"""
         return await self.master.execute('sadd', key, member, *members)
 
+    async def lrange(self, key: str, start: int, finish: int):
+        """Gets the items of a list from indexes start to finish"""
+        return await self.master.execute('lrange', key, start, finish)
+
+    async def lpush(self, key: str, item: any):
+        """Adds one item to a list"""
+        return await self.master.execute('lpush', key, item)
+
+    async def llen(self, key: str):
+        """Checks the length of the list"""
+        return await self.master.execute('llen', key)
+
+    async def lrem(self, key: str, occurences: str, item: any):
+        """Removes the number of occurences that match an item"""
+        return await self.master.execute('lrem', key, occurences, item)
+
     async def scard(self, key: str):
         """Get the number of members in a set"""
         return await self.master.execute('scard', key, encoding="utf-8")
@@ -81,6 +104,68 @@ class RedisConnector:
         """Remove one or more members from a set"""
         return await self.master.execute('srem', key, member, *members)
 
+    async def setexpire(self, key: str, timeout: int = 60):
+        """
+        Puts an expire time on a redis key
+        @param key: the key we want to set an expire time
+        @param timeout:the timeout time in minutes
+        """
+        seconds = timeout * 60
+        return await self.master.execute('expire', key, seconds)
+
+    async def setpersistent(self, key: str):
+        """
+        Remove any expire time associated with a given key
+        @param key: the key we want to remove the expire time
+        """
+        return await self.master.execute('persist', key)
+
+    async def add_media_server(self):
+        media_servers = await self.scan_match_all('media_server_')
+        num_servers = str(len(media_servers) + 1)
+        logger.info(num_servers)
+        new_media_server = 'media_server_' + num_servers
+        logger.info(new_media_server)
+        if not (await redis_connector.key_exists(new_media_server)):
+            await redis_connector.hset(new_media_server, 'num_rooms', 0)
+
+    async def get_media_server(self):
+        """Get the media server that currently has the less amount of room calls associated"""
+        media_servers = await self.scan_match_all('media_server_')
+        least_rooms_media_server = 'media_server_1'
+        min_rooms = await self.hget('media_server_1', 'num_rooms')
+        for media_server in media_servers:
+            media_server = media_server.decode()
+            num_rooms = await self.hget(media_server, 'num_rooms')
+            if num_rooms < min_rooms:
+                min_rooms = num_rooms
+                least_rooms_media_server = media_server
+        return least_rooms_media_server, int(min_rooms.decode())
+
+    async def add_room_to_media_server(self, group_id: str):
+        """Associate new room with the media server that has the least rooms"""
+        media_server, num_rooms = await self.get_media_server()
+        await self.hset(media_server, 'num_rooms', num_rooms + 1)
+        await self.set('room_' + group_id, media_server)
+
+    async def remove_room(self, group_id: str):
+        """Remove room from redis and decrease number of rooms of media server"""
+        media_server = await self.get('room_' + group_id)
+        logger.info(media_server)
+        if media_server:
+            logger.info("Entered If condition")
+            media_server = media_server.decode()
+            num_rooms = int((await self.hget(media_server, 'num_rooms')).decode()) - 1
+            if num_rooms <= 0:
+                num_rooms = 0
+            await self.hset(media_server, 'num_rooms', num_rooms)
+            await self.delete('room_' + group_id)
+        return media_server
+
+    async def user_in_group(self, world_id: str, user_id: str, group_id: str) -> int:
+        """Determine if a given user is a member of a group"""
+        return await self.sismember(f"world:{str(world_id)}:user:{str(user_id)}:groups", group_id)
+
     async def save_world_user_data(self, world_id: int, user_id: Union[int, uuid4], data: dict):
         """
         saves a  new user that joined into a world,
@@ -88,15 +173,44 @@ class RedisConnector:
         be a string of the uuid for guests
         """
         for k, v in data.items():
-            await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
+            if v is not None:
+                await self.hset(f"world:{str(world_id)}:{str(user_id)}", k, pickle.dumps(v))
 
-    async def join_new_guest_user(self, world_id: int, user_id: uuid4, role: models.Role) \
-            -> schemas.World_UserWithRoleInDB:
+    async def get_online_users(self, world_id: int) -> int:
+        """
+        gets the number of online users in a world
+        """
+        key = f"world:{world_id}:online_users"
+        value = await self.get(key)
+        return int(value) if value else 0
+
+    async def get_online_users_platform(self) -> int:
+        """
+        Returns the number of online users currently in the platform
+        """
+        total = 0
+
+        keys = await self.scan_match_all('world:*:online_users')
+        for key in keys:
+            total += int(await self.get(key))
+
+        return total
+
+    async def update_online_users(self, world_id: int, offset: int):
+        key = f"world:{world_id}:online_users"
+        return await self.incrby(key, offset)
+
+    async def join_new_guest_user(self, world_id: int, max_users: int, user_id: uuid4, role: models.Role) \
+            -> Tuple[Optional[schemas.World_UserWithRoleInDB], str]:
         """
         Generates a username for guests and the user the @method save_world_user_data
         to store the user data
         @return : a schema of a World User taking into consideration Redis Stored Values
         """
+
+        online_users = await self.get_online_users(world_id=world_id)
+        if online_users + 1 > max_users:
+            return None, strings.WORLD_IS_FULL
         logger.info(user_id)
         username = generate_guest_username(user_id)
         avatar = choose_avatar()
@@ -110,8 +224,9 @@ class RedisConnector:
             user_id=user_id,
             username=username,
             avatar=avatar,
+            last_pos=[],
             role=RoleInDB(**role.__dict__)
-        )
+        ), ""
 
     async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) \
             -> Optional[schemas.World_UserWithRoleInDB]:
@@ -127,7 +242,7 @@ class RedisConnector:
         role = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'role'
         )
-
+        last_pos = await self.get_user_position(world_id, user_id)
         if username and avatar and role:
             data = {
                 'username': pickle.loads(username),
@@ -138,23 +253,115 @@ class RedisConnector:
                 world_id=world_id,
                 user_id=user_id,
                 avatar=data['avatar'],
+                last_pos=last_pos,
                 username=data['username'],
                 role=schemas.RoleInDB(**data['role'])
             )
 
         return None
 
-    async def get_user_position(self, world_id: str, room_id: str, user_id: str) -> dict:
+    async def get_world_user_data_dict(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> Optional[dict]:
+        """
+        Checks World_User Data if present
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        # TODO: maybe check encoding instead of converting to string
+        user_id = str(user_id)
+        world_id = str(world_id)
+        username = await self.hget(
+            f"world:{world_id}:{user_id}", 'username')
+        avatar = await self.hget(
+            f"world:{world_id}:{user_id}", 'avatar')
+        role = await self.hget(
+            f"world:{world_id}:{user_id}", 'role'
+        )
+
+        if username and avatar and role:
+            role = pickle.loads(role).__dict__
+            return {
+                'username': pickle.loads(username),
+                'avatar': pickle.loads(avatar),
+                'role': {'role_id': role['role_id'], 'name': role['name']},
+            }
+
+        return None
+
+    async def assign_role_to_user(self, world_id: int, role: models.Role, user_id: int, is_guest: bool):
+
+        # updates the cache for the user and guest
+        world_user_data = await self.get_world_user_data(world_id=world_id, user_id=user_id)
+        if world_user_data is None:
+            # if there is no information about the guest in cache then it has not joined this world
+            if is_guest:
+                return None, strings.USER_NOT_IN_WORLD
+        else:
+            if world_user_data.role.role_id == role.role_id:
+                # if the role is not going to change, it is better to return it already
+                return world_user_data, ""
+
+            await self.save_world_user_data(
+                world_id=world_id,
+                user_id=user_id,
+                data={'role': role}
+            )
+            world_user_data.role = role
+            return world_user_data, ""
+
+        return None, ""
+
+    async def can_talk_conference(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> bool:
+        """
+        Checks World_User Data, if present, to be returned to REST API
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        role = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'role'
+        )
+
+        if role:
+            role = pickle.loads(role).__dict__
+            return role['talk_conference']
+        return False
+
+    async def can_manage_conferences(self, world_id: int, user_id: Union[int, uuid4]) \
+            -> bool:
+        """
+        Checks World_User Data, if present, to be returned to REST API
+        @return: a schema of a World User taking into consideration Redis Stored Values
+        """
+        role = await self.hget(
+            f"world:{str(world_id)}:{str(user_id)}", 'role'
+        )
+
+        if role:
+            role = pickle.loads(role).__dict__
+            return role['conference_manage']
+        return False
+
+    async def get_user_position(self, world_id: str, user_id: str) -> dict:
         """Get last user position received"""
         pairs = await self.master.execute('hgetall',
-                                          f"world:{world_id}:room:{room_id}:user:{user_id}:position", encoding="utf-8")
+                                          f"world:{world_id}:user:{user_id}:position", encoding="utf-8")
         return {k: float(v) for k, v in zip(pairs[::2], pairs[1::2])}
 
-    async def set_user_position(self, world_id: str, room_id: str, user_id: str, position: dict):
+    async def set_user_position(self, world_id: str, user_id: str, position: dict):
         """Update last user position received"""
+        if not position:
+            position = {'x': 50.0, 'y': 50.0}
         return await self.master.execute('hmset',
-                                         f"world:{world_id}:room:{room_id}:user:{user_id}:position", 'x', position['x'],
+                                         f"world:{world_id}:user:{user_id}:position", 'x', position['x'],
                                          'y', position['y'])
+
+    async def get_world_users(self, world_id: str):
+        return await self.smembers(f"world:{world_id}:users")
+
+    async def add_users_to_world(self, world_id: str, user_id: str, *users_id: List[str]):
+        return await self.sadd(f"world:{world_id}:users", user_id, *users_id)
+
+    async def rem_users_from_world(self, world_id: str, user_id: str, *users_id: List[str]):
+        return await self.srem(f"world:{world_id}:users", user_id, *users_id)
 
     async def get_user_users(self, world_id: str, user_id: str):
         """Get nearby users from a user"""
@@ -218,12 +425,15 @@ class RedisConnector:
         lowest_group_id = min(mergeable_groups_id)
         mergeable_groups_id.remove(lowest_group_id)
 
+        new_group_created = True
+
         for mgid in mergeable_groups_id:
-            actions['close-room'].append({'worldId': world_id, 'roomId': group_id})
 
             if mgid == group_id:
+                new_group_created = False
                 mem_users_id = all_users_id
             else:
+                actions['close-room'].append({'worldId': world_id, 'roomId': mgid})
                 mem_users_id = mem_group_users_id[mgid][0]
 
             await self.rem_group(world_id, mgid)
@@ -231,15 +441,22 @@ class RedisConnector:
             # add users to lowest group id
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *mem_users_id)
             for muid in mem_users_id:
-                actions["add-users-to-room"].append({'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
-                await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
+                if not (await self.user_in_group(world_id, muid, lowest_group_id)):
+                    actions["add-users-to-room"].append(
+                        {'peerId': muid, 'roomId': lowest_group_id, 'worldId': world_id})
+                    await self.sadd(f"world:{world_id}:user:{muid}:groups", lowest_group_id)
+
+        """Store in redis group associated to a media server"""
+        if new_group_created:
+            await self.add_room_to_media_server(group_id)
 
         """Add users to the normalized group"""
         if not mergeable_groups_id:
             await self.sadd(f"world:{world_id}:group:{lowest_group_id}", *users_id)
             for uid in users_id:
-                actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
-                await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
+                if not (await self.user_in_group(world_id, uid, lowest_group_id)):
+                    actions["add-users-to-room"].append({'peerId': uid, 'roomId': lowest_group_id, 'worldId': world_id})
+                    await self.sadd(f"world:{world_id}:user:{uid}:groups", lowest_group_id)
 
         return actions
 
@@ -254,7 +471,7 @@ class RedisConnector:
         """Remove group from world"""
         for uid in await self.smembers(f"world:{world_id}:group:{group_id}"):
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
-        await self.master.execute('del', f"world:{world_id}:group:{group_id}")
+        await self.delete(f"world:{world_id}:group:{group_id}")
 
     async def rem_users_from_user(self, world_id: str, user_id: str, lost_user_id: str, *lost_users_id: List[str]):
         lost_users_id = [lost_user_id, *lost_users_id]
@@ -271,6 +488,10 @@ class RedisConnector:
         await self.srem(f"world:{world_id}:group:{group_id}", *users_id)
         for uid in users_id:
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
+
+        # hack to avoid removing conference groups
+        if group_id[0] == 'C':
+            return actions
 
         """Normalize groups after remove"""
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
@@ -302,6 +523,27 @@ class RedisConnector:
         for gid in groups_id:
             actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
         return actions
+
+    async def get_user_files(self, world_id: str, user_id: str) -> List[dict]:
+        """Get a list of files associated to a user"""
+        file_list = await self.lrange(f"world:{str(world_id)}:user:{str(user_id)}:files", 0, 2)
+        return [pickle.loads(x) for x in file_list]
+
+    async def add_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Add a file to the user list of files"""
+        return await self.lpush(f"world:{str(world_id)}:user:{str(user_id)}:files", pickle.dumps(file_data))
+
+    async def remove_user_file(self, world_id: str, user_id: str, file_data: dict) -> any:
+        """Remove a file from the user list of files"""
+        return await self.lrem(f"world:{str(world_id)}:user:{str(user_id)}:files", 1, pickle.dumps(file_data))
+
+    async def remove_all_user_files(self, world_id: str, user_id: str) -> any:
+        """Remove a file from the user list of files"""
+        return await self.delete(f"world:{str(world_id)}:user:{str(user_id)}:files")
+
+    async def get_user_files_len(self, world_id: str, user_id: str) -> int:
+        """Get the length of the user list of file"""
+        return await self.llen(f"world:{str(world_id)}:user:{str(user_id)}:files")
 
 
 redis_connector = RedisConnector()
