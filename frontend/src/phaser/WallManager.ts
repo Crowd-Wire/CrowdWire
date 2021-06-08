@@ -39,8 +39,8 @@ class WallManager {
                     let id = tile.index - tile.tileset.firstgid;
                     if (id < 7 || 12 < id) {
                         // Search correct id
-                        if (wallLayer.data[y - 2][x].index - tile.tileset.firstgid === 13 
-                            || roofLayer.data[y - 2][x].index- tile.tileset.firstgid === 6) {
+                        if (wallLayer.data[y - 2][x].index - tile.tileset.firstgid === 13
+                            || roofLayer.data[y - 2][x].index - tile.tileset.firstgid === 6) {
                             id = 7;
                         } else {
                             continue;
@@ -50,16 +50,19 @@ class WallManager {
                         this.data[y - 1][x] |= WallManager.LOCKED_TOP;
                         y + 1 < height && (this.data[y + 1][x] |= WallManager.LOCKED_BOT);
                     } else if (id === 10) {
-                        this.data[y][x + 1] |= 11;
                         this.data[y - 1][x + 1] |= WallManager.LOCKED_TOP;
                         this.data[y + 1][x + 1] |= WallManager.LOCKED_BOT;
+
+                        // Hack to address an id to the door empty tile
+                        this.data[y][x + 1] |= 11;
+                        this.firstGids[y][x + 1] = tile.tileset.firstgid;
                     } else if (id === 12) {
-                        this.data[y][x - 1] |= 11;
                         this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
                         this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
                     }
                     this.data[y][x] |= id;
                     this.firstGids[y][x] |= tile.tileset.firstgid;
+                    console.log(id)
                 }
             WallManager._instance = this;
             console.log(this.data);
@@ -80,12 +83,10 @@ class WallManager {
     }
 
     private isRight(x: number, y: number): boolean {
-        // this.onBounds(x, y) && console.log(this.data[y][x], this.data[y][x] & WallManager.INDEX, this.onBounds(x, y), x, y)
         return !this.onBounds(x, y) || [7, 9, 12].includes(this.data[y][x] & WallManager.INDEX);
     }
 
     private isLeft(x: number, y: number): boolean {
-        // this.onBounds(x, y) && console.log(this.data[y][x], this.data[y][x] & WallManager.INDEX, this.onBounds(x, y), x, y)
         return !this.onBounds(x, y) || [7, 8, 10].includes(this.data[y][x] & WallManager.INDEX);
     }
 
@@ -94,26 +95,28 @@ class WallManager {
             fillRoof = [-1, -1, -1];
 
         // Refill walls
-        for (let i = -2; i <= 2; i++) {
+        for (let i = -2; i <= 3; i++) {
             if (!this.onBounds(x, y + i))
                 continue;
             // console.log(y+i, y, i)
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
-                fill[2 + i] = dt + this.firstGids[y + i][x];
+                fill[2 + i] = dt + this.firstGids[y + i][x];    // Fill 
                 fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
             }
         }
         // Refill roofs
         let prevDt = this.data[y - 1][x] & WallManager.INDEX;
-        for (let i = 0; i <= 2; i++) {
+        for (let i = 0; i <= 4; i++) {
             if (!this.onBounds(x, y + i))
                 continue;
             const dt = this.data[y + i][x] & WallManager.INDEX;
+            console.log(dt)
             if (dt != 0) {
                 if (prevDt != 0) {
                     fill[i] = 13 + this.firstGids[y + i][x];
                 } else {
+                    console.log('roof')
                     fillRoof[i] = 6 + this.firstGids[y + i][x];
                 }
             }
@@ -121,7 +124,6 @@ class WallManager {
         }
         // Update map
         for (let i = 0; i < 5; i++) {
-            console.log(fill[i], fillRoof[i], 'x', x, 'y', y + i - 2)
             fill[i] && this.wallLayer.tilemapLayer.fill(fill[i], x, y + i - 2, 1, 1);
             fillRoof[i] && this.roofLayer.tilemapLayer.fill(fillRoof[i], x, y + i - 2, 1, 1);
         }
@@ -182,12 +184,10 @@ class WallManager {
                 break;
         }
     }
-    once = false;
+
     remove(x: number, y: number) {
         if (!this.checkRemove(x, y))
             return;
-        // if (this.once) return;
-        this.once = true;
 
         let endLeft = 0;
         let endRight = 0;
@@ -203,16 +203,12 @@ class WallManager {
                 break;
             }
         }
-        console.log(endLeft, endRight)
         for (let z = endLeft; z <= endRight; z++) {
-            // console.log(JSON.stringify(this.data))
             this.data[y][z] &= (WallManager.INDEX ^ WallManager.REVERSE);
             this.onBounds(z, y - 1) && (this.data[y - 1][z] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE));
             this.onBounds(z, y + 1) && (this.data[y + 1][z] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE));
             this.firstGids[y][z] = 0;
             this.fill(z, y);
-            // console.log(JSON.stringify(this.data))
-
         }
     }
 }

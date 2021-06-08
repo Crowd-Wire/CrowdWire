@@ -275,11 +275,8 @@ class WorldEditorScene extends Scene {
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
 
-                                    this.flag && console.log('WALL', this.wallManager.checkPlace(0, tileX, tileY));
-                                    this.flag && console.log('WINDOW', this.wallManager.checkPlace(1, tileX, tileY));
-                                    this.flag && console.log('DOOR1', this.wallManager.checkPlace(2, tileX, tileY));
-                                    this.flag && console.log('DOOR2', this.wallManager.checkPlace(3, tileX, tileY));
-                                    this.wallManager.remove(tileX, tileY);
+                                    this.flag && this.wallManager.place(16, 0, tileX, tileY);
+                                    !this.flag && this.wallManager.remove(tileX, tileY);
                                 }
                                 return true;
                             }
