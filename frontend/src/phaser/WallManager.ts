@@ -9,18 +9,23 @@ enum WallType {
 
 class WallManager {
     static _instance: WallManager;
+    static REVERSE = 0b1111111;
     static INDEX = 0b0011111;
     static LOCKED_TOP = 0b0100000;
     static LOCKED_BOT = 0b1000000;
 
     private wallLayer: Tilemaps.LayerData;
+    private roofLayer: Tilemaps.LayerData;
     private data: number[][];
+    private firstGids: number[][];
 
-    constructor(wallLayer: Tilemaps.LayerData) {
+    constructor(wallLayer: Tilemaps.LayerData, roofLayer: Tilemaps.LayerData) {
         if (!WallManager._instance) {
             this.wallLayer = wallLayer;
+            this.roofLayer = roofLayer;
             const { width, height } = wallLayer;
             this.data = Array.from(Array(height), _ => Array(width).fill(0));
+            this.firstGids = Array.from(Array(height), _ => Array(width).fill(0));
 
             for (let y = 0; y < height; y++)
                 for (let x = 0; x < width; x++) {
@@ -46,7 +51,9 @@ class WallManager {
                         this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
                         this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
                     }
+                    // TODO: Check if it is possible to have 0's on the tile index
                     this.data[y][x] |= id;
+                    this.firstGids[y][x] |= tile.tileset.firstgid;
                 }
             WallManager._instance = this;
             console.log(this.data);
@@ -72,6 +79,40 @@ class WallManager {
 
     private isLeft(x: number, y: number): boolean {
         return this.onBounds(x, y) && [8, 10].includes(this.data[y][x] & WallManager.INDEX);
+    }
+
+    private fill(x: number, y: number): void {
+        let fill = Array(5).fill(-1),
+            fillRoof = Array(5).fill(-1);
+
+        // Refill walls
+        for (let i = -2; i <= 2; i++) {
+            const dt = this.data[y + i][x] & WallManager.INDEX;
+            if (dt != 0) {
+                fill[2 + i] = dt + this.firstGids[y + i][x];
+                fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
+            } else {
+                fill[2 + i] = -1;
+            }
+        }
+        // Refill roofs
+        let prevDt = this.data[y - 1][x] & WallManager.INDEX;
+        for (let i = 0; i <= 2; i++) {
+            const dt = this.data[y + i][x] & WallManager.INDEX;
+            if (dt != 0) {
+                if (prevDt != 0) {
+                    fill[2 + i] = 14 + this.firstGids[y + i][x];
+                } else {
+                    fillRoof[2 + i] = 7 + this.firstGids[y + i][x];
+                }
+            }
+            prevDt = dt;
+        }
+        // Update map
+        for (let i = 0; i < 5; i++) {
+            this.wallLayer.tilemapLayer.fill(fill[i], x, y + i - 2)
+            this.roofLayer.tilemapLayer.fill(fillRoof[i], x, y + i - 2)
+        }
     }
 
     checkPlace(type: WallType, x: number, y: number): boolean {
@@ -114,11 +155,44 @@ class WallManager {
     place(firstgid: number, type: WallType, x: number, y: number): void {
         if (!this.checkPlace(type, x, y))
             return;
+
+        switch (type) {
+            case WallType.WALL:
+                this.data[y][x] |= 7;
+                this.firstGids[y][x] = firstgid;
+                this.fill(x, y);
+                break;
+            case WallType.WINDOW:
+                break;
+            case WallType.DOOR1:
+                break;
+            case WallType.DOOR2:
+                break;
+        }
     }
 
     remove(x: number, y: number) {
         if (!this.checkRemove(x, y))
             return;
+
+        const removeIndiv = (x: number, y: number) => {
+            this.data[y][x] &= (WallManager.INDEX ^ WallManager.REVERSE);
+            this.data[y - 1][x] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE);
+            this.data[y + 1][x] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE);
+            this.firstGids[y][x] = 0;
+            this.fill(x, y);
+        }
+        for (let l = 0; ; l++) {
+            const brk = this.isLeft(x - l, y);
+            removeIndiv(x - l, y);
+            if (brk)
+                break;
+        }
+        for (let r = 0; ; r++) {
+            if (this.isRight(x, y))
+                break;
+            removeIndiv(x, y + r);
+        }
     }
 }
 

@@ -22,17 +22,20 @@ class WorldEditorScene extends Scene {
 
     create() {
         this.mapManager = new MapManager();
-        
+
         this.map = this.mapManager.buildMap(this);
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith("Float"))
-            layer.tilemapLayer.setDepth(1000);
+                layer.tilemapLayer.setDepth(1000);
         })
         this.objectGroups = this.mapManager.buildObjects(this);
 
-        this.wallManager = new WallManager(this.map.getLayer('__Collision'));
+        this.wallManager = new WallManager(
+            this.map.getLayer('__Collision'),
+            this.map.getLayer('__Float')
+        );
 
-        // Initialize layers on store
+        // Initialize layers on stores
         const layers = {};
         this.map.objects.concat(this.map.layers).forEach((layer) =>
             layers[layer.name] = { visible: true, blocked: false, active: false })
@@ -272,10 +275,10 @@ class WorldEditorScene extends Scene {
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
 
-                                    this.flag && console.log( 'WALL', this.wallManager.checkPlace(0, tileX, tileY) );
-                                    this.flag && console.log( 'WINDOW', this.wallManager.checkPlace(1, tileX, tileY) );
-                                    this.flag && console.log( 'DOOR1', this.wallManager.checkPlace(2, tileX, tileY) );
-                                    this.flag && console.log( 'DOOR2', this.wallManager.checkPlace(3, tileX, tileY) );
+                                    this.flag && console.log('WALL', this.wallManager.checkPlace(0, tileX, tileY));
+                                    this.flag && console.log('WINDOW', this.wallManager.checkPlace(1, tileX, tileY));
+                                    this.flag && console.log('DOOR1', this.wallManager.checkPlace(2, tileX, tileY));
+                                    this.flag && console.log('DOOR2', this.wallManager.checkPlace(3, tileX, tileY));
                                 }
                                 return true;
                             }
