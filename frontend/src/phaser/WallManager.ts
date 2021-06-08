@@ -90,23 +90,25 @@ class WallManager {
     }
 
     private fill(x: number, y: number): void {
-        let fill = Array(5).fill(-1),
-            fillRoof = Array(5).fill(-1);
+        let fill = [-1, -1, -1],
+            fillRoof = [-1, -1, -1];
 
         // Refill walls
         for (let i = -2; i <= 2; i++) {
+            if (!this.onBounds(x, y + i))
+                continue;
             // console.log(y+i, y, i)
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
                 fill[2 + i] = dt + this.firstGids[y + i][x];
                 fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
-            } else {
-                fill[2 + i] = -1;
             }
         }
         // Refill roofs
         let prevDt = this.data[y - 1][x] & WallManager.INDEX;
         for (let i = 0; i <= 2; i++) {
+            if (!this.onBounds(x, y + i))
+                continue;
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
                 if (prevDt != 0) {
@@ -119,8 +121,9 @@ class WallManager {
         }
         // Update map
         for (let i = 0; i < 5; i++) {
-            this.wallLayer.tilemapLayer.fill(fill[i], x, y + i - 2)
-            this.roofLayer.tilemapLayer.fill(fillRoof[i], x, y + i - 2)
+            console.log(fill[i], fillRoof[i], 'x', x, 'y', y + i - 2)
+            fill[i] && this.wallLayer.tilemapLayer.fill(fill[i], x, y + i - 2, 1, 1);
+            fillRoof[i] && this.roofLayer.tilemapLayer.fill(fillRoof[i], x, y + i - 2, 1, 1);
         }
     }
 
@@ -179,10 +182,12 @@ class WallManager {
                 break;
         }
     }
-
+    once = false;
     remove(x: number, y: number) {
         if (!this.checkRemove(x, y))
             return;
+        // if (this.once) return;
+        this.once = true;
 
         let endLeft = 0;
         let endRight = 0;
@@ -200,11 +205,14 @@ class WallManager {
         }
         console.log(endLeft, endRight)
         for (let z = endLeft; z <= endRight; z++) {
-            // this.data[y][z] &= (WallManager.INDEX ^ WallManager.REVERSE);
-            // this.data[y - 1][z] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE);
-            // this.data[y + 1][z] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE);
-            // this.firstGids[y][z] = 0;
-            // this.fill(z, y);
+            // console.log(JSON.stringify(this.data))
+            this.data[y][z] &= (WallManager.INDEX ^ WallManager.REVERSE);
+            this.onBounds(z, y - 1) && (this.data[y - 1][z] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE));
+            this.onBounds(z, y + 1) && (this.data[y + 1][z] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE));
+            this.firstGids[y][z] = 0;
+            this.fill(z, y);
+            // console.log(JSON.stringify(this.data))
+
         }
     }
 }
