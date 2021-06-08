@@ -62,10 +62,8 @@ class WallManager {
                     }
                     this.data[y][x] |= id;
                     this.firstGids[y][x] |= tile.tileset.firstgid;
-                    console.log(id)
                 }
             WallManager._instance = this;
-            console.log(this.data);
         }
         return WallManager._instance;
     }
@@ -98,10 +96,9 @@ class WallManager {
         for (let i = -2; i <= 3; i++) {
             if (!this.onBounds(x, y + i))
                 continue;
-            // console.log(y+i, y, i)
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
-                fill[2 + i] = dt + this.firstGids[y + i][x];    // Fill 
+                fill[2 + i] = dt + this.firstGids[y + i][x];
                 fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
             }
         }
@@ -111,12 +108,10 @@ class WallManager {
             if (!this.onBounds(x, y + i))
                 continue;
             const dt = this.data[y + i][x] & WallManager.INDEX;
-            console.log(dt)
             if (dt != 0) {
                 if (prevDt != 0) {
                     fill[i] = 13 + this.firstGids[y + i][x];
                 } else {
-                    console.log('roof')
                     fillRoof[i] = 6 + this.firstGids[y + i][x];
                 }
             }
@@ -217,20 +212,12 @@ class WallManager {
         if (!this.checkRemove(x, y))
             return;
 
-        let endLeft = 0;
-        let endRight = 0;
-        for (let l = 0; ; l++) {
-            if (this.isLeft(x - l, y)) {
-                endLeft = x - l;
-                break;
-            }
-        }
-        for (let r = 0; ; r++) {
-            if (this.isRight(x + r, y)) {
-                endRight = x + r;
-                break;
-            }
-        }
+        let i = 0;
+        for (i = 0; !this.isLeft(x - i, y); i++);
+        let endLeft = x - i;
+        for (i = 0; !this.isRight(x + i, y); i++);
+        let endRight = x + i;
+
         for (let z = endLeft; z <= endRight; z++) {
             this.data[y][z] &= (WallManager.INDEX ^ WallManager.REVERSE);
             this.onBounds(z, y - 1) && (this.data[y - 1][z] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE));
