@@ -170,17 +170,45 @@ class WallManager {
         if (!this.checkPlace(type, x, y))
             return;
 
+        const update = (width: number) => {
+            for (let i = 0; i < width; i++) {
+                this.firstGids[y][x - i] = firstgid;
+                this.fill(x - i, y);
+            }
+        }
         switch (type) {
             case WallType.WALL:
                 this.data[y][x] |= 7;
                 this.firstGids[y][x] = firstgid;
-                this.fill(x, y);
+                update(1);
                 break;
             case WallType.WINDOW:
+                this.data[y][x] |= 9;
+                this.data[y][x - 1] |= 8;
+                this.data[y - 1][x] |= WallManager.LOCKED_TOP;
+                this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
+                this.data[y + 1][x] |= WallManager.LOCKED_BOT;
+                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                update(2);
                 break;
             case WallType.DOOR1:
+                this.data[y][x] |= 12;
+                this.data[y][x - 1] |= 11;
+                this.data[y][x - 2] |= 10;
+                this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
+                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                update(3);
                 break;
             case WallType.DOOR2:
+                this.data[y][x] |= 12;
+                this.data[y][x - 1] |= 11;
+                this.data[y][x - 2] |= 11;
+                this.data[y][x - 3] |= 10;
+                this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
+                this.data[y - 1][x - 2] |= WallManager.LOCKED_TOP;
+                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                this.data[y + 1][x - 2] |= WallManager.LOCKED_BOT;
+                update(4);
                 break;
         }
     }
