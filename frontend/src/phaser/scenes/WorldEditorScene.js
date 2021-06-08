@@ -279,6 +279,7 @@ class WorldEditorScene extends Scene {
                                     this.flag && console.log('WINDOW', this.wallManager.checkPlace(1, tileX, tileY));
                                     this.flag && console.log('DOOR1', this.wallManager.checkPlace(2, tileX, tileY));
                                     this.flag && console.log('DOOR2', this.wallManager.checkPlace(3, tileX, tileY));
+                                    this.wallManager.remove(tileX, tileY);
                                 }
                                 return true;
                             }

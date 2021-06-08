@@ -35,9 +35,16 @@ class WallManager {
                         || wallLayer.data[y - 1][x].index === -1) {
                         continue;
                     }
-                    const id = tile.index - tile.tileset.firstgid;
-                    if (id < 7) {
-                        continue;
+                    // TODO: Fix error when tileset is not loaded
+                    let id = tile.index - tile.tileset.firstgid;
+                    if (id < 7 || 12 < id) {
+                        // Search correct id
+                        if (wallLayer.data[y - 2][x].index - tile.tileset.firstgid === 13 
+                            || roofLayer.data[y - 2][x].index- tile.tileset.firstgid === 6) {
+                            id = 7;
+                        } else {
+                            continue;
+                        }
                     }
                     if ([8, 9].includes(id)) {
                         this.data[y - 1][x] |= WallManager.LOCKED_TOP;
@@ -51,7 +58,6 @@ class WallManager {
                         this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
                         this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
                     }
-                    // TODO: Check if it is possible to have 0's on the tile index
                     this.data[y][x] |= id;
                     this.firstGids[y][x] |= tile.tileset.firstgid;
                 }
@@ -74,11 +80,13 @@ class WallManager {
     }
 
     private isRight(x: number, y: number): boolean {
-        return this.onBounds(x, y) && [9, 12].includes(this.data[y][x] & WallManager.INDEX);
+        // this.onBounds(x, y) && console.log(this.data[y][x], this.data[y][x] & WallManager.INDEX, this.onBounds(x, y), x, y)
+        return !this.onBounds(x, y) || [7, 9, 12].includes(this.data[y][x] & WallManager.INDEX);
     }
 
     private isLeft(x: number, y: number): boolean {
-        return this.onBounds(x, y) && [8, 10].includes(this.data[y][x] & WallManager.INDEX);
+        // this.onBounds(x, y) && console.log(this.data[y][x], this.data[y][x] & WallManager.INDEX, this.onBounds(x, y), x, y)
+        return !this.onBounds(x, y) || [7, 8, 10].includes(this.data[y][x] & WallManager.INDEX);
     }
 
     private fill(x: number, y: number): void {
@@ -87,6 +95,7 @@ class WallManager {
 
         // Refill walls
         for (let i = -2; i <= 2; i++) {
+            // console.log(y+i, y, i)
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
                 fill[2 + i] = dt + this.firstGids[y + i][x];
@@ -101,7 +110,7 @@ class WallManager {
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
                 if (prevDt != 0) {
-                    fill[2 + i] = 14 + this.firstGids[y + i][x];
+                    fill[2 + i] = 13 + this.firstGids[y + i][x];
                 } else {
                     fillRoof[2 + i] = 7 + this.firstGids[y + i][x];
                 }
@@ -175,23 +184,27 @@ class WallManager {
         if (!this.checkRemove(x, y))
             return;
 
-        const removeIndiv = (x: number, y: number) => {
-            this.data[y][x] &= (WallManager.INDEX ^ WallManager.REVERSE);
-            this.data[y - 1][x] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE);
-            this.data[y + 1][x] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE);
-            this.firstGids[y][x] = 0;
-            this.fill(x, y);
-        }
+        let endLeft = 0;
+        let endRight = 0;
         for (let l = 0; ; l++) {
-            const brk = this.isLeft(x - l, y);
-            removeIndiv(x - l, y);
-            if (brk)
+            if (this.isLeft(x - l, y)) {
+                endLeft = x - l;
                 break;
+            }
         }
         for (let r = 0; ; r++) {
-            if (this.isRight(x, y))
+            if (this.isRight(x + r, y)) {
+                endRight = x + r;
                 break;
-            removeIndiv(x, y + r);
+            }
+        }
+        console.log(endLeft, endRight)
+        for (let z = endLeft; z <= endRight; z++) {
+            // this.data[y][z] &= (WallManager.INDEX ^ WallManager.REVERSE);
+            // this.data[y - 1][z] &= (WallManager.LOCKED_TOP ^ WallManager.REVERSE);
+            // this.data[y + 1][z] &= (WallManager.LOCKED_BOT ^ WallManager.REVERSE);
+            // this.firstGids[y][z] = 0;
+            // this.fill(z, y);
         }
     }
 }
