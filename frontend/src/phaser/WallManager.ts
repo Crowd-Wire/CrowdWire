@@ -112,9 +112,9 @@ class WallManager {
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
                 if (prevDt != 0) {
-                    fill[2 + i] = 13 + this.firstGids[y + i][x];
+                    fill[i] = 13 + this.firstGids[y + i][x];
                 } else {
-                    fillRoof[2 + i] = 7 + this.firstGids[y + i][x];
+                    fillRoof[i] = 6 + this.firstGids[y + i][x];
                 }
             }
             prevDt = dt;
