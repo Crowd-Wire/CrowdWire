@@ -8,7 +8,7 @@ metadata:
     metallb.universe.tf/allow-shared-ip: crowdwire
 spec:
   type: LoadBalancer
-  loadBalancerIP: 193.136.92.151
+  #loadBalancerIP: 193.136.92.151
   loadBalancerIP: 10.0.12.47
   #externalTrafficPolicy: Local
   ports:
