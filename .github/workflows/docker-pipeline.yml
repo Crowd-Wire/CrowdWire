@@ -18,7 +18,7 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - uses: SpicyPizza/create-envfile@v1
-    - name: Make envfile for MediaSoup
+      name: Make envfile for MediaSoup
       with:
         SENTRY_DNS: ${{ secrets.SENTRY_DNS }}
         MAX_CONSUMERS_PER_WORKER: 480
