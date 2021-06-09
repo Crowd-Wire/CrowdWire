@@ -52,8 +52,8 @@ class TilesTab extends Component<{}, TilesTabState> {
 
     const tilesetTiles = {};
     for (const tileset of mapManager.map.tilesets) {
-      if (!tileset.name.startsWith('_')) {
-        // Not private
+      if (!tileset.name.startsWith('_') && !mapManager.tilesetProps[tileset.name]?.properties?.isWall) {
+        // Not private and not a wall tileset
         const tiles = [],
           tilesetImage = mapManager.tilesetProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
