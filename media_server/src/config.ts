@@ -91,7 +91,7 @@ export const config = {
       listenIps: [
         {
           ip: process.env.WEBRTC_LISTEN_IP || "0.0.0.0",
-          announcedIp: process.env.A_IP || "crowdwire.duckdns.org",
+          announcedIp: process.env.A_IP || "atnog-crowdwire1.av.it.pt",
         },
         // { ip: "192.168.42.68", announcedIp: null },
         // { ip: '10.10.23.101', announcedIp: null },
