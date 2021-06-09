@@ -29,6 +29,7 @@ jobs:
         docker build ./api -t dagomes/api:latest 
     - name: Build MediaSoup
       run: |
+        ls -a ./media_server
         docker build ./media_server -t dagomes/mediaserver:latest 
     - name: Build Frontend
       run: |
