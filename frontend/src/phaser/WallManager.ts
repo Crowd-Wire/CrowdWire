@@ -161,9 +161,9 @@ class WallManager {
         return this.blocked(x, y);
     }
 
-    place(firstgid: number, type: WallType, x: number, y: number): void {
+    place(firstgid: number, type: WallType, x: number, y: number): boolean {
         if (!this.checkPlace(type, x, y))
-            return;
+            return false;
 
         const update = (width: number) => {
             for (let i = 0; i < width; i++) {
@@ -206,11 +206,12 @@ class WallManager {
                 update(4);
                 break;
         }
+        return true;
     }
 
-    remove(x: number, y: number) {
+    remove(x: number, y: number): boolean {
         if (!this.checkRemove(x, y))
-            return;
+            return false;
 
         let i = 0;
         for (i = 0; !this.isLeft(x - i, y); i++);
@@ -225,6 +226,7 @@ class WallManager {
             this.firstGids[y][z] = 0;
             this.fill(z, y);
         }
+        return true;
     }
 }
 

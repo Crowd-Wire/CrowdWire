@@ -5,7 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore";
 
 import { API_BASE } from "config";
 
@@ -96,6 +96,7 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleClick = (id: string) => {
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
     useWorldEditorStore.getState().setActive('tile', id);
   }
 

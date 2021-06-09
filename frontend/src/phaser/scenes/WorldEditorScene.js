@@ -1,4 +1,4 @@
-import Phaser, { Scene, GameObjects, Math } from 'phaser';
+import Phaser, { Scene, GameObjects, Math, Geom } from 'phaser';
 
 import MapManager from "../MapManager.ts";
 import WallManager from "../WallManager.ts";
@@ -25,8 +25,10 @@ class WorldEditorScene extends Scene {
 
         this.map = this.mapManager.buildMap(this);
         this.map.layers.forEach((layer) => {
-            if (layer.name.startsWith("Float"))
+            if (layer.name.includes("Float"))
                 layer.tilemapLayer.setDepth(1000);
+            if (layer.name.includes("Collision"))
+                layer.tilemapLayer.setDepth(500);
         })
         this.objectGroups = this.mapManager.buildObjects(this);
 
@@ -203,13 +205,15 @@ class WorldEditorScene extends Scene {
 
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
                 storeActiveLayer = useWorldEditorStore.getState().activeLayer,
-                activeConference = useWorldEditorStore.getState().active.conference;
+                activeConference = useWorldEditorStore.getState().active.conference,
+                activeWall = useWorldEditorStore.getState().active.wall;
 
             this.preview.setVisible(true);
 
-            const activeLayerName = (activeConference && !useWorldEditorStore.getState().layers['__Conference'].blocked) ? '__Conference' :
-                (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
-                    undefined;
+            const activeLayerName = (activeWall && !useWorldEditorStore.getState().layers['__Collision'].blocked) ? '__Collision' :
+                (activeConference && !useWorldEditorStore.getState().layers['__Conference'].blocked) ? '__Conference' :
+                    (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
+                        undefined;
 
             if (activeLayerName) {
                 // Conference selected and not blocked 
@@ -230,6 +234,39 @@ class WorldEditorScene extends Scene {
 
                     const activeTile = useWorldEditorStore.getState().active.tile
                         || activeConference;
+
+                    if (!activeTile && activeWall) {
+                        // Wall selected
+                        this.preview.setTexture('__DEFAULT');
+
+                        const isDown = this.input.manager.activePointer.isDown;
+                        if (this.tool.type === ToolType.DRAW) {
+                            const [firstgid, type] = activeWall.split('-').map((s) => parseInt(s, 10));
+
+                            this.preview.setBounds(
+                                { x: -32 * (type), y: 0, width: 32 * (type + 1), height: 32 }
+                            );
+
+                            if (isDown) {
+                                if (this.wallManager.place(firstgid, type, tileX, tileY)) {
+                                    // Destroy objects
+                                    const { x, y, width, height } = this.preview.body,
+                                    crushed = this.physics.overlapRect(
+                                        x + 1, y + 1 - 32, width - 2, height - 2 + 32, true, true);
+                                    crushed.forEach((body) => body != this.preview.body && body.gameObject.destroy());
+                                    return true;
+                                }
+                            }
+                            return this.wallManager.checkPlace(type, tileX, tileY);
+
+                        } else if (this.tool.type === ToolType.ERASE) {
+                            if (isDown) {
+                                return this.wallManager.remove(tileX, tileY);
+                            }
+                            return this.wallManager.checkRemove(tileX, tileY);
+                        }
+                        return false;
+                    }
 
                     let activeGid, tint = 0xffffff;
                     if (activeTile && activeTile[0] === 'C') {
@@ -362,7 +399,6 @@ class WorldEditorScene extends Scene {
                                             if (properties) {
                                                 obj.setData(properties);
                                             }
-                                            console.log(this.preview.y)
                                             activeObjectGroup.add(obj);
                                             const { width, height, offset } = this.preview.body;
                                             obj.body.setSize(width, height)
@@ -388,7 +424,6 @@ class WorldEditorScene extends Scene {
                                 if (this.input.manager.activePointer.isDown) {
                                     hovered.forEach((body) => body != this.preview.body && body.gameObject.destroy());
                                 }
-                                console.log(this.objectGroups)
                             }
                             return true;
                         case ToolType.PICK:
