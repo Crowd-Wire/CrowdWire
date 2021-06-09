@@ -11,7 +11,7 @@ EXPOSE 3001
 # set working directory
 WORKDIR /usr/src/app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 RUN npm i
 
