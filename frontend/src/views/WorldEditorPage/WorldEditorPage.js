@@ -55,7 +55,7 @@ class WorldEditorPage extends React.Component {
           size: 40,
           grid: [
             { size: 25, tabs: [6] },
-            { size: 50, tabs: [1, 2, 3] },
+            { size: 50, tabs: [1, 3, 2] },
             { size: 25, tabs: [5, 4] },
           ]
         },

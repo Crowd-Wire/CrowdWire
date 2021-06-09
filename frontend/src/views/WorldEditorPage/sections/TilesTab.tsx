@@ -5,7 +5,7 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore";
 
 import { API_BASE } from "config";
 
@@ -52,8 +52,8 @@ class TilesTab extends Component<{}, TilesTabState> {
 
     const tilesetTiles = {};
     for (const tileset of mapManager.map.tilesets) {
-      if (!tileset.name.startsWith('_')) {
-        // Not private
+      if (!tileset.name.startsWith('_') && !mapManager.tilesetProps[tileset.name]?.properties?.isWall) {
+        // Not private and not a wall tileset
         const tiles = [],
           tilesetImage = mapManager.tilesetProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
@@ -96,6 +96,7 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleClick = (id: string) => {
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
     useWorldEditorStore.getState().setActive('tile', id);
   }
 
