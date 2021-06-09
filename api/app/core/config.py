@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
-    FRONTEND_URL = "https://crowdwire.duckdns.org/" if PRODUCTION else "http://localhost:3000/"
+    FRONTEND_URL = "atnog-crowdwire1.av.it.pt/" if PRODUCTION else "http://localhost:3000/"
 
     HOSTNAME = os.getenv('HOSTNAME', '')
 
