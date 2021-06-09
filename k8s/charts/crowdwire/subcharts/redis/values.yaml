@@ -662,6 +662,8 @@ slave:
     ## The path the volume will be mounted at, useful when using different
     ## Redis(TM) images.
     ##
+    storageClass: "nfs-client" 
+    storageClassName: "nfs-client"
     path: /data
     ## The subdirectory of the volume to mount to, useful in dev environments
     ## and one PV for multiple services.

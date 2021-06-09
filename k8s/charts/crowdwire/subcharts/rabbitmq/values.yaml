@@ -536,7 +536,9 @@ persistence:
   ## this enables PVC templates that will create one per pod
   ##
   enabled: true
-
+  
+  storageClass: "nfs-client"
+  storageClassName: "nfs-client"
   ## rabbitmq data Persistent Volume Storage Class
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -544,7 +546,6 @@ persistence:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
   ## selector can be used to match an existing PersistentVolume
   ## selector:
   ##   matchLabels:

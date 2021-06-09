@@ -4,10 +4,13 @@ metadata:
   name: {{ include "mediaserver.fullname" . }}-udp
   labels:
     {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: crowdwire
 spec:
-  type: NodePort
-  externalIPs:
-    - 193.136.92.151
+  type: LoadBalancer
+  loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
   ports:
     - name : udp0
       port: 40000

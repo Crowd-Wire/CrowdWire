@@ -3,11 +3,11 @@
 ## Current available global Docker image parameters: imageRegistry and imagePullSecrets
 ##
 global:
-  postgresql: {}
+  postgresql: {} 
 #   imageRegistry: myRegistryName
 #   imagePullSecrets:
 #     - myRegistryKeySecretName
-#   storageClass: myStorageClass
+# storageClass: fast
 
 ## Bitnami PostgreSQL image version
 ## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
@@ -401,7 +401,8 @@ persistence:
   ##
   subPath: ''
 
-  # storageClass: "-"
+  storageClass: "nfs-client"
+  storageClassName: "nfs-client"
   accessModes:
     - ReadWriteOnce
   size: 8Gi
