@@ -20,10 +20,10 @@ jobs:
     - uses: SpicyPizza/create-envfile@v1
       name: Make envfile for MediaSoup
       with:
-        SENTRY_DNS: ${{ secrets.SENTRY_DNS }}
-        MAX_CONSUMERS_PER_WORKER: 480
+        envkey_SENTRY_DNS: ${{ secrets.SENTRY_DNS }}
+        envkey_MAX_CONSUMERS_PER_WORKER: 480
         directory: ./media_server
-        file_name: .env
+        file_name: .env      
     - name: Build FastAPI
       run: |
         docker build ./api -t dagomes/api:latest 
