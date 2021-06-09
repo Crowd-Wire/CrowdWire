@@ -14,9 +14,16 @@ jobs:
     - name: docker login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}   
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} 
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - uses: SpicyPizza/create-envfile@v1
+    - name: Make envfile for MediaSoup
+      with:
+        SENTRY_DNS: ${{ secrets.SENTRY_DNS }}
+        MAX_CONSUMERS_PER_WORKER: 480
+        directory: ./media_server
+        file_name: .env
     - name: Build FastAPI
       run: |
         docker build ./api -t dagomes/api:latest 
