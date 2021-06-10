@@ -143,6 +143,8 @@ class MapManager {
                     const objBody = obj.body as Phaser.Physics.Arcade.Body;
                     objBody.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(objBody.y);
+                } else {
+                    obj.setDepth(1);
                 }
                 if (properties) {
                     obj.setData(properties);
