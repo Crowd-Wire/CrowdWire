@@ -1,11 +1,5 @@
 FROM node:14.15.1
 
-
-# install netcat
-RUN apt-get update && \
-    apt-get -y install netcat && \
-    apt-get clean
-
 EXPOSE 3001
 
 # set working directory
