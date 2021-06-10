@@ -144,7 +144,7 @@ export default function WorldReports(props) {
                                 color="primary"
                             />
                         }
-                        label="Show Reviewed"
+                        label={<span style={{ color: 'black' }}>Show Reviewed</span>}
                     />
 
                     <FormControlLabel
@@ -157,7 +157,7 @@ export default function WorldReports(props) {
                                 color="primary"
                             />
                         }
-                        label="Show Banned"
+                        label={<span style={{ color: 'black' }}>Show Banned</span>}
                     />
                 </Col>
                 <Col md={3}>
@@ -199,7 +199,7 @@ export default function WorldReports(props) {
             <hr/>
             <div className="">
                 <Row className="my-3" style={{marginLeft:"auto", marginRight:"auto"}}>
-                {reports.map((r, i) => {
+                { reports && reports.length !== 0 ? reports.map((r, i) => {
                     if(i !== limit)
                         return (
                             <Col md={4} sm={6}>
@@ -207,7 +207,7 @@ export default function WorldReports(props) {
                             </Col>
                             )
                         }
-                )}
+                ): <h2 style={{paddingTop: 100, paddingBottom: 100}}>No reports found for this search...</h2>}
                 </Row>
             </div>
             <hr />
