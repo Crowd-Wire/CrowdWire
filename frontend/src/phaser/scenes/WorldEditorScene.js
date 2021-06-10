@@ -27,8 +27,6 @@ class WorldEditorScene extends Scene {
         this.map.layers.forEach((layer) => {
             if (layer.name.includes("Float"))
                 layer.tilemapLayer.setDepth(1000);
-            if (layer.name.includes("Collision"))
-                layer.tilemapLayer.setDepth(500);
         })
         this.objectGroups = this.mapManager.buildObjects(this);
 

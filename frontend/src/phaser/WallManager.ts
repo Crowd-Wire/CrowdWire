@@ -59,6 +59,10 @@ class WallManager {
                     } else if (id === 12) {
                         this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
                         this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+
+                        // Hack to address an id to the door empty tile
+                        this.data[y][x - 1] |= 11;
+                        this.firstGids[y][x - 1] = tile.tileset.firstgid;
                     }
                     this.data[y][x] |= id;
                     this.firstGids[y][x] |= tile.tileset.firstgid;
@@ -98,8 +102,12 @@ class WallManager {
                 continue;
             const dt = this.data[y + i][x] & WallManager.INDEX;
             if (dt != 0) {
-                fill[2 + i] = dt + this.firstGids[y + i][x];
-                fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
+                if (dt === 11) {
+                    fillRoof[2 + i - 1] = 4 + this.firstGids[y + i][x];
+                } else {
+                    fill[2 + i] = dt + this.firstGids[y + i][x];
+                    fill[2 + i - 1] = dt - 7 + this.firstGids[y + i][x];
+                }
             }
         }
         // Refill roofs
@@ -182,8 +190,10 @@ class WallManager {
                 this.data[y][x - 1] |= 8;
                 this.data[y - 1][x] |= WallManager.LOCKED_TOP;
                 this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
-                this.data[y + 1][x] |= WallManager.LOCKED_BOT;
-                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                if (this.onBounds(x, y + 1)) {
+                    this.data[y + 1][x] |= WallManager.LOCKED_BOT;
+                    this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                }
                 update(2);
                 break;
             case WallType.DOOR1:
@@ -191,7 +201,9 @@ class WallManager {
                 this.data[y][x - 1] |= 11;
                 this.data[y][x - 2] |= 10;
                 this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
-                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                if (this.onBounds(x, y + 1)) {
+                    this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                }
                 update(3);
                 break;
             case WallType.DOOR2:
@@ -201,8 +213,10 @@ class WallManager {
                 this.data[y][x - 3] |= 10;
                 this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
                 this.data[y - 1][x - 2] |= WallManager.LOCKED_TOP;
-                this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
-                this.data[y + 1][x - 2] |= WallManager.LOCKED_BOT;
+                if (this.onBounds(x, y + 1)) {
+                    this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
+                    this.data[y + 1][x - 2] |= WallManager.LOCKED_BOT;
+                }
                 update(4);
                 break;
         }

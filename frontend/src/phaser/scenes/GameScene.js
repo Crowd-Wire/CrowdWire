@@ -237,9 +237,9 @@ class GameScene extends Phaser.Scene {
     }
 
     updateDepth() {
-        this.player.depth = this.player.y + this.player.height/2;
+        this.player.depth = this.player.body.y;
         Object.values(this.remotePlayers).forEach((player) => {
-            player.depth = player.y + player.height/2;
+            player.depth = player.body.y;
         });
     }
 
