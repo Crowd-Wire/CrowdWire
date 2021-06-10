@@ -216,6 +216,9 @@ const GamePage = (props) => {
                     <Button color="success" size="md" round onClick={() => updateWorldUser()}>
 												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
 											</Button>
+                      <Button color="danger" size="md" round simple onClick={() => updateWorldUser()}>
+												<span style={{fontWeight: 600, fontSize: '1rem'}} onClick={() => navigation("/dashboard/search/public")}>Leave</span>
+											</Button>
                     </div>
                   </CardBody>
                 </Card>
