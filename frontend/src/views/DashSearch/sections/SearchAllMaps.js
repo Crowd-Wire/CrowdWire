@@ -12,21 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import useAuthStore from "stores/useAuthStore";
 import IntroText from 'components/IntroText/IntroText';
 import { useParams } from "react-router-dom";
+import  { withRouter } from 'utils/wrapper.js'
 
-export const withRouter = (Component) => {
-  const Wrapper = (props) => {
-    const params = useParams();
-    
-    return (
-      <Component
-	  	params={params}
-        {...props}
-        />
-    );
-  };
-  
-  return Wrapper;
-};
 
 const useStyles = theme => ({
 	root: {

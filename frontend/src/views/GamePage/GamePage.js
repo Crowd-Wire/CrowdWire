@@ -48,7 +48,7 @@ const GamePage = (props) => {
     useAuthStore.getState().setLastLocation(null)
     WorldService.joinWorld(window.location.pathname.split('/')[2])
     .then((res) => {
-      if (res.ok) return res.json()
+      if (res.ok) return res.json();
       navigation("/dashboard/search/public");
     }).then(
       (res) => {
@@ -205,6 +205,9 @@ const GamePage = (props) => {
                     <div style={{textAlign: "center", paddingTop: 50}}>
                     <Button color="success" size="md" round onClick={() => updateWorldUser()}>
 												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
+											</Button>
+                      <Button color="danger" size="md" round simple onClick={() => updateWorldUser()}>
+												<span style={{fontWeight: 600, fontSize: '1rem'}} onClick={() => navigation("/dashboard/search/public")}>Leave</span>
 											</Button>
                     </div>
                   </CardBody>

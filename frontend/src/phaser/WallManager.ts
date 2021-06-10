@@ -223,9 +223,9 @@ class WallManager {
         return true;
     }
 
-    remove(x: number, y: number): boolean {
+    remove(x: number, y: number): number[] {
         if (!this.checkRemove(x, y))
-            return false;
+            return null;
 
         let i = 0;
         for (i = 0; !this.isLeft(x - i, y); i++);
@@ -240,7 +240,7 @@ class WallManager {
             this.firstGids[y][z] = 0;
             this.fill(z, y);
         }
-        return true;
+        return [endLeft, endRight];
     }
 }
 

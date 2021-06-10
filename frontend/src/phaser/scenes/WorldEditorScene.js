@@ -247,10 +247,11 @@ class WorldEditorScene extends Scene {
 
                             if (isDown) {
                                 if (this.wallManager.place(firstgid, type, tileX, tileY)) {
+                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     // Destroy objects
                                     const { x, y, width, height } = this.preview.body,
-                                    crushed = this.physics.overlapRect(
-                                        x + 1, y + 1 - 32, width - 2, height - 2 + 32, true, true);
+                                        crushed = this.physics.overlapRect(
+                                            x + 1, y + 1 - 32, width - 2, height - 2 + 32, true, true);
                                     crushed.forEach((body) => body != this.preview.body && body.gameObject.destroy());
                                     return true;
                                 }
@@ -259,7 +260,18 @@ class WorldEditorScene extends Scene {
 
                         } else if (this.tool.type === ToolType.ERASE) {
                             if (isDown) {
-                                return this.wallManager.remove(tileX, tileY);
+                                let extremes;
+                                if ((extremes = this.wallManager.remove(tileX, tileY))) {
+                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                    // Destroy objects
+                                    const { y, height } = this.preview.body,
+                                        x = extremes[0]*32,
+                                        width = (extremes[1] - extremes[0])*32 + 32,
+                                        crushed = this.physics.overlapRect(
+                                            x + 1, y + 1 - 32, width - 2, height - 2 + 32, true, true);
+                                    crushed.forEach((body) => body != this.preview.body && body.gameObject.destroy());
+                                    return true;
+                                }
                             }
                             return this.wallManager.checkRemove(tileX, tileY);
                         }

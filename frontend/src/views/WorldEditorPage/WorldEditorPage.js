@@ -2,12 +2,6 @@ import React from "react";
 
 import classNames from 'classnames';
 
-// import Phaser from "./Sections/Phaser";
-// import MapUI from "./Sections/MapUI";
-// import MapEditorUI from "./Sections/MapEditorUI";
-// MapManager
-// Settings
-
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
 import WallsTab from "./sections/WallsTab.tsx";

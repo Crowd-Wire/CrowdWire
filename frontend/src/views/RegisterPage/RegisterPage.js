@@ -27,7 +27,7 @@ import Typography from "@material-ui/core/Typography"
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { Link } from 'react-router-dom';
-import  { withRouter } from 'utils/wrapper.js'
+import  { withRouter } from 'utils/wrapper.js';
 
 const useStyles = makeStyles(styles);
 

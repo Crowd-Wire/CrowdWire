@@ -21,8 +21,9 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import CancelIcon from '@material-ui/icons/Cancel';
 import LinkIcon from '@material-ui/icons/Link';
+import BuildIcon from '@material-ui/icons/Build';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
@@ -256,13 +257,21 @@ const GameDrawer = () => {
             >
               <LinkIcon style={iconsStyle} />
             </IconButton>
-            : '' }
+            : null }
           <IconButton onClick={handleFullscreen}>
           { fullScreen ?
               <FullscreenExitIcon style={iconsStyle} />
             : <FullscreenIcon style={iconsStyle} />
           }
           </IconButton>
+          { true ?
+            <IconButton
+              aria-label="open drawer"
+              onClick={() => navigation(window.location.pathname + '/editor')}
+            >
+              <BuildIcon style={iconsStyle} />
+            </IconButton>
+            : null }
           { useWorldUserStore.getState().world_user.role.role_manage ? 
             <IconButton
               aria-label="open drawer"
@@ -270,7 +279,7 @@ const GameDrawer = () => {
             >
               <SettingsIcon style={iconsStyle} />
             </IconButton>
-            : '' }
+            : null }
           { !useAuthStore.getState().guest_uuid ?
             <IconButton
               aria-label="open report modal"
@@ -278,7 +287,7 @@ const GameDrawer = () => {
             >
               <ReportIcon style={iconsStyle} />
             </IconButton>
-          : '' }
+          : null }
           <IconButton
             onClick={() => leaveWorld()}
           >
