@@ -86,6 +86,7 @@ class WebsocketProtocol:
     CLOSE_MEDIA = 'close-media'
     TOGGLE_PRODUCER = 'toggle-producer'
     TOGGLE_PEER_PRODUCER = 'toggle-peer-producer'
+    KICKED = 'KICKED'
     SPEAKING_CHANGE = 'speaking_change'
 
 

@@ -26,8 +26,14 @@ class ConnectionManager:
         self.group_count += 1
         return str(self.group_count)
 
-    async def connect(self, world_id: str, websocket: WebSocket, user_id: int):
+    async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> bool:
         await websocket.accept()
+
+        msg = await redis_connector.check_user_in_world(world_id, user_id)
+        if msg:
+            logger.info("KICKED")
+            await websocket.send_json({ 'topic': protocol.KICKED, 'd': { 'reason': 'An user with the same account is already in this world.' }})
+            return False
 
         # store user's corresponding websockets
         self.users_ws[user_id] = websocket
@@ -53,6 +59,7 @@ class ConnectionManager:
         logger.info(
             f"Connected User {user_id} to World {world_id}"
         )
+        return True
 
     async def disconnect(self, world_id: str, user_id: str):
         if user_id in self.users_ws:
