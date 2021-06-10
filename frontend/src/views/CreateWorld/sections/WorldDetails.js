@@ -177,7 +177,7 @@ export default function WorldDetails(props){
                     </Row>
                     <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px", marginBottom:"30px"}}>
                         <Button onClick={creation} variant="contained" color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
-                            Create Map
+                            Create World
                         </Button>
                     </Row>
                 </div>

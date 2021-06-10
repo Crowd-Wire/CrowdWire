@@ -66,7 +66,7 @@ class EditorNavbar extends React.Component {
       });
       this.askSave = false;
     } else {
-      this.navigate("/dashboard/search");
+      this.navigate(window.location.pathname.replace('/editor', ''));
     }
   }
 

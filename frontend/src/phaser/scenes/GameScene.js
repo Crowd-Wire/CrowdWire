@@ -189,11 +189,12 @@ class GameScene extends Phaser.Scene {
                     < Math.hypot(playerPos.x - curr.center.x, playerPos.y - curr.center.y) ?
                     prev : curr;
             });
-            const { x, y, width, height } = closestBody.gameObject;
+            const { x, y, width, height, depth } = closestBody.gameObject;
             this.selectedObject.setTexture(closestBody.gameObject.texture)
                 .setPosition(x, y)
                 .setSize(width, height)
-                .setVisible(true);
+                .setVisible(true)
+                .setDepth(depth - 1);
             this.interact = closestBody.gameObject.data.list.interact;
         } else {
             this.selectedObject.setVisible(false);
@@ -237,9 +238,9 @@ class GameScene extends Phaser.Scene {
     }
 
     updateDepth() {
-        this.player.depth = this.player.y + this.player.height/2;
+        this.player.depth = this.player.body.y;
         Object.values(this.remotePlayers).forEach((player) => {
-            player.depth = player.y + player.height/2;
+            player.depth = player.body.y;
         });
     }
 
