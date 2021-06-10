@@ -1,9 +1,14 @@
 #!/bin/bash
 echo "Waiting for RabbitMQ to Start..."
 
-while ! nc -z $RABBITMQ_SERVICE_NAME 5672; do
-  sleep 0.1
+until timeout 1 bash -c "cat < /dev/null > /dev/tcp/${RABBITMQ_SERVICE_NAME}/5672"; do
+        >&2 echo "Waiting for RabbitMQ at \"${RABBITMQ_SERVICE_NAME}:5672\"..."
+        sleep 1
 done
+
+#while ! nc -z $RABBITMQ_SERVICE_NAME 5672; do
+  #sleep 0.1
+#done
 
 echo "RabbitMQ started"
 
