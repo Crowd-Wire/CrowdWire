@@ -31,13 +31,12 @@ class ConnectionManager:
 
         msg = await redis_connector.check_user_in_world(world_id, user_id)
         if msg:
-            logger.info("KICKED")
-            await websocket.send_json({ 'topic': protocol.KICKED, 'd': { 'reason': 'An user with the same account is already in this world.' }})
+            await websocket.send_json({'topic': protocol.KICKED, 'd': {'reason': 'An user with the same account is already in this world.'}})
             return False
 
         # store user's corresponding websockets
         self.users_ws[user_id] = websocket
-        logger.info(self.users_ws)
+
         # send players snapshot
         players_snapshot = {}
         # send players information like username, avatars..

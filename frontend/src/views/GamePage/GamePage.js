@@ -51,10 +51,7 @@ const GamePage = (props) => {
       return res.json()
     }).then(
       (res) => {
-        console.log(res.detail)
-
         if (res.detail){
-          console.log("")
           toast.error(
             <span>
               <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -65,8 +62,6 @@ const GamePage = (props) => {
         }
         else {
           useWsHandlerStore.getState().addWsListener(`KICKED`, (d) => {
-            console.log("ODSADAS")
-            console.log(d.reason)
             toast.error(
               <span>
                 <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
@@ -82,7 +77,6 @@ const GamePage = (props) => {
         }
       }
     ).catch(() => {
-      console.log("AONDE TOU CRL")
       navigation("/dashboard/search/public")
     }
     )
