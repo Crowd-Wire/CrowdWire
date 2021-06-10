@@ -143,7 +143,7 @@ export const getSocket = (worldId) => {
 
       switch (data.topic) {
         case "SEND_MESSAGE":
-            useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date});
+            useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
             break;
         case "JOIN_PLAYER":
             usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);

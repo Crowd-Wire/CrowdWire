@@ -42,11 +42,11 @@ async def send_message(world_id: str, user_id: str, payload: dict):
     payload['date'] = datetime.now().strftime('%H:%M')
     payload['from'] = user_id
     send_to = payload['to']
-    if send_to == 'all':
+    if send_to == protocol.MESSAGE_TO_ALL:
         await manager.broadcast(world_id, payload)
-    elif send_to == 'nearby':
-        await manager.broadcast_to_user_rooms(world_id, payload, user_id)
-        await manager.send_personal_message(payload, user_id)
+    elif send_to == protocol.MESSAGE_TO_NEARBY:
+        if not await manager.broadcast_to_user_rooms(world_id, payload, user_id):
+            await manager.send_personal_message(payload, user_id)
 
 
 # TODO: remove after tests
