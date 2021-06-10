@@ -3,7 +3,7 @@ import React, { Component, useState } from "react";
 import classNames from "classnames";
 import Input from '@material-ui/core/Input';
 
-import useWorldEditorStore, { Conference } from "stores/useWorldEditorStore";
+import useWorldEditorStore, { Conference, ToolType } from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
 import { makeStyles } from "@material-ui/core";
@@ -265,6 +265,7 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
       } else {
         props.properties = { name };
       }
+      useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
       useWorldEditorStore.getState().setState({ conferences, activeLayer: '__Conference' });
       useWorldEditorStore.getState().setLayer('__Conference', { active: true });
       useWorldEditorStore.getState().setActive('conference', id);

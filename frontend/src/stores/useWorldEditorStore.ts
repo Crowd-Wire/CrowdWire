@@ -16,7 +16,7 @@ export interface Tool {
 }
 
 interface Tile {
-    style: Record<string, string>;
+    style: Record<string, string | number>;
 }
 
 interface Object extends Tile { }
