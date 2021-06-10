@@ -228,6 +228,11 @@ class RedisConnector:
             role=RoleInDB(**role.__dict__)
         ), ""
 
+    async def check_user_in_world(self, world_id: int, user_id: Union[int, uuid4]):
+        if str(user_id) in await self.get_world_users(world_id):
+            return "An user with the same account is already in this world."
+        return None
+
     async def get_world_user_data(self, world_id: int, user_id: Union[int, uuid4]) \
             -> Optional[schemas.World_UserWithRoleInDB]:
         """
