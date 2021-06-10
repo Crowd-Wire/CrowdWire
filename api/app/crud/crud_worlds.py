@@ -6,7 +6,7 @@ from sqlalchemy import or_
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
 from app.core import strings
-from app.models import World, User, Tag
+from app.models import World, User, Tag, World_User
 from app.redis.redis_decorator import cache, clear_cache_by_model
 from app.schemas import WorldCreate, WorldUpdate, WorldInDBWithUserPermissions
 from app.crud.base import CRUDBase
@@ -216,6 +216,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         else:
             # for a normal user, it can search for public, joined or created worlds
             if not is_superuser or (is_superuser and visibility):
+                logger.debug(requester_id)
                 query, msg = self.filter_by_visibility(query, visibility, requester_id)
                 if query is None:
                     return None, msg
@@ -250,7 +251,7 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             query = query.filter(World.public, World.status != consts.WORLD_BANNED_STATUS)
         elif visibility == "joined":
             # if a user has joined a world and it is banned it should have feedback about it
-            query = query.join(World.users).filter(User.user_id == requester_id)
+            query = query.join(World.users).filter(World_User.user_id == requester_id)
         elif visibility == "owned":
             # if a user has created a world that is now banned, the user should have feedback about it
             query = query.filter(World.creator == requester_id)
