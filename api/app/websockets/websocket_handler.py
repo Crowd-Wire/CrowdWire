@@ -80,8 +80,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     actions = {}
     # create new group and let it normalize
     if add_users:
+        next_group_id = await redis_connector.get_next_group()
         actions = await redis_connector.add_users_to_group(
-            world_id, manager.get_next_group_id(),
+            world_id, next_group_id,
             user_id, *add_users)
 
     # actions made to groups

@@ -256,15 +256,16 @@ export const getSocket = (worldId) => {
             //     console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
             // }
             console.info(`[close] Connection died, code=${event.code} reason=${event.reason}`);
-            const reconnect = setInterval(() => {
-                if (!socket || socket.readyState != socket.OPEN) {
-                usePlayerStore.getState().setConnecting(true);
-                getSocket(worldId);
-                } else {
-                usePlayerStore.getState().setConnecting(false);
-                clearInterval(reconnect);
-                }
-            }, 5000);
+            usePlayerStore.getState().setConnecting(true);
+            // const reconnect = setInterval(() => {
+            //     if (!socket || socket.readyState != socket.OPEN) {
+            //     usePlayerStore.getState().setConnecting(true);
+            //     getSocket(worldId);
+            //     } else {
+            //     usePlayerStore.getState().setConnecting(false);
+            //     clearInterval(reconnect);
+            //     }
+            // }, 5000);
             socket = null;
         }
 

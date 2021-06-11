@@ -547,5 +547,9 @@ class RedisConnector:
         """Get the length of the user list of file"""
         return await self.llen(f"world:{str(world_id)}:user:{str(user_id)}:files")
 
+    async def get_next_group(self) -> str:
+        """Get next unique group ID"""
+        return str(await self.execute('incr', 'group_count'))
+
 
 redis_connector = RedisConnector()
