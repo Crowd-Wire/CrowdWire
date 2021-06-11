@@ -65,14 +65,17 @@ async def send_groups_snapshot(world_id: str):
 async def wire_players(world_id: str, user_id: str, payload: dict):
     users_id = payload['users_id']
 
-    # add nearby users to confirm struc
+    # add nearby users
     await redis_connector.add_users_to_user(world_id, user_id, *users_id)
 
     add_users = set()
     for uid in users_id:
-        if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
-            # check if user already claimed proximity
+        sorted_users = sorted([user_id, uid])
+        common_key = f"world:{world_id}:lock:{sorted_users[0]}:{sorted_users[1]}"
+        if not await redis_connector.sadd(common_key, 1):
+            # hack to check if user already claimed proximity
             add_users.add(uid)
+            await redis_connector.delete(common_key)
 
     actions = {}
     # create new group and let it normalize
