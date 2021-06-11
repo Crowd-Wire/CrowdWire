@@ -43,7 +43,6 @@ export const sendVoice = async (roomId:string = null) => {
   }
 
   if (Object.keys(sendTransports).length <= 0) {
-    console.log("no sendTransport in sendVoice");
     return;
   }
   

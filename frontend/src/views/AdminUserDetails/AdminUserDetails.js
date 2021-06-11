@@ -33,7 +33,6 @@ export default function AdminUserDetails() {
         if(window.location.pathname.split("/").length===4){
             let now_url = window.location.pathname;
             setUrlID(now_url.split("/")[3]);
-            console.log(now_url.split("/")[3]);
             UserService.getUserDetails(now_url.split("/")[3])
                 .then((res) => {
                     return res.json();
@@ -45,7 +44,6 @@ export default function AdminUserDetails() {
                 .then(() => {
                     WorldService.searchAdmin("", [], true, true, 1 , null, null, 1, 3)
                     .then((res) => {
-                        console.log(res)
                         if (res.status!==200)
                             return null;
                         return res.json();

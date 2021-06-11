@@ -125,9 +125,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id}})
         groups_to_remove = await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id)
         await handle_actions(groups_to_remove)
-        logger.info(groups_to_remove)
         groups_to_remove = groups_to_remove['close-room']
-        logger.info(groups_to_remove)
     if add_users_id:
         # add user to a new group with the still nearby users
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
@@ -296,11 +294,9 @@ async def disconnect_user(world_id: str, user_id: str):
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': group_ids}})
         for gid in group_ids:
             users_in_groups.update(await redis_connector.get_group_users(world_id, gid))
-        logger.info(users_in_groups)
         groups_to_remove = await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids)
         await handle_actions(groups_to_remove)
         groups_to_remove = groups_to_remove['close-room']
-        logger.info(groups_to_remove)
         for uid in users_in_groups:
             if uid != user_id:
                 await manager.send_personal_message({

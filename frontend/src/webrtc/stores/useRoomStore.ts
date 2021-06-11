@@ -102,8 +102,6 @@ export const useRoomStore = create(
         }),
       addProducer: (roomId: string, producer: Producer, type: string) => {
         set((s) => {
-          console.log(roomId)
-          console.log(s.rooms[roomId])
           if (s.rooms[roomId]) {
             if (type === 'mic')
               s.rooms[roomId].micProducer = producer
@@ -112,7 +110,6 @@ export const useRoomStore = create(
             else if (type === 'media')
               s.rooms[roomId].mediaProducer = producer
           }
-          console.log(s)
           return {
             ...s,
           }
