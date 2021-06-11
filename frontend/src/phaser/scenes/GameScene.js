@@ -205,12 +205,14 @@ class GameScene extends Phaser.Scene {
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
             // Detect surrounding players
-            const bodies = this.physics.overlapCirc(
-                this.player.body.center.x, this.player.body.center.y, 150);
-            if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
-                const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
-                    .map((b) => b.gameObject.id);
+            const bodies = this.physics
+                .overlapCirc(this.player.body.center.x, this.player.body.center.y, 150)
+                .filter((b) => b.gameObject instanceof RemotePlayer);
+            if (bodies.length != GameScene.inRangePlayers.size) {
+                const rangePlayers = bodies.map((b) => b.gameObject.id);
+                console.log(GameScene.inRangePlayers, rangePlayers);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
+                    console.log('wire')
                     // Wire players
                     this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
@@ -220,6 +222,7 @@ class GameScene extends Phaser.Scene {
                         })
                     );
                 } else if (rangePlayers.length < GameScene.inRangePlayers.size) {
+                    console.log('unwire')
                     // Unwire players
                     this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
@@ -228,7 +231,7 @@ class GameScene extends Phaser.Scene {
                                 GameScene.inRangePlayers.delete(id);
                                 // Close media connections to this user
                                 useConsumerStore.getState().closePeer(id);
-                            };
+                            }
                             return left;
                         })
                     );

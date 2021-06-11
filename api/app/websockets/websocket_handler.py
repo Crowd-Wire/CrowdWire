@@ -4,6 +4,7 @@ from app.redis.connection import redis_connector
 from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
+import asyncio
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
@@ -61,17 +62,33 @@ async def send_groups_snapshot(world_id: str):
 
     await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups})
 
-
+lock = False
 async def wire_players(world_id: str, user_id: str, payload: dict):
+    global lock
     users_id = payload['users_id']
-
-    # add nearby users to confirm struc
-    await redis_connector.add_users_to_user(world_id, user_id, *users_id)
 
     add_users = set()
     for uid in users_id:
-        if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
-            # check if user already claimed proximity
+
+        logger.debug('Waiting')
+        while lock:
+            await asyncio.sleep(0.1)
+        logger.debug('Lock')
+        lock = True
+
+        await redis_connector.execute('multi')
+
+        # add nearby user to confirm struc
+        await redis_connector.add_users_to_user(world_id, user_id, uid)
+        # check if user already claimed proximity
+        await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id)
+
+        execution = await redis_connector.execute('exec')
+
+        lock = False
+        logger.debug('Unlock')
+
+        if execution[1]:
             add_users.add(uid)
 
     actions = {}
