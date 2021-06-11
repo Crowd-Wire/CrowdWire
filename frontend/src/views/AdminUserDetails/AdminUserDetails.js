@@ -144,7 +144,7 @@ export default function AdminUserDetails() {
                                             <Col style={{marginLeft:"auto", marginRight:"auto"}}>
                                                 {worlds.map((m,i) => {
                                                     return(
-                                                        <MapCard map={m} key={m.name} baseUrl={"/dashboard/"} banned={m.status}/>
+                                                        <MapCard map={m} key={m.name} baseUrl={"../../worlds/"} banned={m.status}/>
                                                     )
                                                 })}
                                             </Col>
