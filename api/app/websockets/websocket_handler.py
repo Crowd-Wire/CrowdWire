@@ -301,16 +301,14 @@ async def disconnect_user(world_id: str, user_id: str):
         await handle_actions(groups_to_remove)
         groups_to_remove = groups_to_remove['close-room']
         logger.info(groups_to_remove)
-        for gid in groups_to_remove:
-            group_id = gid['roomId']
-            for uid in users_in_groups:
-                if uid != user_id:
-                    await manager.send_personal_message({
-                        'topic': protocol.UNWIRE_PLAYER, 'merge': True,
-                        'groups': groups_to_remove,
-                        'ids': [user_id]
-                    }, uid)
-    
+        for uid in users_in_groups:
+            if uid != user_id:
+                await manager.send_personal_message({
+                    'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                    'groups': groups_to_remove,
+                    'ids': [user_id]
+                }, uid)
+
 
 async def handle_actions(actions: dict):
     logger.info(actions)
