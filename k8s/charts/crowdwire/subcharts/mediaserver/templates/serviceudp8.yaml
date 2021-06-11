@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp8
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp700
+      port: 40700
+      targetPort: 40700
+      protocol: UDP
+    - name : udp701
+      port: 40701
+      targetPort: 40701
+      protocol: UDP
+    - name : udp702
+      port: 40702
+      targetPort: 40702
+      protocol: UDP
+    - name : udp703
+      port: 40703
+      targetPort: 40703
+      protocol: UDP
+    - name : udp704
+      port: 40704
+      targetPort: 40704
+      protocol: UDP
+    - name : udp705
+      port: 40705
+      targetPort: 40705
+      protocol: UDP
+    - name : udp706
+      port: 40706
+      targetPort: 40706
+      protocol: UDP
+    - name : udp707
+      port: 40707
+      targetPort: 40707
+      protocol: UDP
+    - name : udp708
+      port: 40708
+      targetPort: 40708
+      protocol: UDP
+    - name : udp709
+      port: 40709
+      targetPort: 40709
+      protocol: UDP
+    - name : udp710
+      port: 40710
+      targetPort: 40710
+      protocol: UDP
+    - name : udp711
+      port: 40711
+      targetPort: 40711
+      protocol: UDP
+    - name : udp712
+      port: 40712
+      targetPort: 40712
+      protocol: UDP
+    - name : udp713
+      port: 40713
+      targetPort: 40713
+      protocol: UDP
+    - name : udp714
+      port: 40714
+      targetPort: 40714
+      protocol: UDP
+    - name : udp715
+      port: 40715
+      targetPort: 40715
+      protocol: UDP
+    - name : udp716
+      port: 40716
+      targetPort: 40716
+      protocol: UDP
+    - name : udp717
+      port: 40717
+      targetPort: 40717
+      protocol: UDP
+    - name : udp718
+      port: 40718
+      targetPort: 40718
+      protocol: UDP
+    - name : udp719
+      port: 40719
+      targetPort: 40719
+      protocol: UDP
+    - name : udp720
+      port: 40720
+      targetPort: 40720
+      protocol: UDP
+    - name : udp721
+      port: 40721
+      targetPort: 40721
+      protocol: UDP
+    - name : udp722
+      port: 40722
+      targetPort: 40722
+      protocol: UDP
+    - name : udp723
+      port: 40723
+      targetPort: 40723
+      protocol: UDP
+    - name : udp724
+      port: 40724
+      targetPort: 40724
+      protocol: UDP
+    - name : udp725
+      port: 40725
+      targetPort: 40725
+      protocol: UDP
+    - name : udp726
+      port: 40726
+      targetPort: 40726
+      protocol: UDP
+    - name : udp727
+      port: 40727
+      targetPort: 40727
+      protocol: UDP
+    - name : udp728
+      port: 40728
+      targetPort: 40728
+      protocol: UDP
+    - name : udp729
+      port: 40729
+      targetPort: 40729
+      protocol: UDP
+    - name : udp730
+      port: 40730
+      targetPort: 40730
+      protocol: UDP
+    - name : udp731
+      port: 40731
+      targetPort: 40731
+      protocol: UDP
+    - name : udp732
+      port: 40732
+      targetPort: 40732
+      protocol: UDP
+    - name : udp733
+      port: 40733
+      targetPort: 40733
+      protocol: UDP
+    - name : udp734
+      port: 40734
+      targetPort: 40734
+      protocol: UDP
+    - name : udp735
+      port: 40735
+      targetPort: 40735
+      protocol: UDP
+    - name : udp736
+      port: 40736
+      targetPort: 40736
+      protocol: UDP
+    - name : udp737
+      port: 40737
+      targetPort: 40737
+      protocol: UDP
+    - name : udp738
+      port: 40738
+      targetPort: 40738
+      protocol: UDP
+    - name : udp739
+      port: 40739
+      targetPort: 40739
+      protocol: UDP
+    - name : udp740
+      port: 40740
+      targetPort: 40740
+      protocol: UDP
+    - name : udp741
+      port: 40741
+      targetPort: 40741
+      protocol: UDP
+    - name : udp742
+      port: 40742
+      targetPort: 40742
+      protocol: UDP
+    - name : udp743
+      port: 40743
+      targetPort: 40743
+      protocol: UDP
+    - name : udp744
+      port: 40744
+      targetPort: 40744
+      protocol: UDP
+    - name : udp745
+      port: 40745
+      targetPort: 40745
+      protocol: UDP
+    - name : udp746
+      port: 40746
+      targetPort: 40746
+      protocol: UDP
+    - name : udp747
+      port: 40747
+      targetPort: 40747
+      protocol: UDP
+    - name : udp748
+      port: 40748
+      targetPort: 40748
+      protocol: UDP
+    - name : udp749
+      port: 40749
+      targetPort: 40749
+      protocol: UDP
+    - name : udp750
+      port: 40750
+      targetPort: 40750
+      protocol: UDP
+    - name : udp751
+      port: 40751
+      targetPort: 40751
+      protocol: UDP
+    - name : udp752
+      port: 40752
+      targetPort: 40752
+      protocol: UDP
+    - name : udp753
+      port: 40753
+      targetPort: 40753
+      protocol: UDP
+    - name : udp754
+      port: 40754
+      targetPort: 40754
+      protocol: UDP
+    - name : udp755
+      port: 40755
+      targetPort: 40755
+      protocol: UDP
+    - name : udp756
+      port: 40756
+      targetPort: 40756
+      protocol: UDP
+    - name : udp757
+      port: 40757
+      targetPort: 40757
+      protocol: UDP
+    - name : udp758
+      port: 40758
+      targetPort: 40758
+      protocol: UDP
+    - name : udp759
+      port: 40759
+      targetPort: 40759
+      protocol: UDP
+    - name : udp760
+      port: 40760
+      targetPort: 40760
+      protocol: UDP
+    - name : udp761
+      port: 40761
+      targetPort: 40761
+      protocol: UDP
+    - name : udp762
+      port: 40762
+      targetPort: 40762
+      protocol: UDP
+    - name : udp763
+      port: 40763
+      targetPort: 40763
+      protocol: UDP
+    - name : udp764
+      port: 40764
+      targetPort: 40764
+      protocol: UDP
+    - name : udp765
+      port: 40765
+      targetPort: 40765
+      protocol: UDP
+    - name : udp766
+      port: 40766
+      targetPort: 40766
+      protocol: UDP
+    - name : udp767
+      port: 40767
+      targetPort: 40767
+      protocol: UDP
+    - name : udp768
+      port: 40768
+      targetPort: 40768
+      protocol: UDP
+    - name : udp769
+      port: 40769
+      targetPort: 40769
+      protocol: UDP
+    - name : udp770
+      port: 40770
+      targetPort: 40770
+      protocol: UDP
+    - name : udp771
+      port: 40771
+      targetPort: 40771
+      protocol: UDP
+    - name : udp772
+      port: 40772
+      targetPort: 40772
+      protocol: UDP
+    - name : udp773
+      port: 40773
+      targetPort: 40773
+      protocol: UDP
+    - name : udp774
+      port: 40774
+      targetPort: 40774
+      protocol: UDP
+    - name : udp775
+      port: 40775
+      targetPort: 40775
+      protocol: UDP
+    - name : udp776
+      port: 40776
+      targetPort: 40776
+      protocol: UDP
+    - name : udp777
+      port: 40777
+      targetPort: 40777
+      protocol: UDP
+    - name : udp778
+      port: 40778
+      targetPort: 40778
+      protocol: UDP
+    - name : udp779
+      port: 40779
+      targetPort: 40779
+      protocol: UDP
+    - name : udp780
+      port: 40780
+      targetPort: 40780
+      protocol: UDP
+    - name : udp781
+      port: 40781
+      targetPort: 40781
+      protocol: UDP
+    - name : udp782
+      port: 40782
+      targetPort: 40782
+      protocol: UDP
+    - name : udp783
+      port: 40783
+      targetPort: 40783
+      protocol: UDP
+    - name : udp784
+      port: 40784
+      targetPort: 40784
+      protocol: UDP
+    - name : udp785
+      port: 40785
+      targetPort: 40785
+      protocol: UDP
+    - name : udp786
+      port: 40786
+      targetPort: 40786
+      protocol: UDP
+    - name : udp787
+      port: 40787
+      targetPort: 40787
+      protocol: UDP
+    - name : udp788
+      port: 40788
+      targetPort: 40788
+      protocol: UDP
+    - name : udp789
+      port: 40789
+      targetPort: 40789
+      protocol: UDP
+    - name : udp790
+      port: 40790
+      targetPort: 40790
+      protocol: UDP
+    - name : udp791
+      port: 40791
+      targetPort: 40791
+      protocol: UDP
+    - name : udp792
+      port: 40792
+      targetPort: 40792
+      protocol: UDP
+    - name : udp793
+      port: 40793
+      targetPort: 40793
+      protocol: UDP
+    - name : udp794
+      port: 40794
+      targetPort: 40794
+      protocol: UDP
+    - name : udp795
+      port: 40795
+      targetPort: 40795
+      protocol: UDP
+    - name : udp796
+      port: 40796
+      targetPort: 40796
+      protocol: UDP
+    - name : udp797
+      port: 40797
+      targetPort: 40797
+      protocol: UDP
+    - name : udp798
+      port: 40798
+      targetPort: 40798
+      protocol: UDP
+    - name : udp799
+      port: 40799
+      targetPort: 40799
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}
