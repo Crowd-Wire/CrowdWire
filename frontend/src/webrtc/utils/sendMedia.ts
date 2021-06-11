@@ -54,7 +54,6 @@ export const sendMedia = async (roomId:string = null) => {
             appData: { mediaTag: "media" },
           })
           .then((producer) => {
-            console.log(key)
             addProducer(key, producer, 'media');
           })
           .catch((err) => {
