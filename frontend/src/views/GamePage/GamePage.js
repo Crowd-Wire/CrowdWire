@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { withStyles } from "@material-ui/core";
 import classNames from "classnames";
 
@@ -50,48 +50,48 @@ const GamePage = (props) => {
   useEffect(() => {
     useAuthStore.getState().setLastLocation(null)
     WorldService.joinWorld(window.location.pathname.split('/')[2])
-    .then((res) => {
-      return res.json()
-    }).then(
-      (res) => {
-        if (res.detail){
-          toast.error(
-            <span>
-              <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-              {res.detail}
-            </span>
-          ,toast_props);
-          navigation("/dashboard/search/public");
-        }
-        else {
-          useWsHandlerStore.getState().addWsListener(`KICKED`, (d) => {
+      .then((res) => {
+        return res.json()
+      }).then(
+        (res) => {
+          if (res.detail) {
             toast.error(
               <span>
-                <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
-                {d.reason}
+                <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
+                {res.detail}
               </span>
-            ,toast_props);
-            if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+              , toast_props);
             navigation("/dashboard/search/public");
-          })
-          useWorldUserStore.getState().joinWorld(res);
-          setUsername(res.username)
-          setAvatar(res.avatar)
-          setLoading(0);
+          }
+          else {
+            useWsHandlerStore.getState().addWsListener(`KICKED`, (d) => {
+              toast.error(
+                <span>
+                  <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
+                  {d.reason}
+                </span>
+                , toast_props);
+              if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+              navigation("/dashboard/search/public");
+            })
+            useWorldUserStore.getState().joinWorld(res);
+            setUsername(res.username)
+            setAvatar(res.avatar)
+            setLoading(0);
+          }
         }
+      ).catch(() => {
+        navigation("/dashboard/search/public")
       }
-    ).catch(() => {
-      navigation("/dashboard/search/public")
-    }
-    )
+      )
 
   }, [])
 
   useEffect(() => {
-      // close socket on component unmount
-      return () => {
-        if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
-      }
+    // close socket on component unmount
+    return () => {
+      if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+    }
   }, [])
 
   const updateWorldUser = () => {
@@ -111,13 +111,13 @@ const GamePage = (props) => {
       }).then(
         (res) => {
           if (res) {
-            if (res.detail){
+            if (res.detail) {
               toast.dark(
                 <span>
-                  <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+                  <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
                   {res.detail}
                 </span>
-              ,toast_props);
+                , toast_props);
               navigation("/dashboard/search/public");
             }
             else {
@@ -129,118 +129,118 @@ const GamePage = (props) => {
         }
       )
   }
-  
+
   return (
     <>
-      {loading ? 
+      {loading ?
         (
           <div className={classes.backgroundGradient}></div>
         )
-      : connecting ? 
-        (
-          <div className={classes.backgroundGradient}>
-            <div className={classNames(classes.center, classes.info)}>
-              <img src={logo} className={classes.loader} alt="" />
-              <br />
-              Reconnecting...
-            </div>
-          </div>
-        )
-      : choosingSettings ?
+        : connecting ?
           (
             <div className={classes.backgroundGradient}>
-              <div className={classes.center}>
-                <Card style={{
-                  height: '50%',
-                  minWidth: 400,
-                  padding: 3,
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  overflow: 'hidden',
-                  boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
-                  borderTop: '1px solid rgba(255,255,255,0.5)',
-                  borderLeft: '1px solid rgba(255,255,255,0.5)',
-                  backdropFilter: 'blur(3px)',
-                  borderRadius: '5%',
-                }}>
-                  <CardBody>
-                    <div style={{textAlign: 'center'}}>
-                      <h3 style={{color: '#3f51b5'}}><PersonIcon/>My World User Profile</h3>
-                    </div>
-                    <Row sm={12}>
-                      <Col style={{textAlign: 'center', paddingBottom: 10}}>
-                        <Select
-                          native
-                          className="MuiTypography-root MuiTypography-body1"
-                          style={{fontWeight: 700, color: "rgb(63, 81, 181)", background: 'transparent', border: 0, marginLeft:"auto", marginTop:"10px"}}
-                          inputProps={{
-                            id: 'world_user_avatar',
-                          }}
-                          defaultValue={avatar}
-                          onChange={(event, value) => {setAvatar(event.target.value)}}
+              <div className={classNames(classes.center, classes.info)}>
+                <img src={logo} className={classes.loader} alt="" />
+                <br />
+                Reconnecting...
+              </div>
+            </div>
+          )
+          : choosingSettings ?
+            (
+              <div className={classes.backgroundGradient}>
+                <div className={classes.center}>
+                  <Card style={{
+                    height: '50%',
+                    minWidth: 400,
+                    padding: 3,
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    overflow: 'hidden',
+                    boxShadow: '2px 2px 5px rgba(0,0,0,0.5)',
+                    borderTop: '1px solid rgba(255,255,255,0.5)',
+                    borderLeft: '1px solid rgba(255,255,255,0.5)',
+                    backdropFilter: 'blur(3px)',
+                    borderRadius: '5%',
+                  }}>
+                    <CardBody>
+                      <div style={{ textAlign: 'center' }}>
+                        <h3 style={{ color: '#3f51b5' }}><PersonIcon />My World User Profile</h3>
+                      </div>
+                      <Row sm={12}>
+                        <Col style={{ textAlign: 'center', paddingBottom: 10 }}>
+                          <Select
+                            native
+                            className="MuiTypography-root MuiTypography-body1"
+                            style={{ fontWeight: 700, color: "rgb(63, 81, 181)", background: 'transparent', border: 0, marginLeft: "auto", marginTop: "10px" }}
+                            inputProps={{
+                              id: 'world_user_avatar',
+                            }}
+                            defaultValue={avatar}
+                            onChange={(event, value) => { setAvatar(event.target.value) }}
                           >
-                          <option value={'avatars_1_1'}>Avatar 1</option>
-                          <option value={'avatars_1_2'}>Leandro</option>
-                          <option value={'avatars_1_3'}>Lionel</option>
-                          <option value={'avatars_1_4'}>Leonardo</option>
-                          <option value={'avatars_1_5'}>BSS</option>
-                          <option value={'avatars_1_6'}>Sasha</option>
-                          <option value={'avatars_1_7'}>Avatar 7</option>
-                          <option value={'avatars_1_8'}>Avatar 8</option>
-                          <option value={'avatars_2_1'}>Avatar 9</option>
-                          <option value={'avatars_2_2'}>Avatar 10</option>
-                          <option value={'avatars_2_3'}>Avatar 11</option>
-                          <option value={'avatars_2_4'}>Avatar 12</option>
-                          <option value={'avatars_2_5'}>Avatar 12</option>
-                          <option value={'avatars_2_6'}>Avatar 13</option>
-                          <option value={'avatars_2_7'}>Edu</option>
-                          <option value={'avatars_2_8'}>Eduarda</option>
-                          <option value={'avatars_3_1'}>Avatar 16</option>
-                          <option value={'avatars_3_2'}>Avatar 17</option>
-                          <option value={'avatars_3_3'}>Avatar 18</option>
-                          <option value={'avatars_3_4'}>Teixeira</option>
-                          <option value={'avatars_3_5'}>Avatar 20</option>
-                          <option value={'avatars_3_6'}>Avatar 21</option>
-                          <option value={'avatars_3_7'}>Avatar 22</option>
-                          <option value={'avatars_3_8'}>Avatar 23</option>
-                          <option value={'avatars_4_1'}>Avatar 24</option>
-                          <option value={'avatars_4_2'}>Avatar 25</option>
-                          <option value={'avatars_4_5'}>Avatar 26</option>
-                          <option value={'avatars_4_6'}>Avatar 27</option>
-                        </Select>
-                      </Col>
-                    </Row>
-                    <Row sm={12}>
-                      <Col style={{textAlign: 'center'}}>
-                        <Carousel avatar={avatar} />
-                      </Col>
-                    </Row>
-                    <Row sm={12} style={{paddingTop: 30}}>
-                      <TextField style={{marginLeft:"auto", marginRight:"auto"}} defaultValue={username} id="world_user_username" label="username" variant="outlined" />
-                    </Row>
-                    <div style={{textAlign: "center", paddingTop: 50}}>
-                    <Button color="success" size="md" round onClick={() => updateWorldUser()}>
-												<span style={{fontWeight: 600, fontSize: '1rem'}}>Enter</span>
-											</Button>
-                      <Button color="danger" size="md" round simple onClick={() => updateWorldUser()}>
-												<span style={{fontWeight: 600, fontSize: '1rem'}} onClick={() => navigation("/dashboard/search/public")}>Leave</span>
-											</Button>
-                    </div>
-                  </CardBody>
-                </Card>
+                            <option value={'avatars_1_1'}>Avatar 1</option>
+                            <option value={'avatars_1_2'}>Leandro</option>
+                            <option value={'avatars_1_3'}>Lionel</option>
+                            <option value={'avatars_1_4'}>Leonardo</option>
+                            <option value={'avatars_1_5'}>BSS</option>
+                            <option value={'avatars_1_6'}>Sasha</option>
+                            <option value={'avatars_1_7'}>Avatar 7</option>
+                            <option value={'avatars_1_8'}>Avatar 8</option>
+                            <option value={'avatars_2_1'}>Avatar 9</option>
+                            <option value={'avatars_2_2'}>Avatar 10</option>
+                            <option value={'avatars_2_3'}>Avatar 11</option>
+                            <option value={'avatars_2_4'}>Avatar 12</option>
+                            <option value={'avatars_2_5'}>Avatar 12</option>
+                            <option value={'avatars_2_6'}>Avatar 13</option>
+                            <option value={'avatars_2_7'}>Edu</option>
+                            <option value={'avatars_2_8'}>Eduarda</option>
+                            <option value={'avatars_3_1'}>Avatar 16</option>
+                            <option value={'avatars_3_2'}>Avatar 17</option>
+                            <option value={'avatars_3_3'}>Avatar 18</option>
+                            <option value={'avatars_3_4'}>Teixeira</option>
+                            <option value={'avatars_3_5'}>Avatar 20</option>
+                            <option value={'avatars_3_6'}>Avatar 21</option>
+                            <option value={'avatars_3_7'}>Avatar 22</option>
+                            <option value={'avatars_3_8'}>Avatar 23</option>
+                            <option value={'avatars_4_1'}>Avatar 24</option>
+                            <option value={'avatars_4_2'}>Avatar 25</option>
+                            <option value={'avatars_4_5'}>Avatar 26</option>
+                            <option value={'avatars_4_6'}>Avatar 27</option>
+                          </Select>
+                        </Col>
+                      </Row>
+                      <Row sm={12}>
+                        <Col style={{ textAlign: 'center' }}>
+                          <Carousel avatar={avatar} />
+                        </Col>
+                      </Row>
+                      <Row sm={12} style={{ paddingTop: 30 }}>
+                        <TextField style={{ marginLeft: "auto", marginRight: "auto" }} defaultValue={username} id="world_user_username" label="username" variant="outlined" />
+                      </Row>
+                      <div style={{ textAlign: "center", paddingTop: 50 }}>
+                        <Button color="success" size="md" round onClick={() => updateWorldUser()}>
+                          <span style={{ fontWeight: 600, fontSize: '1rem' }}>Enter</span>
+                        </Button>
+                        <Button color="danger" size="md" round simple onClick={() => updateWorldUser()}>
+                          <span style={{ fontWeight: 600, fontSize: '1rem' }} onClick={() => navigation("/dashboard/search/public")}>Leave</span>
+                        </Button>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
               </div>
-            </div>
-          )
-        :
-          (
-            <div className={classes.wrapper}>
-              <GameDrawer />
-              <div className={classes.gameWindow}>
-                {/* Game */}
-                <RoomCall />
-                <Phaser scene='GameScene' />
+            )
+            :
+            (
+              <div className={classes.wrapper}>
+                <GameDrawer />
+                <div className={classes.gameWindow}>
+                  {/* Game */}
+                  <RoomCall />
+                  <Phaser scene='GameScene' />
+                </div>
               </div>
-            </div>
-          )
+            )
       }
     </>
   );
