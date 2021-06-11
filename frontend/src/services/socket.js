@@ -141,97 +141,123 @@ export const getSocket = (worldId) => {
 
             console.info(`[message] Data received for topic ${data.topic}`);
 
-      switch (data.topic) {
-        case "SEND_MESSAGE":
-            useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
-            break;
-        case "JOIN_PLAYER":
-            usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);
-            break;
-        case "LEAVE_PLAYER":
-            let user_id = data.user_id;
-            useConsumerStore.getState().closePeer(user_id);
-            usePlayerStore.getState().disconnectPlayer(user_id);
-            if (data.groups) {
-              for (let i = 0; i < data.groups.length; i++) {
-                useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
-              }
-            }
-            break;
-        case "PLAYER_MOVEMENT":
-            usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
-            break;
-        case "PLAYERS_SNAPSHOT":
-            usePlayerStore.getState().connectPlayers(data.snapshot, data.players_data);
-            break;
-        case "WIRE_PLAYER":
-            usePlayerStore.getState().wirePlayers(data.ids, data.merge);
-            break;
-        case "UNWIRE_PLAYER":
-            usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
-            if (data.groups) {
-              for (let i = 0; i < data.groups.length; i++) {
-                useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
-              }
-            }
-            break;
-        case "GROUPS_SNAPSHOT":
-            usePlayerStore.getState().setGroups(data.groups);
-            break;
-        case "you-joined-as-speaker":
-          console.log(data)
-          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
-              createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
-                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
-              })
-              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVoice(data.d.roomId);
-                sendVideo(data.d.roomId);
-              });
-          })
-          break;
-        case "you-joined-as-peer":
-          console.log(data)
-          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
-              createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
-                receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
-              })
-              // createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-              //   sendVideo(data.d.roomId);
-              // });
-          })
-          break;
-        case "you-are-now-a-speaker":
-          console.log(data)
-          beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId, true).then(() => {
-              createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
-                sendVideo(data.d.roomId);
-                sendVoice(data.d.roomId);
-              });
-          })
-          break;
-        case "@get-recv-tracks-done":
-          console.log(data)
-          consumeAll(data.d.consumerParametersArr, data.d.roomId);
-          break;
-        case "new-peer-producer":
-          console.log(data)
-          // check if tile im currently on is a conference type or not
-          // else check if player is in range
-          if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
-            const roomId = data.d.roomId;
-            if (useRoomStore.getState().rooms[roomId].recvTransport) {
-              consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
-            } else {
-              consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
-            }
-          }
-          break;
-        case "new-peer-data-producer":
-          console.log(data)
-          const roomId = data.d.roomId;
-            if (useRoomStore.getState().rooms[roomId].recvTransport) {
-              consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
+            switch (data.topic) {
+                case "SEND_MESSAGE":
+                    useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
+                    break;
+                case "JOIN_PLAYER":
+                    usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);
+                    break;
+                case "LEAVE_PLAYER":
+                    let user_id = data.user_id;
+                    useConsumerStore.getState().closePeer(user_id);
+                    usePlayerStore.getState().disconnectPlayer(user_id);
+                    if (data.groups) {
+                        for (let i = 0; i < data.groups.length; i++) {
+                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+                        }
+                    }
+                    break;
+                case "PLAYER_MOVEMENT":
+                    usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
+                    break;
+                case "PLAYERS_SNAPSHOT":
+                    usePlayerStore.getState().connectPlayers(data.snapshot, data.players_data);
+                    break;
+                case "WIRE_PLAYER":
+                    usePlayerStore.getState().wirePlayers(data.ids, data.merge);
+                    break;
+                case "UNWIRE_PLAYER":
+                    usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
+                    if (data.groups) {
+                        for (let i = 0; i < data.groups.length; i++) {
+                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+                        }
+                    }
+                    break;
+                case "GROUPS_SNAPSHOT":
+                    usePlayerStore.getState().setGroups(data.groups);
+                    break;
+                case "you-joined-as-speaker":
+                    console.log(data)
+                    beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+                        createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
+                            receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+                        })
+                        createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                            sendVoice(data.d.roomId);
+                            sendVideo(data.d.roomId);
+                        });
+                    })
+                    break;
+                case "you-joined-as-peer":
+                    console.log(data)
+                    beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+                        createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
+                            receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
+                        })
+                        // createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                        //   sendVideo(data.d.roomId);
+                        // });
+                    })
+                    break;
+                case "you-are-now-a-speaker":
+                    console.log(data)
+                    beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId, true).then(() => {
+                        createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
+                            sendVideo(data.d.roomId);
+                            sendVoice(data.d.roomId);
+                        });
+                    })
+                    break;
+                case "@get-recv-tracks-done":
+                    console.log(data)
+                    consumeAll(data.d.consumerParametersArr, data.d.roomId);
+                    break;
+                case "new-peer-producer":
+                    console.log(data)
+                    // check if tile im currently on is a conference type or not
+                    // else check if player is in range
+                    if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
+                        const roomId = data.d.roomId;
+                        if (useRoomStore.getState().rooms[roomId].recvTransport) {
+                            consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
+                        } else {
+                            consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
+                        }
+                    }
+                    break;
+                case "new-peer-data-producer":
+                    console.log(data)
+                    const roomId = data.d.roomId;
+                    if (useRoomStore.getState().rooms[roomId].recvTransport) {
+                        consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
+                    }
+                    break;
+                case "active-speaker":
+                    console.log(data)
+                    if (data.value)
+                        useConsumerStore.getState().addActiveSpeaker(data.peerId)
+                    else
+                        useConsumerStore.getState().removeActiveSpeaker(data.peerId)
+                    break;
+                case "toggle-peer-producer":
+                    console.log(data)
+                    if (data.kind === 'audio')
+                        useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
+                    else
+                        useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
+                    break;
+                case "close-media":
+                    console.log(data)
+                    useConsumerStore.getState().closeMedia(data.peerId)
+                    break;
+                default:
+                    const { handlerMap } = useWsHandlerStore.getState();
+                    if (data.topic in handlerMap) {
+                        handlerMap[data.topic](data.d);
+                    }
+                    break;
             }
         }
 
