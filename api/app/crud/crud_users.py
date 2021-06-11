@@ -8,7 +8,6 @@ from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
 from app.core import strings, consts
-from loguru import logger
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
