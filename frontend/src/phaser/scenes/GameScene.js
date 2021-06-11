@@ -210,9 +210,7 @@ class GameScene extends Phaser.Scene {
                 .filter((b) => b.gameObject instanceof RemotePlayer);
             if (bodies.length != GameScene.inRangePlayers.size) {
                 const rangePlayers = bodies.map((b) => b.gameObject.id);
-                console.log(GameScene.inRangePlayers, rangePlayers);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
-                    console.log('wire')
                     // Wire players
                     this.ws.wirePlayer(
                         rangePlayers.filter((id) => {
@@ -222,7 +220,6 @@ class GameScene extends Phaser.Scene {
                         })
                     );
                 } else if (rangePlayers.length < GameScene.inRangePlayers.size) {
-                    console.log('unwire')
                     // Unwire players
                     this.ws.unwirePlayer(
                         [...GameScene.inRangePlayers].filter((id) => {
