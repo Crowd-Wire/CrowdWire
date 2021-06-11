@@ -24,6 +24,7 @@ import CardBody from "components/Card/CardBody.js";
 import Select from '@material-ui/core/Select';
 import useAuthStore from "stores/useAuthStore";
 import usePlayerStore from "stores/usePlayerStore";
+import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
 
 const GamePage = (props) => {
 
@@ -50,12 +51,11 @@ const GamePage = (props) => {
     useAuthStore.getState().setLastLocation(null)
     WorldService.joinWorld(window.location.pathname.split('/')[2])
     .then((res) => {
-      if (res.ok) return res.json();
-      navigation("/dashboard/search/public");
+      return res.json()
     }).then(
       (res) => {
         if (res.detail){
-          toast.dark(
+          toast.error(
             <span>
               <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
               {res.detail}
@@ -64,13 +64,24 @@ const GamePage = (props) => {
           navigation("/dashboard/search/public");
         }
         else {
+          useWsHandlerStore.getState().addWsListener(`KICKED`, (d) => {
+            toast.error(
+              <span>
+                <img src={logo} style={{height: 22, width: 22,display: "block", float: "left", paddingRight: 3}} />
+                {d.reason}
+              </span>
+            ,toast_props);
+            if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+            navigation("/dashboard/search/public");
+          })
           useWorldUserStore.getState().joinWorld(res);
           setUsername(res.username)
           setLoading(0);
         }
       }
-    ).catch(() => 
+    ).catch(() => {
       navigation("/dashboard/search/public")
+    }
     )
 
   }, [])

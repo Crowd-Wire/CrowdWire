@@ -143,7 +143,7 @@ export const getSocket = (worldId) => {
 
             switch (data.topic) {
                 case "SEND_MESSAGE":
-                    useMessageStore.getState().addMessage({ from: data.from, text: data.text, date: data.date });
+                    useMessageStore.getState().addMessage({ from: data.from, text: data.text, date: data.date, to: data.to });
                     break;
                 case "JOIN_PLAYER":
                     usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);
@@ -223,39 +223,13 @@ export const getSocket = (worldId) => {
                     if (useRoomStore.getState().rooms[roomId].recvTransport) {
                         consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
                     }
-                    break;
-                case "active-speaker":
-                    console.log(data)
-                    if (data.value)
-                        useConsumerStore.getState().addActiveSpeaker(data.peerId)
-                    else
-                        useConsumerStore.getState().removeActiveSpeaker(data.peerId)
-                    break;
-                case "toggle-peer-producer":
-                    console.log(data)
-                    if (data.kind === 'audio')
-                        useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
-                    else
-                        useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
-                    break;
-                case "close-media":
-                    console.log(data)
-                    useConsumerStore.getState().closeMedia(data.peerId)
-                    break;
-                default:
-                    const { handlerMap } = useWsHandlerStore.getState();
-                    if (data.topic in handlerMap) {
-                        handlerMap[data.topic](data.d);
-                    }
-                    break;
-            }
-        };
+            };
 
-        socket.onclose = (event) => {
-            // if (!event.wasClean) {
-            //     console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-            // } else {
-            //     // event.code is usually 1006 in this case
+            socket.onclose = (event) => {
+                // if (!event.wasClean) {
+                //     console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+                // } else {
+                //     // event.code is usually 1006 in this case
                 console.info(`[close] Connection died, code=${event.code} reason=${event.reason}`);
                 // const reconnect = setInterval(() => {
                 //     if (!socket || socket.readyState != socket.OPEN) {
@@ -266,20 +240,20 @@ export const getSocket = (worldId) => {
                 //         clearInterval(reconnect);
                 //     }
                 // }, 5000);
-            // }
-            socket = null;
-        };
+                // }
+                socket = null;
+            };
 
-        socket.onerror = (error) => {
-            console.error(`[error] ${error.message}`);
-        };
+            socket.onerror = (error) => {
+                console.error(`[error] ${error.message}`);
+            };
+        }
+
+        return { socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference };
     }
 
-    return { socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference };
-}
-
-export const wsend = async (d) => {
-    if (socket && socket.readyState === socket.OPEN) {
-        await socket.send(JSON.stringify(d));
-    }
-};
+    export const wsend = async (d) => {
+        if (socket && socket.readyState === socket.OPEN) {
+            await socket.send(JSON.stringify(d));
+        }
+    };

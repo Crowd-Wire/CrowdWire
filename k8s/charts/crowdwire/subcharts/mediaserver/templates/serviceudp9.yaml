@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp9
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp800
+      port: 40800
+      targetPort: 40800
+      protocol: UDP
+    - name : udp801
+      port: 40801
+      targetPort: 40801
+      protocol: UDP
+    - name : udp802
+      port: 40802
+      targetPort: 40802
+      protocol: UDP
+    - name : udp803
+      port: 40803
+      targetPort: 40803
+      protocol: UDP
+    - name : udp804
+      port: 40804
+      targetPort: 40804
+      protocol: UDP
+    - name : udp805
+      port: 40805
+      targetPort: 40805
+      protocol: UDP
+    - name : udp806
+      port: 40806
+      targetPort: 40806
+      protocol: UDP
+    - name : udp807
+      port: 40807
+      targetPort: 40807
+      protocol: UDP
+    - name : udp808
+      port: 40808
+      targetPort: 40808
+      protocol: UDP
+    - name : udp809
+      port: 40809
+      targetPort: 40809
+      protocol: UDP
+    - name : udp810
+      port: 40810
+      targetPort: 40810
+      protocol: UDP
+    - name : udp811
+      port: 40811
+      targetPort: 40811
+      protocol: UDP
+    - name : udp812
+      port: 40812
+      targetPort: 40812
+      protocol: UDP
+    - name : udp813
+      port: 40813
+      targetPort: 40813
+      protocol: UDP
+    - name : udp814
+      port: 40814
+      targetPort: 40814
+      protocol: UDP
+    - name : udp815
+      port: 40815
+      targetPort: 40815
+      protocol: UDP
+    - name : udp816
+      port: 40816
+      targetPort: 40816
+      protocol: UDP
+    - name : udp817
+      port: 40817
+      targetPort: 40817
+      protocol: UDP
+    - name : udp818
+      port: 40818
+      targetPort: 40818
+      protocol: UDP
+    - name : udp819
+      port: 40819
+      targetPort: 40819
+      protocol: UDP
+    - name : udp820
+      port: 40820
+      targetPort: 40820
+      protocol: UDP
+    - name : udp821
+      port: 40821
+      targetPort: 40821
+      protocol: UDP
+    - name : udp822
+      port: 40822
+      targetPort: 40822
+      protocol: UDP
+    - name : udp823
+      port: 40823
+      targetPort: 40823
+      protocol: UDP
+    - name : udp824
+      port: 40824
+      targetPort: 40824
+      protocol: UDP
+    - name : udp825
+      port: 40825
+      targetPort: 40825
+      protocol: UDP
+    - name : udp826
+      port: 40826
+      targetPort: 40826
+      protocol: UDP
+    - name : udp827
+      port: 40827
+      targetPort: 40827
+      protocol: UDP
+    - name : udp828
+      port: 40828
+      targetPort: 40828
+      protocol: UDP
+    - name : udp829
+      port: 40829
+      targetPort: 40829
+      protocol: UDP
+    - name : udp830
+      port: 40830
+      targetPort: 40830
+      protocol: UDP
+    - name : udp831
+      port: 40831
+      targetPort: 40831
+      protocol: UDP
+    - name : udp832
+      port: 40832
+      targetPort: 40832
+      protocol: UDP
+    - name : udp833
+      port: 40833
+      targetPort: 40833
+      protocol: UDP
+    - name : udp834
+      port: 40834
+      targetPort: 40834
+      protocol: UDP
+    - name : udp835
+      port: 40835
+      targetPort: 40835
+      protocol: UDP
+    - name : udp836
+      port: 40836
+      targetPort: 40836
+      protocol: UDP
+    - name : udp837
+      port: 40837
+      targetPort: 40837
+      protocol: UDP
+    - name : udp838
+      port: 40838
+      targetPort: 40838
+      protocol: UDP
+    - name : udp839
+      port: 40839
+      targetPort: 40839
+      protocol: UDP
+    - name : udp840
+      port: 40840
+      targetPort: 40840
+      protocol: UDP
+    - name : udp841
+      port: 40841
+      targetPort: 40841
+      protocol: UDP
+    - name : udp842
+      port: 40842
+      targetPort: 40842
+      protocol: UDP
+    - name : udp843
+      port: 40843
+      targetPort: 40843
+      protocol: UDP
+    - name : udp844
+      port: 40844
+      targetPort: 40844
+      protocol: UDP
+    - name : udp845
+      port: 40845
+      targetPort: 40845
+      protocol: UDP
+    - name : udp846
+      port: 40846
+      targetPort: 40846
+      protocol: UDP
+    - name : udp847
+      port: 40847
+      targetPort: 40847
+      protocol: UDP
+    - name : udp848
+      port: 40848
+      targetPort: 40848
+      protocol: UDP
+    - name : udp849
+      port: 40849
+      targetPort: 40849
+      protocol: UDP
+    - name : udp850
+      port: 40850
+      targetPort: 40850
+      protocol: UDP
+    - name : udp851
+      port: 40851
+      targetPort: 40851
+      protocol: UDP
+    - name : udp852
+      port: 40852
+      targetPort: 40852
+      protocol: UDP
+    - name : udp853
+      port: 40853
+      targetPort: 40853
+      protocol: UDP
+    - name : udp854
+      port: 40854
+      targetPort: 40854
+      protocol: UDP
+    - name : udp855
+      port: 40855
+      targetPort: 40855
+      protocol: UDP
+    - name : udp856
+      port: 40856
+      targetPort: 40856
+      protocol: UDP
+    - name : udp857
+      port: 40857
+      targetPort: 40857
+      protocol: UDP
+    - name : udp858
+      port: 40858
+      targetPort: 40858
+      protocol: UDP
+    - name : udp859
+      port: 40859
+      targetPort: 40859
+      protocol: UDP
+    - name : udp860
+      port: 40860
+      targetPort: 40860
+      protocol: UDP
+    - name : udp861
+      port: 40861
+      targetPort: 40861
+      protocol: UDP
+    - name : udp862
+      port: 40862
+      targetPort: 40862
+      protocol: UDP
+    - name : udp863
+      port: 40863
+      targetPort: 40863
+      protocol: UDP
+    - name : udp864
+      port: 40864
+      targetPort: 40864
+      protocol: UDP
+    - name : udp865
+      port: 40865
+      targetPort: 40865
+      protocol: UDP
+    - name : udp866
+      port: 40866
+      targetPort: 40866
+      protocol: UDP
+    - name : udp867
+      port: 40867
+      targetPort: 40867
+      protocol: UDP
+    - name : udp868
+      port: 40868
+      targetPort: 40868
+      protocol: UDP
+    - name : udp869
+      port: 40869
+      targetPort: 40869
+      protocol: UDP
+    - name : udp870
+      port: 40870
+      targetPort: 40870
+      protocol: UDP
+    - name : udp871
+      port: 40871
+      targetPort: 40871
+      protocol: UDP
+    - name : udp872
+      port: 40872
+      targetPort: 40872
+      protocol: UDP
+    - name : udp873
+      port: 40873
+      targetPort: 40873
+      protocol: UDP
+    - name : udp874
+      port: 40874
+      targetPort: 40874
+      protocol: UDP
+    - name : udp875
+      port: 40875
+      targetPort: 40875
+      protocol: UDP
+    - name : udp876
+      port: 40876
+      targetPort: 40876
+      protocol: UDP
+    - name : udp877
+      port: 40877
+      targetPort: 40877
+      protocol: UDP
+    - name : udp878
+      port: 40878
+      targetPort: 40878
+      protocol: UDP
+    - name : udp879
+      port: 40879
+      targetPort: 40879
+      protocol: UDP
+    - name : udp880
+      port: 40880
+      targetPort: 40880
+      protocol: UDP
+    - name : udp881
+      port: 40881
+      targetPort: 40881
+      protocol: UDP
+    - name : udp882
+      port: 40882
+      targetPort: 40882
+      protocol: UDP
+    - name : udp883
+      port: 40883
+      targetPort: 40883
+      protocol: UDP
+    - name : udp884
+      port: 40884
+      targetPort: 40884
+      protocol: UDP
+    - name : udp885
+      port: 40885
+      targetPort: 40885
+      protocol: UDP
+    - name : udp886
+      port: 40886
+      targetPort: 40886
+      protocol: UDP
+    - name : udp887
+      port: 40887
+      targetPort: 40887
+      protocol: UDP
+    - name : udp888
+      port: 40888
+      targetPort: 40888
+      protocol: UDP
+    - name : udp889
+      port: 40889
+      targetPort: 40889
+      protocol: UDP
+    - name : udp890
+      port: 40890
+      targetPort: 40890
+      protocol: UDP
+    - name : udp891
+      port: 40891
+      targetPort: 40891
+      protocol: UDP
+    - name : udp892
+      port: 40892
+      targetPort: 40892
+      protocol: UDP
+    - name : udp893
+      port: 40893
+      targetPort: 40893
+      protocol: UDP
+    - name : udp894
+      port: 40894
+      targetPort: 40894
+      protocol: UDP
+    - name : udp895
+      port: 40895
+      targetPort: 40895
+      protocol: UDP
+    - name : udp896
+      port: 40896
+      targetPort: 40896
+      protocol: UDP
+    - name : udp897
+      port: 40897
+      targetPort: 40897
+      protocol: UDP
+    - name : udp898
+      port: 40898
+      targetPort: 40898
+      protocol: UDP
+    - name : udp899
+      port: 40899
+      targetPort: 40899
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

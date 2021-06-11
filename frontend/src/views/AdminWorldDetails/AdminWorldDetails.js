@@ -113,7 +113,7 @@ class AdminWorldDetails extends Component {
                                                             {this.state.world.name}
                                                         </Typography>
                                                         <Typography variant="body2" component="p">
-                                                            Created by: <Link to='/'>{this.state.world.creator}</Link>
+                                                            Created by: <Link to={'/admin/users/' + this.state.world.creator}>{this.state.world.creator}</Link>
                                                         </Typography>
                                                         <Typography variant="body2" color="textSecondary" component="p">
                                                             {this.state.world.description}

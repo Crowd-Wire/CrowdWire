@@ -95,7 +95,7 @@ class UpdatePassword extends React.Component {
         console.log(pass);
         console.log(cpass);
         if(pass !== cpass){
-            console.log(this.state.passHelperText)
+            console.log("passwords not cool")
             this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
             passed = false;
         }
@@ -111,10 +111,8 @@ class UpdatePassword extends React.Component {
             this.setState({cPassHelperText: "You need to input this password field"});
             passed = false;
         }
-        else
-            this.setState({passHelperText: "",cPassHelperText:"", opassHelperText: ""});
-
         if(passed){
+            this.setState({passHelperText: "",cPassHelperText:"", opassHelperText: ""});
             UserService.updateUserPassword(
                 opass,
                 cpass,
@@ -124,14 +122,15 @@ class UpdatePassword extends React.Component {
                 if(res.status == 400){
                     this.setState({opassHelperText: "Your old password is incorrect"});
                 }
-                if(res.status == 200) {
-                    return res.json();
-                }
+                
+                return res.json();
+                
             }
             )
             .then(
             (res) => {
-                this.handleLogin(res.email, document.getElementById("pass").value); 
+                if(!res.detail)
+                    this.handleLogin(res.email, document.getElementById("pass").value); 
             }
         )
         .catch(

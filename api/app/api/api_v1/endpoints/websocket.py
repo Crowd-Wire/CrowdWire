@@ -33,7 +33,8 @@ async def world_websocket(
     user_id = str(user.user_id)
     world_id = str(world_id)
     logger.info(user_id)
-    await manager.connect(world_id, websocket, user_id)
+    if not await manager.connect(world_id, websocket, user_id):
+        return
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
         while True:
