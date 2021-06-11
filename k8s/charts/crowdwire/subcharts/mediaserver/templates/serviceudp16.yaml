@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp16
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1600
+      port: 41600
+      targetPort: 41600
+      protocol: UDP
+    - name : udp1601
+      port: 41601
+      targetPort: 41601
+      protocol: UDP
+    - name : udp1602
+      port: 41602
+      targetPort: 41602
+      protocol: UDP
+    - name : udp1603
+      port: 41603
+      targetPort: 41603
+      protocol: UDP
+    - name : udp1604
+      port: 41604
+      targetPort: 41604
+      protocol: UDP
+    - name : udp1605
+      port: 41605
+      targetPort: 41605
+      protocol: UDP
+    - name : udp1606
+      port: 41606
+      targetPort: 41606
+      protocol: UDP
+    - name : udp1607
+      port: 41607
+      targetPort: 41607
+      protocol: UDP
+    - name : udp1608
+      port: 41608
+      targetPort: 41608
+      protocol: UDP
+    - name : udp1609
+      port: 41609
+      targetPort: 41609
+      protocol: UDP
+    - name : udp1610
+      port: 41610
+      targetPort: 41610
+      protocol: UDP
+    - name : udp1611
+      port: 41611
+      targetPort: 41611
+      protocol: UDP
+    - name : udp1612
+      port: 41612
+      targetPort: 41612
+      protocol: UDP
+    - name : udp1613
+      port: 41613
+      targetPort: 41613
+      protocol: UDP
+    - name : udp1614
+      port: 41614
+      targetPort: 41614
+      protocol: UDP
+    - name : udp1615
+      port: 41615
+      targetPort: 41615
+      protocol: UDP
+    - name : udp1616
+      port: 41616
+      targetPort: 41616
+      protocol: UDP
+    - name : udp1617
+      port: 41617
+      targetPort: 41617
+      protocol: UDP
+    - name : udp1618
+      port: 41618
+      targetPort: 41618
+      protocol: UDP
+    - name : udp1619
+      port: 41619
+      targetPort: 41619
+      protocol: UDP
+    - name : udp1620
+      port: 41620
+      targetPort: 41620
+      protocol: UDP
+    - name : udp1621
+      port: 41621
+      targetPort: 41621
+      protocol: UDP
+    - name : udp1622
+      port: 41622
+      targetPort: 41622
+      protocol: UDP
+    - name : udp1623
+      port: 41623
+      targetPort: 41623
+      protocol: UDP
+    - name : udp1624
+      port: 41624
+      targetPort: 41624
+      protocol: UDP
+    - name : udp1625
+      port: 41625
+      targetPort: 41625
+      protocol: UDP
+    - name : udp1626
+      port: 41626
+      targetPort: 41626
+      protocol: UDP
+    - name : udp1627
+      port: 41627
+      targetPort: 41627
+      protocol: UDP
+    - name : udp1628
+      port: 41628
+      targetPort: 41628
+      protocol: UDP
+    - name : udp1629
+      port: 41629
+      targetPort: 41629
+      protocol: UDP
+    - name : udp1630
+      port: 41630
+      targetPort: 41630
+      protocol: UDP
+    - name : udp1631
+      port: 41631
+      targetPort: 41631
+      protocol: UDP
+    - name : udp1632
+      port: 41632
+      targetPort: 41632
+      protocol: UDP
+    - name : udp1633
+      port: 41633
+      targetPort: 41633
+      protocol: UDP
+    - name : udp1634
+      port: 41634
+      targetPort: 41634
+      protocol: UDP
+    - name : udp1635
+      port: 41635
+      targetPort: 41635
+      protocol: UDP
+    - name : udp1636
+      port: 41636
+      targetPort: 41636
+      protocol: UDP
+    - name : udp1637
+      port: 41637
+      targetPort: 41637
+      protocol: UDP
+    - name : udp1638
+      port: 41638
+      targetPort: 41638
+      protocol: UDP
+    - name : udp1639
+      port: 41639
+      targetPort: 41639
+      protocol: UDP
+    - name : udp1640
+      port: 41640
+      targetPort: 41640
+      protocol: UDP
+    - name : udp1641
+      port: 41641
+      targetPort: 41641
+      protocol: UDP
+    - name : udp1642
+      port: 41642
+      targetPort: 41642
+      protocol: UDP
+    - name : udp1643
+      port: 41643
+      targetPort: 41643
+      protocol: UDP
+    - name : udp1644
+      port: 41644
+      targetPort: 41644
+      protocol: UDP
+    - name : udp1645
+      port: 41645
+      targetPort: 41645
+      protocol: UDP
+    - name : udp1646
+      port: 41646
+      targetPort: 41646
+      protocol: UDP
+    - name : udp1647
+      port: 41647
+      targetPort: 41647
+      protocol: UDP
+    - name : udp1648
+      port: 41648
+      targetPort: 41648
+      protocol: UDP
+    - name : udp1649
+      port: 41649
+      targetPort: 41649
+      protocol: UDP
+    - name : udp1650
+      port: 41650
+      targetPort: 41650
+      protocol: UDP
+    - name : udp1651
+      port: 41651
+      targetPort: 41651
+      protocol: UDP
+    - name : udp1652
+      port: 41652
+      targetPort: 41652
+      protocol: UDP
+    - name : udp1653
+      port: 41653
+      targetPort: 41653
+      protocol: UDP
+    - name : udp1654
+      port: 41654
+      targetPort: 41654
+      protocol: UDP
+    - name : udp1655
+      port: 41655
+      targetPort: 41655
+      protocol: UDP
+    - name : udp1656
+      port: 41656
+      targetPort: 41656
+      protocol: UDP
+    - name : udp1657
+      port: 41657
+      targetPort: 41657
+      protocol: UDP
+    - name : udp1658
+      port: 41658
+      targetPort: 41658
+      protocol: UDP
+    - name : udp1659
+      port: 41659
+      targetPort: 41659
+      protocol: UDP
+    - name : udp1660
+      port: 41660
+      targetPort: 41660
+      protocol: UDP
+    - name : udp1661
+      port: 41661
+      targetPort: 41661
+      protocol: UDP
+    - name : udp1662
+      port: 41662
+      targetPort: 41662
+      protocol: UDP
+    - name : udp1663
+      port: 41663
+      targetPort: 41663
+      protocol: UDP
+    - name : udp1664
+      port: 41664
+      targetPort: 41664
+      protocol: UDP
+    - name : udp1665
+      port: 41665
+      targetPort: 41665
+      protocol: UDP
+    - name : udp1666
+      port: 41666
+      targetPort: 41666
+      protocol: UDP
+    - name : udp1667
+      port: 41667
+      targetPort: 41667
+      protocol: UDP
+    - name : udp1668
+      port: 41668
+      targetPort: 41668
+      protocol: UDP
+    - name : udp1669
+      port: 41669
+      targetPort: 41669
+      protocol: UDP
+    - name : udp1670
+      port: 41670
+      targetPort: 41670
+      protocol: UDP
+    - name : udp1671
+      port: 41671
+      targetPort: 41671
+      protocol: UDP
+    - name : udp1672
+      port: 41672
+      targetPort: 41672
+      protocol: UDP
+    - name : udp1673
+      port: 41673
+      targetPort: 41673
+      protocol: UDP
+    - name : udp1674
+      port: 41674
+      targetPort: 41674
+      protocol: UDP
+    - name : udp1675
+      port: 41675
+      targetPort: 41675
+      protocol: UDP
+    - name : udp1676
+      port: 41676
+      targetPort: 41676
+      protocol: UDP
+    - name : udp1677
+      port: 41677
+      targetPort: 41677
+      protocol: UDP
+    - name : udp1678
+      port: 41678
+      targetPort: 41678
+      protocol: UDP
+    - name : udp1679
+      port: 41679
+      targetPort: 41679
+      protocol: UDP
+    - name : udp1680
+      port: 41680
+      targetPort: 41680
+      protocol: UDP
+    - name : udp1681
+      port: 41681
+      targetPort: 41681
+      protocol: UDP
+    - name : udp1682
+      port: 41682
+      targetPort: 41682
+      protocol: UDP
+    - name : udp1683
+      port: 41683
+      targetPort: 41683
+      protocol: UDP
+    - name : udp1684
+      port: 41684
+      targetPort: 41684
+      protocol: UDP
+    - name : udp1685
+      port: 41685
+      targetPort: 41685
+      protocol: UDP
+    - name : udp1686
+      port: 41686
+      targetPort: 41686
+      protocol: UDP
+    - name : udp1687
+      port: 41687
+      targetPort: 41687
+      protocol: UDP
+    - name : udp1688
+      port: 41688
+      targetPort: 41688
+      protocol: UDP
+    - name : udp1689
+      port: 41689
+      targetPort: 41689
+      protocol: UDP
+    - name : udp1690
+      port: 41690
+      targetPort: 41690
+      protocol: UDP
+    - name : udp1691
+      port: 41691
+      targetPort: 41691
+      protocol: UDP
+    - name : udp1692
+      port: 41692
+      targetPort: 41692
+      protocol: UDP
+    - name : udp1693
+      port: 41693
+      targetPort: 41693
+      protocol: UDP
+    - name : udp1694
+      port: 41694
+      targetPort: 41694
+      protocol: UDP
+    - name : udp1695
+      port: 41695
+      targetPort: 41695
+      protocol: UDP
+    - name : udp1696
+      port: 41696
+      targetPort: 41696
+      protocol: UDP
+    - name : udp1697
+      port: 41697
+      targetPort: 41697
+      protocol: UDP
+    - name : udp1698
+      port: 41698
+      targetPort: 41698
+      protocol: UDP
+    - name : udp1699
+      port: 41699
+      targetPort: 41699
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

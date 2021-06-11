@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp95
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp9500
+      port: 49500
+      targetPort: 49500
+      protocol: UDP
+    - name : udp9501
+      port: 49501
+      targetPort: 49501
+      protocol: UDP
+    - name : udp9502
+      port: 49502
+      targetPort: 49502
+      protocol: UDP
+    - name : udp9503
+      port: 49503
+      targetPort: 49503
+      protocol: UDP
+    - name : udp9504
+      port: 49504
+      targetPort: 49504
+      protocol: UDP
+    - name : udp9505
+      port: 49505
+      targetPort: 49505
+      protocol: UDP
+    - name : udp9506
+      port: 49506
+      targetPort: 49506
+      protocol: UDP
+    - name : udp9507
+      port: 49507
+      targetPort: 49507
+      protocol: UDP
+    - name : udp9508
+      port: 49508
+      targetPort: 49508
+      protocol: UDP
+    - name : udp9509
+      port: 49509
+      targetPort: 49509
+      protocol: UDP
+    - name : udp9510
+      port: 49510
+      targetPort: 49510
+      protocol: UDP
+    - name : udp9511
+      port: 49511
+      targetPort: 49511
+      protocol: UDP
+    - name : udp9512
+      port: 49512
+      targetPort: 49512
+      protocol: UDP
+    - name : udp9513
+      port: 49513
+      targetPort: 49513
+      protocol: UDP
+    - name : udp9514
+      port: 49514
+      targetPort: 49514
+      protocol: UDP
+    - name : udp9515
+      port: 49515
+      targetPort: 49515
+      protocol: UDP
+    - name : udp9516
+      port: 49516
+      targetPort: 49516
+      protocol: UDP
+    - name : udp9517
+      port: 49517
+      targetPort: 49517
+      protocol: UDP
+    - name : udp9518
+      port: 49518
+      targetPort: 49518
+      protocol: UDP
+    - name : udp9519
+      port: 49519
+      targetPort: 49519
+      protocol: UDP
+    - name : udp9520
+      port: 49520
+      targetPort: 49520
+      protocol: UDP
+    - name : udp9521
+      port: 49521
+      targetPort: 49521
+      protocol: UDP
+    - name : udp9522
+      port: 49522
+      targetPort: 49522
+      protocol: UDP
+    - name : udp9523
+      port: 49523
+      targetPort: 49523
+      protocol: UDP
+    - name : udp9524
+      port: 49524
+      targetPort: 49524
+      protocol: UDP
+    - name : udp9525
+      port: 49525
+      targetPort: 49525
+      protocol: UDP
+    - name : udp9526
+      port: 49526
+      targetPort: 49526
+      protocol: UDP
+    - name : udp9527
+      port: 49527
+      targetPort: 49527
+      protocol: UDP
+    - name : udp9528
+      port: 49528
+      targetPort: 49528
+      protocol: UDP
+    - name : udp9529
+      port: 49529
+      targetPort: 49529
+      protocol: UDP
+    - name : udp9530
+      port: 49530
+      targetPort: 49530
+      protocol: UDP
+    - name : udp9531
+      port: 49531
+      targetPort: 49531
+      protocol: UDP
+    - name : udp9532
+      port: 49532
+      targetPort: 49532
+      protocol: UDP
+    - name : udp9533
+      port: 49533
+      targetPort: 49533
+      protocol: UDP
+    - name : udp9534
+      port: 49534
+      targetPort: 49534
+      protocol: UDP
+    - name : udp9535
+      port: 49535
+      targetPort: 49535
+      protocol: UDP
+    - name : udp9536
+      port: 49536
+      targetPort: 49536
+      protocol: UDP
+    - name : udp9537
+      port: 49537
+      targetPort: 49537
+      protocol: UDP
+    - name : udp9538
+      port: 49538
+      targetPort: 49538
+      protocol: UDP
+    - name : udp9539
+      port: 49539
+      targetPort: 49539
+      protocol: UDP
+    - name : udp9540
+      port: 49540
+      targetPort: 49540
+      protocol: UDP
+    - name : udp9541
+      port: 49541
+      targetPort: 49541
+      protocol: UDP
+    - name : udp9542
+      port: 49542
+      targetPort: 49542
+      protocol: UDP
+    - name : udp9543
+      port: 49543
+      targetPort: 49543
+      protocol: UDP
+    - name : udp9544
+      port: 49544
+      targetPort: 49544
+      protocol: UDP
+    - name : udp9545
+      port: 49545
+      targetPort: 49545
+      protocol: UDP
+    - name : udp9546
+      port: 49546
+      targetPort: 49546
+      protocol: UDP
+    - name : udp9547
+      port: 49547
+      targetPort: 49547
+      protocol: UDP
+    - name : udp9548
+      port: 49548
+      targetPort: 49548
+      protocol: UDP
+    - name : udp9549
+      port: 49549
+      targetPort: 49549
+      protocol: UDP
+    - name : udp9550
+      port: 49550
+      targetPort: 49550
+      protocol: UDP
+    - name : udp9551
+      port: 49551
+      targetPort: 49551
+      protocol: UDP
+    - name : udp9552
+      port: 49552
+      targetPort: 49552
+      protocol: UDP
+    - name : udp9553
+      port: 49553
+      targetPort: 49553
+      protocol: UDP
+    - name : udp9554
+      port: 49554
+      targetPort: 49554
+      protocol: UDP
+    - name : udp9555
+      port: 49555
+      targetPort: 49555
+      protocol: UDP
+    - name : udp9556
+      port: 49556
+      targetPort: 49556
+      protocol: UDP
+    - name : udp9557
+      port: 49557
+      targetPort: 49557
+      protocol: UDP
+    - name : udp9558
+      port: 49558
+      targetPort: 49558
+      protocol: UDP
+    - name : udp9559
+      port: 49559
+      targetPort: 49559
+      protocol: UDP
+    - name : udp9560
+      port: 49560
+      targetPort: 49560
+      protocol: UDP
+    - name : udp9561
+      port: 49561
+      targetPort: 49561
+      protocol: UDP
+    - name : udp9562
+      port: 49562
+      targetPort: 49562
+      protocol: UDP
+    - name : udp9563
+      port: 49563
+      targetPort: 49563
+      protocol: UDP
+    - name : udp9564
+      port: 49564
+      targetPort: 49564
+      protocol: UDP
+    - name : udp9565
+      port: 49565
+      targetPort: 49565
+      protocol: UDP
+    - name : udp9566
+      port: 49566
+      targetPort: 49566
+      protocol: UDP
+    - name : udp9567
+      port: 49567
+      targetPort: 49567
+      protocol: UDP
+    - name : udp9568
+      port: 49568
+      targetPort: 49568
+      protocol: UDP
+    - name : udp9569
+      port: 49569
+      targetPort: 49569
+      protocol: UDP
+    - name : udp9570
+      port: 49570
+      targetPort: 49570
+      protocol: UDP
+    - name : udp9571
+      port: 49571
+      targetPort: 49571
+      protocol: UDP
+    - name : udp9572
+      port: 49572
+      targetPort: 49572
+      protocol: UDP
+    - name : udp9573
+      port: 49573
+      targetPort: 49573
+      protocol: UDP
+    - name : udp9574
+      port: 49574
+      targetPort: 49574
+      protocol: UDP
+    - name : udp9575
+      port: 49575
+      targetPort: 49575
+      protocol: UDP
+    - name : udp9576
+      port: 49576
+      targetPort: 49576
+      protocol: UDP
+    - name : udp9577
+      port: 49577
+      targetPort: 49577
+      protocol: UDP
+    - name : udp9578
+      port: 49578
+      targetPort: 49578
+      protocol: UDP
+    - name : udp9579
+      port: 49579
+      targetPort: 49579
+      protocol: UDP
+    - name : udp9580
+      port: 49580
+      targetPort: 49580
+      protocol: UDP
+    - name : udp9581
+      port: 49581
+      targetPort: 49581
+      protocol: UDP
+    - name : udp9582
+      port: 49582
+      targetPort: 49582
+      protocol: UDP
+    - name : udp9583
+      port: 49583
+      targetPort: 49583
+      protocol: UDP
+    - name : udp9584
+      port: 49584
+      targetPort: 49584
+      protocol: UDP
+    - name : udp9585
+      port: 49585
+      targetPort: 49585
+      protocol: UDP
+    - name : udp9586
+      port: 49586
+      targetPort: 49586
+      protocol: UDP
+    - name : udp9587
+      port: 49587
+      targetPort: 49587
+      protocol: UDP
+    - name : udp9588
+      port: 49588
+      targetPort: 49588
+      protocol: UDP
+    - name : udp9589
+      port: 49589
+      targetPort: 49589
+      protocol: UDP
+    - name : udp9590
+      port: 49590
+      targetPort: 49590
+      protocol: UDP
+    - name : udp9591
+      port: 49591
+      targetPort: 49591
+      protocol: UDP
+    - name : udp9592
+      port: 49592
+      targetPort: 49592
+      protocol: UDP
+    - name : udp9593
+      port: 49593
+      targetPort: 49593
+      protocol: UDP
+    - name : udp9594
+      port: 49594
+      targetPort: 49594
+      protocol: UDP
+    - name : udp9595
+      port: 49595
+      targetPort: 49595
+      protocol: UDP
+    - name : udp9596
+      port: 49596
+      targetPort: 49596
+      protocol: UDP
+    - name : udp9597
+      port: 49597
+      targetPort: 49597
+      protocol: UDP
+    - name : udp9598
+      port: 49598
+      targetPort: 49598
+      protocol: UDP
+    - name : udp9599
+      port: 49599
+      targetPort: 49599
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

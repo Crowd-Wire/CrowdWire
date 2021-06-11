@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp84
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp8400
+      port: 48400
+      targetPort: 48400
+      protocol: UDP
+    - name : udp8401
+      port: 48401
+      targetPort: 48401
+      protocol: UDP
+    - name : udp8402
+      port: 48402
+      targetPort: 48402
+      protocol: UDP
+    - name : udp8403
+      port: 48403
+      targetPort: 48403
+      protocol: UDP
+    - name : udp8404
+      port: 48404
+      targetPort: 48404
+      protocol: UDP
+    - name : udp8405
+      port: 48405
+      targetPort: 48405
+      protocol: UDP
+    - name : udp8406
+      port: 48406
+      targetPort: 48406
+      protocol: UDP
+    - name : udp8407
+      port: 48407
+      targetPort: 48407
+      protocol: UDP
+    - name : udp8408
+      port: 48408
+      targetPort: 48408
+      protocol: UDP
+    - name : udp8409
+      port: 48409
+      targetPort: 48409
+      protocol: UDP
+    - name : udp8410
+      port: 48410
+      targetPort: 48410
+      protocol: UDP
+    - name : udp8411
+      port: 48411
+      targetPort: 48411
+      protocol: UDP
+    - name : udp8412
+      port: 48412
+      targetPort: 48412
+      protocol: UDP
+    - name : udp8413
+      port: 48413
+      targetPort: 48413
+      protocol: UDP
+    - name : udp8414
+      port: 48414
+      targetPort: 48414
+      protocol: UDP
+    - name : udp8415
+      port: 48415
+      targetPort: 48415
+      protocol: UDP
+    - name : udp8416
+      port: 48416
+      targetPort: 48416
+      protocol: UDP
+    - name : udp8417
+      port: 48417
+      targetPort: 48417
+      protocol: UDP
+    - name : udp8418
+      port: 48418
+      targetPort: 48418
+      protocol: UDP
+    - name : udp8419
+      port: 48419
+      targetPort: 48419
+      protocol: UDP
+    - name : udp8420
+      port: 48420
+      targetPort: 48420
+      protocol: UDP
+    - name : udp8421
+      port: 48421
+      targetPort: 48421
+      protocol: UDP
+    - name : udp8422
+      port: 48422
+      targetPort: 48422
+      protocol: UDP
+    - name : udp8423
+      port: 48423
+      targetPort: 48423
+      protocol: UDP
+    - name : udp8424
+      port: 48424
+      targetPort: 48424
+      protocol: UDP
+    - name : udp8425
+      port: 48425
+      targetPort: 48425
+      protocol: UDP
+    - name : udp8426
+      port: 48426
+      targetPort: 48426
+      protocol: UDP
+    - name : udp8427
+      port: 48427
+      targetPort: 48427
+      protocol: UDP
+    - name : udp8428
+      port: 48428
+      targetPort: 48428
+      protocol: UDP
+    - name : udp8429
+      port: 48429
+      targetPort: 48429
+      protocol: UDP
+    - name : udp8430
+      port: 48430
+      targetPort: 48430
+      protocol: UDP
+    - name : udp8431
+      port: 48431
+      targetPort: 48431
+      protocol: UDP
+    - name : udp8432
+      port: 48432
+      targetPort: 48432
+      protocol: UDP
+    - name : udp8433
+      port: 48433
+      targetPort: 48433
+      protocol: UDP
+    - name : udp8434
+      port: 48434
+      targetPort: 48434
+      protocol: UDP
+    - name : udp8435
+      port: 48435
+      targetPort: 48435
+      protocol: UDP
+    - name : udp8436
+      port: 48436
+      targetPort: 48436
+      protocol: UDP
+    - name : udp8437
+      port: 48437
+      targetPort: 48437
+      protocol: UDP
+    - name : udp8438
+      port: 48438
+      targetPort: 48438
+      protocol: UDP
+    - name : udp8439
+      port: 48439
+      targetPort: 48439
+      protocol: UDP
+    - name : udp8440
+      port: 48440
+      targetPort: 48440
+      protocol: UDP
+    - name : udp8441
+      port: 48441
+      targetPort: 48441
+      protocol: UDP
+    - name : udp8442
+      port: 48442
+      targetPort: 48442
+      protocol: UDP
+    - name : udp8443
+      port: 48443
+      targetPort: 48443
+      protocol: UDP
+    - name : udp8444
+      port: 48444
+      targetPort: 48444
+      protocol: UDP
+    - name : udp8445
+      port: 48445
+      targetPort: 48445
+      protocol: UDP
+    - name : udp8446
+      port: 48446
+      targetPort: 48446
+      protocol: UDP
+    - name : udp8447
+      port: 48447
+      targetPort: 48447
+      protocol: UDP
+    - name : udp8448
+      port: 48448
+      targetPort: 48448
+      protocol: UDP
+    - name : udp8449
+      port: 48449
+      targetPort: 48449
+      protocol: UDP
+    - name : udp8450
+      port: 48450
+      targetPort: 48450
+      protocol: UDP
+    - name : udp8451
+      port: 48451
+      targetPort: 48451
+      protocol: UDP
+    - name : udp8452
+      port: 48452
+      targetPort: 48452
+      protocol: UDP
+    - name : udp8453
+      port: 48453
+      targetPort: 48453
+      protocol: UDP
+    - name : udp8454
+      port: 48454
+      targetPort: 48454
+      protocol: UDP
+    - name : udp8455
+      port: 48455
+      targetPort: 48455
+      protocol: UDP
+    - name : udp8456
+      port: 48456
+      targetPort: 48456
+      protocol: UDP
+    - name : udp8457
+      port: 48457
+      targetPort: 48457
+      protocol: UDP
+    - name : udp8458
+      port: 48458
+      targetPort: 48458
+      protocol: UDP
+    - name : udp8459
+      port: 48459
+      targetPort: 48459
+      protocol: UDP
+    - name : udp8460
+      port: 48460
+      targetPort: 48460
+      protocol: UDP
+    - name : udp8461
+      port: 48461
+      targetPort: 48461
+      protocol: UDP
+    - name : udp8462
+      port: 48462
+      targetPort: 48462
+      protocol: UDP
+    - name : udp8463
+      port: 48463
+      targetPort: 48463
+      protocol: UDP
+    - name : udp8464
+      port: 48464
+      targetPort: 48464
+      protocol: UDP
+    - name : udp8465
+      port: 48465
+      targetPort: 48465
+      protocol: UDP
+    - name : udp8466
+      port: 48466
+      targetPort: 48466
+      protocol: UDP
+    - name : udp8467
+      port: 48467
+      targetPort: 48467
+      protocol: UDP
+    - name : udp8468
+      port: 48468
+      targetPort: 48468
+      protocol: UDP
+    - name : udp8469
+      port: 48469
+      targetPort: 48469
+      protocol: UDP
+    - name : udp8470
+      port: 48470
+      targetPort: 48470
+      protocol: UDP
+    - name : udp8471
+      port: 48471
+      targetPort: 48471
+      protocol: UDP
+    - name : udp8472
+      port: 48472
+      targetPort: 48472
+      protocol: UDP
+    - name : udp8473
+      port: 48473
+      targetPort: 48473
+      protocol: UDP
+    - name : udp8474
+      port: 48474
+      targetPort: 48474
+      protocol: UDP
+    - name : udp8475
+      port: 48475
+      targetPort: 48475
+      protocol: UDP
+    - name : udp8476
+      port: 48476
+      targetPort: 48476
+      protocol: UDP
+    - name : udp8477
+      port: 48477
+      targetPort: 48477
+      protocol: UDP
+    - name : udp8478
+      port: 48478
+      targetPort: 48478
+      protocol: UDP
+    - name : udp8479
+      port: 48479
+      targetPort: 48479
+      protocol: UDP
+    - name : udp8480
+      port: 48480
+      targetPort: 48480
+      protocol: UDP
+    - name : udp8481
+      port: 48481
+      targetPort: 48481
+      protocol: UDP
+    - name : udp8482
+      port: 48482
+      targetPort: 48482
+      protocol: UDP
+    - name : udp8483
+      port: 48483
+      targetPort: 48483
+      protocol: UDP
+    - name : udp8484
+      port: 48484
+      targetPort: 48484
+      protocol: UDP
+    - name : udp8485
+      port: 48485
+      targetPort: 48485
+      protocol: UDP
+    - name : udp8486
+      port: 48486
+      targetPort: 48486
+      protocol: UDP
+    - name : udp8487
+      port: 48487
+      targetPort: 48487
+      protocol: UDP
+    - name : udp8488
+      port: 48488
+      targetPort: 48488
+      protocol: UDP
+    - name : udp8489
+      port: 48489
+      targetPort: 48489
+      protocol: UDP
+    - name : udp8490
+      port: 48490
+      targetPort: 48490
+      protocol: UDP
+    - name : udp8491
+      port: 48491
+      targetPort: 48491
+      protocol: UDP
+    - name : udp8492
+      port: 48492
+      targetPort: 48492
+      protocol: UDP
+    - name : udp8493
+      port: 48493
+      targetPort: 48493
+      protocol: UDP
+    - name : udp8494
+      port: 48494
+      targetPort: 48494
+      protocol: UDP
+    - name : udp8495
+      port: 48495
+      targetPort: 48495
+      protocol: UDP
+    - name : udp8496
+      port: 48496
+      targetPort: 48496
+      protocol: UDP
+    - name : udp8497
+      port: 48497
+      targetPort: 48497
+      protocol: UDP
+    - name : udp8498
+      port: 48498
+      targetPort: 48498
+      protocol: UDP
+    - name : udp8499
+      port: 48499
+      targetPort: 48499
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

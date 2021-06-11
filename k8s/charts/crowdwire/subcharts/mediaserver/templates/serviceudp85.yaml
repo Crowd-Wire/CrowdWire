@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp85
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp8500
+      port: 48500
+      targetPort: 48500
+      protocol: UDP
+    - name : udp8501
+      port: 48501
+      targetPort: 48501
+      protocol: UDP
+    - name : udp8502
+      port: 48502
+      targetPort: 48502
+      protocol: UDP
+    - name : udp8503
+      port: 48503
+      targetPort: 48503
+      protocol: UDP
+    - name : udp8504
+      port: 48504
+      targetPort: 48504
+      protocol: UDP
+    - name : udp8505
+      port: 48505
+      targetPort: 48505
+      protocol: UDP
+    - name : udp8506
+      port: 48506
+      targetPort: 48506
+      protocol: UDP
+    - name : udp8507
+      port: 48507
+      targetPort: 48507
+      protocol: UDP
+    - name : udp8508
+      port: 48508
+      targetPort: 48508
+      protocol: UDP
+    - name : udp8509
+      port: 48509
+      targetPort: 48509
+      protocol: UDP
+    - name : udp8510
+      port: 48510
+      targetPort: 48510
+      protocol: UDP
+    - name : udp8511
+      port: 48511
+      targetPort: 48511
+      protocol: UDP
+    - name : udp8512
+      port: 48512
+      targetPort: 48512
+      protocol: UDP
+    - name : udp8513
+      port: 48513
+      targetPort: 48513
+      protocol: UDP
+    - name : udp8514
+      port: 48514
+      targetPort: 48514
+      protocol: UDP
+    - name : udp8515
+      port: 48515
+      targetPort: 48515
+      protocol: UDP
+    - name : udp8516
+      port: 48516
+      targetPort: 48516
+      protocol: UDP
+    - name : udp8517
+      port: 48517
+      targetPort: 48517
+      protocol: UDP
+    - name : udp8518
+      port: 48518
+      targetPort: 48518
+      protocol: UDP
+    - name : udp8519
+      port: 48519
+      targetPort: 48519
+      protocol: UDP
+    - name : udp8520
+      port: 48520
+      targetPort: 48520
+      protocol: UDP
+    - name : udp8521
+      port: 48521
+      targetPort: 48521
+      protocol: UDP
+    - name : udp8522
+      port: 48522
+      targetPort: 48522
+      protocol: UDP
+    - name : udp8523
+      port: 48523
+      targetPort: 48523
+      protocol: UDP
+    - name : udp8524
+      port: 48524
+      targetPort: 48524
+      protocol: UDP
+    - name : udp8525
+      port: 48525
+      targetPort: 48525
+      protocol: UDP
+    - name : udp8526
+      port: 48526
+      targetPort: 48526
+      protocol: UDP
+    - name : udp8527
+      port: 48527
+      targetPort: 48527
+      protocol: UDP
+    - name : udp8528
+      port: 48528
+      targetPort: 48528
+      protocol: UDP
+    - name : udp8529
+      port: 48529
+      targetPort: 48529
+      protocol: UDP
+    - name : udp8530
+      port: 48530
+      targetPort: 48530
+      protocol: UDP
+    - name : udp8531
+      port: 48531
+      targetPort: 48531
+      protocol: UDP
+    - name : udp8532
+      port: 48532
+      targetPort: 48532
+      protocol: UDP
+    - name : udp8533
+      port: 48533
+      targetPort: 48533
+      protocol: UDP
+    - name : udp8534
+      port: 48534
+      targetPort: 48534
+      protocol: UDP
+    - name : udp8535
+      port: 48535
+      targetPort: 48535
+      protocol: UDP
+    - name : udp8536
+      port: 48536
+      targetPort: 48536
+      protocol: UDP
+    - name : udp8537
+      port: 48537
+      targetPort: 48537
+      protocol: UDP
+    - name : udp8538
+      port: 48538
+      targetPort: 48538
+      protocol: UDP
+    - name : udp8539
+      port: 48539
+      targetPort: 48539
+      protocol: UDP
+    - name : udp8540
+      port: 48540
+      targetPort: 48540
+      protocol: UDP
+    - name : udp8541
+      port: 48541
+      targetPort: 48541
+      protocol: UDP
+    - name : udp8542
+      port: 48542
+      targetPort: 48542
+      protocol: UDP
+    - name : udp8543
+      port: 48543
+      targetPort: 48543
+      protocol: UDP
+    - name : udp8544
+      port: 48544
+      targetPort: 48544
+      protocol: UDP
+    - name : udp8545
+      port: 48545
+      targetPort: 48545
+      protocol: UDP
+    - name : udp8546
+      port: 48546
+      targetPort: 48546
+      protocol: UDP
+    - name : udp8547
+      port: 48547
+      targetPort: 48547
+      protocol: UDP
+    - name : udp8548
+      port: 48548
+      targetPort: 48548
+      protocol: UDP
+    - name : udp8549
+      port: 48549
+      targetPort: 48549
+      protocol: UDP
+    - name : udp8550
+      port: 48550
+      targetPort: 48550
+      protocol: UDP
+    - name : udp8551
+      port: 48551
+      targetPort: 48551
+      protocol: UDP
+    - name : udp8552
+      port: 48552
+      targetPort: 48552
+      protocol: UDP
+    - name : udp8553
+      port: 48553
+      targetPort: 48553
+      protocol: UDP
+    - name : udp8554
+      port: 48554
+      targetPort: 48554
+      protocol: UDP
+    - name : udp8555
+      port: 48555
+      targetPort: 48555
+      protocol: UDP
+    - name : udp8556
+      port: 48556
+      targetPort: 48556
+      protocol: UDP
+    - name : udp8557
+      port: 48557
+      targetPort: 48557
+      protocol: UDP
+    - name : udp8558
+      port: 48558
+      targetPort: 48558
+      protocol: UDP
+    - name : udp8559
+      port: 48559
+      targetPort: 48559
+      protocol: UDP
+    - name : udp8560
+      port: 48560
+      targetPort: 48560
+      protocol: UDP
+    - name : udp8561
+      port: 48561
+      targetPort: 48561
+      protocol: UDP
+    - name : udp8562
+      port: 48562
+      targetPort: 48562
+      protocol: UDP
+    - name : udp8563
+      port: 48563
+      targetPort: 48563
+      protocol: UDP
+    - name : udp8564
+      port: 48564
+      targetPort: 48564
+      protocol: UDP
+    - name : udp8565
+      port: 48565
+      targetPort: 48565
+      protocol: UDP
+    - name : udp8566
+      port: 48566
+      targetPort: 48566
+      protocol: UDP
+    - name : udp8567
+      port: 48567
+      targetPort: 48567
+      protocol: UDP
+    - name : udp8568
+      port: 48568
+      targetPort: 48568
+      protocol: UDP
+    - name : udp8569
+      port: 48569
+      targetPort: 48569
+      protocol: UDP
+    - name : udp8570
+      port: 48570
+      targetPort: 48570
+      protocol: UDP
+    - name : udp8571
+      port: 48571
+      targetPort: 48571
+      protocol: UDP
+    - name : udp8572
+      port: 48572
+      targetPort: 48572
+      protocol: UDP
+    - name : udp8573
+      port: 48573
+      targetPort: 48573
+      protocol: UDP
+    - name : udp8574
+      port: 48574
+      targetPort: 48574
+      protocol: UDP
+    - name : udp8575
+      port: 48575
+      targetPort: 48575
+      protocol: UDP
+    - name : udp8576
+      port: 48576
+      targetPort: 48576
+      protocol: UDP
+    - name : udp8577
+      port: 48577
+      targetPort: 48577
+      protocol: UDP
+    - name : udp8578
+      port: 48578
+      targetPort: 48578
+      protocol: UDP
+    - name : udp8579
+      port: 48579
+      targetPort: 48579
+      protocol: UDP
+    - name : udp8580
+      port: 48580
+      targetPort: 48580
+      protocol: UDP
+    - name : udp8581
+      port: 48581
+      targetPort: 48581
+      protocol: UDP
+    - name : udp8582
+      port: 48582
+      targetPort: 48582
+      protocol: UDP
+    - name : udp8583
+      port: 48583
+      targetPort: 48583
+      protocol: UDP
+    - name : udp8584
+      port: 48584
+      targetPort: 48584
+      protocol: UDP
+    - name : udp8585
+      port: 48585
+      targetPort: 48585
+      protocol: UDP
+    - name : udp8586
+      port: 48586
+      targetPort: 48586
+      protocol: UDP
+    - name : udp8587
+      port: 48587
+      targetPort: 48587
+      protocol: UDP
+    - name : udp8588
+      port: 48588
+      targetPort: 48588
+      protocol: UDP
+    - name : udp8589
+      port: 48589
+      targetPort: 48589
+      protocol: UDP
+    - name : udp8590
+      port: 48590
+      targetPort: 48590
+      protocol: UDP
+    - name : udp8591
+      port: 48591
+      targetPort: 48591
+      protocol: UDP
+    - name : udp8592
+      port: 48592
+      targetPort: 48592
+      protocol: UDP
+    - name : udp8593
+      port: 48593
+      targetPort: 48593
+      protocol: UDP
+    - name : udp8594
+      port: 48594
+      targetPort: 48594
+      protocol: UDP
+    - name : udp8595
+      port: 48595
+      targetPort: 48595
+      protocol: UDP
+    - name : udp8596
+      port: 48596
+      targetPort: 48596
+      protocol: UDP
+    - name : udp8597
+      port: 48597
+      targetPort: 48597
+      protocol: UDP
+    - name : udp8598
+      port: 48598
+      targetPort: 48598
+      protocol: UDP
+    - name : udp8599
+      port: 48599
+      targetPort: 48599
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

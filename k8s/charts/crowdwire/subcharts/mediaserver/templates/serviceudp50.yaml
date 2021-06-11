@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp50
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp5000
+      port: 45000
+      targetPort: 45000
+      protocol: UDP
+    - name : udp5001
+      port: 45001
+      targetPort: 45001
+      protocol: UDP
+    - name : udp5002
+      port: 45002
+      targetPort: 45002
+      protocol: UDP
+    - name : udp5003
+      port: 45003
+      targetPort: 45003
+      protocol: UDP
+    - name : udp5004
+      port: 45004
+      targetPort: 45004
+      protocol: UDP
+    - name : udp5005
+      port: 45005
+      targetPort: 45005
+      protocol: UDP
+    - name : udp5006
+      port: 45006
+      targetPort: 45006
+      protocol: UDP
+    - name : udp5007
+      port: 45007
+      targetPort: 45007
+      protocol: UDP
+    - name : udp5008
+      port: 45008
+      targetPort: 45008
+      protocol: UDP
+    - name : udp5009
+      port: 45009
+      targetPort: 45009
+      protocol: UDP
+    - name : udp5010
+      port: 45010
+      targetPort: 45010
+      protocol: UDP
+    - name : udp5011
+      port: 45011
+      targetPort: 45011
+      protocol: UDP
+    - name : udp5012
+      port: 45012
+      targetPort: 45012
+      protocol: UDP
+    - name : udp5013
+      port: 45013
+      targetPort: 45013
+      protocol: UDP
+    - name : udp5014
+      port: 45014
+      targetPort: 45014
+      protocol: UDP
+    - name : udp5015
+      port: 45015
+      targetPort: 45015
+      protocol: UDP
+    - name : udp5016
+      port: 45016
+      targetPort: 45016
+      protocol: UDP
+    - name : udp5017
+      port: 45017
+      targetPort: 45017
+      protocol: UDP
+    - name : udp5018
+      port: 45018
+      targetPort: 45018
+      protocol: UDP
+    - name : udp5019
+      port: 45019
+      targetPort: 45019
+      protocol: UDP
+    - name : udp5020
+      port: 45020
+      targetPort: 45020
+      protocol: UDP
+    - name : udp5021
+      port: 45021
+      targetPort: 45021
+      protocol: UDP
+    - name : udp5022
+      port: 45022
+      targetPort: 45022
+      protocol: UDP
+    - name : udp5023
+      port: 45023
+      targetPort: 45023
+      protocol: UDP
+    - name : udp5024
+      port: 45024
+      targetPort: 45024
+      protocol: UDP
+    - name : udp5025
+      port: 45025
+      targetPort: 45025
+      protocol: UDP
+    - name : udp5026
+      port: 45026
+      targetPort: 45026
+      protocol: UDP
+    - name : udp5027
+      port: 45027
+      targetPort: 45027
+      protocol: UDP
+    - name : udp5028
+      port: 45028
+      targetPort: 45028
+      protocol: UDP
+    - name : udp5029
+      port: 45029
+      targetPort: 45029
+      protocol: UDP
+    - name : udp5030
+      port: 45030
+      targetPort: 45030
+      protocol: UDP
+    - name : udp5031
+      port: 45031
+      targetPort: 45031
+      protocol: UDP
+    - name : udp5032
+      port: 45032
+      targetPort: 45032
+      protocol: UDP
+    - name : udp5033
+      port: 45033
+      targetPort: 45033
+      protocol: UDP
+    - name : udp5034
+      port: 45034
+      targetPort: 45034
+      protocol: UDP
+    - name : udp5035
+      port: 45035
+      targetPort: 45035
+      protocol: UDP
+    - name : udp5036
+      port: 45036
+      targetPort: 45036
+      protocol: UDP
+    - name : udp5037
+      port: 45037
+      targetPort: 45037
+      protocol: UDP
+    - name : udp5038
+      port: 45038
+      targetPort: 45038
+      protocol: UDP
+    - name : udp5039
+      port: 45039
+      targetPort: 45039
+      protocol: UDP
+    - name : udp5040
+      port: 45040
+      targetPort: 45040
+      protocol: UDP
+    - name : udp5041
+      port: 45041
+      targetPort: 45041
+      protocol: UDP
+    - name : udp5042
+      port: 45042
+      targetPort: 45042
+      protocol: UDP
+    - name : udp5043
+      port: 45043
+      targetPort: 45043
+      protocol: UDP
+    - name : udp5044
+      port: 45044
+      targetPort: 45044
+      protocol: UDP
+    - name : udp5045
+      port: 45045
+      targetPort: 45045
+      protocol: UDP
+    - name : udp5046
+      port: 45046
+      targetPort: 45046
+      protocol: UDP
+    - name : udp5047
+      port: 45047
+      targetPort: 45047
+      protocol: UDP
+    - name : udp5048
+      port: 45048
+      targetPort: 45048
+      protocol: UDP
+    - name : udp5049
+      port: 45049
+      targetPort: 45049
+      protocol: UDP
+    - name : udp5050
+      port: 45050
+      targetPort: 45050
+      protocol: UDP
+    - name : udp5051
+      port: 45051
+      targetPort: 45051
+      protocol: UDP
+    - name : udp5052
+      port: 45052
+      targetPort: 45052
+      protocol: UDP
+    - name : udp5053
+      port: 45053
+      targetPort: 45053
+      protocol: UDP
+    - name : udp5054
+      port: 45054
+      targetPort: 45054
+      protocol: UDP
+    - name : udp5055
+      port: 45055
+      targetPort: 45055
+      protocol: UDP
+    - name : udp5056
+      port: 45056
+      targetPort: 45056
+      protocol: UDP
+    - name : udp5057
+      port: 45057
+      targetPort: 45057
+      protocol: UDP
+    - name : udp5058
+      port: 45058
+      targetPort: 45058
+      protocol: UDP
+    - name : udp5059
+      port: 45059
+      targetPort: 45059
+      protocol: UDP
+    - name : udp5060
+      port: 45060
+      targetPort: 45060
+      protocol: UDP
+    - name : udp5061
+      port: 45061
+      targetPort: 45061
+      protocol: UDP
+    - name : udp5062
+      port: 45062
+      targetPort: 45062
+      protocol: UDP
+    - name : udp5063
+      port: 45063
+      targetPort: 45063
+      protocol: UDP
+    - name : udp5064
+      port: 45064
+      targetPort: 45064
+      protocol: UDP
+    - name : udp5065
+      port: 45065
+      targetPort: 45065
+      protocol: UDP
+    - name : udp5066
+      port: 45066
+      targetPort: 45066
+      protocol: UDP
+    - name : udp5067
+      port: 45067
+      targetPort: 45067
+      protocol: UDP
+    - name : udp5068
+      port: 45068
+      targetPort: 45068
+      protocol: UDP
+    - name : udp5069
+      port: 45069
+      targetPort: 45069
+      protocol: UDP
+    - name : udp5070
+      port: 45070
+      targetPort: 45070
+      protocol: UDP
+    - name : udp5071
+      port: 45071
+      targetPort: 45071
+      protocol: UDP
+    - name : udp5072
+      port: 45072
+      targetPort: 45072
+      protocol: UDP
+    - name : udp5073
+      port: 45073
+      targetPort: 45073
+      protocol: UDP
+    - name : udp5074
+      port: 45074
+      targetPort: 45074
+      protocol: UDP
+    - name : udp5075
+      port: 45075
+      targetPort: 45075
+      protocol: UDP
+    - name : udp5076
+      port: 45076
+      targetPort: 45076
+      protocol: UDP
+    - name : udp5077
+      port: 45077
+      targetPort: 45077
+      protocol: UDP
+    - name : udp5078
+      port: 45078
+      targetPort: 45078
+      protocol: UDP
+    - name : udp5079
+      port: 45079
+      targetPort: 45079
+      protocol: UDP
+    - name : udp5080
+      port: 45080
+      targetPort: 45080
+      protocol: UDP
+    - name : udp5081
+      port: 45081
+      targetPort: 45081
+      protocol: UDP
+    - name : udp5082
+      port: 45082
+      targetPort: 45082
+      protocol: UDP
+    - name : udp5083
+      port: 45083
+      targetPort: 45083
+      protocol: UDP
+    - name : udp5084
+      port: 45084
+      targetPort: 45084
+      protocol: UDP
+    - name : udp5085
+      port: 45085
+      targetPort: 45085
+      protocol: UDP
+    - name : udp5086
+      port: 45086
+      targetPort: 45086
+      protocol: UDP
+    - name : udp5087
+      port: 45087
+      targetPort: 45087
+      protocol: UDP
+    - name : udp5088
+      port: 45088
+      targetPort: 45088
+      protocol: UDP
+    - name : udp5089
+      port: 45089
+      targetPort: 45089
+      protocol: UDP
+    - name : udp5090
+      port: 45090
+      targetPort: 45090
+      protocol: UDP
+    - name : udp5091
+      port: 45091
+      targetPort: 45091
+      protocol: UDP
+    - name : udp5092
+      port: 45092
+      targetPort: 45092
+      protocol: UDP
+    - name : udp5093
+      port: 45093
+      targetPort: 45093
+      protocol: UDP
+    - name : udp5094
+      port: 45094
+      targetPort: 45094
+      protocol: UDP
+    - name : udp5095
+      port: 45095
+      targetPort: 45095
+      protocol: UDP
+    - name : udp5096
+      port: 45096
+      targetPort: 45096
+      protocol: UDP
+    - name : udp5097
+      port: 45097
+      targetPort: 45097
+      protocol: UDP
+    - name : udp5098
+      port: 45098
+      targetPort: 45098
+      protocol: UDP
+    - name : udp5099
+      port: 45099
+      targetPort: 45099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

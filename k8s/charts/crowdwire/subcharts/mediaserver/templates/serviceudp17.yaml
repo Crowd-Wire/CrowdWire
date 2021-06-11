@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp17
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1700
+      port: 41700
+      targetPort: 41700
+      protocol: UDP
+    - name : udp1701
+      port: 41701
+      targetPort: 41701
+      protocol: UDP
+    - name : udp1702
+      port: 41702
+      targetPort: 41702
+      protocol: UDP
+    - name : udp1703
+      port: 41703
+      targetPort: 41703
+      protocol: UDP
+    - name : udp1704
+      port: 41704
+      targetPort: 41704
+      protocol: UDP
+    - name : udp1705
+      port: 41705
+      targetPort: 41705
+      protocol: UDP
+    - name : udp1706
+      port: 41706
+      targetPort: 41706
+      protocol: UDP
+    - name : udp1707
+      port: 41707
+      targetPort: 41707
+      protocol: UDP
+    - name : udp1708
+      port: 41708
+      targetPort: 41708
+      protocol: UDP
+    - name : udp1709
+      port: 41709
+      targetPort: 41709
+      protocol: UDP
+    - name : udp1710
+      port: 41710
+      targetPort: 41710
+      protocol: UDP
+    - name : udp1711
+      port: 41711
+      targetPort: 41711
+      protocol: UDP
+    - name : udp1712
+      port: 41712
+      targetPort: 41712
+      protocol: UDP
+    - name : udp1713
+      port: 41713
+      targetPort: 41713
+      protocol: UDP
+    - name : udp1714
+      port: 41714
+      targetPort: 41714
+      protocol: UDP
+    - name : udp1715
+      port: 41715
+      targetPort: 41715
+      protocol: UDP
+    - name : udp1716
+      port: 41716
+      targetPort: 41716
+      protocol: UDP
+    - name : udp1717
+      port: 41717
+      targetPort: 41717
+      protocol: UDP
+    - name : udp1718
+      port: 41718
+      targetPort: 41718
+      protocol: UDP
+    - name : udp1719
+      port: 41719
+      targetPort: 41719
+      protocol: UDP
+    - name : udp1720
+      port: 41720
+      targetPort: 41720
+      protocol: UDP
+    - name : udp1721
+      port: 41721
+      targetPort: 41721
+      protocol: UDP
+    - name : udp1722
+      port: 41722
+      targetPort: 41722
+      protocol: UDP
+    - name : udp1723
+      port: 41723
+      targetPort: 41723
+      protocol: UDP
+    - name : udp1724
+      port: 41724
+      targetPort: 41724
+      protocol: UDP
+    - name : udp1725
+      port: 41725
+      targetPort: 41725
+      protocol: UDP
+    - name : udp1726
+      port: 41726
+      targetPort: 41726
+      protocol: UDP
+    - name : udp1727
+      port: 41727
+      targetPort: 41727
+      protocol: UDP
+    - name : udp1728
+      port: 41728
+      targetPort: 41728
+      protocol: UDP
+    - name : udp1729
+      port: 41729
+      targetPort: 41729
+      protocol: UDP
+    - name : udp1730
+      port: 41730
+      targetPort: 41730
+      protocol: UDP
+    - name : udp1731
+      port: 41731
+      targetPort: 41731
+      protocol: UDP
+    - name : udp1732
+      port: 41732
+      targetPort: 41732
+      protocol: UDP
+    - name : udp1733
+      port: 41733
+      targetPort: 41733
+      protocol: UDP
+    - name : udp1734
+      port: 41734
+      targetPort: 41734
+      protocol: UDP
+    - name : udp1735
+      port: 41735
+      targetPort: 41735
+      protocol: UDP
+    - name : udp1736
+      port: 41736
+      targetPort: 41736
+      protocol: UDP
+    - name : udp1737
+      port: 41737
+      targetPort: 41737
+      protocol: UDP
+    - name : udp1738
+      port: 41738
+      targetPort: 41738
+      protocol: UDP
+    - name : udp1739
+      port: 41739
+      targetPort: 41739
+      protocol: UDP
+    - name : udp1740
+      port: 41740
+      targetPort: 41740
+      protocol: UDP
+    - name : udp1741
+      port: 41741
+      targetPort: 41741
+      protocol: UDP
+    - name : udp1742
+      port: 41742
+      targetPort: 41742
+      protocol: UDP
+    - name : udp1743
+      port: 41743
+      targetPort: 41743
+      protocol: UDP
+    - name : udp1744
+      port: 41744
+      targetPort: 41744
+      protocol: UDP
+    - name : udp1745
+      port: 41745
+      targetPort: 41745
+      protocol: UDP
+    - name : udp1746
+      port: 41746
+      targetPort: 41746
+      protocol: UDP
+    - name : udp1747
+      port: 41747
+      targetPort: 41747
+      protocol: UDP
+    - name : udp1748
+      port: 41748
+      targetPort: 41748
+      protocol: UDP
+    - name : udp1749
+      port: 41749
+      targetPort: 41749
+      protocol: UDP
+    - name : udp1750
+      port: 41750
+      targetPort: 41750
+      protocol: UDP
+    - name : udp1751
+      port: 41751
+      targetPort: 41751
+      protocol: UDP
+    - name : udp1752
+      port: 41752
+      targetPort: 41752
+      protocol: UDP
+    - name : udp1753
+      port: 41753
+      targetPort: 41753
+      protocol: UDP
+    - name : udp1754
+      port: 41754
+      targetPort: 41754
+      protocol: UDP
+    - name : udp1755
+      port: 41755
+      targetPort: 41755
+      protocol: UDP
+    - name : udp1756
+      port: 41756
+      targetPort: 41756
+      protocol: UDP
+    - name : udp1757
+      port: 41757
+      targetPort: 41757
+      protocol: UDP
+    - name : udp1758
+      port: 41758
+      targetPort: 41758
+      protocol: UDP
+    - name : udp1759
+      port: 41759
+      targetPort: 41759
+      protocol: UDP
+    - name : udp1760
+      port: 41760
+      targetPort: 41760
+      protocol: UDP
+    - name : udp1761
+      port: 41761
+      targetPort: 41761
+      protocol: UDP
+    - name : udp1762
+      port: 41762
+      targetPort: 41762
+      protocol: UDP
+    - name : udp1763
+      port: 41763
+      targetPort: 41763
+      protocol: UDP
+    - name : udp1764
+      port: 41764
+      targetPort: 41764
+      protocol: UDP
+    - name : udp1765
+      port: 41765
+      targetPort: 41765
+      protocol: UDP
+    - name : udp1766
+      port: 41766
+      targetPort: 41766
+      protocol: UDP
+    - name : udp1767
+      port: 41767
+      targetPort: 41767
+      protocol: UDP
+    - name : udp1768
+      port: 41768
+      targetPort: 41768
+      protocol: UDP
+    - name : udp1769
+      port: 41769
+      targetPort: 41769
+      protocol: UDP
+    - name : udp1770
+      port: 41770
+      targetPort: 41770
+      protocol: UDP
+    - name : udp1771
+      port: 41771
+      targetPort: 41771
+      protocol: UDP
+    - name : udp1772
+      port: 41772
+      targetPort: 41772
+      protocol: UDP
+    - name : udp1773
+      port: 41773
+      targetPort: 41773
+      protocol: UDP
+    - name : udp1774
+      port: 41774
+      targetPort: 41774
+      protocol: UDP
+    - name : udp1775
+      port: 41775
+      targetPort: 41775
+      protocol: UDP
+    - name : udp1776
+      port: 41776
+      targetPort: 41776
+      protocol: UDP
+    - name : udp1777
+      port: 41777
+      targetPort: 41777
+      protocol: UDP
+    - name : udp1778
+      port: 41778
+      targetPort: 41778
+      protocol: UDP
+    - name : udp1779
+      port: 41779
+      targetPort: 41779
+      protocol: UDP
+    - name : udp1780
+      port: 41780
+      targetPort: 41780
+      protocol: UDP
+    - name : udp1781
+      port: 41781
+      targetPort: 41781
+      protocol: UDP
+    - name : udp1782
+      port: 41782
+      targetPort: 41782
+      protocol: UDP
+    - name : udp1783
+      port: 41783
+      targetPort: 41783
+      protocol: UDP
+    - name : udp1784
+      port: 41784
+      targetPort: 41784
+      protocol: UDP
+    - name : udp1785
+      port: 41785
+      targetPort: 41785
+      protocol: UDP
+    - name : udp1786
+      port: 41786
+      targetPort: 41786
+      protocol: UDP
+    - name : udp1787
+      port: 41787
+      targetPort: 41787
+      protocol: UDP
+    - name : udp1788
+      port: 41788
+      targetPort: 41788
+      protocol: UDP
+    - name : udp1789
+      port: 41789
+      targetPort: 41789
+      protocol: UDP
+    - name : udp1790
+      port: 41790
+      targetPort: 41790
+      protocol: UDP
+    - name : udp1791
+      port: 41791
+      targetPort: 41791
+      protocol: UDP
+    - name : udp1792
+      port: 41792
+      targetPort: 41792
+      protocol: UDP
+    - name : udp1793
+      port: 41793
+      targetPort: 41793
+      protocol: UDP
+    - name : udp1794
+      port: 41794
+      targetPort: 41794
+      protocol: UDP
+    - name : udp1795
+      port: 41795
+      targetPort: 41795
+      protocol: UDP
+    - name : udp1796
+      port: 41796
+      targetPort: 41796
+      protocol: UDP
+    - name : udp1797
+      port: 41797
+      targetPort: 41797
+      protocol: UDP
+    - name : udp1798
+      port: 41798
+      targetPort: 41798
+      protocol: UDP
+    - name : udp1799
+      port: 41799
+      targetPort: 41799
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

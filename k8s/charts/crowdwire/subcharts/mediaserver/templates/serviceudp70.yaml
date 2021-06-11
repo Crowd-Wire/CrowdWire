@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp70
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp7000
+      port: 47000
+      targetPort: 47000
+      protocol: UDP
+    - name : udp7001
+      port: 47001
+      targetPort: 47001
+      protocol: UDP
+    - name : udp7002
+      port: 47002
+      targetPort: 47002
+      protocol: UDP
+    - name : udp7003
+      port: 47003
+      targetPort: 47003
+      protocol: UDP
+    - name : udp7004
+      port: 47004
+      targetPort: 47004
+      protocol: UDP
+    - name : udp7005
+      port: 47005
+      targetPort: 47005
+      protocol: UDP
+    - name : udp7006
+      port: 47006
+      targetPort: 47006
+      protocol: UDP
+    - name : udp7007
+      port: 47007
+      targetPort: 47007
+      protocol: UDP
+    - name : udp7008
+      port: 47008
+      targetPort: 47008
+      protocol: UDP
+    - name : udp7009
+      port: 47009
+      targetPort: 47009
+      protocol: UDP
+    - name : udp7010
+      port: 47010
+      targetPort: 47010
+      protocol: UDP
+    - name : udp7011
+      port: 47011
+      targetPort: 47011
+      protocol: UDP
+    - name : udp7012
+      port: 47012
+      targetPort: 47012
+      protocol: UDP
+    - name : udp7013
+      port: 47013
+      targetPort: 47013
+      protocol: UDP
+    - name : udp7014
+      port: 47014
+      targetPort: 47014
+      protocol: UDP
+    - name : udp7015
+      port: 47015
+      targetPort: 47015
+      protocol: UDP
+    - name : udp7016
+      port: 47016
+      targetPort: 47016
+      protocol: UDP
+    - name : udp7017
+      port: 47017
+      targetPort: 47017
+      protocol: UDP
+    - name : udp7018
+      port: 47018
+      targetPort: 47018
+      protocol: UDP
+    - name : udp7019
+      port: 47019
+      targetPort: 47019
+      protocol: UDP
+    - name : udp7020
+      port: 47020
+      targetPort: 47020
+      protocol: UDP
+    - name : udp7021
+      port: 47021
+      targetPort: 47021
+      protocol: UDP
+    - name : udp7022
+      port: 47022
+      targetPort: 47022
+      protocol: UDP
+    - name : udp7023
+      port: 47023
+      targetPort: 47023
+      protocol: UDP
+    - name : udp7024
+      port: 47024
+      targetPort: 47024
+      protocol: UDP
+    - name : udp7025
+      port: 47025
+      targetPort: 47025
+      protocol: UDP
+    - name : udp7026
+      port: 47026
+      targetPort: 47026
+      protocol: UDP
+    - name : udp7027
+      port: 47027
+      targetPort: 47027
+      protocol: UDP
+    - name : udp7028
+      port: 47028
+      targetPort: 47028
+      protocol: UDP
+    - name : udp7029
+      port: 47029
+      targetPort: 47029
+      protocol: UDP
+    - name : udp7030
+      port: 47030
+      targetPort: 47030
+      protocol: UDP
+    - name : udp7031
+      port: 47031
+      targetPort: 47031
+      protocol: UDP
+    - name : udp7032
+      port: 47032
+      targetPort: 47032
+      protocol: UDP
+    - name : udp7033
+      port: 47033
+      targetPort: 47033
+      protocol: UDP
+    - name : udp7034
+      port: 47034
+      targetPort: 47034
+      protocol: UDP
+    - name : udp7035
+      port: 47035
+      targetPort: 47035
+      protocol: UDP
+    - name : udp7036
+      port: 47036
+      targetPort: 47036
+      protocol: UDP
+    - name : udp7037
+      port: 47037
+      targetPort: 47037
+      protocol: UDP
+    - name : udp7038
+      port: 47038
+      targetPort: 47038
+      protocol: UDP
+    - name : udp7039
+      port: 47039
+      targetPort: 47039
+      protocol: UDP
+    - name : udp7040
+      port: 47040
+      targetPort: 47040
+      protocol: UDP
+    - name : udp7041
+      port: 47041
+      targetPort: 47041
+      protocol: UDP
+    - name : udp7042
+      port: 47042
+      targetPort: 47042
+      protocol: UDP
+    - name : udp7043
+      port: 47043
+      targetPort: 47043
+      protocol: UDP
+    - name : udp7044
+      port: 47044
+      targetPort: 47044
+      protocol: UDP
+    - name : udp7045
+      port: 47045
+      targetPort: 47045
+      protocol: UDP
+    - name : udp7046
+      port: 47046
+      targetPort: 47046
+      protocol: UDP
+    - name : udp7047
+      port: 47047
+      targetPort: 47047
+      protocol: UDP
+    - name : udp7048
+      port: 47048
+      targetPort: 47048
+      protocol: UDP
+    - name : udp7049
+      port: 47049
+      targetPort: 47049
+      protocol: UDP
+    - name : udp7050
+      port: 47050
+      targetPort: 47050
+      protocol: UDP
+    - name : udp7051
+      port: 47051
+      targetPort: 47051
+      protocol: UDP
+    - name : udp7052
+      port: 47052
+      targetPort: 47052
+      protocol: UDP
+    - name : udp7053
+      port: 47053
+      targetPort: 47053
+      protocol: UDP
+    - name : udp7054
+      port: 47054
+      targetPort: 47054
+      protocol: UDP
+    - name : udp7055
+      port: 47055
+      targetPort: 47055
+      protocol: UDP
+    - name : udp7056
+      port: 47056
+      targetPort: 47056
+      protocol: UDP
+    - name : udp7057
+      port: 47057
+      targetPort: 47057
+      protocol: UDP
+    - name : udp7058
+      port: 47058
+      targetPort: 47058
+      protocol: UDP
+    - name : udp7059
+      port: 47059
+      targetPort: 47059
+      protocol: UDP
+    - name : udp7060
+      port: 47060
+      targetPort: 47060
+      protocol: UDP
+    - name : udp7061
+      port: 47061
+      targetPort: 47061
+      protocol: UDP
+    - name : udp7062
+      port: 47062
+      targetPort: 47062
+      protocol: UDP
+    - name : udp7063
+      port: 47063
+      targetPort: 47063
+      protocol: UDP
+    - name : udp7064
+      port: 47064
+      targetPort: 47064
+      protocol: UDP
+    - name : udp7065
+      port: 47065
+      targetPort: 47065
+      protocol: UDP
+    - name : udp7066
+      port: 47066
+      targetPort: 47066
+      protocol: UDP
+    - name : udp7067
+      port: 47067
+      targetPort: 47067
+      protocol: UDP
+    - name : udp7068
+      port: 47068
+      targetPort: 47068
+      protocol: UDP
+    - name : udp7069
+      port: 47069
+      targetPort: 47069
+      protocol: UDP
+    - name : udp7070
+      port: 47070
+      targetPort: 47070
+      protocol: UDP
+    - name : udp7071
+      port: 47071
+      targetPort: 47071
+      protocol: UDP
+    - name : udp7072
+      port: 47072
+      targetPort: 47072
+      protocol: UDP
+    - name : udp7073
+      port: 47073
+      targetPort: 47073
+      protocol: UDP
+    - name : udp7074
+      port: 47074
+      targetPort: 47074
+      protocol: UDP
+    - name : udp7075
+      port: 47075
+      targetPort: 47075
+      protocol: UDP
+    - name : udp7076
+      port: 47076
+      targetPort: 47076
+      protocol: UDP
+    - name : udp7077
+      port: 47077
+      targetPort: 47077
+      protocol: UDP
+    - name : udp7078
+      port: 47078
+      targetPort: 47078
+      protocol: UDP
+    - name : udp7079
+      port: 47079
+      targetPort: 47079
+      protocol: UDP
+    - name : udp7080
+      port: 47080
+      targetPort: 47080
+      protocol: UDP
+    - name : udp7081
+      port: 47081
+      targetPort: 47081
+      protocol: UDP
+    - name : udp7082
+      port: 47082
+      targetPort: 47082
+      protocol: UDP
+    - name : udp7083
+      port: 47083
+      targetPort: 47083
+      protocol: UDP
+    - name : udp7084
+      port: 47084
+      targetPort: 47084
+      protocol: UDP
+    - name : udp7085
+      port: 47085
+      targetPort: 47085
+      protocol: UDP
+    - name : udp7086
+      port: 47086
+      targetPort: 47086
+      protocol: UDP
+    - name : udp7087
+      port: 47087
+      targetPort: 47087
+      protocol: UDP
+    - name : udp7088
+      port: 47088
+      targetPort: 47088
+      protocol: UDP
+    - name : udp7089
+      port: 47089
+      targetPort: 47089
+      protocol: UDP
+    - name : udp7090
+      port: 47090
+      targetPort: 47090
+      protocol: UDP
+    - name : udp7091
+      port: 47091
+      targetPort: 47091
+      protocol: UDP
+    - name : udp7092
+      port: 47092
+      targetPort: 47092
+      protocol: UDP
+    - name : udp7093
+      port: 47093
+      targetPort: 47093
+      protocol: UDP
+    - name : udp7094
+      port: 47094
+      targetPort: 47094
+      protocol: UDP
+    - name : udp7095
+      port: 47095
+      targetPort: 47095
+      protocol: UDP
+    - name : udp7096
+      port: 47096
+      targetPort: 47096
+      protocol: UDP
+    - name : udp7097
+      port: 47097
+      targetPort: 47097
+      protocol: UDP
+    - name : udp7098
+      port: 47098
+      targetPort: 47098
+      protocol: UDP
+    - name : udp7099
+      port: 47099
+      targetPort: 47099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

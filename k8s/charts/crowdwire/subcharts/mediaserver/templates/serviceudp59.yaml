@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp59
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp5900
+      port: 45900
+      targetPort: 45900
+      protocol: UDP
+    - name : udp5901
+      port: 45901
+      targetPort: 45901
+      protocol: UDP
+    - name : udp5902
+      port: 45902
+      targetPort: 45902
+      protocol: UDP
+    - name : udp5903
+      port: 45903
+      targetPort: 45903
+      protocol: UDP
+    - name : udp5904
+      port: 45904
+      targetPort: 45904
+      protocol: UDP
+    - name : udp5905
+      port: 45905
+      targetPort: 45905
+      protocol: UDP
+    - name : udp5906
+      port: 45906
+      targetPort: 45906
+      protocol: UDP
+    - name : udp5907
+      port: 45907
+      targetPort: 45907
+      protocol: UDP
+    - name : udp5908
+      port: 45908
+      targetPort: 45908
+      protocol: UDP
+    - name : udp5909
+      port: 45909
+      targetPort: 45909
+      protocol: UDP
+    - name : udp5910
+      port: 45910
+      targetPort: 45910
+      protocol: UDP
+    - name : udp5911
+      port: 45911
+      targetPort: 45911
+      protocol: UDP
+    - name : udp5912
+      port: 45912
+      targetPort: 45912
+      protocol: UDP
+    - name : udp5913
+      port: 45913
+      targetPort: 45913
+      protocol: UDP
+    - name : udp5914
+      port: 45914
+      targetPort: 45914
+      protocol: UDP
+    - name : udp5915
+      port: 45915
+      targetPort: 45915
+      protocol: UDP
+    - name : udp5916
+      port: 45916
+      targetPort: 45916
+      protocol: UDP
+    - name : udp5917
+      port: 45917
+      targetPort: 45917
+      protocol: UDP
+    - name : udp5918
+      port: 45918
+      targetPort: 45918
+      protocol: UDP
+    - name : udp5919
+      port: 45919
+      targetPort: 45919
+      protocol: UDP
+    - name : udp5920
+      port: 45920
+      targetPort: 45920
+      protocol: UDP
+    - name : udp5921
+      port: 45921
+      targetPort: 45921
+      protocol: UDP
+    - name : udp5922
+      port: 45922
+      targetPort: 45922
+      protocol: UDP
+    - name : udp5923
+      port: 45923
+      targetPort: 45923
+      protocol: UDP
+    - name : udp5924
+      port: 45924
+      targetPort: 45924
+      protocol: UDP
+    - name : udp5925
+      port: 45925
+      targetPort: 45925
+      protocol: UDP
+    - name : udp5926
+      port: 45926
+      targetPort: 45926
+      protocol: UDP
+    - name : udp5927
+      port: 45927
+      targetPort: 45927
+      protocol: UDP
+    - name : udp5928
+      port: 45928
+      targetPort: 45928
+      protocol: UDP
+    - name : udp5929
+      port: 45929
+      targetPort: 45929
+      protocol: UDP
+    - name : udp5930
+      port: 45930
+      targetPort: 45930
+      protocol: UDP
+    - name : udp5931
+      port: 45931
+      targetPort: 45931
+      protocol: UDP
+    - name : udp5932
+      port: 45932
+      targetPort: 45932
+      protocol: UDP
+    - name : udp5933
+      port: 45933
+      targetPort: 45933
+      protocol: UDP
+    - name : udp5934
+      port: 45934
+      targetPort: 45934
+      protocol: UDP
+    - name : udp5935
+      port: 45935
+      targetPort: 45935
+      protocol: UDP
+    - name : udp5936
+      port: 45936
+      targetPort: 45936
+      protocol: UDP
+    - name : udp5937
+      port: 45937
+      targetPort: 45937
+      protocol: UDP
+    - name : udp5938
+      port: 45938
+      targetPort: 45938
+      protocol: UDP
+    - name : udp5939
+      port: 45939
+      targetPort: 45939
+      protocol: UDP
+    - name : udp5940
+      port: 45940
+      targetPort: 45940
+      protocol: UDP
+    - name : udp5941
+      port: 45941
+      targetPort: 45941
+      protocol: UDP
+    - name : udp5942
+      port: 45942
+      targetPort: 45942
+      protocol: UDP
+    - name : udp5943
+      port: 45943
+      targetPort: 45943
+      protocol: UDP
+    - name : udp5944
+      port: 45944
+      targetPort: 45944
+      protocol: UDP
+    - name : udp5945
+      port: 45945
+      targetPort: 45945
+      protocol: UDP
+    - name : udp5946
+      port: 45946
+      targetPort: 45946
+      protocol: UDP
+    - name : udp5947
+      port: 45947
+      targetPort: 45947
+      protocol: UDP
+    - name : udp5948
+      port: 45948
+      targetPort: 45948
+      protocol: UDP
+    - name : udp5949
+      port: 45949
+      targetPort: 45949
+      protocol: UDP
+    - name : udp5950
+      port: 45950
+      targetPort: 45950
+      protocol: UDP
+    - name : udp5951
+      port: 45951
+      targetPort: 45951
+      protocol: UDP
+    - name : udp5952
+      port: 45952
+      targetPort: 45952
+      protocol: UDP
+    - name : udp5953
+      port: 45953
+      targetPort: 45953
+      protocol: UDP
+    - name : udp5954
+      port: 45954
+      targetPort: 45954
+      protocol: UDP
+    - name : udp5955
+      port: 45955
+      targetPort: 45955
+      protocol: UDP
+    - name : udp5956
+      port: 45956
+      targetPort: 45956
+      protocol: UDP
+    - name : udp5957
+      port: 45957
+      targetPort: 45957
+      protocol: UDP
+    - name : udp5958
+      port: 45958
+      targetPort: 45958
+      protocol: UDP
+    - name : udp5959
+      port: 45959
+      targetPort: 45959
+      protocol: UDP
+    - name : udp5960
+      port: 45960
+      targetPort: 45960
+      protocol: UDP
+    - name : udp5961
+      port: 45961
+      targetPort: 45961
+      protocol: UDP
+    - name : udp5962
+      port: 45962
+      targetPort: 45962
+      protocol: UDP
+    - name : udp5963
+      port: 45963
+      targetPort: 45963
+      protocol: UDP
+    - name : udp5964
+      port: 45964
+      targetPort: 45964
+      protocol: UDP
+    - name : udp5965
+      port: 45965
+      targetPort: 45965
+      protocol: UDP
+    - name : udp5966
+      port: 45966
+      targetPort: 45966
+      protocol: UDP
+    - name : udp5967
+      port: 45967
+      targetPort: 45967
+      protocol: UDP
+    - name : udp5968
+      port: 45968
+      targetPort: 45968
+      protocol: UDP
+    - name : udp5969
+      port: 45969
+      targetPort: 45969
+      protocol: UDP
+    - name : udp5970
+      port: 45970
+      targetPort: 45970
+      protocol: UDP
+    - name : udp5971
+      port: 45971
+      targetPort: 45971
+      protocol: UDP
+    - name : udp5972
+      port: 45972
+      targetPort: 45972
+      protocol: UDP
+    - name : udp5973
+      port: 45973
+      targetPort: 45973
+      protocol: UDP
+    - name : udp5974
+      port: 45974
+      targetPort: 45974
+      protocol: UDP
+    - name : udp5975
+      port: 45975
+      targetPort: 45975
+      protocol: UDP
+    - name : udp5976
+      port: 45976
+      targetPort: 45976
+      protocol: UDP
+    - name : udp5977
+      port: 45977
+      targetPort: 45977
+      protocol: UDP
+    - name : udp5978
+      port: 45978
+      targetPort: 45978
+      protocol: UDP
+    - name : udp5979
+      port: 45979
+      targetPort: 45979
+      protocol: UDP
+    - name : udp5980
+      port: 45980
+      targetPort: 45980
+      protocol: UDP
+    - name : udp5981
+      port: 45981
+      targetPort: 45981
+      protocol: UDP
+    - name : udp5982
+      port: 45982
+      targetPort: 45982
+      protocol: UDP
+    - name : udp5983
+      port: 45983
+      targetPort: 45983
+      protocol: UDP
+    - name : udp5984
+      port: 45984
+      targetPort: 45984
+      protocol: UDP
+    - name : udp5985
+      port: 45985
+      targetPort: 45985
+      protocol: UDP
+    - name : udp5986
+      port: 45986
+      targetPort: 45986
+      protocol: UDP
+    - name : udp5987
+      port: 45987
+      targetPort: 45987
+      protocol: UDP
+    - name : udp5988
+      port: 45988
+      targetPort: 45988
+      protocol: UDP
+    - name : udp5989
+      port: 45989
+      targetPort: 45989
+      protocol: UDP
+    - name : udp5990
+      port: 45990
+      targetPort: 45990
+      protocol: UDP
+    - name : udp5991
+      port: 45991
+      targetPort: 45991
+      protocol: UDP
+    - name : udp5992
+      port: 45992
+      targetPort: 45992
+      protocol: UDP
+    - name : udp5993
+      port: 45993
+      targetPort: 45993
+      protocol: UDP
+    - name : udp5994
+      port: 45994
+      targetPort: 45994
+      protocol: UDP
+    - name : udp5995
+      port: 45995
+      targetPort: 45995
+      protocol: UDP
+    - name : udp5996
+      port: 45996
+      targetPort: 45996
+      protocol: UDP
+    - name : udp5997
+      port: 45997
+      targetPort: 45997
+      protocol: UDP
+    - name : udp5998
+      port: 45998
+      targetPort: 45998
+      protocol: UDP
+    - name : udp5999
+      port: 45999
+      targetPort: 45999
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

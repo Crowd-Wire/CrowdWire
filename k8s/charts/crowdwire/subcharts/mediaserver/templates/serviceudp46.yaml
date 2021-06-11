@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp46
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp4600
+      port: 44600
+      targetPort: 44600
+      protocol: UDP
+    - name : udp4601
+      port: 44601
+      targetPort: 44601
+      protocol: UDP
+    - name : udp4602
+      port: 44602
+      targetPort: 44602
+      protocol: UDP
+    - name : udp4603
+      port: 44603
+      targetPort: 44603
+      protocol: UDP
+    - name : udp4604
+      port: 44604
+      targetPort: 44604
+      protocol: UDP
+    - name : udp4605
+      port: 44605
+      targetPort: 44605
+      protocol: UDP
+    - name : udp4606
+      port: 44606
+      targetPort: 44606
+      protocol: UDP
+    - name : udp4607
+      port: 44607
+      targetPort: 44607
+      protocol: UDP
+    - name : udp4608
+      port: 44608
+      targetPort: 44608
+      protocol: UDP
+    - name : udp4609
+      port: 44609
+      targetPort: 44609
+      protocol: UDP
+    - name : udp4610
+      port: 44610
+      targetPort: 44610
+      protocol: UDP
+    - name : udp4611
+      port: 44611
+      targetPort: 44611
+      protocol: UDP
+    - name : udp4612
+      port: 44612
+      targetPort: 44612
+      protocol: UDP
+    - name : udp4613
+      port: 44613
+      targetPort: 44613
+      protocol: UDP
+    - name : udp4614
+      port: 44614
+      targetPort: 44614
+      protocol: UDP
+    - name : udp4615
+      port: 44615
+      targetPort: 44615
+      protocol: UDP
+    - name : udp4616
+      port: 44616
+      targetPort: 44616
+      protocol: UDP
+    - name : udp4617
+      port: 44617
+      targetPort: 44617
+      protocol: UDP
+    - name : udp4618
+      port: 44618
+      targetPort: 44618
+      protocol: UDP
+    - name : udp4619
+      port: 44619
+      targetPort: 44619
+      protocol: UDP
+    - name : udp4620
+      port: 44620
+      targetPort: 44620
+      protocol: UDP
+    - name : udp4621
+      port: 44621
+      targetPort: 44621
+      protocol: UDP
+    - name : udp4622
+      port: 44622
+      targetPort: 44622
+      protocol: UDP
+    - name : udp4623
+      port: 44623
+      targetPort: 44623
+      protocol: UDP
+    - name : udp4624
+      port: 44624
+      targetPort: 44624
+      protocol: UDP
+    - name : udp4625
+      port: 44625
+      targetPort: 44625
+      protocol: UDP
+    - name : udp4626
+      port: 44626
+      targetPort: 44626
+      protocol: UDP
+    - name : udp4627
+      port: 44627
+      targetPort: 44627
+      protocol: UDP
+    - name : udp4628
+      port: 44628
+      targetPort: 44628
+      protocol: UDP
+    - name : udp4629
+      port: 44629
+      targetPort: 44629
+      protocol: UDP
+    - name : udp4630
+      port: 44630
+      targetPort: 44630
+      protocol: UDP
+    - name : udp4631
+      port: 44631
+      targetPort: 44631
+      protocol: UDP
+    - name : udp4632
+      port: 44632
+      targetPort: 44632
+      protocol: UDP
+    - name : udp4633
+      port: 44633
+      targetPort: 44633
+      protocol: UDP
+    - name : udp4634
+      port: 44634
+      targetPort: 44634
+      protocol: UDP
+    - name : udp4635
+      port: 44635
+      targetPort: 44635
+      protocol: UDP
+    - name : udp4636
+      port: 44636
+      targetPort: 44636
+      protocol: UDP
+    - name : udp4637
+      port: 44637
+      targetPort: 44637
+      protocol: UDP
+    - name : udp4638
+      port: 44638
+      targetPort: 44638
+      protocol: UDP
+    - name : udp4639
+      port: 44639
+      targetPort: 44639
+      protocol: UDP
+    - name : udp4640
+      port: 44640
+      targetPort: 44640
+      protocol: UDP
+    - name : udp4641
+      port: 44641
+      targetPort: 44641
+      protocol: UDP
+    - name : udp4642
+      port: 44642
+      targetPort: 44642
+      protocol: UDP
+    - name : udp4643
+      port: 44643
+      targetPort: 44643
+      protocol: UDP
+    - name : udp4644
+      port: 44644
+      targetPort: 44644
+      protocol: UDP
+    - name : udp4645
+      port: 44645
+      targetPort: 44645
+      protocol: UDP
+    - name : udp4646
+      port: 44646
+      targetPort: 44646
+      protocol: UDP
+    - name : udp4647
+      port: 44647
+      targetPort: 44647
+      protocol: UDP
+    - name : udp4648
+      port: 44648
+      targetPort: 44648
+      protocol: UDP
+    - name : udp4649
+      port: 44649
+      targetPort: 44649
+      protocol: UDP
+    - name : udp4650
+      port: 44650
+      targetPort: 44650
+      protocol: UDP
+    - name : udp4651
+      port: 44651
+      targetPort: 44651
+      protocol: UDP
+    - name : udp4652
+      port: 44652
+      targetPort: 44652
+      protocol: UDP
+    - name : udp4653
+      port: 44653
+      targetPort: 44653
+      protocol: UDP
+    - name : udp4654
+      port: 44654
+      targetPort: 44654
+      protocol: UDP
+    - name : udp4655
+      port: 44655
+      targetPort: 44655
+      protocol: UDP
+    - name : udp4656
+      port: 44656
+      targetPort: 44656
+      protocol: UDP
+    - name : udp4657
+      port: 44657
+      targetPort: 44657
+      protocol: UDP
+    - name : udp4658
+      port: 44658
+      targetPort: 44658
+      protocol: UDP
+    - name : udp4659
+      port: 44659
+      targetPort: 44659
+      protocol: UDP
+    - name : udp4660
+      port: 44660
+      targetPort: 44660
+      protocol: UDP
+    - name : udp4661
+      port: 44661
+      targetPort: 44661
+      protocol: UDP
+    - name : udp4662
+      port: 44662
+      targetPort: 44662
+      protocol: UDP
+    - name : udp4663
+      port: 44663
+      targetPort: 44663
+      protocol: UDP
+    - name : udp4664
+      port: 44664
+      targetPort: 44664
+      protocol: UDP
+    - name : udp4665
+      port: 44665
+      targetPort: 44665
+      protocol: UDP
+    - name : udp4666
+      port: 44666
+      targetPort: 44666
+      protocol: UDP
+    - name : udp4667
+      port: 44667
+      targetPort: 44667
+      protocol: UDP
+    - name : udp4668
+      port: 44668
+      targetPort: 44668
+      protocol: UDP
+    - name : udp4669
+      port: 44669
+      targetPort: 44669
+      protocol: UDP
+    - name : udp4670
+      port: 44670
+      targetPort: 44670
+      protocol: UDP
+    - name : udp4671
+      port: 44671
+      targetPort: 44671
+      protocol: UDP
+    - name : udp4672
+      port: 44672
+      targetPort: 44672
+      protocol: UDP
+    - name : udp4673
+      port: 44673
+      targetPort: 44673
+      protocol: UDP
+    - name : udp4674
+      port: 44674
+      targetPort: 44674
+      protocol: UDP
+    - name : udp4675
+      port: 44675
+      targetPort: 44675
+      protocol: UDP
+    - name : udp4676
+      port: 44676
+      targetPort: 44676
+      protocol: UDP
+    - name : udp4677
+      port: 44677
+      targetPort: 44677
+      protocol: UDP
+    - name : udp4678
+      port: 44678
+      targetPort: 44678
+      protocol: UDP
+    - name : udp4679
+      port: 44679
+      targetPort: 44679
+      protocol: UDP
+    - name : udp4680
+      port: 44680
+      targetPort: 44680
+      protocol: UDP
+    - name : udp4681
+      port: 44681
+      targetPort: 44681
+      protocol: UDP
+    - name : udp4682
+      port: 44682
+      targetPort: 44682
+      protocol: UDP
+    - name : udp4683
+      port: 44683
+      targetPort: 44683
+      protocol: UDP
+    - name : udp4684
+      port: 44684
+      targetPort: 44684
+      protocol: UDP
+    - name : udp4685
+      port: 44685
+      targetPort: 44685
+      protocol: UDP
+    - name : udp4686
+      port: 44686
+      targetPort: 44686
+      protocol: UDP
+    - name : udp4687
+      port: 44687
+      targetPort: 44687
+      protocol: UDP
+    - name : udp4688
+      port: 44688
+      targetPort: 44688
+      protocol: UDP
+    - name : udp4689
+      port: 44689
+      targetPort: 44689
+      protocol: UDP
+    - name : udp4690
+      port: 44690
+      targetPort: 44690
+      protocol: UDP
+    - name : udp4691
+      port: 44691
+      targetPort: 44691
+      protocol: UDP
+    - name : udp4692
+      port: 44692
+      targetPort: 44692
+      protocol: UDP
+    - name : udp4693
+      port: 44693
+      targetPort: 44693
+      protocol: UDP
+    - name : udp4694
+      port: 44694
+      targetPort: 44694
+      protocol: UDP
+    - name : udp4695
+      port: 44695
+      targetPort: 44695
+      protocol: UDP
+    - name : udp4696
+      port: 44696
+      targetPort: 44696
+      protocol: UDP
+    - name : udp4697
+      port: 44697
+      targetPort: 44697
+      protocol: UDP
+    - name : udp4698
+      port: 44698
+      targetPort: 44698
+      protocol: UDP
+    - name : udp4699
+      port: 44699
+      targetPort: 44699
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

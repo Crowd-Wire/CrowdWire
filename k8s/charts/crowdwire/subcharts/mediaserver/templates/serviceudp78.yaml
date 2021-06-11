@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp78
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp7800
+      port: 47800
+      targetPort: 47800
+      protocol: UDP
+    - name : udp7801
+      port: 47801
+      targetPort: 47801
+      protocol: UDP
+    - name : udp7802
+      port: 47802
+      targetPort: 47802
+      protocol: UDP
+    - name : udp7803
+      port: 47803
+      targetPort: 47803
+      protocol: UDP
+    - name : udp7804
+      port: 47804
+      targetPort: 47804
+      protocol: UDP
+    - name : udp7805
+      port: 47805
+      targetPort: 47805
+      protocol: UDP
+    - name : udp7806
+      port: 47806
+      targetPort: 47806
+      protocol: UDP
+    - name : udp7807
+      port: 47807
+      targetPort: 47807
+      protocol: UDP
+    - name : udp7808
+      port: 47808
+      targetPort: 47808
+      protocol: UDP
+    - name : udp7809
+      port: 47809
+      targetPort: 47809
+      protocol: UDP
+    - name : udp7810
+      port: 47810
+      targetPort: 47810
+      protocol: UDP
+    - name : udp7811
+      port: 47811
+      targetPort: 47811
+      protocol: UDP
+    - name : udp7812
+      port: 47812
+      targetPort: 47812
+      protocol: UDP
+    - name : udp7813
+      port: 47813
+      targetPort: 47813
+      protocol: UDP
+    - name : udp7814
+      port: 47814
+      targetPort: 47814
+      protocol: UDP
+    - name : udp7815
+      port: 47815
+      targetPort: 47815
+      protocol: UDP
+    - name : udp7816
+      port: 47816
+      targetPort: 47816
+      protocol: UDP
+    - name : udp7817
+      port: 47817
+      targetPort: 47817
+      protocol: UDP
+    - name : udp7818
+      port: 47818
+      targetPort: 47818
+      protocol: UDP
+    - name : udp7819
+      port: 47819
+      targetPort: 47819
+      protocol: UDP
+    - name : udp7820
+      port: 47820
+      targetPort: 47820
+      protocol: UDP
+    - name : udp7821
+      port: 47821
+      targetPort: 47821
+      protocol: UDP
+    - name : udp7822
+      port: 47822
+      targetPort: 47822
+      protocol: UDP
+    - name : udp7823
+      port: 47823
+      targetPort: 47823
+      protocol: UDP
+    - name : udp7824
+      port: 47824
+      targetPort: 47824
+      protocol: UDP
+    - name : udp7825
+      port: 47825
+      targetPort: 47825
+      protocol: UDP
+    - name : udp7826
+      port: 47826
+      targetPort: 47826
+      protocol: UDP
+    - name : udp7827
+      port: 47827
+      targetPort: 47827
+      protocol: UDP
+    - name : udp7828
+      port: 47828
+      targetPort: 47828
+      protocol: UDP
+    - name : udp7829
+      port: 47829
+      targetPort: 47829
+      protocol: UDP
+    - name : udp7830
+      port: 47830
+      targetPort: 47830
+      protocol: UDP
+    - name : udp7831
+      port: 47831
+      targetPort: 47831
+      protocol: UDP
+    - name : udp7832
+      port: 47832
+      targetPort: 47832
+      protocol: UDP
+    - name : udp7833
+      port: 47833
+      targetPort: 47833
+      protocol: UDP
+    - name : udp7834
+      port: 47834
+      targetPort: 47834
+      protocol: UDP
+    - name : udp7835
+      port: 47835
+      targetPort: 47835
+      protocol: UDP
+    - name : udp7836
+      port: 47836
+      targetPort: 47836
+      protocol: UDP
+    - name : udp7837
+      port: 47837
+      targetPort: 47837
+      protocol: UDP
+    - name : udp7838
+      port: 47838
+      targetPort: 47838
+      protocol: UDP
+    - name : udp7839
+      port: 47839
+      targetPort: 47839
+      protocol: UDP
+    - name : udp7840
+      port: 47840
+      targetPort: 47840
+      protocol: UDP
+    - name : udp7841
+      port: 47841
+      targetPort: 47841
+      protocol: UDP
+    - name : udp7842
+      port: 47842
+      targetPort: 47842
+      protocol: UDP
+    - name : udp7843
+      port: 47843
+      targetPort: 47843
+      protocol: UDP
+    - name : udp7844
+      port: 47844
+      targetPort: 47844
+      protocol: UDP
+    - name : udp7845
+      port: 47845
+      targetPort: 47845
+      protocol: UDP
+    - name : udp7846
+      port: 47846
+      targetPort: 47846
+      protocol: UDP
+    - name : udp7847
+      port: 47847
+      targetPort: 47847
+      protocol: UDP
+    - name : udp7848
+      port: 47848
+      targetPort: 47848
+      protocol: UDP
+    - name : udp7849
+      port: 47849
+      targetPort: 47849
+      protocol: UDP
+    - name : udp7850
+      port: 47850
+      targetPort: 47850
+      protocol: UDP
+    - name : udp7851
+      port: 47851
+      targetPort: 47851
+      protocol: UDP
+    - name : udp7852
+      port: 47852
+      targetPort: 47852
+      protocol: UDP
+    - name : udp7853
+      port: 47853
+      targetPort: 47853
+      protocol: UDP
+    - name : udp7854
+      port: 47854
+      targetPort: 47854
+      protocol: UDP
+    - name : udp7855
+      port: 47855
+      targetPort: 47855
+      protocol: UDP
+    - name : udp7856
+      port: 47856
+      targetPort: 47856
+      protocol: UDP
+    - name : udp7857
+      port: 47857
+      targetPort: 47857
+      protocol: UDP
+    - name : udp7858
+      port: 47858
+      targetPort: 47858
+      protocol: UDP
+    - name : udp7859
+      port: 47859
+      targetPort: 47859
+      protocol: UDP
+    - name : udp7860
+      port: 47860
+      targetPort: 47860
+      protocol: UDP
+    - name : udp7861
+      port: 47861
+      targetPort: 47861
+      protocol: UDP
+    - name : udp7862
+      port: 47862
+      targetPort: 47862
+      protocol: UDP
+    - name : udp7863
+      port: 47863
+      targetPort: 47863
+      protocol: UDP
+    - name : udp7864
+      port: 47864
+      targetPort: 47864
+      protocol: UDP
+    - name : udp7865
+      port: 47865
+      targetPort: 47865
+      protocol: UDP
+    - name : udp7866
+      port: 47866
+      targetPort: 47866
+      protocol: UDP
+    - name : udp7867
+      port: 47867
+      targetPort: 47867
+      protocol: UDP
+    - name : udp7868
+      port: 47868
+      targetPort: 47868
+      protocol: UDP
+    - name : udp7869
+      port: 47869
+      targetPort: 47869
+      protocol: UDP
+    - name : udp7870
+      port: 47870
+      targetPort: 47870
+      protocol: UDP
+    - name : udp7871
+      port: 47871
+      targetPort: 47871
+      protocol: UDP
+    - name : udp7872
+      port: 47872
+      targetPort: 47872
+      protocol: UDP
+    - name : udp7873
+      port: 47873
+      targetPort: 47873
+      protocol: UDP
+    - name : udp7874
+      port: 47874
+      targetPort: 47874
+      protocol: UDP
+    - name : udp7875
+      port: 47875
+      targetPort: 47875
+      protocol: UDP
+    - name : udp7876
+      port: 47876
+      targetPort: 47876
+      protocol: UDP
+    - name : udp7877
+      port: 47877
+      targetPort: 47877
+      protocol: UDP
+    - name : udp7878
+      port: 47878
+      targetPort: 47878
+      protocol: UDP
+    - name : udp7879
+      port: 47879
+      targetPort: 47879
+      protocol: UDP
+    - name : udp7880
+      port: 47880
+      targetPort: 47880
+      protocol: UDP
+    - name : udp7881
+      port: 47881
+      targetPort: 47881
+      protocol: UDP
+    - name : udp7882
+      port: 47882
+      targetPort: 47882
+      protocol: UDP
+    - name : udp7883
+      port: 47883
+      targetPort: 47883
+      protocol: UDP
+    - name : udp7884
+      port: 47884
+      targetPort: 47884
+      protocol: UDP
+    - name : udp7885
+      port: 47885
+      targetPort: 47885
+      protocol: UDP
+    - name : udp7886
+      port: 47886
+      targetPort: 47886
+      protocol: UDP
+    - name : udp7887
+      port: 47887
+      targetPort: 47887
+      protocol: UDP
+    - name : udp7888
+      port: 47888
+      targetPort: 47888
+      protocol: UDP
+    - name : udp7889
+      port: 47889
+      targetPort: 47889
+      protocol: UDP
+    - name : udp7890
+      port: 47890
+      targetPort: 47890
+      protocol: UDP
+    - name : udp7891
+      port: 47891
+      targetPort: 47891
+      protocol: UDP
+    - name : udp7892
+      port: 47892
+      targetPort: 47892
+      protocol: UDP
+    - name : udp7893
+      port: 47893
+      targetPort: 47893
+      protocol: UDP
+    - name : udp7894
+      port: 47894
+      targetPort: 47894
+      protocol: UDP
+    - name : udp7895
+      port: 47895
+      targetPort: 47895
+      protocol: UDP
+    - name : udp7896
+      port: 47896
+      targetPort: 47896
+      protocol: UDP
+    - name : udp7897
+      port: 47897
+      targetPort: 47897
+      protocol: UDP
+    - name : udp7898
+      port: 47898
+      targetPort: 47898
+      protocol: UDP
+    - name : udp7899
+      port: 47899
+      targetPort: 47899
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}
