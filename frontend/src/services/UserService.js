@@ -118,6 +118,20 @@ class UserService {
             }
         })
     };
+
+    banUser(user_id, status) {
+
+        return fetch(API_BASE + "users/" + user_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization": "Bearer " + AuthenticationService.getToken(),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({status: status})
+        })
+    }
+
     updateUserPassword(old_password, new_password) {
         let json_body = {};
         if (old_password){

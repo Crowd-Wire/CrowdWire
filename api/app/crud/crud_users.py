@@ -61,9 +61,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if not user_obj:
             return user_obj, strings.USER_NOT_FOUND
         if request_user.user_id != id and not request_user.is_superuser:
-            logger.debug(request_user.user_id)
-            logger.debug(id)
-            logger.debug(request_user.is_superuser)
             return None, strings.USER_EDITION_FORBIDDEN
         return user_obj, ""
 
