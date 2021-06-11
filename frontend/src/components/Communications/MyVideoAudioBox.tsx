@@ -172,15 +172,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setShowModal(!showModal)
   }
 
-  // function setShowModalFile(show) {
-  //   if (!show) {
-  //     useWorldUserStore.setState({ showFileSharing: false })
-  //   } else {
-  //     wsend({ topic: "REMOVE_ALL_USER_FILES" });
-  //     useConsumerStore.getState().closeDataConsumers();
-  //   }
-  // }
-
   const handleFullscreen = () => {
     if (!fullscreen) {
       handle.enter()
