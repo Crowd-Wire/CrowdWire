@@ -204,7 +204,8 @@ export const useConsumerStore = create(
             };
           }
           to_del_users.forEach((x) => delete s.consumerMap[x])
-
+          useRoomStore.getState().removeRoom(roomId);
+          
           return {
             consumerMap: {
               ...s.consumerMap
