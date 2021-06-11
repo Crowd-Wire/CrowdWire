@@ -52,8 +52,8 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [audioPauseState, setAudioPauseState] = useState(true);
   const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [showModalFile, setShowModalFile] = useState(false);
-  const [showIframe, setShowIframe] = useState(false);
+  const showFileSharing = useWorldUserStore(state => state.showFileSharing);
+  const showIframe = useWorldUserStore(state => state.showIFrame);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -85,6 +85,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     }
     toast.dismiss(toast_id);
   }
+
+  useEffect(() => {
+    if (showFileSharing) {
+      wsend({ topic: "REMOVE_ALL_USER_FILES" });
+      useConsumerStore.getState().closeDataConsumers();
+    }
+  }, [showFileSharing])
 
   useEffect(() => {
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
@@ -163,18 +170,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     setShowModal(!showModal)
   }
 
-  function toggleModalFile() {
-    setShowModalFile(!showModalFile)
-    if (showModalFile) {
-      wsend({ topic: "REMOVE_ALL_USER_FILES" });
-      useConsumerStore.getState().closeDataConsumers();
-    }
-  }
-
-  function toggleExternalService() {
-    setShowIframe(!showIframe)
-  }
-
   const handleFullscreen = () => {
     if (!fullscreen) {
       handle.enter()
@@ -220,12 +215,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     let { set } = useMediaStore.getState();
     let { rooms, removeProducer } = useRoomStore.getState();
 
-    if (mediaOffState)
+    if (mediaOffState) {
       sendMedia().then((media) => {
         if (media)
           setMediaOffState(!mediaOffState)
       });
-    else if (Object.keys(rooms).length > 0) {
+    } else if (Object.keys(rooms).length > 0) {
       for (const [key, value] of Object.entries(rooms)) {
         removeProducer(key, 'media');
       }
@@ -275,14 +270,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         width: '100%',
         overflow: 'auto',
       }}>
-
-      <Button variant='contained' color="primary" onClick={() => toggleModalFile()}>
-        File Sharing
-      </Button>
-
-      <Button variant='contained' color="primary" onClick={() => toggleExternalService()}>
-        Iframe
-      </Button>
 
       <FullScreen handle={handle}>
         <Card style={{
@@ -388,13 +375,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         {showModal ?
           <DeviceSettings closeModal={toggleModal} />
           : ''}
-        {showModalFile ?
-          <FileSharing closeModal={toggleModalFile} />
+        {showFileSharing ?
+          <FileSharing closeModal={() => useWorldUserStore.setState({ showFileSharing: false })} />
           : ''}
         {showIframe ?
           <>
-            <div style={{ position: 'fixed', top: 0, left: 80, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
-              <Button onClick={() => toggleExternalService()} variant="contained" color="primary" style={{ top: 10 }}>
+            <div style={{ position: 'fixed', top: 0, left: 65, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
+              <Button onClick={() => useWorldUserStore.setState({ showIFrame: false })} variant="contained" color="primary" style={{ top: 10 }}>
                 Close External Service
               </Button>
             </div>
@@ -404,7 +391,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
              https://www.chesshotel.com/pt/"
              https://r7.whiteboardfox.com/
             */}
-            <div style={{ position: 'fixed', top: 60, left: 80, width: 'calc(100% - 80px)', height: 'calc(100% - 60px)', background: 'white' }}>
+            <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
               <Iframe url="https://r7.whiteboardfox.com/"
                 position="absolute"
                 width="100%"

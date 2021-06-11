@@ -29,9 +29,9 @@ import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
 const GamePage = (props) => {
 
   const { classes } = props;
-  const [loading, setLoading] = useState(1)
+  const [loading, setLoading] = useState(1);
   const navigation = useNavigate();
-  const [choosingSettings, setChoosingSettings] = useState(true)
+  const [choosingSettings, setChoosingSettings] = useState(true);
   const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("avatars_1_1")
   let connecting = usePlayerStore(state => state.connecting);
@@ -48,10 +48,10 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
-    useAuthStore.getState().setLastLocation(null)
+    useAuthStore.getState().setLastLocation(null);
     WorldService.joinWorld(window.location.pathname.split('/')[2])
       .then((res) => {
-        return res.json()
+        return res.json();
       }).then(
         (res) => {
           if (res.detail) {
@@ -71,7 +71,9 @@ const GamePage = (props) => {
                   {d.reason}
                 </span>
                 , toast_props);
-              if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+              if (useWorldUserStore.getState().world_user) {
+                getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+              }
               navigation("/dashboard/search/public");
             })
             useWorldUserStore.getState().joinWorld(res);
@@ -81,16 +83,18 @@ const GamePage = (props) => {
           }
         }
       ).catch(() => {
-        navigation("/dashboard/search/public")
-      }
-      )
+        navigation("/dashboard/search/public");
+      })
 
   }, [])
 
   useEffect(() => {
+    usePlayerStore.getState().setConnecting(false);
     // close socket on component unmount
     return () => {
-      if (useWorldUserStore.getState().world_user) getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+      if (useWorldUserStore.getState().world_user) {
+        getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+      }
     }
   }, [])
 
@@ -106,7 +110,7 @@ const GamePage = (props) => {
       user_username
     )
       .then((res) => {
-        if (res.ok) return res.json()
+        if (res.ok) return res.json();
         navigation("/dashboard/search/public");
       }).then(
         (res) => {

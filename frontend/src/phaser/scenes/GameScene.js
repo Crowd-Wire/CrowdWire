@@ -202,6 +202,16 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    updateInteract() {
+        if (this.cursors.interact.isDown) {
+            if (this.interact === 'FILE_SHARE') {
+                useWorldUserStore.getState().setShowFileSharing();
+            } else if (this.interact === 'WHITEBOARD') {
+                useWorldUserStore.getState().setShowIFrame();
+            }
+        }
+    }
+
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
             // Detect surrounding players
@@ -248,10 +258,7 @@ class GameScene extends Phaser.Scene {
         this.player.update();
         this.updateDepth();
         this.updateRangePlayers();
-
-        if (this.cursors.interact.isDown) {
-            console.log(this.interact);
-        }
+        this.updateInteract();
     }
 }
 
