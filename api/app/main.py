@@ -28,11 +28,11 @@ def get_application() -> FastAPI:
     )
     db = SessionLocal()
     init_db(db)
+    app.mount("/static", StaticFiles(directory="static"), name="static")
     app.add_event_handler("startup", init_logging)
     app.add_event_handler("startup", redis_connector.sentinel_connection)
     app.add_event_handler("startup", rabbit_handler.start_pool)
     app.include_router(api_router)
-    app.mount("/static", StaticFiles(directory="static"), name="static")
     return app
 
 

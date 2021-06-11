@@ -25,7 +25,7 @@ class RedisConnector:
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
         # self.master = await aioredis.create_connection('redis://localhost/0')
-        # await self.master.execute('flushall')
+        # await self.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -34,75 +34,75 @@ class RedisConnector:
         return await self.master.execute(*args, **kwargs)
 
     async def key_exists(self, key: str):
-        return await self.master.execute('exists', key)
+        return await self.execute('exists', key)
 
     async def get(self, key: str) -> any:
-        return await self.master.execute('get', key)
+        return await self.execute('get', key)
 
     async def delete(self, key: Union[str, bytes]):
-        return await self.master.execute('del', key)
+        return await self.execute('del', key)
 
     async def set(self, key: str, value: str) -> any:
-        return await self.master.execute('set', key, value)
+        return await self.execute('set', key, value)
 
     async def incrby(self, key: str, value: int):
-        return await self.master.execute('incrby', key, value)
+        return await self.execute('incrby', key, value)
 
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
-        return await self.master.execute('scan', 0, 'match', f"*{matcher}*")
+        return await self.execute('scan', 0, 'match', f"*{matcher}*")
 
     async def scan_match_all(self, matcher: str) -> List[str]:
         """Scans keys that contain a matcher string"""
         cursor = 0
         all_keys = []
         while cursor != b'0':
-            cursor, keys = await self.master.execute('scan', cursor, 'match', f"*{matcher}*")
+            cursor, keys = await self.execute('scan', cursor, 'match', f"*{matcher}*")
             all_keys.extend(keys)
         return all_keys
 
     async def hget(self, key: str, field: any):
         # TODO: CHECK ENCODINGS!
-        return await self.master.execute('hget', key, field)
+        return await self.execute('hget', key, field)
 
     async def hset(self, key: str, field: str, value: any):
-        return await self.master.execute('hset', key, field, value)
+        return await self.execute('hset', key, field, value)
 
     async def sadd(self, key: str, member: str, *members):
         """Adds one or more members to a set"""
-        return await self.master.execute('sadd', key, member, *members)
+        return await self.execute('sadd', key, member, *members)
 
     async def lrange(self, key: str, start: int, finish: int):
         """Gets the items of a list from indexes start to finish"""
-        return await self.master.execute('lrange', key, start, finish)
+        return await self.execute('lrange', key, start, finish)
 
     async def lpush(self, key: str, item: any):
         """Adds one item to a list"""
-        return await self.master.execute('lpush', key, item)
+        return await self.execute('lpush', key, item)
 
     async def llen(self, key: str):
         """Checks the length of the list"""
-        return await self.master.execute('llen', key)
+        return await self.execute('llen', key)
 
     async def lrem(self, key: str, occurences: str, item: any):
         """Removes the number of occurences that match an item"""
-        return await self.master.execute('lrem', key, occurences, item)
+        return await self.execute('lrem', key, occurences, item)
 
     async def scard(self, key: str):
         """Get the number of members in a set"""
-        return await self.master.execute('scard', key, encoding="utf-8")
+        return await self.execute('scard', key, encoding="utf-8")
 
     async def sismember(self, key: str, member: str) -> int:
         """Determine if a given value is a member of a set"""
-        return await self.master.execute('sismember', key, member)
+        return await self.execute('sismember', key, member)
 
     async def smembers(self, key: str):
         """Get all the members in a set"""
-        return await self.master.execute('smembers', key, encoding='utf-8')
+        return await self.execute('smembers', key, encoding='utf-8')
 
     async def srem(self, key: str, member: str, *members):
         """Remove one or more members from a set"""
-        return await self.master.execute('srem', key, member, *members)
+        return await self.execute('srem', key, member, *members)
 
     async def setexpire(self, key: str, timeout: int = 60):
         """
@@ -111,14 +111,14 @@ class RedisConnector:
         @param timeout:the timeout time in minutes
         """
         seconds = timeout * 60
-        return await self.master.execute('expire', key, seconds)
+        return await self.execute('expire', key, seconds)
 
     async def setpersistent(self, key: str):
         """
         Remove any expire time associated with a given key
         @param key: the key we want to remove the expire time
         """
-        return await self.master.execute('persist', key)
+        return await self.execute('persist', key)
 
     async def add_media_server(self):
         media_servers = await self.scan_match_all('media_server_')
@@ -342,7 +342,7 @@ class RedisConnector:
 
     async def get_user_position(self, world_id: str, user_id: str) -> dict:
         """Get last user position received"""
-        pairs = await self.master.execute('hgetall',
+        pairs = await self.execute('hgetall',
                                           f"world:{world_id}:user:{user_id}:position", encoding="utf-8")
         return {k: float(v) for k, v in zip(pairs[::2], pairs[1::2])}
 
@@ -350,7 +350,7 @@ class RedisConnector:
         """Update last user position received"""
         if not position:
             position = {'x': 50.0, 'y': 50.0}
-        return await self.master.execute('hmset',
+        return await self.execute('hmset',
                                          f"world:{world_id}:user:{user_id}:position", 'x', position['x'],
                                          'y', position['y'])
 
@@ -378,7 +378,7 @@ class RedisConnector:
     async def add_users_to_user(self, world_id: str, user_id: str, found_user_id: str, *found_users_id: List[str]):
         """Add one ore more found users to a user"""
         found_users_id = [found_user_id, *found_users_id]
-        await self.sadd(f"world:{world_id}:user:{user_id}:users", *found_users_id)
+        return await self.sadd(f"world:{world_id}:user:{user_id}:users", *found_users_id)
 
     async def add_users_to_group(self, world_id: str, group_id: str, user_id: str, *users_id: List[str]):
         """

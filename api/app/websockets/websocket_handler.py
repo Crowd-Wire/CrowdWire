@@ -62,34 +62,22 @@ async def send_groups_snapshot(world_id: str):
 
     await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups})
 
-lock = False
+# lock = False
 async def wire_players(world_id: str, user_id: str, payload: dict):
-    global lock
+    # global lock
     users_id = payload['users_id']
+
+    # add nearby users
+    await redis_connector.add_users_to_user(world_id, user_id, *users_id)
 
     add_users = set()
     for uid in users_id:
-
-        logger.debug('Waiting')
-        while lock:
-            await asyncio.sleep(0.1)
-        logger.debug('Lock')
-        lock = True
-
-        await redis_connector.execute('multi')
-
-        # add nearby user to confirm struc
-        await redis_connector.add_users_to_user(world_id, user_id, uid)
-        # check if user already claimed proximity
-        await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id)
-
-        execution = await redis_connector.execute('exec')
-
-        lock = False
-        logger.debug('Unlock')
-
-        if execution[1]:
+        sorted_users = sorted([user_id, uid])
+        common_key = f"world:{world_id}:lock:{sorted_users[0]}:{sorted_users[1]}"
+        if not await redis_connector.sadd(common_key, 1):
+            # hack to check if user already claimed proximity
             add_users.add(uid)
+            await redis_connector.delete(common_key)
 
     actions = {}
     # create new group and let it normalize
