@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp90
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp9000
+      port: 49000
+      targetPort: 49000
+      protocol: UDP
+    - name : udp9001
+      port: 49001
+      targetPort: 49001
+      protocol: UDP
+    - name : udp9002
+      port: 49002
+      targetPort: 49002
+      protocol: UDP
+    - name : udp9003
+      port: 49003
+      targetPort: 49003
+      protocol: UDP
+    - name : udp9004
+      port: 49004
+      targetPort: 49004
+      protocol: UDP
+    - name : udp9005
+      port: 49005
+      targetPort: 49005
+      protocol: UDP
+    - name : udp9006
+      port: 49006
+      targetPort: 49006
+      protocol: UDP
+    - name : udp9007
+      port: 49007
+      targetPort: 49007
+      protocol: UDP
+    - name : udp9008
+      port: 49008
+      targetPort: 49008
+      protocol: UDP
+    - name : udp9009
+      port: 49009
+      targetPort: 49009
+      protocol: UDP
+    - name : udp9010
+      port: 49010
+      targetPort: 49010
+      protocol: UDP
+    - name : udp9011
+      port: 49011
+      targetPort: 49011
+      protocol: UDP
+    - name : udp9012
+      port: 49012
+      targetPort: 49012
+      protocol: UDP
+    - name : udp9013
+      port: 49013
+      targetPort: 49013
+      protocol: UDP
+    - name : udp9014
+      port: 49014
+      targetPort: 49014
+      protocol: UDP
+    - name : udp9015
+      port: 49015
+      targetPort: 49015
+      protocol: UDP
+    - name : udp9016
+      port: 49016
+      targetPort: 49016
+      protocol: UDP
+    - name : udp9017
+      port: 49017
+      targetPort: 49017
+      protocol: UDP
+    - name : udp9018
+      port: 49018
+      targetPort: 49018
+      protocol: UDP
+    - name : udp9019
+      port: 49019
+      targetPort: 49019
+      protocol: UDP
+    - name : udp9020
+      port: 49020
+      targetPort: 49020
+      protocol: UDP
+    - name : udp9021
+      port: 49021
+      targetPort: 49021
+      protocol: UDP
+    - name : udp9022
+      port: 49022
+      targetPort: 49022
+      protocol: UDP
+    - name : udp9023
+      port: 49023
+      targetPort: 49023
+      protocol: UDP
+    - name : udp9024
+      port: 49024
+      targetPort: 49024
+      protocol: UDP
+    - name : udp9025
+      port: 49025
+      targetPort: 49025
+      protocol: UDP
+    - name : udp9026
+      port: 49026
+      targetPort: 49026
+      protocol: UDP
+    - name : udp9027
+      port: 49027
+      targetPort: 49027
+      protocol: UDP
+    - name : udp9028
+      port: 49028
+      targetPort: 49028
+      protocol: UDP
+    - name : udp9029
+      port: 49029
+      targetPort: 49029
+      protocol: UDP
+    - name : udp9030
+      port: 49030
+      targetPort: 49030
+      protocol: UDP
+    - name : udp9031
+      port: 49031
+      targetPort: 49031
+      protocol: UDP
+    - name : udp9032
+      port: 49032
+      targetPort: 49032
+      protocol: UDP
+    - name : udp9033
+      port: 49033
+      targetPort: 49033
+      protocol: UDP
+    - name : udp9034
+      port: 49034
+      targetPort: 49034
+      protocol: UDP
+    - name : udp9035
+      port: 49035
+      targetPort: 49035
+      protocol: UDP
+    - name : udp9036
+      port: 49036
+      targetPort: 49036
+      protocol: UDP
+    - name : udp9037
+      port: 49037
+      targetPort: 49037
+      protocol: UDP
+    - name : udp9038
+      port: 49038
+      targetPort: 49038
+      protocol: UDP
+    - name : udp9039
+      port: 49039
+      targetPort: 49039
+      protocol: UDP
+    - name : udp9040
+      port: 49040
+      targetPort: 49040
+      protocol: UDP
+    - name : udp9041
+      port: 49041
+      targetPort: 49041
+      protocol: UDP
+    - name : udp9042
+      port: 49042
+      targetPort: 49042
+      protocol: UDP
+    - name : udp9043
+      port: 49043
+      targetPort: 49043
+      protocol: UDP
+    - name : udp9044
+      port: 49044
+      targetPort: 49044
+      protocol: UDP
+    - name : udp9045
+      port: 49045
+      targetPort: 49045
+      protocol: UDP
+    - name : udp9046
+      port: 49046
+      targetPort: 49046
+      protocol: UDP
+    - name : udp9047
+      port: 49047
+      targetPort: 49047
+      protocol: UDP
+    - name : udp9048
+      port: 49048
+      targetPort: 49048
+      protocol: UDP
+    - name : udp9049
+      port: 49049
+      targetPort: 49049
+      protocol: UDP
+    - name : udp9050
+      port: 49050
+      targetPort: 49050
+      protocol: UDP
+    - name : udp9051
+      port: 49051
+      targetPort: 49051
+      protocol: UDP
+    - name : udp9052
+      port: 49052
+      targetPort: 49052
+      protocol: UDP
+    - name : udp9053
+      port: 49053
+      targetPort: 49053
+      protocol: UDP
+    - name : udp9054
+      port: 49054
+      targetPort: 49054
+      protocol: UDP
+    - name : udp9055
+      port: 49055
+      targetPort: 49055
+      protocol: UDP
+    - name : udp9056
+      port: 49056
+      targetPort: 49056
+      protocol: UDP
+    - name : udp9057
+      port: 49057
+      targetPort: 49057
+      protocol: UDP
+    - name : udp9058
+      port: 49058
+      targetPort: 49058
+      protocol: UDP
+    - name : udp9059
+      port: 49059
+      targetPort: 49059
+      protocol: UDP
+    - name : udp9060
+      port: 49060
+      targetPort: 49060
+      protocol: UDP
+    - name : udp9061
+      port: 49061
+      targetPort: 49061
+      protocol: UDP
+    - name : udp9062
+      port: 49062
+      targetPort: 49062
+      protocol: UDP
+    - name : udp9063
+      port: 49063
+      targetPort: 49063
+      protocol: UDP
+    - name : udp9064
+      port: 49064
+      targetPort: 49064
+      protocol: UDP
+    - name : udp9065
+      port: 49065
+      targetPort: 49065
+      protocol: UDP
+    - name : udp9066
+      port: 49066
+      targetPort: 49066
+      protocol: UDP
+    - name : udp9067
+      port: 49067
+      targetPort: 49067
+      protocol: UDP
+    - name : udp9068
+      port: 49068
+      targetPort: 49068
+      protocol: UDP
+    - name : udp9069
+      port: 49069
+      targetPort: 49069
+      protocol: UDP
+    - name : udp9070
+      port: 49070
+      targetPort: 49070
+      protocol: UDP
+    - name : udp9071
+      port: 49071
+      targetPort: 49071
+      protocol: UDP
+    - name : udp9072
+      port: 49072
+      targetPort: 49072
+      protocol: UDP
+    - name : udp9073
+      port: 49073
+      targetPort: 49073
+      protocol: UDP
+    - name : udp9074
+      port: 49074
+      targetPort: 49074
+      protocol: UDP
+    - name : udp9075
+      port: 49075
+      targetPort: 49075
+      protocol: UDP
+    - name : udp9076
+      port: 49076
+      targetPort: 49076
+      protocol: UDP
+    - name : udp9077
+      port: 49077
+      targetPort: 49077
+      protocol: UDP
+    - name : udp9078
+      port: 49078
+      targetPort: 49078
+      protocol: UDP
+    - name : udp9079
+      port: 49079
+      targetPort: 49079
+      protocol: UDP
+    - name : udp9080
+      port: 49080
+      targetPort: 49080
+      protocol: UDP
+    - name : udp9081
+      port: 49081
+      targetPort: 49081
+      protocol: UDP
+    - name : udp9082
+      port: 49082
+      targetPort: 49082
+      protocol: UDP
+    - name : udp9083
+      port: 49083
+      targetPort: 49083
+      protocol: UDP
+    - name : udp9084
+      port: 49084
+      targetPort: 49084
+      protocol: UDP
+    - name : udp9085
+      port: 49085
+      targetPort: 49085
+      protocol: UDP
+    - name : udp9086
+      port: 49086
+      targetPort: 49086
+      protocol: UDP
+    - name : udp9087
+      port: 49087
+      targetPort: 49087
+      protocol: UDP
+    - name : udp9088
+      port: 49088
+      targetPort: 49088
+      protocol: UDP
+    - name : udp9089
+      port: 49089
+      targetPort: 49089
+      protocol: UDP
+    - name : udp9090
+      port: 49090
+      targetPort: 49090
+      protocol: UDP
+    - name : udp9091
+      port: 49091
+      targetPort: 49091
+      protocol: UDP
+    - name : udp9092
+      port: 49092
+      targetPort: 49092
+      protocol: UDP
+    - name : udp9093
+      port: 49093
+      targetPort: 49093
+      protocol: UDP
+    - name : udp9094
+      port: 49094
+      targetPort: 49094
+      protocol: UDP
+    - name : udp9095
+      port: 49095
+      targetPort: 49095
+      protocol: UDP
+    - name : udp9096
+      port: 49096
+      targetPort: 49096
+      protocol: UDP
+    - name : udp9097
+      port: 49097
+      targetPort: 49097
+      protocol: UDP
+    - name : udp9098
+      port: 49098
+      targetPort: 49098
+      protocol: UDP
+    - name : udp9099
+      port: 49099
+      targetPort: 49099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

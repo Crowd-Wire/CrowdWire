@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp19
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1900
+      port: 41900
+      targetPort: 41900
+      protocol: UDP
+    - name : udp1901
+      port: 41901
+      targetPort: 41901
+      protocol: UDP
+    - name : udp1902
+      port: 41902
+      targetPort: 41902
+      protocol: UDP
+    - name : udp1903
+      port: 41903
+      targetPort: 41903
+      protocol: UDP
+    - name : udp1904
+      port: 41904
+      targetPort: 41904
+      protocol: UDP
+    - name : udp1905
+      port: 41905
+      targetPort: 41905
+      protocol: UDP
+    - name : udp1906
+      port: 41906
+      targetPort: 41906
+      protocol: UDP
+    - name : udp1907
+      port: 41907
+      targetPort: 41907
+      protocol: UDP
+    - name : udp1908
+      port: 41908
+      targetPort: 41908
+      protocol: UDP
+    - name : udp1909
+      port: 41909
+      targetPort: 41909
+      protocol: UDP
+    - name : udp1910
+      port: 41910
+      targetPort: 41910
+      protocol: UDP
+    - name : udp1911
+      port: 41911
+      targetPort: 41911
+      protocol: UDP
+    - name : udp1912
+      port: 41912
+      targetPort: 41912
+      protocol: UDP
+    - name : udp1913
+      port: 41913
+      targetPort: 41913
+      protocol: UDP
+    - name : udp1914
+      port: 41914
+      targetPort: 41914
+      protocol: UDP
+    - name : udp1915
+      port: 41915
+      targetPort: 41915
+      protocol: UDP
+    - name : udp1916
+      port: 41916
+      targetPort: 41916
+      protocol: UDP
+    - name : udp1917
+      port: 41917
+      targetPort: 41917
+      protocol: UDP
+    - name : udp1918
+      port: 41918
+      targetPort: 41918
+      protocol: UDP
+    - name : udp1919
+      port: 41919
+      targetPort: 41919
+      protocol: UDP
+    - name : udp1920
+      port: 41920
+      targetPort: 41920
+      protocol: UDP
+    - name : udp1921
+      port: 41921
+      targetPort: 41921
+      protocol: UDP
+    - name : udp1922
+      port: 41922
+      targetPort: 41922
+      protocol: UDP
+    - name : udp1923
+      port: 41923
+      targetPort: 41923
+      protocol: UDP
+    - name : udp1924
+      port: 41924
+      targetPort: 41924
+      protocol: UDP
+    - name : udp1925
+      port: 41925
+      targetPort: 41925
+      protocol: UDP
+    - name : udp1926
+      port: 41926
+      targetPort: 41926
+      protocol: UDP
+    - name : udp1927
+      port: 41927
+      targetPort: 41927
+      protocol: UDP
+    - name : udp1928
+      port: 41928
+      targetPort: 41928
+      protocol: UDP
+    - name : udp1929
+      port: 41929
+      targetPort: 41929
+      protocol: UDP
+    - name : udp1930
+      port: 41930
+      targetPort: 41930
+      protocol: UDP
+    - name : udp1931
+      port: 41931
+      targetPort: 41931
+      protocol: UDP
+    - name : udp1932
+      port: 41932
+      targetPort: 41932
+      protocol: UDP
+    - name : udp1933
+      port: 41933
+      targetPort: 41933
+      protocol: UDP
+    - name : udp1934
+      port: 41934
+      targetPort: 41934
+      protocol: UDP
+    - name : udp1935
+      port: 41935
+      targetPort: 41935
+      protocol: UDP
+    - name : udp1936
+      port: 41936
+      targetPort: 41936
+      protocol: UDP
+    - name : udp1937
+      port: 41937
+      targetPort: 41937
+      protocol: UDP
+    - name : udp1938
+      port: 41938
+      targetPort: 41938
+      protocol: UDP
+    - name : udp1939
+      port: 41939
+      targetPort: 41939
+      protocol: UDP
+    - name : udp1940
+      port: 41940
+      targetPort: 41940
+      protocol: UDP
+    - name : udp1941
+      port: 41941
+      targetPort: 41941
+      protocol: UDP
+    - name : udp1942
+      port: 41942
+      targetPort: 41942
+      protocol: UDP
+    - name : udp1943
+      port: 41943
+      targetPort: 41943
+      protocol: UDP
+    - name : udp1944
+      port: 41944
+      targetPort: 41944
+      protocol: UDP
+    - name : udp1945
+      port: 41945
+      targetPort: 41945
+      protocol: UDP
+    - name : udp1946
+      port: 41946
+      targetPort: 41946
+      protocol: UDP
+    - name : udp1947
+      port: 41947
+      targetPort: 41947
+      protocol: UDP
+    - name : udp1948
+      port: 41948
+      targetPort: 41948
+      protocol: UDP
+    - name : udp1949
+      port: 41949
+      targetPort: 41949
+      protocol: UDP
+    - name : udp1950
+      port: 41950
+      targetPort: 41950
+      protocol: UDP
+    - name : udp1951
+      port: 41951
+      targetPort: 41951
+      protocol: UDP
+    - name : udp1952
+      port: 41952
+      targetPort: 41952
+      protocol: UDP
+    - name : udp1953
+      port: 41953
+      targetPort: 41953
+      protocol: UDP
+    - name : udp1954
+      port: 41954
+      targetPort: 41954
+      protocol: UDP
+    - name : udp1955
+      port: 41955
+      targetPort: 41955
+      protocol: UDP
+    - name : udp1956
+      port: 41956
+      targetPort: 41956
+      protocol: UDP
+    - name : udp1957
+      port: 41957
+      targetPort: 41957
+      protocol: UDP
+    - name : udp1958
+      port: 41958
+      targetPort: 41958
+      protocol: UDP
+    - name : udp1959
+      port: 41959
+      targetPort: 41959
+      protocol: UDP
+    - name : udp1960
+      port: 41960
+      targetPort: 41960
+      protocol: UDP
+    - name : udp1961
+      port: 41961
+      targetPort: 41961
+      protocol: UDP
+    - name : udp1962
+      port: 41962
+      targetPort: 41962
+      protocol: UDP
+    - name : udp1963
+      port: 41963
+      targetPort: 41963
+      protocol: UDP
+    - name : udp1964
+      port: 41964
+      targetPort: 41964
+      protocol: UDP
+    - name : udp1965
+      port: 41965
+      targetPort: 41965
+      protocol: UDP
+    - name : udp1966
+      port: 41966
+      targetPort: 41966
+      protocol: UDP
+    - name : udp1967
+      port: 41967
+      targetPort: 41967
+      protocol: UDP
+    - name : udp1968
+      port: 41968
+      targetPort: 41968
+      protocol: UDP
+    - name : udp1969
+      port: 41969
+      targetPort: 41969
+      protocol: UDP
+    - name : udp1970
+      port: 41970
+      targetPort: 41970
+      protocol: UDP
+    - name : udp1971
+      port: 41971
+      targetPort: 41971
+      protocol: UDP
+    - name : udp1972
+      port: 41972
+      targetPort: 41972
+      protocol: UDP
+    - name : udp1973
+      port: 41973
+      targetPort: 41973
+      protocol: UDP
+    - name : udp1974
+      port: 41974
+      targetPort: 41974
+      protocol: UDP
+    - name : udp1975
+      port: 41975
+      targetPort: 41975
+      protocol: UDP
+    - name : udp1976
+      port: 41976
+      targetPort: 41976
+      protocol: UDP
+    - name : udp1977
+      port: 41977
+      targetPort: 41977
+      protocol: UDP
+    - name : udp1978
+      port: 41978
+      targetPort: 41978
+      protocol: UDP
+    - name : udp1979
+      port: 41979
+      targetPort: 41979
+      protocol: UDP
+    - name : udp1980
+      port: 41980
+      targetPort: 41980
+      protocol: UDP
+    - name : udp1981
+      port: 41981
+      targetPort: 41981
+      protocol: UDP
+    - name : udp1982
+      port: 41982
+      targetPort: 41982
+      protocol: UDP
+    - name : udp1983
+      port: 41983
+      targetPort: 41983
+      protocol: UDP
+    - name : udp1984
+      port: 41984
+      targetPort: 41984
+      protocol: UDP
+    - name : udp1985
+      port: 41985
+      targetPort: 41985
+      protocol: UDP
+    - name : udp1986
+      port: 41986
+      targetPort: 41986
+      protocol: UDP
+    - name : udp1987
+      port: 41987
+      targetPort: 41987
+      protocol: UDP
+    - name : udp1988
+      port: 41988
+      targetPort: 41988
+      protocol: UDP
+    - name : udp1989
+      port: 41989
+      targetPort: 41989
+      protocol: UDP
+    - name : udp1990
+      port: 41990
+      targetPort: 41990
+      protocol: UDP
+    - name : udp1991
+      port: 41991
+      targetPort: 41991
+      protocol: UDP
+    - name : udp1992
+      port: 41992
+      targetPort: 41992
+      protocol: UDP
+    - name : udp1993
+      port: 41993
+      targetPort: 41993
+      protocol: UDP
+    - name : udp1994
+      port: 41994
+      targetPort: 41994
+      protocol: UDP
+    - name : udp1995
+      port: 41995
+      targetPort: 41995
+      protocol: UDP
+    - name : udp1996
+      port: 41996
+      targetPort: 41996
+      protocol: UDP
+    - name : udp1997
+      port: 41997
+      targetPort: 41997
+      protocol: UDP
+    - name : udp1998
+      port: 41998
+      targetPort: 41998
+      protocol: UDP
+    - name : udp1999
+      port: 41999
+      targetPort: 41999
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

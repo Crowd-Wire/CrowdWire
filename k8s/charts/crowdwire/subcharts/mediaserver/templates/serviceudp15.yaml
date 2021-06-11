@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp15
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1500
+      port: 41500
+      targetPort: 41500
+      protocol: UDP
+    - name : udp1501
+      port: 41501
+      targetPort: 41501
+      protocol: UDP
+    - name : udp1502
+      port: 41502
+      targetPort: 41502
+      protocol: UDP
+    - name : udp1503
+      port: 41503
+      targetPort: 41503
+      protocol: UDP
+    - name : udp1504
+      port: 41504
+      targetPort: 41504
+      protocol: UDP
+    - name : udp1505
+      port: 41505
+      targetPort: 41505
+      protocol: UDP
+    - name : udp1506
+      port: 41506
+      targetPort: 41506
+      protocol: UDP
+    - name : udp1507
+      port: 41507
+      targetPort: 41507
+      protocol: UDP
+    - name : udp1508
+      port: 41508
+      targetPort: 41508
+      protocol: UDP
+    - name : udp1509
+      port: 41509
+      targetPort: 41509
+      protocol: UDP
+    - name : udp1510
+      port: 41510
+      targetPort: 41510
+      protocol: UDP
+    - name : udp1511
+      port: 41511
+      targetPort: 41511
+      protocol: UDP
+    - name : udp1512
+      port: 41512
+      targetPort: 41512
+      protocol: UDP
+    - name : udp1513
+      port: 41513
+      targetPort: 41513
+      protocol: UDP
+    - name : udp1514
+      port: 41514
+      targetPort: 41514
+      protocol: UDP
+    - name : udp1515
+      port: 41515
+      targetPort: 41515
+      protocol: UDP
+    - name : udp1516
+      port: 41516
+      targetPort: 41516
+      protocol: UDP
+    - name : udp1517
+      port: 41517
+      targetPort: 41517
+      protocol: UDP
+    - name : udp1518
+      port: 41518
+      targetPort: 41518
+      protocol: UDP
+    - name : udp1519
+      port: 41519
+      targetPort: 41519
+      protocol: UDP
+    - name : udp1520
+      port: 41520
+      targetPort: 41520
+      protocol: UDP
+    - name : udp1521
+      port: 41521
+      targetPort: 41521
+      protocol: UDP
+    - name : udp1522
+      port: 41522
+      targetPort: 41522
+      protocol: UDP
+    - name : udp1523
+      port: 41523
+      targetPort: 41523
+      protocol: UDP
+    - name : udp1524
+      port: 41524
+      targetPort: 41524
+      protocol: UDP
+    - name : udp1525
+      port: 41525
+      targetPort: 41525
+      protocol: UDP
+    - name : udp1526
+      port: 41526
+      targetPort: 41526
+      protocol: UDP
+    - name : udp1527
+      port: 41527
+      targetPort: 41527
+      protocol: UDP
+    - name : udp1528
+      port: 41528
+      targetPort: 41528
+      protocol: UDP
+    - name : udp1529
+      port: 41529
+      targetPort: 41529
+      protocol: UDP
+    - name : udp1530
+      port: 41530
+      targetPort: 41530
+      protocol: UDP
+    - name : udp1531
+      port: 41531
+      targetPort: 41531
+      protocol: UDP
+    - name : udp1532
+      port: 41532
+      targetPort: 41532
+      protocol: UDP
+    - name : udp1533
+      port: 41533
+      targetPort: 41533
+      protocol: UDP
+    - name : udp1534
+      port: 41534
+      targetPort: 41534
+      protocol: UDP
+    - name : udp1535
+      port: 41535
+      targetPort: 41535
+      protocol: UDP
+    - name : udp1536
+      port: 41536
+      targetPort: 41536
+      protocol: UDP
+    - name : udp1537
+      port: 41537
+      targetPort: 41537
+      protocol: UDP
+    - name : udp1538
+      port: 41538
+      targetPort: 41538
+      protocol: UDP
+    - name : udp1539
+      port: 41539
+      targetPort: 41539
+      protocol: UDP
+    - name : udp1540
+      port: 41540
+      targetPort: 41540
+      protocol: UDP
+    - name : udp1541
+      port: 41541
+      targetPort: 41541
+      protocol: UDP
+    - name : udp1542
+      port: 41542
+      targetPort: 41542
+      protocol: UDP
+    - name : udp1543
+      port: 41543
+      targetPort: 41543
+      protocol: UDP
+    - name : udp1544
+      port: 41544
+      targetPort: 41544
+      protocol: UDP
+    - name : udp1545
+      port: 41545
+      targetPort: 41545
+      protocol: UDP
+    - name : udp1546
+      port: 41546
+      targetPort: 41546
+      protocol: UDP
+    - name : udp1547
+      port: 41547
+      targetPort: 41547
+      protocol: UDP
+    - name : udp1548
+      port: 41548
+      targetPort: 41548
+      protocol: UDP
+    - name : udp1549
+      port: 41549
+      targetPort: 41549
+      protocol: UDP
+    - name : udp1550
+      port: 41550
+      targetPort: 41550
+      protocol: UDP
+    - name : udp1551
+      port: 41551
+      targetPort: 41551
+      protocol: UDP
+    - name : udp1552
+      port: 41552
+      targetPort: 41552
+      protocol: UDP
+    - name : udp1553
+      port: 41553
+      targetPort: 41553
+      protocol: UDP
+    - name : udp1554
+      port: 41554
+      targetPort: 41554
+      protocol: UDP
+    - name : udp1555
+      port: 41555
+      targetPort: 41555
+      protocol: UDP
+    - name : udp1556
+      port: 41556
+      targetPort: 41556
+      protocol: UDP
+    - name : udp1557
+      port: 41557
+      targetPort: 41557
+      protocol: UDP
+    - name : udp1558
+      port: 41558
+      targetPort: 41558
+      protocol: UDP
+    - name : udp1559
+      port: 41559
+      targetPort: 41559
+      protocol: UDP
+    - name : udp1560
+      port: 41560
+      targetPort: 41560
+      protocol: UDP
+    - name : udp1561
+      port: 41561
+      targetPort: 41561
+      protocol: UDP
+    - name : udp1562
+      port: 41562
+      targetPort: 41562
+      protocol: UDP
+    - name : udp1563
+      port: 41563
+      targetPort: 41563
+      protocol: UDP
+    - name : udp1564
+      port: 41564
+      targetPort: 41564
+      protocol: UDP
+    - name : udp1565
+      port: 41565
+      targetPort: 41565
+      protocol: UDP
+    - name : udp1566
+      port: 41566
+      targetPort: 41566
+      protocol: UDP
+    - name : udp1567
+      port: 41567
+      targetPort: 41567
+      protocol: UDP
+    - name : udp1568
+      port: 41568
+      targetPort: 41568
+      protocol: UDP
+    - name : udp1569
+      port: 41569
+      targetPort: 41569
+      protocol: UDP
+    - name : udp1570
+      port: 41570
+      targetPort: 41570
+      protocol: UDP
+    - name : udp1571
+      port: 41571
+      targetPort: 41571
+      protocol: UDP
+    - name : udp1572
+      port: 41572
+      targetPort: 41572
+      protocol: UDP
+    - name : udp1573
+      port: 41573
+      targetPort: 41573
+      protocol: UDP
+    - name : udp1574
+      port: 41574
+      targetPort: 41574
+      protocol: UDP
+    - name : udp1575
+      port: 41575
+      targetPort: 41575
+      protocol: UDP
+    - name : udp1576
+      port: 41576
+      targetPort: 41576
+      protocol: UDP
+    - name : udp1577
+      port: 41577
+      targetPort: 41577
+      protocol: UDP
+    - name : udp1578
+      port: 41578
+      targetPort: 41578
+      protocol: UDP
+    - name : udp1579
+      port: 41579
+      targetPort: 41579
+      protocol: UDP
+    - name : udp1580
+      port: 41580
+      targetPort: 41580
+      protocol: UDP
+    - name : udp1581
+      port: 41581
+      targetPort: 41581
+      protocol: UDP
+    - name : udp1582
+      port: 41582
+      targetPort: 41582
+      protocol: UDP
+    - name : udp1583
+      port: 41583
+      targetPort: 41583
+      protocol: UDP
+    - name : udp1584
+      port: 41584
+      targetPort: 41584
+      protocol: UDP
+    - name : udp1585
+      port: 41585
+      targetPort: 41585
+      protocol: UDP
+    - name : udp1586
+      port: 41586
+      targetPort: 41586
+      protocol: UDP
+    - name : udp1587
+      port: 41587
+      targetPort: 41587
+      protocol: UDP
+    - name : udp1588
+      port: 41588
+      targetPort: 41588
+      protocol: UDP
+    - name : udp1589
+      port: 41589
+      targetPort: 41589
+      protocol: UDP
+    - name : udp1590
+      port: 41590
+      targetPort: 41590
+      protocol: UDP
+    - name : udp1591
+      port: 41591
+      targetPort: 41591
+      protocol: UDP
+    - name : udp1592
+      port: 41592
+      targetPort: 41592
+      protocol: UDP
+    - name : udp1593
+      port: 41593
+      targetPort: 41593
+      protocol: UDP
+    - name : udp1594
+      port: 41594
+      targetPort: 41594
+      protocol: UDP
+    - name : udp1595
+      port: 41595
+      targetPort: 41595
+      protocol: UDP
+    - name : udp1596
+      port: 41596
+      targetPort: 41596
+      protocol: UDP
+    - name : udp1597
+      port: 41597
+      targetPort: 41597
+      protocol: UDP
+    - name : udp1598
+      port: 41598
+      targetPort: 41598
+      protocol: UDP
+    - name : udp1599
+      port: 41599
+      targetPort: 41599
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp37
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp3700
+      port: 43700
+      targetPort: 43700
+      protocol: UDP
+    - name : udp3701
+      port: 43701
+      targetPort: 43701
+      protocol: UDP
+    - name : udp3702
+      port: 43702
+      targetPort: 43702
+      protocol: UDP
+    - name : udp3703
+      port: 43703
+      targetPort: 43703
+      protocol: UDP
+    - name : udp3704
+      port: 43704
+      targetPort: 43704
+      protocol: UDP
+    - name : udp3705
+      port: 43705
+      targetPort: 43705
+      protocol: UDP
+    - name : udp3706
+      port: 43706
+      targetPort: 43706
+      protocol: UDP
+    - name : udp3707
+      port: 43707
+      targetPort: 43707
+      protocol: UDP
+    - name : udp3708
+      port: 43708
+      targetPort: 43708
+      protocol: UDP
+    - name : udp3709
+      port: 43709
+      targetPort: 43709
+      protocol: UDP
+    - name : udp3710
+      port: 43710
+      targetPort: 43710
+      protocol: UDP
+    - name : udp3711
+      port: 43711
+      targetPort: 43711
+      protocol: UDP
+    - name : udp3712
+      port: 43712
+      targetPort: 43712
+      protocol: UDP
+    - name : udp3713
+      port: 43713
+      targetPort: 43713
+      protocol: UDP
+    - name : udp3714
+      port: 43714
+      targetPort: 43714
+      protocol: UDP
+    - name : udp3715
+      port: 43715
+      targetPort: 43715
+      protocol: UDP
+    - name : udp3716
+      port: 43716
+      targetPort: 43716
+      protocol: UDP
+    - name : udp3717
+      port: 43717
+      targetPort: 43717
+      protocol: UDP
+    - name : udp3718
+      port: 43718
+      targetPort: 43718
+      protocol: UDP
+    - name : udp3719
+      port: 43719
+      targetPort: 43719
+      protocol: UDP
+    - name : udp3720
+      port: 43720
+      targetPort: 43720
+      protocol: UDP
+    - name : udp3721
+      port: 43721
+      targetPort: 43721
+      protocol: UDP
+    - name : udp3722
+      port: 43722
+      targetPort: 43722
+      protocol: UDP
+    - name : udp3723
+      port: 43723
+      targetPort: 43723
+      protocol: UDP
+    - name : udp3724
+      port: 43724
+      targetPort: 43724
+      protocol: UDP
+    - name : udp3725
+      port: 43725
+      targetPort: 43725
+      protocol: UDP
+    - name : udp3726
+      port: 43726
+      targetPort: 43726
+      protocol: UDP
+    - name : udp3727
+      port: 43727
+      targetPort: 43727
+      protocol: UDP
+    - name : udp3728
+      port: 43728
+      targetPort: 43728
+      protocol: UDP
+    - name : udp3729
+      port: 43729
+      targetPort: 43729
+      protocol: UDP
+    - name : udp3730
+      port: 43730
+      targetPort: 43730
+      protocol: UDP
+    - name : udp3731
+      port: 43731
+      targetPort: 43731
+      protocol: UDP
+    - name : udp3732
+      port: 43732
+      targetPort: 43732
+      protocol: UDP
+    - name : udp3733
+      port: 43733
+      targetPort: 43733
+      protocol: UDP
+    - name : udp3734
+      port: 43734
+      targetPort: 43734
+      protocol: UDP
+    - name : udp3735
+      port: 43735
+      targetPort: 43735
+      protocol: UDP
+    - name : udp3736
+      port: 43736
+      targetPort: 43736
+      protocol: UDP
+    - name : udp3737
+      port: 43737
+      targetPort: 43737
+      protocol: UDP
+    - name : udp3738
+      port: 43738
+      targetPort: 43738
+      protocol: UDP
+    - name : udp3739
+      port: 43739
+      targetPort: 43739
+      protocol: UDP
+    - name : udp3740
+      port: 43740
+      targetPort: 43740
+      protocol: UDP
+    - name : udp3741
+      port: 43741
+      targetPort: 43741
+      protocol: UDP
+    - name : udp3742
+      port: 43742
+      targetPort: 43742
+      protocol: UDP
+    - name : udp3743
+      port: 43743
+      targetPort: 43743
+      protocol: UDP
+    - name : udp3744
+      port: 43744
+      targetPort: 43744
+      protocol: UDP
+    - name : udp3745
+      port: 43745
+      targetPort: 43745
+      protocol: UDP
+    - name : udp3746
+      port: 43746
+      targetPort: 43746
+      protocol: UDP
+    - name : udp3747
+      port: 43747
+      targetPort: 43747
+      protocol: UDP
+    - name : udp3748
+      port: 43748
+      targetPort: 43748
+      protocol: UDP
+    - name : udp3749
+      port: 43749
+      targetPort: 43749
+      protocol: UDP
+    - name : udp3750
+      port: 43750
+      targetPort: 43750
+      protocol: UDP
+    - name : udp3751
+      port: 43751
+      targetPort: 43751
+      protocol: UDP
+    - name : udp3752
+      port: 43752
+      targetPort: 43752
+      protocol: UDP
+    - name : udp3753
+      port: 43753
+      targetPort: 43753
+      protocol: UDP
+    - name : udp3754
+      port: 43754
+      targetPort: 43754
+      protocol: UDP
+    - name : udp3755
+      port: 43755
+      targetPort: 43755
+      protocol: UDP
+    - name : udp3756
+      port: 43756
+      targetPort: 43756
+      protocol: UDP
+    - name : udp3757
+      port: 43757
+      targetPort: 43757
+      protocol: UDP
+    - name : udp3758
+      port: 43758
+      targetPort: 43758
+      protocol: UDP
+    - name : udp3759
+      port: 43759
+      targetPort: 43759
+      protocol: UDP
+    - name : udp3760
+      port: 43760
+      targetPort: 43760
+      protocol: UDP
+    - name : udp3761
+      port: 43761
+      targetPort: 43761
+      protocol: UDP
+    - name : udp3762
+      port: 43762
+      targetPort: 43762
+      protocol: UDP
+    - name : udp3763
+      port: 43763
+      targetPort: 43763
+      protocol: UDP
+    - name : udp3764
+      port: 43764
+      targetPort: 43764
+      protocol: UDP
+    - name : udp3765
+      port: 43765
+      targetPort: 43765
+      protocol: UDP
+    - name : udp3766
+      port: 43766
+      targetPort: 43766
+      protocol: UDP
+    - name : udp3767
+      port: 43767
+      targetPort: 43767
+      protocol: UDP
+    - name : udp3768
+      port: 43768
+      targetPort: 43768
+      protocol: UDP
+    - name : udp3769
+      port: 43769
+      targetPort: 43769
+      protocol: UDP
+    - name : udp3770
+      port: 43770
+      targetPort: 43770
+      protocol: UDP
+    - name : udp3771
+      port: 43771
+      targetPort: 43771
+      protocol: UDP
+    - name : udp3772
+      port: 43772
+      targetPort: 43772
+      protocol: UDP
+    - name : udp3773
+      port: 43773
+      targetPort: 43773
+      protocol: UDP
+    - name : udp3774
+      port: 43774
+      targetPort: 43774
+      protocol: UDP
+    - name : udp3775
+      port: 43775
+      targetPort: 43775
+      protocol: UDP
+    - name : udp3776
+      port: 43776
+      targetPort: 43776
+      protocol: UDP
+    - name : udp3777
+      port: 43777
+      targetPort: 43777
+      protocol: UDP
+    - name : udp3778
+      port: 43778
+      targetPort: 43778
+      protocol: UDP
+    - name : udp3779
+      port: 43779
+      targetPort: 43779
+      protocol: UDP
+    - name : udp3780
+      port: 43780
+      targetPort: 43780
+      protocol: UDP
+    - name : udp3781
+      port: 43781
+      targetPort: 43781
+      protocol: UDP
+    - name : udp3782
+      port: 43782
+      targetPort: 43782
+      protocol: UDP
+    - name : udp3783
+      port: 43783
+      targetPort: 43783
+      protocol: UDP
+    - name : udp3784
+      port: 43784
+      targetPort: 43784
+      protocol: UDP
+    - name : udp3785
+      port: 43785
+      targetPort: 43785
+      protocol: UDP
+    - name : udp3786
+      port: 43786
+      targetPort: 43786
+      protocol: UDP
+    - name : udp3787
+      port: 43787
+      targetPort: 43787
+      protocol: UDP
+    - name : udp3788
+      port: 43788
+      targetPort: 43788
+      protocol: UDP
+    - name : udp3789
+      port: 43789
+      targetPort: 43789
+      protocol: UDP
+    - name : udp3790
+      port: 43790
+      targetPort: 43790
+      protocol: UDP
+    - name : udp3791
+      port: 43791
+      targetPort: 43791
+      protocol: UDP
+    - name : udp3792
+      port: 43792
+      targetPort: 43792
+      protocol: UDP
+    - name : udp3793
+      port: 43793
+      targetPort: 43793
+      protocol: UDP
+    - name : udp3794
+      port: 43794
+      targetPort: 43794
+      protocol: UDP
+    - name : udp3795
+      port: 43795
+      targetPort: 43795
+      protocol: UDP
+    - name : udp3796
+      port: 43796
+      targetPort: 43796
+      protocol: UDP
+    - name : udp3797
+      port: 43797
+      targetPort: 43797
+      protocol: UDP
+    - name : udp3798
+      port: 43798
+      targetPort: 43798
+      protocol: UDP
+    - name : udp3799
+      port: 43799
+      targetPort: 43799
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

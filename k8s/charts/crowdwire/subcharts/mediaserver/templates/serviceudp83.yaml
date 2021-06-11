@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp83
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp8300
+      port: 48300
+      targetPort: 48300
+      protocol: UDP
+    - name : udp8301
+      port: 48301
+      targetPort: 48301
+      protocol: UDP
+    - name : udp8302
+      port: 48302
+      targetPort: 48302
+      protocol: UDP
+    - name : udp8303
+      port: 48303
+      targetPort: 48303
+      protocol: UDP
+    - name : udp8304
+      port: 48304
+      targetPort: 48304
+      protocol: UDP
+    - name : udp8305
+      port: 48305
+      targetPort: 48305
+      protocol: UDP
+    - name : udp8306
+      port: 48306
+      targetPort: 48306
+      protocol: UDP
+    - name : udp8307
+      port: 48307
+      targetPort: 48307
+      protocol: UDP
+    - name : udp8308
+      port: 48308
+      targetPort: 48308
+      protocol: UDP
+    - name : udp8309
+      port: 48309
+      targetPort: 48309
+      protocol: UDP
+    - name : udp8310
+      port: 48310
+      targetPort: 48310
+      protocol: UDP
+    - name : udp8311
+      port: 48311
+      targetPort: 48311
+      protocol: UDP
+    - name : udp8312
+      port: 48312
+      targetPort: 48312
+      protocol: UDP
+    - name : udp8313
+      port: 48313
+      targetPort: 48313
+      protocol: UDP
+    - name : udp8314
+      port: 48314
+      targetPort: 48314
+      protocol: UDP
+    - name : udp8315
+      port: 48315
+      targetPort: 48315
+      protocol: UDP
+    - name : udp8316
+      port: 48316
+      targetPort: 48316
+      protocol: UDP
+    - name : udp8317
+      port: 48317
+      targetPort: 48317
+      protocol: UDP
+    - name : udp8318
+      port: 48318
+      targetPort: 48318
+      protocol: UDP
+    - name : udp8319
+      port: 48319
+      targetPort: 48319
+      protocol: UDP
+    - name : udp8320
+      port: 48320
+      targetPort: 48320
+      protocol: UDP
+    - name : udp8321
+      port: 48321
+      targetPort: 48321
+      protocol: UDP
+    - name : udp8322
+      port: 48322
+      targetPort: 48322
+      protocol: UDP
+    - name : udp8323
+      port: 48323
+      targetPort: 48323
+      protocol: UDP
+    - name : udp8324
+      port: 48324
+      targetPort: 48324
+      protocol: UDP
+    - name : udp8325
+      port: 48325
+      targetPort: 48325
+      protocol: UDP
+    - name : udp8326
+      port: 48326
+      targetPort: 48326
+      protocol: UDP
+    - name : udp8327
+      port: 48327
+      targetPort: 48327
+      protocol: UDP
+    - name : udp8328
+      port: 48328
+      targetPort: 48328
+      protocol: UDP
+    - name : udp8329
+      port: 48329
+      targetPort: 48329
+      protocol: UDP
+    - name : udp8330
+      port: 48330
+      targetPort: 48330
+      protocol: UDP
+    - name : udp8331
+      port: 48331
+      targetPort: 48331
+      protocol: UDP
+    - name : udp8332
+      port: 48332
+      targetPort: 48332
+      protocol: UDP
+    - name : udp8333
+      port: 48333
+      targetPort: 48333
+      protocol: UDP
+    - name : udp8334
+      port: 48334
+      targetPort: 48334
+      protocol: UDP
+    - name : udp8335
+      port: 48335
+      targetPort: 48335
+      protocol: UDP
+    - name : udp8336
+      port: 48336
+      targetPort: 48336
+      protocol: UDP
+    - name : udp8337
+      port: 48337
+      targetPort: 48337
+      protocol: UDP
+    - name : udp8338
+      port: 48338
+      targetPort: 48338
+      protocol: UDP
+    - name : udp8339
+      port: 48339
+      targetPort: 48339
+      protocol: UDP
+    - name : udp8340
+      port: 48340
+      targetPort: 48340
+      protocol: UDP
+    - name : udp8341
+      port: 48341
+      targetPort: 48341
+      protocol: UDP
+    - name : udp8342
+      port: 48342
+      targetPort: 48342
+      protocol: UDP
+    - name : udp8343
+      port: 48343
+      targetPort: 48343
+      protocol: UDP
+    - name : udp8344
+      port: 48344
+      targetPort: 48344
+      protocol: UDP
+    - name : udp8345
+      port: 48345
+      targetPort: 48345
+      protocol: UDP
+    - name : udp8346
+      port: 48346
+      targetPort: 48346
+      protocol: UDP
+    - name : udp8347
+      port: 48347
+      targetPort: 48347
+      protocol: UDP
+    - name : udp8348
+      port: 48348
+      targetPort: 48348
+      protocol: UDP
+    - name : udp8349
+      port: 48349
+      targetPort: 48349
+      protocol: UDP
+    - name : udp8350
+      port: 48350
+      targetPort: 48350
+      protocol: UDP
+    - name : udp8351
+      port: 48351
+      targetPort: 48351
+      protocol: UDP
+    - name : udp8352
+      port: 48352
+      targetPort: 48352
+      protocol: UDP
+    - name : udp8353
+      port: 48353
+      targetPort: 48353
+      protocol: UDP
+    - name : udp8354
+      port: 48354
+      targetPort: 48354
+      protocol: UDP
+    - name : udp8355
+      port: 48355
+      targetPort: 48355
+      protocol: UDP
+    - name : udp8356
+      port: 48356
+      targetPort: 48356
+      protocol: UDP
+    - name : udp8357
+      port: 48357
+      targetPort: 48357
+      protocol: UDP
+    - name : udp8358
+      port: 48358
+      targetPort: 48358
+      protocol: UDP
+    - name : udp8359
+      port: 48359
+      targetPort: 48359
+      protocol: UDP
+    - name : udp8360
+      port: 48360
+      targetPort: 48360
+      protocol: UDP
+    - name : udp8361
+      port: 48361
+      targetPort: 48361
+      protocol: UDP
+    - name : udp8362
+      port: 48362
+      targetPort: 48362
+      protocol: UDP
+    - name : udp8363
+      port: 48363
+      targetPort: 48363
+      protocol: UDP
+    - name : udp8364
+      port: 48364
+      targetPort: 48364
+      protocol: UDP
+    - name : udp8365
+      port: 48365
+      targetPort: 48365
+      protocol: UDP
+    - name : udp8366
+      port: 48366
+      targetPort: 48366
+      protocol: UDP
+    - name : udp8367
+      port: 48367
+      targetPort: 48367
+      protocol: UDP
+    - name : udp8368
+      port: 48368
+      targetPort: 48368
+      protocol: UDP
+    - name : udp8369
+      port: 48369
+      targetPort: 48369
+      protocol: UDP
+    - name : udp8370
+      port: 48370
+      targetPort: 48370
+      protocol: UDP
+    - name : udp8371
+      port: 48371
+      targetPort: 48371
+      protocol: UDP
+    - name : udp8372
+      port: 48372
+      targetPort: 48372
+      protocol: UDP
+    - name : udp8373
+      port: 48373
+      targetPort: 48373
+      protocol: UDP
+    - name : udp8374
+      port: 48374
+      targetPort: 48374
+      protocol: UDP
+    - name : udp8375
+      port: 48375
+      targetPort: 48375
+      protocol: UDP
+    - name : udp8376
+      port: 48376
+      targetPort: 48376
+      protocol: UDP
+    - name : udp8377
+      port: 48377
+      targetPort: 48377
+      protocol: UDP
+    - name : udp8378
+      port: 48378
+      targetPort: 48378
+      protocol: UDP
+    - name : udp8379
+      port: 48379
+      targetPort: 48379
+      protocol: UDP
+    - name : udp8380
+      port: 48380
+      targetPort: 48380
+      protocol: UDP
+    - name : udp8381
+      port: 48381
+      targetPort: 48381
+      protocol: UDP
+    - name : udp8382
+      port: 48382
+      targetPort: 48382
+      protocol: UDP
+    - name : udp8383
+      port: 48383
+      targetPort: 48383
+      protocol: UDP
+    - name : udp8384
+      port: 48384
+      targetPort: 48384
+      protocol: UDP
+    - name : udp8385
+      port: 48385
+      targetPort: 48385
+      protocol: UDP
+    - name : udp8386
+      port: 48386
+      targetPort: 48386
+      protocol: UDP
+    - name : udp8387
+      port: 48387
+      targetPort: 48387
+      protocol: UDP
+    - name : udp8388
+      port: 48388
+      targetPort: 48388
+      protocol: UDP
+    - name : udp8389
+      port: 48389
+      targetPort: 48389
+      protocol: UDP
+    - name : udp8390
+      port: 48390
+      targetPort: 48390
+      protocol: UDP
+    - name : udp8391
+      port: 48391
+      targetPort: 48391
+      protocol: UDP
+    - name : udp8392
+      port: 48392
+      targetPort: 48392
+      protocol: UDP
+    - name : udp8393
+      port: 48393
+      targetPort: 48393
+      protocol: UDP
+    - name : udp8394
+      port: 48394
+      targetPort: 48394
+      protocol: UDP
+    - name : udp8395
+      port: 48395
+      targetPort: 48395
+      protocol: UDP
+    - name : udp8396
+      port: 48396
+      targetPort: 48396
+      protocol: UDP
+    - name : udp8397
+      port: 48397
+      targetPort: 48397
+      protocol: UDP
+    - name : udp8398
+      port: 48398
+      targetPort: 48398
+      protocol: UDP
+    - name : udp8399
+      port: 48399
+      targetPort: 48399
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

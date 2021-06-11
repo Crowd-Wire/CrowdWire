@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp74
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp7400
+      port: 47400
+      targetPort: 47400
+      protocol: UDP
+    - name : udp7401
+      port: 47401
+      targetPort: 47401
+      protocol: UDP
+    - name : udp7402
+      port: 47402
+      targetPort: 47402
+      protocol: UDP
+    - name : udp7403
+      port: 47403
+      targetPort: 47403
+      protocol: UDP
+    - name : udp7404
+      port: 47404
+      targetPort: 47404
+      protocol: UDP
+    - name : udp7405
+      port: 47405
+      targetPort: 47405
+      protocol: UDP
+    - name : udp7406
+      port: 47406
+      targetPort: 47406
+      protocol: UDP
+    - name : udp7407
+      port: 47407
+      targetPort: 47407
+      protocol: UDP
+    - name : udp7408
+      port: 47408
+      targetPort: 47408
+      protocol: UDP
+    - name : udp7409
+      port: 47409
+      targetPort: 47409
+      protocol: UDP
+    - name : udp7410
+      port: 47410
+      targetPort: 47410
+      protocol: UDP
+    - name : udp7411
+      port: 47411
+      targetPort: 47411
+      protocol: UDP
+    - name : udp7412
+      port: 47412
+      targetPort: 47412
+      protocol: UDP
+    - name : udp7413
+      port: 47413
+      targetPort: 47413
+      protocol: UDP
+    - name : udp7414
+      port: 47414
+      targetPort: 47414
+      protocol: UDP
+    - name : udp7415
+      port: 47415
+      targetPort: 47415
+      protocol: UDP
+    - name : udp7416
+      port: 47416
+      targetPort: 47416
+      protocol: UDP
+    - name : udp7417
+      port: 47417
+      targetPort: 47417
+      protocol: UDP
+    - name : udp7418
+      port: 47418
+      targetPort: 47418
+      protocol: UDP
+    - name : udp7419
+      port: 47419
+      targetPort: 47419
+      protocol: UDP
+    - name : udp7420
+      port: 47420
+      targetPort: 47420
+      protocol: UDP
+    - name : udp7421
+      port: 47421
+      targetPort: 47421
+      protocol: UDP
+    - name : udp7422
+      port: 47422
+      targetPort: 47422
+      protocol: UDP
+    - name : udp7423
+      port: 47423
+      targetPort: 47423
+      protocol: UDP
+    - name : udp7424
+      port: 47424
+      targetPort: 47424
+      protocol: UDP
+    - name : udp7425
+      port: 47425
+      targetPort: 47425
+      protocol: UDP
+    - name : udp7426
+      port: 47426
+      targetPort: 47426
+      protocol: UDP
+    - name : udp7427
+      port: 47427
+      targetPort: 47427
+      protocol: UDP
+    - name : udp7428
+      port: 47428
+      targetPort: 47428
+      protocol: UDP
+    - name : udp7429
+      port: 47429
+      targetPort: 47429
+      protocol: UDP
+    - name : udp7430
+      port: 47430
+      targetPort: 47430
+      protocol: UDP
+    - name : udp7431
+      port: 47431
+      targetPort: 47431
+      protocol: UDP
+    - name : udp7432
+      port: 47432
+      targetPort: 47432
+      protocol: UDP
+    - name : udp7433
+      port: 47433
+      targetPort: 47433
+      protocol: UDP
+    - name : udp7434
+      port: 47434
+      targetPort: 47434
+      protocol: UDP
+    - name : udp7435
+      port: 47435
+      targetPort: 47435
+      protocol: UDP
+    - name : udp7436
+      port: 47436
+      targetPort: 47436
+      protocol: UDP
+    - name : udp7437
+      port: 47437
+      targetPort: 47437
+      protocol: UDP
+    - name : udp7438
+      port: 47438
+      targetPort: 47438
+      protocol: UDP
+    - name : udp7439
+      port: 47439
+      targetPort: 47439
+      protocol: UDP
+    - name : udp7440
+      port: 47440
+      targetPort: 47440
+      protocol: UDP
+    - name : udp7441
+      port: 47441
+      targetPort: 47441
+      protocol: UDP
+    - name : udp7442
+      port: 47442
+      targetPort: 47442
+      protocol: UDP
+    - name : udp7443
+      port: 47443
+      targetPort: 47443
+      protocol: UDP
+    - name : udp7444
+      port: 47444
+      targetPort: 47444
+      protocol: UDP
+    - name : udp7445
+      port: 47445
+      targetPort: 47445
+      protocol: UDP
+    - name : udp7446
+      port: 47446
+      targetPort: 47446
+      protocol: UDP
+    - name : udp7447
+      port: 47447
+      targetPort: 47447
+      protocol: UDP
+    - name : udp7448
+      port: 47448
+      targetPort: 47448
+      protocol: UDP
+    - name : udp7449
+      port: 47449
+      targetPort: 47449
+      protocol: UDP
+    - name : udp7450
+      port: 47450
+      targetPort: 47450
+      protocol: UDP
+    - name : udp7451
+      port: 47451
+      targetPort: 47451
+      protocol: UDP
+    - name : udp7452
+      port: 47452
+      targetPort: 47452
+      protocol: UDP
+    - name : udp7453
+      port: 47453
+      targetPort: 47453
+      protocol: UDP
+    - name : udp7454
+      port: 47454
+      targetPort: 47454
+      protocol: UDP
+    - name : udp7455
+      port: 47455
+      targetPort: 47455
+      protocol: UDP
+    - name : udp7456
+      port: 47456
+      targetPort: 47456
+      protocol: UDP
+    - name : udp7457
+      port: 47457
+      targetPort: 47457
+      protocol: UDP
+    - name : udp7458
+      port: 47458
+      targetPort: 47458
+      protocol: UDP
+    - name : udp7459
+      port: 47459
+      targetPort: 47459
+      protocol: UDP
+    - name : udp7460
+      port: 47460
+      targetPort: 47460
+      protocol: UDP
+    - name : udp7461
+      port: 47461
+      targetPort: 47461
+      protocol: UDP
+    - name : udp7462
+      port: 47462
+      targetPort: 47462
+      protocol: UDP
+    - name : udp7463
+      port: 47463
+      targetPort: 47463
+      protocol: UDP
+    - name : udp7464
+      port: 47464
+      targetPort: 47464
+      protocol: UDP
+    - name : udp7465
+      port: 47465
+      targetPort: 47465
+      protocol: UDP
+    - name : udp7466
+      port: 47466
+      targetPort: 47466
+      protocol: UDP
+    - name : udp7467
+      port: 47467
+      targetPort: 47467
+      protocol: UDP
+    - name : udp7468
+      port: 47468
+      targetPort: 47468
+      protocol: UDP
+    - name : udp7469
+      port: 47469
+      targetPort: 47469
+      protocol: UDP
+    - name : udp7470
+      port: 47470
+      targetPort: 47470
+      protocol: UDP
+    - name : udp7471
+      port: 47471
+      targetPort: 47471
+      protocol: UDP
+    - name : udp7472
+      port: 47472
+      targetPort: 47472
+      protocol: UDP
+    - name : udp7473
+      port: 47473
+      targetPort: 47473
+      protocol: UDP
+    - name : udp7474
+      port: 47474
+      targetPort: 47474
+      protocol: UDP
+    - name : udp7475
+      port: 47475
+      targetPort: 47475
+      protocol: UDP
+    - name : udp7476
+      port: 47476
+      targetPort: 47476
+      protocol: UDP
+    - name : udp7477
+      port: 47477
+      targetPort: 47477
+      protocol: UDP
+    - name : udp7478
+      port: 47478
+      targetPort: 47478
+      protocol: UDP
+    - name : udp7479
+      port: 47479
+      targetPort: 47479
+      protocol: UDP
+    - name : udp7480
+      port: 47480
+      targetPort: 47480
+      protocol: UDP
+    - name : udp7481
+      port: 47481
+      targetPort: 47481
+      protocol: UDP
+    - name : udp7482
+      port: 47482
+      targetPort: 47482
+      protocol: UDP
+    - name : udp7483
+      port: 47483
+      targetPort: 47483
+      protocol: UDP
+    - name : udp7484
+      port: 47484
+      targetPort: 47484
+      protocol: UDP
+    - name : udp7485
+      port: 47485
+      targetPort: 47485
+      protocol: UDP
+    - name : udp7486
+      port: 47486
+      targetPort: 47486
+      protocol: UDP
+    - name : udp7487
+      port: 47487
+      targetPort: 47487
+      protocol: UDP
+    - name : udp7488
+      port: 47488
+      targetPort: 47488
+      protocol: UDP
+    - name : udp7489
+      port: 47489
+      targetPort: 47489
+      protocol: UDP
+    - name : udp7490
+      port: 47490
+      targetPort: 47490
+      protocol: UDP
+    - name : udp7491
+      port: 47491
+      targetPort: 47491
+      protocol: UDP
+    - name : udp7492
+      port: 47492
+      targetPort: 47492
+      protocol: UDP
+    - name : udp7493
+      port: 47493
+      targetPort: 47493
+      protocol: UDP
+    - name : udp7494
+      port: 47494
+      targetPort: 47494
+      protocol: UDP
+    - name : udp7495
+      port: 47495
+      targetPort: 47495
+      protocol: UDP
+    - name : udp7496
+      port: 47496
+      targetPort: 47496
+      protocol: UDP
+    - name : udp7497
+      port: 47497
+      targetPort: 47497
+      protocol: UDP
+    - name : udp7498
+      port: 47498
+      targetPort: 47498
+      protocol: UDP
+    - name : udp7499
+      port: 47499
+      targetPort: 47499
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

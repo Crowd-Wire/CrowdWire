@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp40
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp4000
+      port: 44000
+      targetPort: 44000
+      protocol: UDP
+    - name : udp4001
+      port: 44001
+      targetPort: 44001
+      protocol: UDP
+    - name : udp4002
+      port: 44002
+      targetPort: 44002
+      protocol: UDP
+    - name : udp4003
+      port: 44003
+      targetPort: 44003
+      protocol: UDP
+    - name : udp4004
+      port: 44004
+      targetPort: 44004
+      protocol: UDP
+    - name : udp4005
+      port: 44005
+      targetPort: 44005
+      protocol: UDP
+    - name : udp4006
+      port: 44006
+      targetPort: 44006
+      protocol: UDP
+    - name : udp4007
+      port: 44007
+      targetPort: 44007
+      protocol: UDP
+    - name : udp4008
+      port: 44008
+      targetPort: 44008
+      protocol: UDP
+    - name : udp4009
+      port: 44009
+      targetPort: 44009
+      protocol: UDP
+    - name : udp4010
+      port: 44010
+      targetPort: 44010
+      protocol: UDP
+    - name : udp4011
+      port: 44011
+      targetPort: 44011
+      protocol: UDP
+    - name : udp4012
+      port: 44012
+      targetPort: 44012
+      protocol: UDP
+    - name : udp4013
+      port: 44013
+      targetPort: 44013
+      protocol: UDP
+    - name : udp4014
+      port: 44014
+      targetPort: 44014
+      protocol: UDP
+    - name : udp4015
+      port: 44015
+      targetPort: 44015
+      protocol: UDP
+    - name : udp4016
+      port: 44016
+      targetPort: 44016
+      protocol: UDP
+    - name : udp4017
+      port: 44017
+      targetPort: 44017
+      protocol: UDP
+    - name : udp4018
+      port: 44018
+      targetPort: 44018
+      protocol: UDP
+    - name : udp4019
+      port: 44019
+      targetPort: 44019
+      protocol: UDP
+    - name : udp4020
+      port: 44020
+      targetPort: 44020
+      protocol: UDP
+    - name : udp4021
+      port: 44021
+      targetPort: 44021
+      protocol: UDP
+    - name : udp4022
+      port: 44022
+      targetPort: 44022
+      protocol: UDP
+    - name : udp4023
+      port: 44023
+      targetPort: 44023
+      protocol: UDP
+    - name : udp4024
+      port: 44024
+      targetPort: 44024
+      protocol: UDP
+    - name : udp4025
+      port: 44025
+      targetPort: 44025
+      protocol: UDP
+    - name : udp4026
+      port: 44026
+      targetPort: 44026
+      protocol: UDP
+    - name : udp4027
+      port: 44027
+      targetPort: 44027
+      protocol: UDP
+    - name : udp4028
+      port: 44028
+      targetPort: 44028
+      protocol: UDP
+    - name : udp4029
+      port: 44029
+      targetPort: 44029
+      protocol: UDP
+    - name : udp4030
+      port: 44030
+      targetPort: 44030
+      protocol: UDP
+    - name : udp4031
+      port: 44031
+      targetPort: 44031
+      protocol: UDP
+    - name : udp4032
+      port: 44032
+      targetPort: 44032
+      protocol: UDP
+    - name : udp4033
+      port: 44033
+      targetPort: 44033
+      protocol: UDP
+    - name : udp4034
+      port: 44034
+      targetPort: 44034
+      protocol: UDP
+    - name : udp4035
+      port: 44035
+      targetPort: 44035
+      protocol: UDP
+    - name : udp4036
+      port: 44036
+      targetPort: 44036
+      protocol: UDP
+    - name : udp4037
+      port: 44037
+      targetPort: 44037
+      protocol: UDP
+    - name : udp4038
+      port: 44038
+      targetPort: 44038
+      protocol: UDP
+    - name : udp4039
+      port: 44039
+      targetPort: 44039
+      protocol: UDP
+    - name : udp4040
+      port: 44040
+      targetPort: 44040
+      protocol: UDP
+    - name : udp4041
+      port: 44041
+      targetPort: 44041
+      protocol: UDP
+    - name : udp4042
+      port: 44042
+      targetPort: 44042
+      protocol: UDP
+    - name : udp4043
+      port: 44043
+      targetPort: 44043
+      protocol: UDP
+    - name : udp4044
+      port: 44044
+      targetPort: 44044
+      protocol: UDP
+    - name : udp4045
+      port: 44045
+      targetPort: 44045
+      protocol: UDP
+    - name : udp4046
+      port: 44046
+      targetPort: 44046
+      protocol: UDP
+    - name : udp4047
+      port: 44047
+      targetPort: 44047
+      protocol: UDP
+    - name : udp4048
+      port: 44048
+      targetPort: 44048
+      protocol: UDP
+    - name : udp4049
+      port: 44049
+      targetPort: 44049
+      protocol: UDP
+    - name : udp4050
+      port: 44050
+      targetPort: 44050
+      protocol: UDP
+    - name : udp4051
+      port: 44051
+      targetPort: 44051
+      protocol: UDP
+    - name : udp4052
+      port: 44052
+      targetPort: 44052
+      protocol: UDP
+    - name : udp4053
+      port: 44053
+      targetPort: 44053
+      protocol: UDP
+    - name : udp4054
+      port: 44054
+      targetPort: 44054
+      protocol: UDP
+    - name : udp4055
+      port: 44055
+      targetPort: 44055
+      protocol: UDP
+    - name : udp4056
+      port: 44056
+      targetPort: 44056
+      protocol: UDP
+    - name : udp4057
+      port: 44057
+      targetPort: 44057
+      protocol: UDP
+    - name : udp4058
+      port: 44058
+      targetPort: 44058
+      protocol: UDP
+    - name : udp4059
+      port: 44059
+      targetPort: 44059
+      protocol: UDP
+    - name : udp4060
+      port: 44060
+      targetPort: 44060
+      protocol: UDP
+    - name : udp4061
+      port: 44061
+      targetPort: 44061
+      protocol: UDP
+    - name : udp4062
+      port: 44062
+      targetPort: 44062
+      protocol: UDP
+    - name : udp4063
+      port: 44063
+      targetPort: 44063
+      protocol: UDP
+    - name : udp4064
+      port: 44064
+      targetPort: 44064
+      protocol: UDP
+    - name : udp4065
+      port: 44065
+      targetPort: 44065
+      protocol: UDP
+    - name : udp4066
+      port: 44066
+      targetPort: 44066
+      protocol: UDP
+    - name : udp4067
+      port: 44067
+      targetPort: 44067
+      protocol: UDP
+    - name : udp4068
+      port: 44068
+      targetPort: 44068
+      protocol: UDP
+    - name : udp4069
+      port: 44069
+      targetPort: 44069
+      protocol: UDP
+    - name : udp4070
+      port: 44070
+      targetPort: 44070
+      protocol: UDP
+    - name : udp4071
+      port: 44071
+      targetPort: 44071
+      protocol: UDP
+    - name : udp4072
+      port: 44072
+      targetPort: 44072
+      protocol: UDP
+    - name : udp4073
+      port: 44073
+      targetPort: 44073
+      protocol: UDP
+    - name : udp4074
+      port: 44074
+      targetPort: 44074
+      protocol: UDP
+    - name : udp4075
+      port: 44075
+      targetPort: 44075
+      protocol: UDP
+    - name : udp4076
+      port: 44076
+      targetPort: 44076
+      protocol: UDP
+    - name : udp4077
+      port: 44077
+      targetPort: 44077
+      protocol: UDP
+    - name : udp4078
+      port: 44078
+      targetPort: 44078
+      protocol: UDP
+    - name : udp4079
+      port: 44079
+      targetPort: 44079
+      protocol: UDP
+    - name : udp4080
+      port: 44080
+      targetPort: 44080
+      protocol: UDP
+    - name : udp4081
+      port: 44081
+      targetPort: 44081
+      protocol: UDP
+    - name : udp4082
+      port: 44082
+      targetPort: 44082
+      protocol: UDP
+    - name : udp4083
+      port: 44083
+      targetPort: 44083
+      protocol: UDP
+    - name : udp4084
+      port: 44084
+      targetPort: 44084
+      protocol: UDP
+    - name : udp4085
+      port: 44085
+      targetPort: 44085
+      protocol: UDP
+    - name : udp4086
+      port: 44086
+      targetPort: 44086
+      protocol: UDP
+    - name : udp4087
+      port: 44087
+      targetPort: 44087
+      protocol: UDP
+    - name : udp4088
+      port: 44088
+      targetPort: 44088
+      protocol: UDP
+    - name : udp4089
+      port: 44089
+      targetPort: 44089
+      protocol: UDP
+    - name : udp4090
+      port: 44090
+      targetPort: 44090
+      protocol: UDP
+    - name : udp4091
+      port: 44091
+      targetPort: 44091
+      protocol: UDP
+    - name : udp4092
+      port: 44092
+      targetPort: 44092
+      protocol: UDP
+    - name : udp4093
+      port: 44093
+      targetPort: 44093
+      protocol: UDP
+    - name : udp4094
+      port: 44094
+      targetPort: 44094
+      protocol: UDP
+    - name : udp4095
+      port: 44095
+      targetPort: 44095
+      protocol: UDP
+    - name : udp4096
+      port: 44096
+      targetPort: 44096
+      protocol: UDP
+    - name : udp4097
+      port: 44097
+      targetPort: 44097
+      protocol: UDP
+    - name : udp4098
+      port: 44098
+      targetPort: 44098
+      protocol: UDP
+    - name : udp4099
+      port: 44099
+      targetPort: 44099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

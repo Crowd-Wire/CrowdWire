@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp36
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp3600
+      port: 43600
+      targetPort: 43600
+      protocol: UDP
+    - name : udp3601
+      port: 43601
+      targetPort: 43601
+      protocol: UDP
+    - name : udp3602
+      port: 43602
+      targetPort: 43602
+      protocol: UDP
+    - name : udp3603
+      port: 43603
+      targetPort: 43603
+      protocol: UDP
+    - name : udp3604
+      port: 43604
+      targetPort: 43604
+      protocol: UDP
+    - name : udp3605
+      port: 43605
+      targetPort: 43605
+      protocol: UDP
+    - name : udp3606
+      port: 43606
+      targetPort: 43606
+      protocol: UDP
+    - name : udp3607
+      port: 43607
+      targetPort: 43607
+      protocol: UDP
+    - name : udp3608
+      port: 43608
+      targetPort: 43608
+      protocol: UDP
+    - name : udp3609
+      port: 43609
+      targetPort: 43609
+      protocol: UDP
+    - name : udp3610
+      port: 43610
+      targetPort: 43610
+      protocol: UDP
+    - name : udp3611
+      port: 43611
+      targetPort: 43611
+      protocol: UDP
+    - name : udp3612
+      port: 43612
+      targetPort: 43612
+      protocol: UDP
+    - name : udp3613
+      port: 43613
+      targetPort: 43613
+      protocol: UDP
+    - name : udp3614
+      port: 43614
+      targetPort: 43614
+      protocol: UDP
+    - name : udp3615
+      port: 43615
+      targetPort: 43615
+      protocol: UDP
+    - name : udp3616
+      port: 43616
+      targetPort: 43616
+      protocol: UDP
+    - name : udp3617
+      port: 43617
+      targetPort: 43617
+      protocol: UDP
+    - name : udp3618
+      port: 43618
+      targetPort: 43618
+      protocol: UDP
+    - name : udp3619
+      port: 43619
+      targetPort: 43619
+      protocol: UDP
+    - name : udp3620
+      port: 43620
+      targetPort: 43620
+      protocol: UDP
+    - name : udp3621
+      port: 43621
+      targetPort: 43621
+      protocol: UDP
+    - name : udp3622
+      port: 43622
+      targetPort: 43622
+      protocol: UDP
+    - name : udp3623
+      port: 43623
+      targetPort: 43623
+      protocol: UDP
+    - name : udp3624
+      port: 43624
+      targetPort: 43624
+      protocol: UDP
+    - name : udp3625
+      port: 43625
+      targetPort: 43625
+      protocol: UDP
+    - name : udp3626
+      port: 43626
+      targetPort: 43626
+      protocol: UDP
+    - name : udp3627
+      port: 43627
+      targetPort: 43627
+      protocol: UDP
+    - name : udp3628
+      port: 43628
+      targetPort: 43628
+      protocol: UDP
+    - name : udp3629
+      port: 43629
+      targetPort: 43629
+      protocol: UDP
+    - name : udp3630
+      port: 43630
+      targetPort: 43630
+      protocol: UDP
+    - name : udp3631
+      port: 43631
+      targetPort: 43631
+      protocol: UDP
+    - name : udp3632
+      port: 43632
+      targetPort: 43632
+      protocol: UDP
+    - name : udp3633
+      port: 43633
+      targetPort: 43633
+      protocol: UDP
+    - name : udp3634
+      port: 43634
+      targetPort: 43634
+      protocol: UDP
+    - name : udp3635
+      port: 43635
+      targetPort: 43635
+      protocol: UDP
+    - name : udp3636
+      port: 43636
+      targetPort: 43636
+      protocol: UDP
+    - name : udp3637
+      port: 43637
+      targetPort: 43637
+      protocol: UDP
+    - name : udp3638
+      port: 43638
+      targetPort: 43638
+      protocol: UDP
+    - name : udp3639
+      port: 43639
+      targetPort: 43639
+      protocol: UDP
+    - name : udp3640
+      port: 43640
+      targetPort: 43640
+      protocol: UDP
+    - name : udp3641
+      port: 43641
+      targetPort: 43641
+      protocol: UDP
+    - name : udp3642
+      port: 43642
+      targetPort: 43642
+      protocol: UDP
+    - name : udp3643
+      port: 43643
+      targetPort: 43643
+      protocol: UDP
+    - name : udp3644
+      port: 43644
+      targetPort: 43644
+      protocol: UDP
+    - name : udp3645
+      port: 43645
+      targetPort: 43645
+      protocol: UDP
+    - name : udp3646
+      port: 43646
+      targetPort: 43646
+      protocol: UDP
+    - name : udp3647
+      port: 43647
+      targetPort: 43647
+      protocol: UDP
+    - name : udp3648
+      port: 43648
+      targetPort: 43648
+      protocol: UDP
+    - name : udp3649
+      port: 43649
+      targetPort: 43649
+      protocol: UDP
+    - name : udp3650
+      port: 43650
+      targetPort: 43650
+      protocol: UDP
+    - name : udp3651
+      port: 43651
+      targetPort: 43651
+      protocol: UDP
+    - name : udp3652
+      port: 43652
+      targetPort: 43652
+      protocol: UDP
+    - name : udp3653
+      port: 43653
+      targetPort: 43653
+      protocol: UDP
+    - name : udp3654
+      port: 43654
+      targetPort: 43654
+      protocol: UDP
+    - name : udp3655
+      port: 43655
+      targetPort: 43655
+      protocol: UDP
+    - name : udp3656
+      port: 43656
+      targetPort: 43656
+      protocol: UDP
+    - name : udp3657
+      port: 43657
+      targetPort: 43657
+      protocol: UDP
+    - name : udp3658
+      port: 43658
+      targetPort: 43658
+      protocol: UDP
+    - name : udp3659
+      port: 43659
+      targetPort: 43659
+      protocol: UDP
+    - name : udp3660
+      port: 43660
+      targetPort: 43660
+      protocol: UDP
+    - name : udp3661
+      port: 43661
+      targetPort: 43661
+      protocol: UDP
+    - name : udp3662
+      port: 43662
+      targetPort: 43662
+      protocol: UDP
+    - name : udp3663
+      port: 43663
+      targetPort: 43663
+      protocol: UDP
+    - name : udp3664
+      port: 43664
+      targetPort: 43664
+      protocol: UDP
+    - name : udp3665
+      port: 43665
+      targetPort: 43665
+      protocol: UDP
+    - name : udp3666
+      port: 43666
+      targetPort: 43666
+      protocol: UDP
+    - name : udp3667
+      port: 43667
+      targetPort: 43667
+      protocol: UDP
+    - name : udp3668
+      port: 43668
+      targetPort: 43668
+      protocol: UDP
+    - name : udp3669
+      port: 43669
+      targetPort: 43669
+      protocol: UDP
+    - name : udp3670
+      port: 43670
+      targetPort: 43670
+      protocol: UDP
+    - name : udp3671
+      port: 43671
+      targetPort: 43671
+      protocol: UDP
+    - name : udp3672
+      port: 43672
+      targetPort: 43672
+      protocol: UDP
+    - name : udp3673
+      port: 43673
+      targetPort: 43673
+      protocol: UDP
+    - name : udp3674
+      port: 43674
+      targetPort: 43674
+      protocol: UDP
+    - name : udp3675
+      port: 43675
+      targetPort: 43675
+      protocol: UDP
+    - name : udp3676
+      port: 43676
+      targetPort: 43676
+      protocol: UDP
+    - name : udp3677
+      port: 43677
+      targetPort: 43677
+      protocol: UDP
+    - name : udp3678
+      port: 43678
+      targetPort: 43678
+      protocol: UDP
+    - name : udp3679
+      port: 43679
+      targetPort: 43679
+      protocol: UDP
+    - name : udp3680
+      port: 43680
+      targetPort: 43680
+      protocol: UDP
+    - name : udp3681
+      port: 43681
+      targetPort: 43681
+      protocol: UDP
+    - name : udp3682
+      port: 43682
+      targetPort: 43682
+      protocol: UDP
+    - name : udp3683
+      port: 43683
+      targetPort: 43683
+      protocol: UDP
+    - name : udp3684
+      port: 43684
+      targetPort: 43684
+      protocol: UDP
+    - name : udp3685
+      port: 43685
+      targetPort: 43685
+      protocol: UDP
+    - name : udp3686
+      port: 43686
+      targetPort: 43686
+      protocol: UDP
+    - name : udp3687
+      port: 43687
+      targetPort: 43687
+      protocol: UDP
+    - name : udp3688
+      port: 43688
+      targetPort: 43688
+      protocol: UDP
+    - name : udp3689
+      port: 43689
+      targetPort: 43689
+      protocol: UDP
+    - name : udp3690
+      port: 43690
+      targetPort: 43690
+      protocol: UDP
+    - name : udp3691
+      port: 43691
+      targetPort: 43691
+      protocol: UDP
+    - name : udp3692
+      port: 43692
+      targetPort: 43692
+      protocol: UDP
+    - name : udp3693
+      port: 43693
+      targetPort: 43693
+      protocol: UDP
+    - name : udp3694
+      port: 43694
+      targetPort: 43694
+      protocol: UDP
+    - name : udp3695
+      port: 43695
+      targetPort: 43695
+      protocol: UDP
+    - name : udp3696
+      port: 43696
+      targetPort: 43696
+      protocol: UDP
+    - name : udp3697
+      port: 43697
+      targetPort: 43697
+      protocol: UDP
+    - name : udp3698
+      port: 43698
+      targetPort: 43698
+      protocol: UDP
+    - name : udp3699
+      port: 43699
+      targetPort: 43699
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}
