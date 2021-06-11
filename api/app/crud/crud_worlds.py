@@ -216,7 +216,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         else:
             # for a normal user, it can search for public, joined or created worlds
             if not is_superuser or (is_superuser and visibility):
-                logger.debug(requester_id)
                 query, msg = self.filter_by_visibility(query, visibility, requester_id)
                 if query is None:
                     return None, msg
