@@ -42,7 +42,7 @@ export default function AdminUserDetails() {
                     setUser(res);
                 })
                 .then(() => {
-                    WorldService.searchAdmin("", [], true, true, true, 1 , null, null, 1, 3)
+                    WorldService.searchAdmin("", [], true, true, 1 , null, null, 1, 3)
                     .then((res) => {
                         if(res.status!==200)
                             return null;
