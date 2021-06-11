@@ -61,7 +61,7 @@ async def send_email(
 ) -> None:
     access_token, expires = create_access_token(user_id, expires_delta=timedelta(settings.EMAIL_EXPIRE))
     html = f"<h3>Hello {email_to}</h3> " \
-           f"<a href={settings.FRONTEND_URL + 'confirm/' + access_token}> Confirm </a>"
+           f"<a href=\"{settings.FRONTEND_URL + 'confirm/' + access_token}\"> Confirm </a>"
 
     message = MessageSchema(
         subject="Crowdwire",
