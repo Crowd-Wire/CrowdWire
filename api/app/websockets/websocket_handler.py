@@ -4,7 +4,6 @@ from app.redis.connection import redis_connector
 from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
-import asyncio
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
@@ -62,9 +61,8 @@ async def send_groups_snapshot(world_id: str):
 
     await manager.broadcast(world_id, {'topic': 'GROUPS_SNAPSHOT', 'groups': groups})
 
-# lock = False
+
 async def wire_players(world_id: str, user_id: str, payload: dict):
-    # global lock
     users_id = payload['users_id']
 
     # add nearby users

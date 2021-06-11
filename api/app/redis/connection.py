@@ -342,17 +342,14 @@ class RedisConnector:
 
     async def get_user_position(self, world_id: str, user_id: str) -> dict:
         """Get last user position received"""
-        pairs = await self.execute('hgetall',
-                                          f"world:{world_id}:user:{user_id}:position", encoding="utf-8")
+        pairs = await self.execute('hgetall', f"world:{world_id}:user:{user_id}:position", encoding="utf-8")
         return {k: float(v) for k, v in zip(pairs[::2], pairs[1::2])}
 
     async def set_user_position(self, world_id: str, user_id: str, position: dict):
         """Update last user position received"""
         if not position:
             position = {'x': 50.0, 'y': 50.0}
-        return await self.execute('hmset',
-                                         f"world:{world_id}:user:{user_id}:position", 'x', position['x'],
-                                         'y', position['y'])
+        return await self.execute('hmset', f"world:{world_id}:user:{user_id}:position", 'x', position['x'], 'y', position['y'])
 
     async def get_world_users(self, world_id: str):
         return await self.smembers(f"world:{world_id}:users")
