@@ -149,6 +149,14 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);
             break;
         case "LEAVE_PLAYER":
+            console.log(data)
+            console.log(useRoomStore.getState())
+            if (data.groups) {
+              for (let i = 0; i < data.groups.length; i++) {
+                useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+              }
+            }
+            console.log(useRoomStore.getState())
             let user_id = data.user_id;
             useConsumerStore.getState().closePeer(user_id);
             usePlayerStore.getState().disconnectPlayer(user_id);
@@ -163,6 +171,14 @@ export const getSocket = (worldId) => {
             usePlayerStore.getState().wirePlayers(data.ids, data.merge);
             break;
         case "UNWIRE_PLAYER":
+            console.log(data)
+            console.log(useRoomStore.getState())
+            if (data.groups) {
+              for (let i = 0; i < data.groups.length; i++) {
+                useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+              }
+            }
+            console.log(useRoomStore.getState())
             usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
             break;
         case "GROUPS_SNAPSHOT":
@@ -193,6 +209,7 @@ export const getSocket = (worldId) => {
           break;
         case "you-are-now-a-speaker":
           console.log(data)
+          // TODO: HE ALREADY IN THE ROOM
           beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
               createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                 sendVideo(data.d.roomId);

@@ -6,7 +6,6 @@ export const useMediaStore = create(
     {
       mediaStream: null as MediaStream | null,
       media: null as MediaStreamTrack | null,
-      mediaProducer: null as any | null,
     },
     (set) => ({
       nullify: () => {
@@ -15,7 +14,6 @@ export const useMediaStore = create(
           return {
             media: null,
             mediaStream: null,
-            mediaProducer: null,
           }
         })
       },

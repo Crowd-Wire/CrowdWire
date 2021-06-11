@@ -190,50 +190,57 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoPauseState(!videoPauseState)
     useMuteStore.getState().setVideoMute(videoPauseState);
-    let { camProducer } = useVideoStore.getState();
-    let { rooms } = useRoomStore.getState();
-
-    sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
-
-    if (camProducer) {
-      if (videoPauseState)
-        camProducer.pause();
-      else
-        camProducer.resume();
-      for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
-    }
+    
+    sendVideo().then(() => {
+      let { rooms } = useRoomStore.getState();
+      if (Object.keys(rooms).length > 0) {
+        for (const [key, value] of Object.entries(rooms)) {
+          if (value.camProducer) {
+            if (videoPauseState)
+              value.camProducer.pause();
+            else
+              value.camProducer.resume();
+          }
+        }
+      }
+    })
+    wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
   }
   const toggleAudio = () => {
     setAudioPauseState(!audioPauseState)
     useMuteStore.getState().setAudioMute(audioPauseState)
-    let { micProducer } = useVoiceStore.getState();
-    let { rooms } = useRoomStore.getState();
 
-    sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
-    
-    if (micProducer) {
-      if (audioPauseState)
-        micProducer.pause();
-      else {
-        micProducer.resume();
+    sendVoice().then(() => {
+      let { rooms } = useRoomStore.getState();
+      if (Object.keys(rooms).length > 0) {
+        for (const [key, value] of Object.entries(rooms)) {
+          if (value.micProducer) {
+            if (videoPauseState)
+              value.micProducer.pause();
+            else
+              value.micProducer.resume();
+          }
+        }
       }
-      for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
-    }
+    });
+
+    wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
   }
 
   const toggleMedia = () => {
-    let { mediaProducer, set } = useMediaStore.getState();
+    let { set } = useMediaStore.getState();
+    let { rooms, removeProducer } = useRoomStore.getState();
     
     if (mediaOffState)
       sendMedia().then((media) => {
         if (media)
           setMediaOffState(!mediaOffState)
         });
-    else if (mediaProducer) {
-      mediaProducer.close()
-      set({media: null, mediaStream: null, mediaProducer: null})
+    else if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        removeProducer(key, 'media');
+      }
+      set({media: null, mediaStream: null})
     }
   }
 

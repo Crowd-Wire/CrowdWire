@@ -220,7 +220,10 @@ export const useConsumerStore = create(
               break;
             };
           }
+          console.log(to_close)
+          console.log(useRoomStore.getState().rooms)
           if (to_close) useRoomStore.getState().removeRoom(roomId);
+          console.log(useRoomStore.getState().rooms)
           return {
             consumerMap: {
               ...s.consumerMap
@@ -243,7 +246,9 @@ export const useConsumerStore = create(
         }),
       closePeer: (userId) =>
         set((s) => {
+          console.log(userId)
           let user = s.consumerMap[userId]
+          console.log(user)
           if (user) {
             if (user.consumerAudio && !user.consumerAudio.closed) {
               user.consumerAudio.close()

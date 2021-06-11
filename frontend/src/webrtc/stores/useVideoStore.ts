@@ -1,3 +1,4 @@
+import { Producer } from "mediasoup-client/lib/Producer";
 import create from "zustand";
 import { combine } from "zustand/middleware";
 
@@ -6,7 +7,6 @@ export const useVideoStore = create(
     {
       camStream: null as MediaStream | null,
       cam: null as MediaStreamTrack | null,
-      camProducer: null as any | null,
     },
     (set) => ({
       nullify: () => {
@@ -15,7 +15,6 @@ export const useVideoStore = create(
           return {
             cam: null,
             camStream: null,
-            camProducer: null,
           }
         })
       },

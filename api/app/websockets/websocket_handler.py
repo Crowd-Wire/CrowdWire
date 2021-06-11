@@ -112,18 +112,23 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         users_in_my_group.update(await redis_connector.get_group_users(world_id, guid))
 
     add_users_id &= users_in_my_group
+    groups_to_remove = []
 
     if rem_groups_id:
         # remove user from groups where the faraway users are
         # rem user_id from rem_groups_ids
         # return close rooms aswell
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': rem_groups_id}})
-        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
+        groups_to_remove = await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id)
+        await handle_actions(groups_to_remove)
+        logger.info(groups_to_remove)
+        groups_to_remove = groups_to_remove['close-room']
+        logger.info(groups_to_remove)
     if add_users_id:
         # add user to a new group with the still nearby users
         await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
 
-    await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'merge': True, 'ids': users_id}, user_id)
+    await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'groups': groups_to_remove, 'merge': True, 'ids': users_id}, user_id)
     await send_groups_snapshot(world_id)
 
 
@@ -131,15 +136,20 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
     conference_id = payload['conference_id']
     groups_id = await redis_connector.get_user_groups(world_id, user_id)
 
-    for gid in groups_id:
-        for uid in await redis_connector.get_group_users(world_id, gid):
-            await manager.send_personal_message({
-                'topic': protocol.UNWIRE_PLAYER, 'merge': True,
-                'ids': [user_id]
-            }, uid)
+    groups_to_remove = []
 
     if groups_id:
-        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id))
+        groups_to_remove = await redis_connector.rem_groups_from_user(world_id, user_id, *groups_id)
+        await handle_actions(groups_to_remove)
+        groups_to_remove = groups_to_remove['close-room']
+
+        for gid in groups_id:
+            for uid in await redis_connector.get_group_users(world_id, gid):
+                await manager.send_personal_message({
+                    'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                    'groups': groups_to_remove,
+                    'ids': [user_id]
+                }, uid)
     await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
     await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
 
@@ -257,6 +267,7 @@ async def leave_conference(world_id: str, user_id: str, payload: dict):
 
     await manager.send_personal_message({
         'topic': protocol.UNWIRE_PLAYER, 'merge': False,
+        'groups': conference_id,
         'ids': []
     }, user_id)
     for uid in await redis_connector.get_group_users(world_id, conference_id):
@@ -275,10 +286,27 @@ async def disconnect_user(world_id: str, user_id: str):
 
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
+    groups_to_remove = []
+    users_in_groups = set()
     if group_ids:
         await handle_actions({'rem-user-from-groups': {'worldId': world_id, 'peerId': user_id, 'groupIds': group_ids}})
-        await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids))
-
+        for gid in group_ids:
+            users_in_groups.update(await redis_connector.get_group_users(world_id, gid))
+        logger.info(users_in_groups)
+        groups_to_remove = await redis_connector.rem_groups_from_user(world_id, user_id, *group_ids)
+        await handle_actions(groups_to_remove)
+        groups_to_remove = groups_to_remove['close-room']
+        logger.info(groups_to_remove)
+        for gid in groups_to_remove:
+            group_id = gid['roomId']
+            for uid in users_in_groups:
+                if uid != user_id:
+                    await manager.send_personal_message({
+                        'topic': protocol.UNWIRE_PLAYER, 'merge': True,
+                        'groups': groups_to_remove,
+                        'ids': [user_id]
+                    }, uid)
+    
 
 async def handle_actions(actions: dict):
     logger.info(actions)

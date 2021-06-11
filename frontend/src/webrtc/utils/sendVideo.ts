@@ -2,27 +2,25 @@ import storeDevice from "../../redux/commStore.js";
 import { useRoomStore } from "../stores/useRoomStore";
 import { useVideoStore } from "../stores/useVideoStore";
 import { useMuteStore } from "../stores/useMuteStore";
-import { Transport } from "mediasoup-client/lib/Transport";
 
 export const sendVideo = async (roomId:string = null) => {
   const { camId } = storeDevice.getState().camId;
   let { set, cam, camStream } = useVideoStore.getState();
-  const { rooms } = useRoomStore.getState();
+  const { rooms, addProducer, removeProducer } = useRoomStore.getState();
   const { videoMuted } = useMuteStore.getState();
   
   if ( (roomId && !(roomId in rooms)) || videoMuted)
     return;
   
-  const sendTransports: Transport[] = [];
+  let sendTransports: {} = {};
 
   if (roomId)
-    sendTransports.push(rooms[roomId].sendTransport)
+    sendTransports = { roomId: rooms[roomId].sendTransport }
   else {
-    for (let value of Object.values(rooms))
-      sendTransports.push(value.sendTransport)
+    sendTransports = rooms;
   }
 
-  if (sendTransports.length <= 0) {
+  if (Object.keys(sendTransports).length <= 0) {
     console.log("no sendTransport in sendVoice");
     return;
   }
@@ -45,23 +43,26 @@ export const sendVideo = async (roomId:string = null) => {
 
   if (cam) {
     console.log("creating producer...");
-    sendTransports.forEach(function (sendTransport) {
-      if (sendTransport) {
-        sendTransport.produce({
+    for (const [ key, value ] of Object.entries(sendTransports)) {
+      //@ts-ignore
+      if (value && value.sendTransport) {
+        //@ts-ignore
+        value.sendTransport.produce({
           track: cam,
           appData: { mediaTag: "video" },
         })
         .then((producer) => {
-          set({camProducer: producer})
-          producer.on("transportclose", () => {
-            producer.close();
-          })
+          console.log(useRoomStore.getState())
+          addProducer(key, producer, 'cam');
+          console.log(useRoomStore.getState())
         })
         .catch((err) => {
+          set({ cam: null, camStream: null });
+          removeProducer(key, 'cam');
           console.log(err)
         })
-      }
-    });
 
+      }
+    }
   }
 };

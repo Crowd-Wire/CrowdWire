@@ -1,3 +1,4 @@
+import { Producer } from "mediasoup-client/lib/Producer";
 import create from "zustand";
 import { combine } from "zustand/middleware";
 
@@ -6,7 +7,6 @@ export const useVoiceStore = create(
     {
       micStream: null as MediaStream | null,
       mic: null as MediaStreamTrack | null,
-      micProducer: null as any | null,
     },
     (set) => ({
       nullify: () => {
@@ -15,7 +15,6 @@ export const useVoiceStore = create(
           return {
             mic: null,
             micStream: null,
-            micProducer: null,
           }
         })
       },

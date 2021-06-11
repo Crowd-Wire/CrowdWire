@@ -1,25 +1,22 @@
 import { useRoomStore } from "../stores/useRoomStore";
 import { useMediaStore } from "../stores/useMediaStore";
-import { Transport } from "mediasoup-client/lib/Transport";
 
 export const sendMedia = async (roomId:string = null) => {
   let { set, media, mediaStream } = useMediaStore.getState();
-  const { rooms } = useRoomStore.getState();
-
+  const { rooms, addProducer, removeProducer } = useRoomStore.getState();
   
   if (roomId && !(roomId in rooms))
     return;
   
-  const sendTransports: Transport[] = [];
+  let sendTransports: {} = {};
 
   if (roomId)
-    sendTransports.push(rooms[roomId].sendTransport)
+    sendTransports = { roomId: rooms[roomId].sendTransport }
   else {
-    for (let value of Object.values(rooms))
-      sendTransports.push(value.sendTransport)
+    sendTransports = rooms;
   }
 
-  if (sendTransports.length <= 0) {
+  if (Object.keys(sendTransports).length <= 0) {
     console.log("no sendTransport in sendVoice");
     return;
   }
@@ -32,7 +29,7 @@ export const sendMedia = async (roomId:string = null) => {
         set({mediaStream: mediaStream, media: media})
       })
     } catch (err) {
-      set({ media: null, mediaStream: null });
+      set({media: null, mediaStream: null})
       console.log(err);
       return;
     }
@@ -41,25 +38,32 @@ export const sendMedia = async (roomId:string = null) => {
   if (media) {
     try {
       console.log("creating producer...");
-      sendTransports.forEach(function (sendTransport) {
-        if (sendTransport) {
-          sendTransport.produce({
+      for (const [ key, value ] of Object.entries(sendTransports)) {
+        //@ts-ignore
+        if (value && value.sendTransport) {
+          //@ts-ignore
+          value.sendTransport.produce({
             track: media,
             appData: { mediaTag: "media" },
           })
           .then((producer) => {
-            set({mediaProducer: producer});
-            producer.on("transportclose", () => {
-              producer.close();
-              set({media: null, mediaStream: null, mediaProducer: null});
-            })
+            addProducer(key, producer, 'media');
           })
-          .catch((err) => console.log(err))
+          .catch((err) => {
+            console.log(err)
+            removeProducer(key, 'media');
+            set({media: null, mediaStream: null})
+          })
         }
-      });
+      };
       media.onended = function(event) {
-        useMediaStore.getState().mediaProducer.close();
-        set({media: null, mediaStream: null, mediaProducer: null})
+        let { rooms } = useRoomStore.getState();
+        if (Object.keys(rooms).length > 0) {
+          for (const [key, value] of Object.entries(rooms)) {
+            removeProducer(key, 'media');
+          }
+        }
+        set({media: null, mediaStream: null})
       }
       return true;
     } catch (err) {
