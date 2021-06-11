@@ -13,9 +13,10 @@ import WorldService from "services/WorldService.ts";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';
+import BuildIcon from '@material-ui/icons/Build';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import Button from "components/CustomButtons/Button.js";
-import { useNavigate } from 'react-router-dom';
-
+import { withRouter } from "utils/wrapper";
 
 class DashboardStats extends Component{
     
@@ -27,6 +28,8 @@ class DashboardStats extends Component{
             open: false,
             page: false
         }
+        this.navigate = props.navigate;
+        this.params = props.params;
     }
 
    
@@ -86,7 +89,15 @@ class DashboardStats extends Component{
                     { this.props.canManage ? 
                         <Row sm={12}>
                             <Button color="primary" onClick={() => {this.showWorldManagement()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
-                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Manage Map</span>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><AssignmentIcon/>Manage World</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
+                    { this.props.isCreator ? 
+                        <Row sm={12}>
+                            <Button color="primary" onClick={() => this.navigate('/world/' + this.params.id + '/editor')} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><BuildIcon/>Edit World</span>
                             </Button>
                         </Row>
                     : ''
@@ -146,4 +157,4 @@ class DashboardStats extends Component{
     }
 }
 
-export default (DashboardStats);
+export default withRouter(DashboardStats);
