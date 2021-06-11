@@ -8,23 +8,12 @@ from app.redis.connection import redis_connector
 
 
 class ConnectionManager:
-    user_count = -1  # TODO: remove after tests
-    group_count = -1
 
     def __init__(self):
         """
         Dictionary with the user_id as key and the corresponding websocket as value
         """
         self.users_ws: Dict[str, WebSocket] = {}
-
-    # TODO: remove after tests
-    def get_next_user_id(self):
-        self.user_count += 1
-        return str(self.user_count)
-
-    def get_next_group_id(self):
-        self.group_count += 1
-        return str(self.group_count)
 
     async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> bool:
         await websocket.accept()

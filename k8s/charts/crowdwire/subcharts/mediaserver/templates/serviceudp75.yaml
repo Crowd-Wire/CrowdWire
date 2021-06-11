@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp75
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp7500
+      port: 47500
+      targetPort: 47500
+      protocol: UDP
+    - name : udp7501
+      port: 47501
+      targetPort: 47501
+      protocol: UDP
+    - name : udp7502
+      port: 47502
+      targetPort: 47502
+      protocol: UDP
+    - name : udp7503
+      port: 47503
+      targetPort: 47503
+      protocol: UDP
+    - name : udp7504
+      port: 47504
+      targetPort: 47504
+      protocol: UDP
+    - name : udp7505
+      port: 47505
+      targetPort: 47505
+      protocol: UDP
+    - name : udp7506
+      port: 47506
+      targetPort: 47506
+      protocol: UDP
+    - name : udp7507
+      port: 47507
+      targetPort: 47507
+      protocol: UDP
+    - name : udp7508
+      port: 47508
+      targetPort: 47508
+      protocol: UDP
+    - name : udp7509
+      port: 47509
+      targetPort: 47509
+      protocol: UDP
+    - name : udp7510
+      port: 47510
+      targetPort: 47510
+      protocol: UDP
+    - name : udp7511
+      port: 47511
+      targetPort: 47511
+      protocol: UDP
+    - name : udp7512
+      port: 47512
+      targetPort: 47512
+      protocol: UDP
+    - name : udp7513
+      port: 47513
+      targetPort: 47513
+      protocol: UDP
+    - name : udp7514
+      port: 47514
+      targetPort: 47514
+      protocol: UDP
+    - name : udp7515
+      port: 47515
+      targetPort: 47515
+      protocol: UDP
+    - name : udp7516
+      port: 47516
+      targetPort: 47516
+      protocol: UDP
+    - name : udp7517
+      port: 47517
+      targetPort: 47517
+      protocol: UDP
+    - name : udp7518
+      port: 47518
+      targetPort: 47518
+      protocol: UDP
+    - name : udp7519
+      port: 47519
+      targetPort: 47519
+      protocol: UDP
+    - name : udp7520
+      port: 47520
+      targetPort: 47520
+      protocol: UDP
+    - name : udp7521
+      port: 47521
+      targetPort: 47521
+      protocol: UDP
+    - name : udp7522
+      port: 47522
+      targetPort: 47522
+      protocol: UDP
+    - name : udp7523
+      port: 47523
+      targetPort: 47523
+      protocol: UDP
+    - name : udp7524
+      port: 47524
+      targetPort: 47524
+      protocol: UDP
+    - name : udp7525
+      port: 47525
+      targetPort: 47525
+      protocol: UDP
+    - name : udp7526
+      port: 47526
+      targetPort: 47526
+      protocol: UDP
+    - name : udp7527
+      port: 47527
+      targetPort: 47527
+      protocol: UDP
+    - name : udp7528
+      port: 47528
+      targetPort: 47528
+      protocol: UDP
+    - name : udp7529
+      port: 47529
+      targetPort: 47529
+      protocol: UDP
+    - name : udp7530
+      port: 47530
+      targetPort: 47530
+      protocol: UDP
+    - name : udp7531
+      port: 47531
+      targetPort: 47531
+      protocol: UDP
+    - name : udp7532
+      port: 47532
+      targetPort: 47532
+      protocol: UDP
+    - name : udp7533
+      port: 47533
+      targetPort: 47533
+      protocol: UDP
+    - name : udp7534
+      port: 47534
+      targetPort: 47534
+      protocol: UDP
+    - name : udp7535
+      port: 47535
+      targetPort: 47535
+      protocol: UDP
+    - name : udp7536
+      port: 47536
+      targetPort: 47536
+      protocol: UDP
+    - name : udp7537
+      port: 47537
+      targetPort: 47537
+      protocol: UDP
+    - name : udp7538
+      port: 47538
+      targetPort: 47538
+      protocol: UDP
+    - name : udp7539
+      port: 47539
+      targetPort: 47539
+      protocol: UDP
+    - name : udp7540
+      port: 47540
+      targetPort: 47540
+      protocol: UDP
+    - name : udp7541
+      port: 47541
+      targetPort: 47541
+      protocol: UDP
+    - name : udp7542
+      port: 47542
+      targetPort: 47542
+      protocol: UDP
+    - name : udp7543
+      port: 47543
+      targetPort: 47543
+      protocol: UDP
+    - name : udp7544
+      port: 47544
+      targetPort: 47544
+      protocol: UDP
+    - name : udp7545
+      port: 47545
+      targetPort: 47545
+      protocol: UDP
+    - name : udp7546
+      port: 47546
+      targetPort: 47546
+      protocol: UDP
+    - name : udp7547
+      port: 47547
+      targetPort: 47547
+      protocol: UDP
+    - name : udp7548
+      port: 47548
+      targetPort: 47548
+      protocol: UDP
+    - name : udp7549
+      port: 47549
+      targetPort: 47549
+      protocol: UDP
+    - name : udp7550
+      port: 47550
+      targetPort: 47550
+      protocol: UDP
+    - name : udp7551
+      port: 47551
+      targetPort: 47551
+      protocol: UDP
+    - name : udp7552
+      port: 47552
+      targetPort: 47552
+      protocol: UDP
+    - name : udp7553
+      port: 47553
+      targetPort: 47553
+      protocol: UDP
+    - name : udp7554
+      port: 47554
+      targetPort: 47554
+      protocol: UDP
+    - name : udp7555
+      port: 47555
+      targetPort: 47555
+      protocol: UDP
+    - name : udp7556
+      port: 47556
+      targetPort: 47556
+      protocol: UDP
+    - name : udp7557
+      port: 47557
+      targetPort: 47557
+      protocol: UDP
+    - name : udp7558
+      port: 47558
+      targetPort: 47558
+      protocol: UDP
+    - name : udp7559
+      port: 47559
+      targetPort: 47559
+      protocol: UDP
+    - name : udp7560
+      port: 47560
+      targetPort: 47560
+      protocol: UDP
+    - name : udp7561
+      port: 47561
+      targetPort: 47561
+      protocol: UDP
+    - name : udp7562
+      port: 47562
+      targetPort: 47562
+      protocol: UDP
+    - name : udp7563
+      port: 47563
+      targetPort: 47563
+      protocol: UDP
+    - name : udp7564
+      port: 47564
+      targetPort: 47564
+      protocol: UDP
+    - name : udp7565
+      port: 47565
+      targetPort: 47565
+      protocol: UDP
+    - name : udp7566
+      port: 47566
+      targetPort: 47566
+      protocol: UDP
+    - name : udp7567
+      port: 47567
+      targetPort: 47567
+      protocol: UDP
+    - name : udp7568
+      port: 47568
+      targetPort: 47568
+      protocol: UDP
+    - name : udp7569
+      port: 47569
+      targetPort: 47569
+      protocol: UDP
+    - name : udp7570
+      port: 47570
+      targetPort: 47570
+      protocol: UDP
+    - name : udp7571
+      port: 47571
+      targetPort: 47571
+      protocol: UDP
+    - name : udp7572
+      port: 47572
+      targetPort: 47572
+      protocol: UDP
+    - name : udp7573
+      port: 47573
+      targetPort: 47573
+      protocol: UDP
+    - name : udp7574
+      port: 47574
+      targetPort: 47574
+      protocol: UDP
+    - name : udp7575
+      port: 47575
+      targetPort: 47575
+      protocol: UDP
+    - name : udp7576
+      port: 47576
+      targetPort: 47576
+      protocol: UDP
+    - name : udp7577
+      port: 47577
+      targetPort: 47577
+      protocol: UDP
+    - name : udp7578
+      port: 47578
+      targetPort: 47578
+      protocol: UDP
+    - name : udp7579
+      port: 47579
+      targetPort: 47579
+      protocol: UDP
+    - name : udp7580
+      port: 47580
+      targetPort: 47580
+      protocol: UDP
+    - name : udp7581
+      port: 47581
+      targetPort: 47581
+      protocol: UDP
+    - name : udp7582
+      port: 47582
+      targetPort: 47582
+      protocol: UDP
+    - name : udp7583
+      port: 47583
+      targetPort: 47583
+      protocol: UDP
+    - name : udp7584
+      port: 47584
+      targetPort: 47584
+      protocol: UDP
+    - name : udp7585
+      port: 47585
+      targetPort: 47585
+      protocol: UDP
+    - name : udp7586
+      port: 47586
+      targetPort: 47586
+      protocol: UDP
+    - name : udp7587
+      port: 47587
+      targetPort: 47587
+      protocol: UDP
+    - name : udp7588
+      port: 47588
+      targetPort: 47588
+      protocol: UDP
+    - name : udp7589
+      port: 47589
+      targetPort: 47589
+      protocol: UDP
+    - name : udp7590
+      port: 47590
+      targetPort: 47590
+      protocol: UDP
+    - name : udp7591
+      port: 47591
+      targetPort: 47591
+      protocol: UDP
+    - name : udp7592
+      port: 47592
+      targetPort: 47592
+      protocol: UDP
+    - name : udp7593
+      port: 47593
+      targetPort: 47593
+      protocol: UDP
+    - name : udp7594
+      port: 47594
+      targetPort: 47594
+      protocol: UDP
+    - name : udp7595
+      port: 47595
+      targetPort: 47595
+      protocol: UDP
+    - name : udp7596
+      port: 47596
+      targetPort: 47596
+      protocol: UDP
+    - name : udp7597
+      port: 47597
+      targetPort: 47597
+      protocol: UDP
+    - name : udp7598
+      port: 47598
+      targetPort: 47598
+      protocol: UDP
+    - name : udp7599
+      port: 47599
+      targetPort: 47599
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

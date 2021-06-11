@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp51
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp5100
+      port: 45100
+      targetPort: 45100
+      protocol: UDP
+    - name : udp5101
+      port: 45101
+      targetPort: 45101
+      protocol: UDP
+    - name : udp5102
+      port: 45102
+      targetPort: 45102
+      protocol: UDP
+    - name : udp5103
+      port: 45103
+      targetPort: 45103
+      protocol: UDP
+    - name : udp5104
+      port: 45104
+      targetPort: 45104
+      protocol: UDP
+    - name : udp5105
+      port: 45105
+      targetPort: 45105
+      protocol: UDP
+    - name : udp5106
+      port: 45106
+      targetPort: 45106
+      protocol: UDP
+    - name : udp5107
+      port: 45107
+      targetPort: 45107
+      protocol: UDP
+    - name : udp5108
+      port: 45108
+      targetPort: 45108
+      protocol: UDP
+    - name : udp5109
+      port: 45109
+      targetPort: 45109
+      protocol: UDP
+    - name : udp5110
+      port: 45110
+      targetPort: 45110
+      protocol: UDP
+    - name : udp5111
+      port: 45111
+      targetPort: 45111
+      protocol: UDP
+    - name : udp5112
+      port: 45112
+      targetPort: 45112
+      protocol: UDP
+    - name : udp5113
+      port: 45113
+      targetPort: 45113
+      protocol: UDP
+    - name : udp5114
+      port: 45114
+      targetPort: 45114
+      protocol: UDP
+    - name : udp5115
+      port: 45115
+      targetPort: 45115
+      protocol: UDP
+    - name : udp5116
+      port: 45116
+      targetPort: 45116
+      protocol: UDP
+    - name : udp5117
+      port: 45117
+      targetPort: 45117
+      protocol: UDP
+    - name : udp5118
+      port: 45118
+      targetPort: 45118
+      protocol: UDP
+    - name : udp5119
+      port: 45119
+      targetPort: 45119
+      protocol: UDP
+    - name : udp5120
+      port: 45120
+      targetPort: 45120
+      protocol: UDP
+    - name : udp5121
+      port: 45121
+      targetPort: 45121
+      protocol: UDP
+    - name : udp5122
+      port: 45122
+      targetPort: 45122
+      protocol: UDP
+    - name : udp5123
+      port: 45123
+      targetPort: 45123
+      protocol: UDP
+    - name : udp5124
+      port: 45124
+      targetPort: 45124
+      protocol: UDP
+    - name : udp5125
+      port: 45125
+      targetPort: 45125
+      protocol: UDP
+    - name : udp5126
+      port: 45126
+      targetPort: 45126
+      protocol: UDP
+    - name : udp5127
+      port: 45127
+      targetPort: 45127
+      protocol: UDP
+    - name : udp5128
+      port: 45128
+      targetPort: 45128
+      protocol: UDP
+    - name : udp5129
+      port: 45129
+      targetPort: 45129
+      protocol: UDP
+    - name : udp5130
+      port: 45130
+      targetPort: 45130
+      protocol: UDP
+    - name : udp5131
+      port: 45131
+      targetPort: 45131
+      protocol: UDP
+    - name : udp5132
+      port: 45132
+      targetPort: 45132
+      protocol: UDP
+    - name : udp5133
+      port: 45133
+      targetPort: 45133
+      protocol: UDP
+    - name : udp5134
+      port: 45134
+      targetPort: 45134
+      protocol: UDP
+    - name : udp5135
+      port: 45135
+      targetPort: 45135
+      protocol: UDP
+    - name : udp5136
+      port: 45136
+      targetPort: 45136
+      protocol: UDP
+    - name : udp5137
+      port: 45137
+      targetPort: 45137
+      protocol: UDP
+    - name : udp5138
+      port: 45138
+      targetPort: 45138
+      protocol: UDP
+    - name : udp5139
+      port: 45139
+      targetPort: 45139
+      protocol: UDP
+    - name : udp5140
+      port: 45140
+      targetPort: 45140
+      protocol: UDP
+    - name : udp5141
+      port: 45141
+      targetPort: 45141
+      protocol: UDP
+    - name : udp5142
+      port: 45142
+      targetPort: 45142
+      protocol: UDP
+    - name : udp5143
+      port: 45143
+      targetPort: 45143
+      protocol: UDP
+    - name : udp5144
+      port: 45144
+      targetPort: 45144
+      protocol: UDP
+    - name : udp5145
+      port: 45145
+      targetPort: 45145
+      protocol: UDP
+    - name : udp5146
+      port: 45146
+      targetPort: 45146
+      protocol: UDP
+    - name : udp5147
+      port: 45147
+      targetPort: 45147
+      protocol: UDP
+    - name : udp5148
+      port: 45148
+      targetPort: 45148
+      protocol: UDP
+    - name : udp5149
+      port: 45149
+      targetPort: 45149
+      protocol: UDP
+    - name : udp5150
+      port: 45150
+      targetPort: 45150
+      protocol: UDP
+    - name : udp5151
+      port: 45151
+      targetPort: 45151
+      protocol: UDP
+    - name : udp5152
+      port: 45152
+      targetPort: 45152
+      protocol: UDP
+    - name : udp5153
+      port: 45153
+      targetPort: 45153
+      protocol: UDP
+    - name : udp5154
+      port: 45154
+      targetPort: 45154
+      protocol: UDP
+    - name : udp5155
+      port: 45155
+      targetPort: 45155
+      protocol: UDP
+    - name : udp5156
+      port: 45156
+      targetPort: 45156
+      protocol: UDP
+    - name : udp5157
+      port: 45157
+      targetPort: 45157
+      protocol: UDP
+    - name : udp5158
+      port: 45158
+      targetPort: 45158
+      protocol: UDP
+    - name : udp5159
+      port: 45159
+      targetPort: 45159
+      protocol: UDP
+    - name : udp5160
+      port: 45160
+      targetPort: 45160
+      protocol: UDP
+    - name : udp5161
+      port: 45161
+      targetPort: 45161
+      protocol: UDP
+    - name : udp5162
+      port: 45162
+      targetPort: 45162
+      protocol: UDP
+    - name : udp5163
+      port: 45163
+      targetPort: 45163
+      protocol: UDP
+    - name : udp5164
+      port: 45164
+      targetPort: 45164
+      protocol: UDP
+    - name : udp5165
+      port: 45165
+      targetPort: 45165
+      protocol: UDP
+    - name : udp5166
+      port: 45166
+      targetPort: 45166
+      protocol: UDP
+    - name : udp5167
+      port: 45167
+      targetPort: 45167
+      protocol: UDP
+    - name : udp5168
+      port: 45168
+      targetPort: 45168
+      protocol: UDP
+    - name : udp5169
+      port: 45169
+      targetPort: 45169
+      protocol: UDP
+    - name : udp5170
+      port: 45170
+      targetPort: 45170
+      protocol: UDP
+    - name : udp5171
+      port: 45171
+      targetPort: 45171
+      protocol: UDP
+    - name : udp5172
+      port: 45172
+      targetPort: 45172
+      protocol: UDP
+    - name : udp5173
+      port: 45173
+      targetPort: 45173
+      protocol: UDP
+    - name : udp5174
+      port: 45174
+      targetPort: 45174
+      protocol: UDP
+    - name : udp5175
+      port: 45175
+      targetPort: 45175
+      protocol: UDP
+    - name : udp5176
+      port: 45176
+      targetPort: 45176
+      protocol: UDP
+    - name : udp5177
+      port: 45177
+      targetPort: 45177
+      protocol: UDP
+    - name : udp5178
+      port: 45178
+      targetPort: 45178
+      protocol: UDP
+    - name : udp5179
+      port: 45179
+      targetPort: 45179
+      protocol: UDP
+    - name : udp5180
+      port: 45180
+      targetPort: 45180
+      protocol: UDP
+    - name : udp5181
+      port: 45181
+      targetPort: 45181
+      protocol: UDP
+    - name : udp5182
+      port: 45182
+      targetPort: 45182
+      protocol: UDP
+    - name : udp5183
+      port: 45183
+      targetPort: 45183
+      protocol: UDP
+    - name : udp5184
+      port: 45184
+      targetPort: 45184
+      protocol: UDP
+    - name : udp5185
+      port: 45185
+      targetPort: 45185
+      protocol: UDP
+    - name : udp5186
+      port: 45186
+      targetPort: 45186
+      protocol: UDP
+    - name : udp5187
+      port: 45187
+      targetPort: 45187
+      protocol: UDP
+    - name : udp5188
+      port: 45188
+      targetPort: 45188
+      protocol: UDP
+    - name : udp5189
+      port: 45189
+      targetPort: 45189
+      protocol: UDP
+    - name : udp5190
+      port: 45190
+      targetPort: 45190
+      protocol: UDP
+    - name : udp5191
+      port: 45191
+      targetPort: 45191
+      protocol: UDP
+    - name : udp5192
+      port: 45192
+      targetPort: 45192
+      protocol: UDP
+    - name : udp5193
+      port: 45193
+      targetPort: 45193
+      protocol: UDP
+    - name : udp5194
+      port: 45194
+      targetPort: 45194
+      protocol: UDP
+    - name : udp5195
+      port: 45195
+      targetPort: 45195
+      protocol: UDP
+    - name : udp5196
+      port: 45196
+      targetPort: 45196
+      protocol: UDP
+    - name : udp5197
+      port: 45197
+      targetPort: 45197
+      protocol: UDP
+    - name : udp5198
+      port: 45198
+      targetPort: 45198
+      protocol: UDP
+    - name : udp5199
+      port: 45199
+      targetPort: 45199
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

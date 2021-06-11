@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp79
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp7900
+      port: 47900
+      targetPort: 47900
+      protocol: UDP
+    - name : udp7901
+      port: 47901
+      targetPort: 47901
+      protocol: UDP
+    - name : udp7902
+      port: 47902
+      targetPort: 47902
+      protocol: UDP
+    - name : udp7903
+      port: 47903
+      targetPort: 47903
+      protocol: UDP
+    - name : udp7904
+      port: 47904
+      targetPort: 47904
+      protocol: UDP
+    - name : udp7905
+      port: 47905
+      targetPort: 47905
+      protocol: UDP
+    - name : udp7906
+      port: 47906
+      targetPort: 47906
+      protocol: UDP
+    - name : udp7907
+      port: 47907
+      targetPort: 47907
+      protocol: UDP
+    - name : udp7908
+      port: 47908
+      targetPort: 47908
+      protocol: UDP
+    - name : udp7909
+      port: 47909
+      targetPort: 47909
+      protocol: UDP
+    - name : udp7910
+      port: 47910
+      targetPort: 47910
+      protocol: UDP
+    - name : udp7911
+      port: 47911
+      targetPort: 47911
+      protocol: UDP
+    - name : udp7912
+      port: 47912
+      targetPort: 47912
+      protocol: UDP
+    - name : udp7913
+      port: 47913
+      targetPort: 47913
+      protocol: UDP
+    - name : udp7914
+      port: 47914
+      targetPort: 47914
+      protocol: UDP
+    - name : udp7915
+      port: 47915
+      targetPort: 47915
+      protocol: UDP
+    - name : udp7916
+      port: 47916
+      targetPort: 47916
+      protocol: UDP
+    - name : udp7917
+      port: 47917
+      targetPort: 47917
+      protocol: UDP
+    - name : udp7918
+      port: 47918
+      targetPort: 47918
+      protocol: UDP
+    - name : udp7919
+      port: 47919
+      targetPort: 47919
+      protocol: UDP
+    - name : udp7920
+      port: 47920
+      targetPort: 47920
+      protocol: UDP
+    - name : udp7921
+      port: 47921
+      targetPort: 47921
+      protocol: UDP
+    - name : udp7922
+      port: 47922
+      targetPort: 47922
+      protocol: UDP
+    - name : udp7923
+      port: 47923
+      targetPort: 47923
+      protocol: UDP
+    - name : udp7924
+      port: 47924
+      targetPort: 47924
+      protocol: UDP
+    - name : udp7925
+      port: 47925
+      targetPort: 47925
+      protocol: UDP
+    - name : udp7926
+      port: 47926
+      targetPort: 47926
+      protocol: UDP
+    - name : udp7927
+      port: 47927
+      targetPort: 47927
+      protocol: UDP
+    - name : udp7928
+      port: 47928
+      targetPort: 47928
+      protocol: UDP
+    - name : udp7929
+      port: 47929
+      targetPort: 47929
+      protocol: UDP
+    - name : udp7930
+      port: 47930
+      targetPort: 47930
+      protocol: UDP
+    - name : udp7931
+      port: 47931
+      targetPort: 47931
+      protocol: UDP
+    - name : udp7932
+      port: 47932
+      targetPort: 47932
+      protocol: UDP
+    - name : udp7933
+      port: 47933
+      targetPort: 47933
+      protocol: UDP
+    - name : udp7934
+      port: 47934
+      targetPort: 47934
+      protocol: UDP
+    - name : udp7935
+      port: 47935
+      targetPort: 47935
+      protocol: UDP
+    - name : udp7936
+      port: 47936
+      targetPort: 47936
+      protocol: UDP
+    - name : udp7937
+      port: 47937
+      targetPort: 47937
+      protocol: UDP
+    - name : udp7938
+      port: 47938
+      targetPort: 47938
+      protocol: UDP
+    - name : udp7939
+      port: 47939
+      targetPort: 47939
+      protocol: UDP
+    - name : udp7940
+      port: 47940
+      targetPort: 47940
+      protocol: UDP
+    - name : udp7941
+      port: 47941
+      targetPort: 47941
+      protocol: UDP
+    - name : udp7942
+      port: 47942
+      targetPort: 47942
+      protocol: UDP
+    - name : udp7943
+      port: 47943
+      targetPort: 47943
+      protocol: UDP
+    - name : udp7944
+      port: 47944
+      targetPort: 47944
+      protocol: UDP
+    - name : udp7945
+      port: 47945
+      targetPort: 47945
+      protocol: UDP
+    - name : udp7946
+      port: 47946
+      targetPort: 47946
+      protocol: UDP
+    - name : udp7947
+      port: 47947
+      targetPort: 47947
+      protocol: UDP
+    - name : udp7948
+      port: 47948
+      targetPort: 47948
+      protocol: UDP
+    - name : udp7949
+      port: 47949
+      targetPort: 47949
+      protocol: UDP
+    - name : udp7950
+      port: 47950
+      targetPort: 47950
+      protocol: UDP
+    - name : udp7951
+      port: 47951
+      targetPort: 47951
+      protocol: UDP
+    - name : udp7952
+      port: 47952
+      targetPort: 47952
+      protocol: UDP
+    - name : udp7953
+      port: 47953
+      targetPort: 47953
+      protocol: UDP
+    - name : udp7954
+      port: 47954
+      targetPort: 47954
+      protocol: UDP
+    - name : udp7955
+      port: 47955
+      targetPort: 47955
+      protocol: UDP
+    - name : udp7956
+      port: 47956
+      targetPort: 47956
+      protocol: UDP
+    - name : udp7957
+      port: 47957
+      targetPort: 47957
+      protocol: UDP
+    - name : udp7958
+      port: 47958
+      targetPort: 47958
+      protocol: UDP
+    - name : udp7959
+      port: 47959
+      targetPort: 47959
+      protocol: UDP
+    - name : udp7960
+      port: 47960
+      targetPort: 47960
+      protocol: UDP
+    - name : udp7961
+      port: 47961
+      targetPort: 47961
+      protocol: UDP
+    - name : udp7962
+      port: 47962
+      targetPort: 47962
+      protocol: UDP
+    - name : udp7963
+      port: 47963
+      targetPort: 47963
+      protocol: UDP
+    - name : udp7964
+      port: 47964
+      targetPort: 47964
+      protocol: UDP
+    - name : udp7965
+      port: 47965
+      targetPort: 47965
+      protocol: UDP
+    - name : udp7966
+      port: 47966
+      targetPort: 47966
+      protocol: UDP
+    - name : udp7967
+      port: 47967
+      targetPort: 47967
+      protocol: UDP
+    - name : udp7968
+      port: 47968
+      targetPort: 47968
+      protocol: UDP
+    - name : udp7969
+      port: 47969
+      targetPort: 47969
+      protocol: UDP
+    - name : udp7970
+      port: 47970
+      targetPort: 47970
+      protocol: UDP
+    - name : udp7971
+      port: 47971
+      targetPort: 47971
+      protocol: UDP
+    - name : udp7972
+      port: 47972
+      targetPort: 47972
+      protocol: UDP
+    - name : udp7973
+      port: 47973
+      targetPort: 47973
+      protocol: UDP
+    - name : udp7974
+      port: 47974
+      targetPort: 47974
+      protocol: UDP
+    - name : udp7975
+      port: 47975
+      targetPort: 47975
+      protocol: UDP
+    - name : udp7976
+      port: 47976
+      targetPort: 47976
+      protocol: UDP
+    - name : udp7977
+      port: 47977
+      targetPort: 47977
+      protocol: UDP
+    - name : udp7978
+      port: 47978
+      targetPort: 47978
+      protocol: UDP
+    - name : udp7979
+      port: 47979
+      targetPort: 47979
+      protocol: UDP
+    - name : udp7980
+      port: 47980
+      targetPort: 47980
+      protocol: UDP
+    - name : udp7981
+      port: 47981
+      targetPort: 47981
+      protocol: UDP
+    - name : udp7982
+      port: 47982
+      targetPort: 47982
+      protocol: UDP
+    - name : udp7983
+      port: 47983
+      targetPort: 47983
+      protocol: UDP
+    - name : udp7984
+      port: 47984
+      targetPort: 47984
+      protocol: UDP
+    - name : udp7985
+      port: 47985
+      targetPort: 47985
+      protocol: UDP
+    - name : udp7986
+      port: 47986
+      targetPort: 47986
+      protocol: UDP
+    - name : udp7987
+      port: 47987
+      targetPort: 47987
+      protocol: UDP
+    - name : udp7988
+      port: 47988
+      targetPort: 47988
+      protocol: UDP
+    - name : udp7989
+      port: 47989
+      targetPort: 47989
+      protocol: UDP
+    - name : udp7990
+      port: 47990
+      targetPort: 47990
+      protocol: UDP
+    - name : udp7991
+      port: 47991
+      targetPort: 47991
+      protocol: UDP
+    - name : udp7992
+      port: 47992
+      targetPort: 47992
+      protocol: UDP
+    - name : udp7993
+      port: 47993
+      targetPort: 47993
+      protocol: UDP
+    - name : udp7994
+      port: 47994
+      targetPort: 47994
+      protocol: UDP
+    - name : udp7995
+      port: 47995
+      targetPort: 47995
+      protocol: UDP
+    - name : udp7996
+      port: 47996
+      targetPort: 47996
+      protocol: UDP
+    - name : udp7997
+      port: 47997
+      targetPort: 47997
+      protocol: UDP
+    - name : udp7998
+      port: 47998
+      targetPort: 47998
+      protocol: UDP
+    - name : udp7999
+      port: 47999
+      targetPort: 47999
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

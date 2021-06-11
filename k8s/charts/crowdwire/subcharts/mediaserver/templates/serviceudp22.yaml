@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp22
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp2200
+      port: 42200
+      targetPort: 42200
+      protocol: UDP
+    - name : udp2201
+      port: 42201
+      targetPort: 42201
+      protocol: UDP
+    - name : udp2202
+      port: 42202
+      targetPort: 42202
+      protocol: UDP
+    - name : udp2203
+      port: 42203
+      targetPort: 42203
+      protocol: UDP
+    - name : udp2204
+      port: 42204
+      targetPort: 42204
+      protocol: UDP
+    - name : udp2205
+      port: 42205
+      targetPort: 42205
+      protocol: UDP
+    - name : udp2206
+      port: 42206
+      targetPort: 42206
+      protocol: UDP
+    - name : udp2207
+      port: 42207
+      targetPort: 42207
+      protocol: UDP
+    - name : udp2208
+      port: 42208
+      targetPort: 42208
+      protocol: UDP
+    - name : udp2209
+      port: 42209
+      targetPort: 42209
+      protocol: UDP
+    - name : udp2210
+      port: 42210
+      targetPort: 42210
+      protocol: UDP
+    - name : udp2211
+      port: 42211
+      targetPort: 42211
+      protocol: UDP
+    - name : udp2212
+      port: 42212
+      targetPort: 42212
+      protocol: UDP
+    - name : udp2213
+      port: 42213
+      targetPort: 42213
+      protocol: UDP
+    - name : udp2214
+      port: 42214
+      targetPort: 42214
+      protocol: UDP
+    - name : udp2215
+      port: 42215
+      targetPort: 42215
+      protocol: UDP
+    - name : udp2216
+      port: 42216
+      targetPort: 42216
+      protocol: UDP
+    - name : udp2217
+      port: 42217
+      targetPort: 42217
+      protocol: UDP
+    - name : udp2218
+      port: 42218
+      targetPort: 42218
+      protocol: UDP
+    - name : udp2219
+      port: 42219
+      targetPort: 42219
+      protocol: UDP
+    - name : udp2220
+      port: 42220
+      targetPort: 42220
+      protocol: UDP
+    - name : udp2221
+      port: 42221
+      targetPort: 42221
+      protocol: UDP
+    - name : udp2222
+      port: 42222
+      targetPort: 42222
+      protocol: UDP
+    - name : udp2223
+      port: 42223
+      targetPort: 42223
+      protocol: UDP
+    - name : udp2224
+      port: 42224
+      targetPort: 42224
+      protocol: UDP
+    - name : udp2225
+      port: 42225
+      targetPort: 42225
+      protocol: UDP
+    - name : udp2226
+      port: 42226
+      targetPort: 42226
+      protocol: UDP
+    - name : udp2227
+      port: 42227
+      targetPort: 42227
+      protocol: UDP
+    - name : udp2228
+      port: 42228
+      targetPort: 42228
+      protocol: UDP
+    - name : udp2229
+      port: 42229
+      targetPort: 42229
+      protocol: UDP
+    - name : udp2230
+      port: 42230
+      targetPort: 42230
+      protocol: UDP
+    - name : udp2231
+      port: 42231
+      targetPort: 42231
+      protocol: UDP
+    - name : udp2232
+      port: 42232
+      targetPort: 42232
+      protocol: UDP
+    - name : udp2233
+      port: 42233
+      targetPort: 42233
+      protocol: UDP
+    - name : udp2234
+      port: 42234
+      targetPort: 42234
+      protocol: UDP
+    - name : udp2235
+      port: 42235
+      targetPort: 42235
+      protocol: UDP
+    - name : udp2236
+      port: 42236
+      targetPort: 42236
+      protocol: UDP
+    - name : udp2237
+      port: 42237
+      targetPort: 42237
+      protocol: UDP
+    - name : udp2238
+      port: 42238
+      targetPort: 42238
+      protocol: UDP
+    - name : udp2239
+      port: 42239
+      targetPort: 42239
+      protocol: UDP
+    - name : udp2240
+      port: 42240
+      targetPort: 42240
+      protocol: UDP
+    - name : udp2241
+      port: 42241
+      targetPort: 42241
+      protocol: UDP
+    - name : udp2242
+      port: 42242
+      targetPort: 42242
+      protocol: UDP
+    - name : udp2243
+      port: 42243
+      targetPort: 42243
+      protocol: UDP
+    - name : udp2244
+      port: 42244
+      targetPort: 42244
+      protocol: UDP
+    - name : udp2245
+      port: 42245
+      targetPort: 42245
+      protocol: UDP
+    - name : udp2246
+      port: 42246
+      targetPort: 42246
+      protocol: UDP
+    - name : udp2247
+      port: 42247
+      targetPort: 42247
+      protocol: UDP
+    - name : udp2248
+      port: 42248
+      targetPort: 42248
+      protocol: UDP
+    - name : udp2249
+      port: 42249
+      targetPort: 42249
+      protocol: UDP
+    - name : udp2250
+      port: 42250
+      targetPort: 42250
+      protocol: UDP
+    - name : udp2251
+      port: 42251
+      targetPort: 42251
+      protocol: UDP
+    - name : udp2252
+      port: 42252
+      targetPort: 42252
+      protocol: UDP
+    - name : udp2253
+      port: 42253
+      targetPort: 42253
+      protocol: UDP
+    - name : udp2254
+      port: 42254
+      targetPort: 42254
+      protocol: UDP
+    - name : udp2255
+      port: 42255
+      targetPort: 42255
+      protocol: UDP
+    - name : udp2256
+      port: 42256
+      targetPort: 42256
+      protocol: UDP
+    - name : udp2257
+      port: 42257
+      targetPort: 42257
+      protocol: UDP
+    - name : udp2258
+      port: 42258
+      targetPort: 42258
+      protocol: UDP
+    - name : udp2259
+      port: 42259
+      targetPort: 42259
+      protocol: UDP
+    - name : udp2260
+      port: 42260
+      targetPort: 42260
+      protocol: UDP
+    - name : udp2261
+      port: 42261
+      targetPort: 42261
+      protocol: UDP
+    - name : udp2262
+      port: 42262
+      targetPort: 42262
+      protocol: UDP
+    - name : udp2263
+      port: 42263
+      targetPort: 42263
+      protocol: UDP
+    - name : udp2264
+      port: 42264
+      targetPort: 42264
+      protocol: UDP
+    - name : udp2265
+      port: 42265
+      targetPort: 42265
+      protocol: UDP
+    - name : udp2266
+      port: 42266
+      targetPort: 42266
+      protocol: UDP
+    - name : udp2267
+      port: 42267
+      targetPort: 42267
+      protocol: UDP
+    - name : udp2268
+      port: 42268
+      targetPort: 42268
+      protocol: UDP
+    - name : udp2269
+      port: 42269
+      targetPort: 42269
+      protocol: UDP
+    - name : udp2270
+      port: 42270
+      targetPort: 42270
+      protocol: UDP
+    - name : udp2271
+      port: 42271
+      targetPort: 42271
+      protocol: UDP
+    - name : udp2272
+      port: 42272
+      targetPort: 42272
+      protocol: UDP
+    - name : udp2273
+      port: 42273
+      targetPort: 42273
+      protocol: UDP
+    - name : udp2274
+      port: 42274
+      targetPort: 42274
+      protocol: UDP
+    - name : udp2275
+      port: 42275
+      targetPort: 42275
+      protocol: UDP
+    - name : udp2276
+      port: 42276
+      targetPort: 42276
+      protocol: UDP
+    - name : udp2277
+      port: 42277
+      targetPort: 42277
+      protocol: UDP
+    - name : udp2278
+      port: 42278
+      targetPort: 42278
+      protocol: UDP
+    - name : udp2279
+      port: 42279
+      targetPort: 42279
+      protocol: UDP
+    - name : udp2280
+      port: 42280
+      targetPort: 42280
+      protocol: UDP
+    - name : udp2281
+      port: 42281
+      targetPort: 42281
+      protocol: UDP
+    - name : udp2282
+      port: 42282
+      targetPort: 42282
+      protocol: UDP
+    - name : udp2283
+      port: 42283
+      targetPort: 42283
+      protocol: UDP
+    - name : udp2284
+      port: 42284
+      targetPort: 42284
+      protocol: UDP
+    - name : udp2285
+      port: 42285
+      targetPort: 42285
+      protocol: UDP
+    - name : udp2286
+      port: 42286
+      targetPort: 42286
+      protocol: UDP
+    - name : udp2287
+      port: 42287
+      targetPort: 42287
+      protocol: UDP
+    - name : udp2288
+      port: 42288
+      targetPort: 42288
+      protocol: UDP
+    - name : udp2289
+      port: 42289
+      targetPort: 42289
+      protocol: UDP
+    - name : udp2290
+      port: 42290
+      targetPort: 42290
+      protocol: UDP
+    - name : udp2291
+      port: 42291
+      targetPort: 42291
+      protocol: UDP
+    - name : udp2292
+      port: 42292
+      targetPort: 42292
+      protocol: UDP
+    - name : udp2293
+      port: 42293
+      targetPort: 42293
+      protocol: UDP
+    - name : udp2294
+      port: 42294
+      targetPort: 42294
+      protocol: UDP
+    - name : udp2295
+      port: 42295
+      targetPort: 42295
+      protocol: UDP
+    - name : udp2296
+      port: 42296
+      targetPort: 42296
+      protocol: UDP
+    - name : udp2297
+      port: 42297
+      targetPort: 42297
+      protocol: UDP
+    - name : udp2298
+      port: 42298
+      targetPort: 42298
+      protocol: UDP
+    - name : udp2299
+      port: 42299
+      targetPort: 42299
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

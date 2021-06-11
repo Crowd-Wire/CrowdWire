@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp12
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1200
+      port: 41200
+      targetPort: 41200
+      protocol: UDP
+    - name : udp1201
+      port: 41201
+      targetPort: 41201
+      protocol: UDP
+    - name : udp1202
+      port: 41202
+      targetPort: 41202
+      protocol: UDP
+    - name : udp1203
+      port: 41203
+      targetPort: 41203
+      protocol: UDP
+    - name : udp1204
+      port: 41204
+      targetPort: 41204
+      protocol: UDP
+    - name : udp1205
+      port: 41205
+      targetPort: 41205
+      protocol: UDP
+    - name : udp1206
+      port: 41206
+      targetPort: 41206
+      protocol: UDP
+    - name : udp1207
+      port: 41207
+      targetPort: 41207
+      protocol: UDP
+    - name : udp1208
+      port: 41208
+      targetPort: 41208
+      protocol: UDP
+    - name : udp1209
+      port: 41209
+      targetPort: 41209
+      protocol: UDP
+    - name : udp1210
+      port: 41210
+      targetPort: 41210
+      protocol: UDP
+    - name : udp1211
+      port: 41211
+      targetPort: 41211
+      protocol: UDP
+    - name : udp1212
+      port: 41212
+      targetPort: 41212
+      protocol: UDP
+    - name : udp1213
+      port: 41213
+      targetPort: 41213
+      protocol: UDP
+    - name : udp1214
+      port: 41214
+      targetPort: 41214
+      protocol: UDP
+    - name : udp1215
+      port: 41215
+      targetPort: 41215
+      protocol: UDP
+    - name : udp1216
+      port: 41216
+      targetPort: 41216
+      protocol: UDP
+    - name : udp1217
+      port: 41217
+      targetPort: 41217
+      protocol: UDP
+    - name : udp1218
+      port: 41218
+      targetPort: 41218
+      protocol: UDP
+    - name : udp1219
+      port: 41219
+      targetPort: 41219
+      protocol: UDP
+    - name : udp1220
+      port: 41220
+      targetPort: 41220
+      protocol: UDP
+    - name : udp1221
+      port: 41221
+      targetPort: 41221
+      protocol: UDP
+    - name : udp1222
+      port: 41222
+      targetPort: 41222
+      protocol: UDP
+    - name : udp1223
+      port: 41223
+      targetPort: 41223
+      protocol: UDP
+    - name : udp1224
+      port: 41224
+      targetPort: 41224
+      protocol: UDP
+    - name : udp1225
+      port: 41225
+      targetPort: 41225
+      protocol: UDP
+    - name : udp1226
+      port: 41226
+      targetPort: 41226
+      protocol: UDP
+    - name : udp1227
+      port: 41227
+      targetPort: 41227
+      protocol: UDP
+    - name : udp1228
+      port: 41228
+      targetPort: 41228
+      protocol: UDP
+    - name : udp1229
+      port: 41229
+      targetPort: 41229
+      protocol: UDP
+    - name : udp1230
+      port: 41230
+      targetPort: 41230
+      protocol: UDP
+    - name : udp1231
+      port: 41231
+      targetPort: 41231
+      protocol: UDP
+    - name : udp1232
+      port: 41232
+      targetPort: 41232
+      protocol: UDP
+    - name : udp1233
+      port: 41233
+      targetPort: 41233
+      protocol: UDP
+    - name : udp1234
+      port: 41234
+      targetPort: 41234
+      protocol: UDP
+    - name : udp1235
+      port: 41235
+      targetPort: 41235
+      protocol: UDP
+    - name : udp1236
+      port: 41236
+      targetPort: 41236
+      protocol: UDP
+    - name : udp1237
+      port: 41237
+      targetPort: 41237
+      protocol: UDP
+    - name : udp1238
+      port: 41238
+      targetPort: 41238
+      protocol: UDP
+    - name : udp1239
+      port: 41239
+      targetPort: 41239
+      protocol: UDP
+    - name : udp1240
+      port: 41240
+      targetPort: 41240
+      protocol: UDP
+    - name : udp1241
+      port: 41241
+      targetPort: 41241
+      protocol: UDP
+    - name : udp1242
+      port: 41242
+      targetPort: 41242
+      protocol: UDP
+    - name : udp1243
+      port: 41243
+      targetPort: 41243
+      protocol: UDP
+    - name : udp1244
+      port: 41244
+      targetPort: 41244
+      protocol: UDP
+    - name : udp1245
+      port: 41245
+      targetPort: 41245
+      protocol: UDP
+    - name : udp1246
+      port: 41246
+      targetPort: 41246
+      protocol: UDP
+    - name : udp1247
+      port: 41247
+      targetPort: 41247
+      protocol: UDP
+    - name : udp1248
+      port: 41248
+      targetPort: 41248
+      protocol: UDP
+    - name : udp1249
+      port: 41249
+      targetPort: 41249
+      protocol: UDP
+    - name : udp1250
+      port: 41250
+      targetPort: 41250
+      protocol: UDP
+    - name : udp1251
+      port: 41251
+      targetPort: 41251
+      protocol: UDP
+    - name : udp1252
+      port: 41252
+      targetPort: 41252
+      protocol: UDP
+    - name : udp1253
+      port: 41253
+      targetPort: 41253
+      protocol: UDP
+    - name : udp1254
+      port: 41254
+      targetPort: 41254
+      protocol: UDP
+    - name : udp1255
+      port: 41255
+      targetPort: 41255
+      protocol: UDP
+    - name : udp1256
+      port: 41256
+      targetPort: 41256
+      protocol: UDP
+    - name : udp1257
+      port: 41257
+      targetPort: 41257
+      protocol: UDP
+    - name : udp1258
+      port: 41258
+      targetPort: 41258
+      protocol: UDP
+    - name : udp1259
+      port: 41259
+      targetPort: 41259
+      protocol: UDP
+    - name : udp1260
+      port: 41260
+      targetPort: 41260
+      protocol: UDP
+    - name : udp1261
+      port: 41261
+      targetPort: 41261
+      protocol: UDP
+    - name : udp1262
+      port: 41262
+      targetPort: 41262
+      protocol: UDP
+    - name : udp1263
+      port: 41263
+      targetPort: 41263
+      protocol: UDP
+    - name : udp1264
+      port: 41264
+      targetPort: 41264
+      protocol: UDP
+    - name : udp1265
+      port: 41265
+      targetPort: 41265
+      protocol: UDP
+    - name : udp1266
+      port: 41266
+      targetPort: 41266
+      protocol: UDP
+    - name : udp1267
+      port: 41267
+      targetPort: 41267
+      protocol: UDP
+    - name : udp1268
+      port: 41268
+      targetPort: 41268
+      protocol: UDP
+    - name : udp1269
+      port: 41269
+      targetPort: 41269
+      protocol: UDP
+    - name : udp1270
+      port: 41270
+      targetPort: 41270
+      protocol: UDP
+    - name : udp1271
+      port: 41271
+      targetPort: 41271
+      protocol: UDP
+    - name : udp1272
+      port: 41272
+      targetPort: 41272
+      protocol: UDP
+    - name : udp1273
+      port: 41273
+      targetPort: 41273
+      protocol: UDP
+    - name : udp1274
+      port: 41274
+      targetPort: 41274
+      protocol: UDP
+    - name : udp1275
+      port: 41275
+      targetPort: 41275
+      protocol: UDP
+    - name : udp1276
+      port: 41276
+      targetPort: 41276
+      protocol: UDP
+    - name : udp1277
+      port: 41277
+      targetPort: 41277
+      protocol: UDP
+    - name : udp1278
+      port: 41278
+      targetPort: 41278
+      protocol: UDP
+    - name : udp1279
+      port: 41279
+      targetPort: 41279
+      protocol: UDP
+    - name : udp1280
+      port: 41280
+      targetPort: 41280
+      protocol: UDP
+    - name : udp1281
+      port: 41281
+      targetPort: 41281
+      protocol: UDP
+    - name : udp1282
+      port: 41282
+      targetPort: 41282
+      protocol: UDP
+    - name : udp1283
+      port: 41283
+      targetPort: 41283
+      protocol: UDP
+    - name : udp1284
+      port: 41284
+      targetPort: 41284
+      protocol: UDP
+    - name : udp1285
+      port: 41285
+      targetPort: 41285
+      protocol: UDP
+    - name : udp1286
+      port: 41286
+      targetPort: 41286
+      protocol: UDP
+    - name : udp1287
+      port: 41287
+      targetPort: 41287
+      protocol: UDP
+    - name : udp1288
+      port: 41288
+      targetPort: 41288
+      protocol: UDP
+    - name : udp1289
+      port: 41289
+      targetPort: 41289
+      protocol: UDP
+    - name : udp1290
+      port: 41290
+      targetPort: 41290
+      protocol: UDP
+    - name : udp1291
+      port: 41291
+      targetPort: 41291
+      protocol: UDP
+    - name : udp1292
+      port: 41292
+      targetPort: 41292
+      protocol: UDP
+    - name : udp1293
+      port: 41293
+      targetPort: 41293
+      protocol: UDP
+    - name : udp1294
+      port: 41294
+      targetPort: 41294
+      protocol: UDP
+    - name : udp1295
+      port: 41295
+      targetPort: 41295
+      protocol: UDP
+    - name : udp1296
+      port: 41296
+      targetPort: 41296
+      protocol: UDP
+    - name : udp1297
+      port: 41297
+      targetPort: 41297
+      protocol: UDP
+    - name : udp1298
+      port: 41298
+      targetPort: 41298
+      protocol: UDP
+    - name : udp1299
+      port: 41299
+      targetPort: 41299
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

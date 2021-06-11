@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp69
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp6900
+      port: 46900
+      targetPort: 46900
+      protocol: UDP
+    - name : udp6901
+      port: 46901
+      targetPort: 46901
+      protocol: UDP
+    - name : udp6902
+      port: 46902
+      targetPort: 46902
+      protocol: UDP
+    - name : udp6903
+      port: 46903
+      targetPort: 46903
+      protocol: UDP
+    - name : udp6904
+      port: 46904
+      targetPort: 46904
+      protocol: UDP
+    - name : udp6905
+      port: 46905
+      targetPort: 46905
+      protocol: UDP
+    - name : udp6906
+      port: 46906
+      targetPort: 46906
+      protocol: UDP
+    - name : udp6907
+      port: 46907
+      targetPort: 46907
+      protocol: UDP
+    - name : udp6908
+      port: 46908
+      targetPort: 46908
+      protocol: UDP
+    - name : udp6909
+      port: 46909
+      targetPort: 46909
+      protocol: UDP
+    - name : udp6910
+      port: 46910
+      targetPort: 46910
+      protocol: UDP
+    - name : udp6911
+      port: 46911
+      targetPort: 46911
+      protocol: UDP
+    - name : udp6912
+      port: 46912
+      targetPort: 46912
+      protocol: UDP
+    - name : udp6913
+      port: 46913
+      targetPort: 46913
+      protocol: UDP
+    - name : udp6914
+      port: 46914
+      targetPort: 46914
+      protocol: UDP
+    - name : udp6915
+      port: 46915
+      targetPort: 46915
+      protocol: UDP
+    - name : udp6916
+      port: 46916
+      targetPort: 46916
+      protocol: UDP
+    - name : udp6917
+      port: 46917
+      targetPort: 46917
+      protocol: UDP
+    - name : udp6918
+      port: 46918
+      targetPort: 46918
+      protocol: UDP
+    - name : udp6919
+      port: 46919
+      targetPort: 46919
+      protocol: UDP
+    - name : udp6920
+      port: 46920
+      targetPort: 46920
+      protocol: UDP
+    - name : udp6921
+      port: 46921
+      targetPort: 46921
+      protocol: UDP
+    - name : udp6922
+      port: 46922
+      targetPort: 46922
+      protocol: UDP
+    - name : udp6923
+      port: 46923
+      targetPort: 46923
+      protocol: UDP
+    - name : udp6924
+      port: 46924
+      targetPort: 46924
+      protocol: UDP
+    - name : udp6925
+      port: 46925
+      targetPort: 46925
+      protocol: UDP
+    - name : udp6926
+      port: 46926
+      targetPort: 46926
+      protocol: UDP
+    - name : udp6927
+      port: 46927
+      targetPort: 46927
+      protocol: UDP
+    - name : udp6928
+      port: 46928
+      targetPort: 46928
+      protocol: UDP
+    - name : udp6929
+      port: 46929
+      targetPort: 46929
+      protocol: UDP
+    - name : udp6930
+      port: 46930
+      targetPort: 46930
+      protocol: UDP
+    - name : udp6931
+      port: 46931
+      targetPort: 46931
+      protocol: UDP
+    - name : udp6932
+      port: 46932
+      targetPort: 46932
+      protocol: UDP
+    - name : udp6933
+      port: 46933
+      targetPort: 46933
+      protocol: UDP
+    - name : udp6934
+      port: 46934
+      targetPort: 46934
+      protocol: UDP
+    - name : udp6935
+      port: 46935
+      targetPort: 46935
+      protocol: UDP
+    - name : udp6936
+      port: 46936
+      targetPort: 46936
+      protocol: UDP
+    - name : udp6937
+      port: 46937
+      targetPort: 46937
+      protocol: UDP
+    - name : udp6938
+      port: 46938
+      targetPort: 46938
+      protocol: UDP
+    - name : udp6939
+      port: 46939
+      targetPort: 46939
+      protocol: UDP
+    - name : udp6940
+      port: 46940
+      targetPort: 46940
+      protocol: UDP
+    - name : udp6941
+      port: 46941
+      targetPort: 46941
+      protocol: UDP
+    - name : udp6942
+      port: 46942
+      targetPort: 46942
+      protocol: UDP
+    - name : udp6943
+      port: 46943
+      targetPort: 46943
+      protocol: UDP
+    - name : udp6944
+      port: 46944
+      targetPort: 46944
+      protocol: UDP
+    - name : udp6945
+      port: 46945
+      targetPort: 46945
+      protocol: UDP
+    - name : udp6946
+      port: 46946
+      targetPort: 46946
+      protocol: UDP
+    - name : udp6947
+      port: 46947
+      targetPort: 46947
+      protocol: UDP
+    - name : udp6948
+      port: 46948
+      targetPort: 46948
+      protocol: UDP
+    - name : udp6949
+      port: 46949
+      targetPort: 46949
+      protocol: UDP
+    - name : udp6950
+      port: 46950
+      targetPort: 46950
+      protocol: UDP
+    - name : udp6951
+      port: 46951
+      targetPort: 46951
+      protocol: UDP
+    - name : udp6952
+      port: 46952
+      targetPort: 46952
+      protocol: UDP
+    - name : udp6953
+      port: 46953
+      targetPort: 46953
+      protocol: UDP
+    - name : udp6954
+      port: 46954
+      targetPort: 46954
+      protocol: UDP
+    - name : udp6955
+      port: 46955
+      targetPort: 46955
+      protocol: UDP
+    - name : udp6956
+      port: 46956
+      targetPort: 46956
+      protocol: UDP
+    - name : udp6957
+      port: 46957
+      targetPort: 46957
+      protocol: UDP
+    - name : udp6958
+      port: 46958
+      targetPort: 46958
+      protocol: UDP
+    - name : udp6959
+      port: 46959
+      targetPort: 46959
+      protocol: UDP
+    - name : udp6960
+      port: 46960
+      targetPort: 46960
+      protocol: UDP
+    - name : udp6961
+      port: 46961
+      targetPort: 46961
+      protocol: UDP
+    - name : udp6962
+      port: 46962
+      targetPort: 46962
+      protocol: UDP
+    - name : udp6963
+      port: 46963
+      targetPort: 46963
+      protocol: UDP
+    - name : udp6964
+      port: 46964
+      targetPort: 46964
+      protocol: UDP
+    - name : udp6965
+      port: 46965
+      targetPort: 46965
+      protocol: UDP
+    - name : udp6966
+      port: 46966
+      targetPort: 46966
+      protocol: UDP
+    - name : udp6967
+      port: 46967
+      targetPort: 46967
+      protocol: UDP
+    - name : udp6968
+      port: 46968
+      targetPort: 46968
+      protocol: UDP
+    - name : udp6969
+      port: 46969
+      targetPort: 46969
+      protocol: UDP
+    - name : udp6970
+      port: 46970
+      targetPort: 46970
+      protocol: UDP
+    - name : udp6971
+      port: 46971
+      targetPort: 46971
+      protocol: UDP
+    - name : udp6972
+      port: 46972
+      targetPort: 46972
+      protocol: UDP
+    - name : udp6973
+      port: 46973
+      targetPort: 46973
+      protocol: UDP
+    - name : udp6974
+      port: 46974
+      targetPort: 46974
+      protocol: UDP
+    - name : udp6975
+      port: 46975
+      targetPort: 46975
+      protocol: UDP
+    - name : udp6976
+      port: 46976
+      targetPort: 46976
+      protocol: UDP
+    - name : udp6977
+      port: 46977
+      targetPort: 46977
+      protocol: UDP
+    - name : udp6978
+      port: 46978
+      targetPort: 46978
+      protocol: UDP
+    - name : udp6979
+      port: 46979
+      targetPort: 46979
+      protocol: UDP
+    - name : udp6980
+      port: 46980
+      targetPort: 46980
+      protocol: UDP
+    - name : udp6981
+      port: 46981
+      targetPort: 46981
+      protocol: UDP
+    - name : udp6982
+      port: 46982
+      targetPort: 46982
+      protocol: UDP
+    - name : udp6983
+      port: 46983
+      targetPort: 46983
+      protocol: UDP
+    - name : udp6984
+      port: 46984
+      targetPort: 46984
+      protocol: UDP
+    - name : udp6985
+      port: 46985
+      targetPort: 46985
+      protocol: UDP
+    - name : udp6986
+      port: 46986
+      targetPort: 46986
+      protocol: UDP
+    - name : udp6987
+      port: 46987
+      targetPort: 46987
+      protocol: UDP
+    - name : udp6988
+      port: 46988
+      targetPort: 46988
+      protocol: UDP
+    - name : udp6989
+      port: 46989
+      targetPort: 46989
+      protocol: UDP
+    - name : udp6990
+      port: 46990
+      targetPort: 46990
+      protocol: UDP
+    - name : udp6991
+      port: 46991
+      targetPort: 46991
+      protocol: UDP
+    - name : udp6992
+      port: 46992
+      targetPort: 46992
+      protocol: UDP
+    - name : udp6993
+      port: 46993
+      targetPort: 46993
+      protocol: UDP
+    - name : udp6994
+      port: 46994
+      targetPort: 46994
+      protocol: UDP
+    - name : udp6995
+      port: 46995
+      targetPort: 46995
+      protocol: UDP
+    - name : udp6996
+      port: 46996
+      targetPort: 46996
+      protocol: UDP
+    - name : udp6997
+      port: 46997
+      targetPort: 46997
+      protocol: UDP
+    - name : udp6998
+      port: 46998
+      targetPort: 46998
+      protocol: UDP
+    - name : udp6999
+      port: 46999
+      targetPort: 46999
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

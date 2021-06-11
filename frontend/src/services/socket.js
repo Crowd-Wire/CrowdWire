@@ -17,129 +17,129 @@ import useMessageStore from "stores/useMessageStore.ts";
 import GameScene from "phaser/scenes/GameScene.js";
 
 async function flushConsumerQueue(_roomId) {
-  try {
-    for (const {
-      roomId,
-      d: { peerId, consumerParameters },
-    } of consumerQueue) {
-      if (_roomId === roomId) {
-        await consumeStream(consumerParameters, roomId, peerId, consumerParameters.kind,)
-      }
+    try {
+        for (const {
+            roomId,
+            d: { peerId, consumerParameters },
+        } of consumerQueue) {
+            if (_roomId === roomId) {
+                await consumeStream(consumerParameters, roomId, peerId, consumerParameters.kind,)
+            }
+        }
+    } catch (err) {
+        console.log(err);
+    } finally {
+        consumerQueue = [];
     }
-  } catch (err) {
-    console.log(err);
-  } finally {
-    consumerQueue = [];
-  }
 }
 
 async function consumeAll(consumerParametersArr, roomId) {
-  try {
-    for (const { consumer, kind } of consumerParametersArr) {
-      if (kind === 'file') {
-        if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
-          break;
+    try {
+        for (const { consumer, kind } of consumerParametersArr) {
+            if (kind === 'file') {
+                if (!(await consumeDataStream(consumer.consumerParameters, roomId, consumer.peerId))) {
+                    break;
+                }
+            } else {
+                if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
+                    break;
+                }
+            }
         }
-      } else{
-        if (!(await consumeStream(consumer.consumerParameters, roomId, consumer.peerId, kind))) {
-          break;
-        }
-      }
+    } catch (err) {
+        console.log(err);
     }
-  } catch (err) {
-    console.log(err);
-  }
 }
 
 
 let socket = null;
 let consumerQueue = [];
-let last_position = {x: 50, y: 50};
+let last_position = { x: 50, y: 50 };
 
 export const getSocket = (worldId) => {
-  const joinPlayer = async (position) => {
-    const payload = {
-      topic: "JOIN_PLAYER",
-      position
+    const joinPlayer = async (position) => {
+        const payload = {
+            topic: "JOIN_PLAYER",
+            position
+        }
+        last_position = position;
+        await wsend(payload);
     }
-    last_position = position;
-    await wsend(payload);
-  }
 
-  const sendMovement = async (position, velocity) => {
-    const payload = {
-      topic: "PLAYER_MOVEMENT",
-      position,
-      velocity,
+    const sendMovement = async (position, velocity) => {
+        const payload = {
+            topic: "PLAYER_MOVEMENT",
+            position,
+            velocity,
+        }
+        last_position = position;
+        await wsend(payload);
     }
-    last_position = position;
-    await wsend(payload);
-  }
 
-  const joinConference = async (conferenceId) => {
-    const payload = {
-      topic: "JOIN_CONFERENCE",
-      conference_id: conferenceId,
+    const joinConference = async (conferenceId) => {
+        const payload = {
+            topic: "JOIN_CONFERENCE",
+            conference_id: conferenceId,
+        }
+        await wsend(payload);
     }
-    await wsend(payload);
-  }
 
-  const leaveConference = async (conferenceId) => {
-    const payload = {
-      topic: "LEAVE_CONFERENCE",
-      conference_id: conferenceId,
+    const leaveConference = async (conferenceId) => {
+        const payload = {
+            topic: "LEAVE_CONFERENCE",
+            conference_id: conferenceId,
+        }
+        await wsend(payload);
     }
-    await wsend(payload);
-  }
 
-  const wirePlayer = async (usersId) => {
-    const payload = {
-      topic: "WIRE_PLAYER",
-      users_id: usersId,
+    const wirePlayer = async (usersId) => {
+        const payload = {
+            topic: "WIRE_PLAYER",
+            users_id: usersId,
+        }
+        await wsend(payload);
     }
-    await wsend(payload);
-  }
 
-  const unwirePlayer = async (usersId) => {
-    const payload = {
-      topic: "UNWIRE_PLAYER",
-      users_id: usersId,
+    const unwirePlayer = async (usersId) => {
+        const payload = {
+            topic: "UNWIRE_PLAYER",
+            users_id: usersId,
+        }
+        await wsend(payload);
     }
-    await wsend(payload);
-  }
 
-  const sendMessage = async (message, to) => {
-    const payload = {
-      topic: "SEND_MESSAGE",
-      text: message,
-      to,
+    const sendMessage = async (message, to) => {
+        const payload = {
+            topic: "SEND_MESSAGE",
+            text: message,
+            to,
+        }
+        await wsend(payload);
     }
-    await wsend(payload);
-  }
 
-  if (!socket) {
-    const token = AuthenticationService.getToken();
-    socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
+    if (!socket) {
+        const token = AuthenticationService.getToken();
+        socket = new WebSocket(`${WS_BASE}/ws/${worldId}?token=${token}`);
 
-    socket.onopen = async (event) => {
-        console.info("[open] Connection established");
-        const heartbeat = setInterval(() => {
-            if (socket && socket.readyState === socket.OPEN) {
-              socket.send(JSON.stringify({'topic': 'PING', 'position': last_position}));
-            } else {
-              clearInterval(heartbeat);
+        socket.onopen = async (event) => {
+            console.info("[open] Connection established");
+            const heartbeat = setInterval(() => {
+                if (socket && socket.readyState === socket.OPEN) {
+                    socket.send(JSON.stringify({ 'topic': 'PING', 'position': last_position }));
+                } else {
+                    clearInterval(heartbeat);
+                }
+            }, 5000);
+        };
+
+        socket.onmessage = (event) => {
+            if (event.data == "PONG") {
+                return
             }
-        }, 5000);
-    };
 
-    socket.onmessage = (event) => {
-      if (event.data == "PONG") {
-        return
-      }
+            var data = JSON.parse(event.data);
 
-      var data = JSON.parse(event.data);
-
-      console.info(`[message] Data received for topic ${data.topic}`);
+            console.info(`[message] Data received for topic ${data.topic}`);
 
       switch (data.topic) {
         case "SEND_MESSAGE":
@@ -233,61 +233,36 @@ export const getSocket = (worldId) => {
             if (useRoomStore.getState().rooms[roomId].recvTransport) {
               consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
             }
-          break;
-        case "active-speaker":
-          console.log(data)
-          if (data.value)
-            useConsumerStore.getState().addActiveSpeaker(data.peerId)
-          else
-            useConsumerStore.getState().removeActiveSpeaker(data.peerId)
-          break;
-        case "toggle-peer-producer":
-          console.log(data)
-          if (data.kind === 'audio')
-            useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
-          else
-            useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
-          break;
-        case "close-media":
-          console.log(data)
-          useConsumerStore.getState().closeMedia(data.peerId)
-          break;
-        default:
-          const { handlerMap } = useWsHandlerStore.getState();
-          if (data.topic in handlerMap) {
-            handlerMap[data.topic](data.d);
-          }
-          break;
-      }
-    };
+        }
 
-    socket.onclose = (event) => {
-      if (event.wasClean) {
-        console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
-      } else {
-        // event.code is usually 1006 in this case
-        console.info('[close] Connection died');
-        // const reconnect = setInterval(() => {
-        //   if (!socket || socket.readyState != socket.OPEN) {
-        //     getSocket(worldId);
-        //   } else {
-        //     clearInterval(reconnect);
-        //   }
-        // }, 5000);
-      }
-      socket = null;
-    };
+        socket.onclose = (event) => {
+            // if (event.wasClean) {
+            //     console.info(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+            // }
+            console.info(`[close] Connection died, code=${event.code} reason=${event.reason}`);
+            usePlayerStore.getState().setConnecting(true);
+            // const reconnect = setInterval(() => {
+            //     if (!socket || socket.readyState != socket.OPEN) {
+            //     usePlayerStore.getState().setConnecting(true);
+            //     getSocket(worldId);
+            //     } else {
+            //     usePlayerStore.getState().setConnecting(false);
+            //     clearInterval(reconnect);
+            //     }
+            // }, 5000);
+            socket = null;
+        }
 
-    socket.onerror = (error) => {
-      console.error(`[error] ${error.message}`);
-    };
-  }
+        socket.onerror = (error) => {
+            console.error(`[error] ${error.message}`);
+        }
+    }
 
-  return {socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference};
+    return { socket, sendMovement, joinPlayer, wirePlayer, unwirePlayer, sendMessage, joinConference, leaveConference };
 }
 
 export const wsend = async (d) => {
-  if (socket && socket.readyState === socket.OPEN) {
-    await socket.send(JSON.stringify(d));
-  }
-};
+    if (socket && socket.readyState === socket.OPEN) {
+        await socket.send(JSON.stringify(d));
+    }
+}

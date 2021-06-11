@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp13
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1300
+      port: 41300
+      targetPort: 41300
+      protocol: UDP
+    - name : udp1301
+      port: 41301
+      targetPort: 41301
+      protocol: UDP
+    - name : udp1302
+      port: 41302
+      targetPort: 41302
+      protocol: UDP
+    - name : udp1303
+      port: 41303
+      targetPort: 41303
+      protocol: UDP
+    - name : udp1304
+      port: 41304
+      targetPort: 41304
+      protocol: UDP
+    - name : udp1305
+      port: 41305
+      targetPort: 41305
+      protocol: UDP
+    - name : udp1306
+      port: 41306
+      targetPort: 41306
+      protocol: UDP
+    - name : udp1307
+      port: 41307
+      targetPort: 41307
+      protocol: UDP
+    - name : udp1308
+      port: 41308
+      targetPort: 41308
+      protocol: UDP
+    - name : udp1309
+      port: 41309
+      targetPort: 41309
+      protocol: UDP
+    - name : udp1310
+      port: 41310
+      targetPort: 41310
+      protocol: UDP
+    - name : udp1311
+      port: 41311
+      targetPort: 41311
+      protocol: UDP
+    - name : udp1312
+      port: 41312
+      targetPort: 41312
+      protocol: UDP
+    - name : udp1313
+      port: 41313
+      targetPort: 41313
+      protocol: UDP
+    - name : udp1314
+      port: 41314
+      targetPort: 41314
+      protocol: UDP
+    - name : udp1315
+      port: 41315
+      targetPort: 41315
+      protocol: UDP
+    - name : udp1316
+      port: 41316
+      targetPort: 41316
+      protocol: UDP
+    - name : udp1317
+      port: 41317
+      targetPort: 41317
+      protocol: UDP
+    - name : udp1318
+      port: 41318
+      targetPort: 41318
+      protocol: UDP
+    - name : udp1319
+      port: 41319
+      targetPort: 41319
+      protocol: UDP
+    - name : udp1320
+      port: 41320
+      targetPort: 41320
+      protocol: UDP
+    - name : udp1321
+      port: 41321
+      targetPort: 41321
+      protocol: UDP
+    - name : udp1322
+      port: 41322
+      targetPort: 41322
+      protocol: UDP
+    - name : udp1323
+      port: 41323
+      targetPort: 41323
+      protocol: UDP
+    - name : udp1324
+      port: 41324
+      targetPort: 41324
+      protocol: UDP
+    - name : udp1325
+      port: 41325
+      targetPort: 41325
+      protocol: UDP
+    - name : udp1326
+      port: 41326
+      targetPort: 41326
+      protocol: UDP
+    - name : udp1327
+      port: 41327
+      targetPort: 41327
+      protocol: UDP
+    - name : udp1328
+      port: 41328
+      targetPort: 41328
+      protocol: UDP
+    - name : udp1329
+      port: 41329
+      targetPort: 41329
+      protocol: UDP
+    - name : udp1330
+      port: 41330
+      targetPort: 41330
+      protocol: UDP
+    - name : udp1331
+      port: 41331
+      targetPort: 41331
+      protocol: UDP
+    - name : udp1332
+      port: 41332
+      targetPort: 41332
+      protocol: UDP
+    - name : udp1333
+      port: 41333
+      targetPort: 41333
+      protocol: UDP
+    - name : udp1334
+      port: 41334
+      targetPort: 41334
+      protocol: UDP
+    - name : udp1335
+      port: 41335
+      targetPort: 41335
+      protocol: UDP
+    - name : udp1336
+      port: 41336
+      targetPort: 41336
+      protocol: UDP
+    - name : udp1337
+      port: 41337
+      targetPort: 41337
+      protocol: UDP
+    - name : udp1338
+      port: 41338
+      targetPort: 41338
+      protocol: UDP
+    - name : udp1339
+      port: 41339
+      targetPort: 41339
+      protocol: UDP
+    - name : udp1340
+      port: 41340
+      targetPort: 41340
+      protocol: UDP
+    - name : udp1341
+      port: 41341
+      targetPort: 41341
+      protocol: UDP
+    - name : udp1342
+      port: 41342
+      targetPort: 41342
+      protocol: UDP
+    - name : udp1343
+      port: 41343
+      targetPort: 41343
+      protocol: UDP
+    - name : udp1344
+      port: 41344
+      targetPort: 41344
+      protocol: UDP
+    - name : udp1345
+      port: 41345
+      targetPort: 41345
+      protocol: UDP
+    - name : udp1346
+      port: 41346
+      targetPort: 41346
+      protocol: UDP
+    - name : udp1347
+      port: 41347
+      targetPort: 41347
+      protocol: UDP
+    - name : udp1348
+      port: 41348
+      targetPort: 41348
+      protocol: UDP
+    - name : udp1349
+      port: 41349
+      targetPort: 41349
+      protocol: UDP
+    - name : udp1350
+      port: 41350
+      targetPort: 41350
+      protocol: UDP
+    - name : udp1351
+      port: 41351
+      targetPort: 41351
+      protocol: UDP
+    - name : udp1352
+      port: 41352
+      targetPort: 41352
+      protocol: UDP
+    - name : udp1353
+      port: 41353
+      targetPort: 41353
+      protocol: UDP
+    - name : udp1354
+      port: 41354
+      targetPort: 41354
+      protocol: UDP
+    - name : udp1355
+      port: 41355
+      targetPort: 41355
+      protocol: UDP
+    - name : udp1356
+      port: 41356
+      targetPort: 41356
+      protocol: UDP
+    - name : udp1357
+      port: 41357
+      targetPort: 41357
+      protocol: UDP
+    - name : udp1358
+      port: 41358
+      targetPort: 41358
+      protocol: UDP
+    - name : udp1359
+      port: 41359
+      targetPort: 41359
+      protocol: UDP
+    - name : udp1360
+      port: 41360
+      targetPort: 41360
+      protocol: UDP
+    - name : udp1361
+      port: 41361
+      targetPort: 41361
+      protocol: UDP
+    - name : udp1362
+      port: 41362
+      targetPort: 41362
+      protocol: UDP
+    - name : udp1363
+      port: 41363
+      targetPort: 41363
+      protocol: UDP
+    - name : udp1364
+      port: 41364
+      targetPort: 41364
+      protocol: UDP
+    - name : udp1365
+      port: 41365
+      targetPort: 41365
+      protocol: UDP
+    - name : udp1366
+      port: 41366
+      targetPort: 41366
+      protocol: UDP
+    - name : udp1367
+      port: 41367
+      targetPort: 41367
+      protocol: UDP
+    - name : udp1368
+      port: 41368
+      targetPort: 41368
+      protocol: UDP
+    - name : udp1369
+      port: 41369
+      targetPort: 41369
+      protocol: UDP
+    - name : udp1370
+      port: 41370
+      targetPort: 41370
+      protocol: UDP
+    - name : udp1371
+      port: 41371
+      targetPort: 41371
+      protocol: UDP
+    - name : udp1372
+      port: 41372
+      targetPort: 41372
+      protocol: UDP
+    - name : udp1373
+      port: 41373
+      targetPort: 41373
+      protocol: UDP
+    - name : udp1374
+      port: 41374
+      targetPort: 41374
+      protocol: UDP
+    - name : udp1375
+      port: 41375
+      targetPort: 41375
+      protocol: UDP
+    - name : udp1376
+      port: 41376
+      targetPort: 41376
+      protocol: UDP
+    - name : udp1377
+      port: 41377
+      targetPort: 41377
+      protocol: UDP
+    - name : udp1378
+      port: 41378
+      targetPort: 41378
+      protocol: UDP
+    - name : udp1379
+      port: 41379
+      targetPort: 41379
+      protocol: UDP
+    - name : udp1380
+      port: 41380
+      targetPort: 41380
+      protocol: UDP
+    - name : udp1381
+      port: 41381
+      targetPort: 41381
+      protocol: UDP
+    - name : udp1382
+      port: 41382
+      targetPort: 41382
+      protocol: UDP
+    - name : udp1383
+      port: 41383
+      targetPort: 41383
+      protocol: UDP
+    - name : udp1384
+      port: 41384
+      targetPort: 41384
+      protocol: UDP
+    - name : udp1385
+      port: 41385
+      targetPort: 41385
+      protocol: UDP
+    - name : udp1386
+      port: 41386
+      targetPort: 41386
+      protocol: UDP
+    - name : udp1387
+      port: 41387
+      targetPort: 41387
+      protocol: UDP
+    - name : udp1388
+      port: 41388
+      targetPort: 41388
+      protocol: UDP
+    - name : udp1389
+      port: 41389
+      targetPort: 41389
+      protocol: UDP
+    - name : udp1390
+      port: 41390
+      targetPort: 41390
+      protocol: UDP
+    - name : udp1391
+      port: 41391
+      targetPort: 41391
+      protocol: UDP
+    - name : udp1392
+      port: 41392
+      targetPort: 41392
+      protocol: UDP
+    - name : udp1393
+      port: 41393
+      targetPort: 41393
+      protocol: UDP
+    - name : udp1394
+      port: 41394
+      targetPort: 41394
+      protocol: UDP
+    - name : udp1395
+      port: 41395
+      targetPort: 41395
+      protocol: UDP
+    - name : udp1396
+      port: 41396
+      targetPort: 41396
+      protocol: UDP
+    - name : udp1397
+      port: 41397
+      targetPort: 41397
+      protocol: UDP
+    - name : udp1398
+      port: 41398
+      targetPort: 41398
+      protocol: UDP
+    - name : udp1399
+      port: 41399
+      targetPort: 41399
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

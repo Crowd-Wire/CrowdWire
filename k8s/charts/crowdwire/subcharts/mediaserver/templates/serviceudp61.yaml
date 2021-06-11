@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp61
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp6100
+      port: 46100
+      targetPort: 46100
+      protocol: UDP
+    - name : udp6101
+      port: 46101
+      targetPort: 46101
+      protocol: UDP
+    - name : udp6102
+      port: 46102
+      targetPort: 46102
+      protocol: UDP
+    - name : udp6103
+      port: 46103
+      targetPort: 46103
+      protocol: UDP
+    - name : udp6104
+      port: 46104
+      targetPort: 46104
+      protocol: UDP
+    - name : udp6105
+      port: 46105
+      targetPort: 46105
+      protocol: UDP
+    - name : udp6106
+      port: 46106
+      targetPort: 46106
+      protocol: UDP
+    - name : udp6107
+      port: 46107
+      targetPort: 46107
+      protocol: UDP
+    - name : udp6108
+      port: 46108
+      targetPort: 46108
+      protocol: UDP
+    - name : udp6109
+      port: 46109
+      targetPort: 46109
+      protocol: UDP
+    - name : udp6110
+      port: 46110
+      targetPort: 46110
+      protocol: UDP
+    - name : udp6111
+      port: 46111
+      targetPort: 46111
+      protocol: UDP
+    - name : udp6112
+      port: 46112
+      targetPort: 46112
+      protocol: UDP
+    - name : udp6113
+      port: 46113
+      targetPort: 46113
+      protocol: UDP
+    - name : udp6114
+      port: 46114
+      targetPort: 46114
+      protocol: UDP
+    - name : udp6115
+      port: 46115
+      targetPort: 46115
+      protocol: UDP
+    - name : udp6116
+      port: 46116
+      targetPort: 46116
+      protocol: UDP
+    - name : udp6117
+      port: 46117
+      targetPort: 46117
+      protocol: UDP
+    - name : udp6118
+      port: 46118
+      targetPort: 46118
+      protocol: UDP
+    - name : udp6119
+      port: 46119
+      targetPort: 46119
+      protocol: UDP
+    - name : udp6120
+      port: 46120
+      targetPort: 46120
+      protocol: UDP
+    - name : udp6121
+      port: 46121
+      targetPort: 46121
+      protocol: UDP
+    - name : udp6122
+      port: 46122
+      targetPort: 46122
+      protocol: UDP
+    - name : udp6123
+      port: 46123
+      targetPort: 46123
+      protocol: UDP
+    - name : udp6124
+      port: 46124
+      targetPort: 46124
+      protocol: UDP
+    - name : udp6125
+      port: 46125
+      targetPort: 46125
+      protocol: UDP
+    - name : udp6126
+      port: 46126
+      targetPort: 46126
+      protocol: UDP
+    - name : udp6127
+      port: 46127
+      targetPort: 46127
+      protocol: UDP
+    - name : udp6128
+      port: 46128
+      targetPort: 46128
+      protocol: UDP
+    - name : udp6129
+      port: 46129
+      targetPort: 46129
+      protocol: UDP
+    - name : udp6130
+      port: 46130
+      targetPort: 46130
+      protocol: UDP
+    - name : udp6131
+      port: 46131
+      targetPort: 46131
+      protocol: UDP
+    - name : udp6132
+      port: 46132
+      targetPort: 46132
+      protocol: UDP
+    - name : udp6133
+      port: 46133
+      targetPort: 46133
+      protocol: UDP
+    - name : udp6134
+      port: 46134
+      targetPort: 46134
+      protocol: UDP
+    - name : udp6135
+      port: 46135
+      targetPort: 46135
+      protocol: UDP
+    - name : udp6136
+      port: 46136
+      targetPort: 46136
+      protocol: UDP
+    - name : udp6137
+      port: 46137
+      targetPort: 46137
+      protocol: UDP
+    - name : udp6138
+      port: 46138
+      targetPort: 46138
+      protocol: UDP
+    - name : udp6139
+      port: 46139
+      targetPort: 46139
+      protocol: UDP
+    - name : udp6140
+      port: 46140
+      targetPort: 46140
+      protocol: UDP
+    - name : udp6141
+      port: 46141
+      targetPort: 46141
+      protocol: UDP
+    - name : udp6142
+      port: 46142
+      targetPort: 46142
+      protocol: UDP
+    - name : udp6143
+      port: 46143
+      targetPort: 46143
+      protocol: UDP
+    - name : udp6144
+      port: 46144
+      targetPort: 46144
+      protocol: UDP
+    - name : udp6145
+      port: 46145
+      targetPort: 46145
+      protocol: UDP
+    - name : udp6146
+      port: 46146
+      targetPort: 46146
+      protocol: UDP
+    - name : udp6147
+      port: 46147
+      targetPort: 46147
+      protocol: UDP
+    - name : udp6148
+      port: 46148
+      targetPort: 46148
+      protocol: UDP
+    - name : udp6149
+      port: 46149
+      targetPort: 46149
+      protocol: UDP
+    - name : udp6150
+      port: 46150
+      targetPort: 46150
+      protocol: UDP
+    - name : udp6151
+      port: 46151
+      targetPort: 46151
+      protocol: UDP
+    - name : udp6152
+      port: 46152
+      targetPort: 46152
+      protocol: UDP
+    - name : udp6153
+      port: 46153
+      targetPort: 46153
+      protocol: UDP
+    - name : udp6154
+      port: 46154
+      targetPort: 46154
+      protocol: UDP
+    - name : udp6155
+      port: 46155
+      targetPort: 46155
+      protocol: UDP
+    - name : udp6156
+      port: 46156
+      targetPort: 46156
+      protocol: UDP
+    - name : udp6157
+      port: 46157
+      targetPort: 46157
+      protocol: UDP
+    - name : udp6158
+      port: 46158
+      targetPort: 46158
+      protocol: UDP
+    - name : udp6159
+      port: 46159
+      targetPort: 46159
+      protocol: UDP
+    - name : udp6160
+      port: 46160
+      targetPort: 46160
+      protocol: UDP
+    - name : udp6161
+      port: 46161
+      targetPort: 46161
+      protocol: UDP
+    - name : udp6162
+      port: 46162
+      targetPort: 46162
+      protocol: UDP
+    - name : udp6163
+      port: 46163
+      targetPort: 46163
+      protocol: UDP
+    - name : udp6164
+      port: 46164
+      targetPort: 46164
+      protocol: UDP
+    - name : udp6165
+      port: 46165
+      targetPort: 46165
+      protocol: UDP
+    - name : udp6166
+      port: 46166
+      targetPort: 46166
+      protocol: UDP
+    - name : udp6167
+      port: 46167
+      targetPort: 46167
+      protocol: UDP
+    - name : udp6168
+      port: 46168
+      targetPort: 46168
+      protocol: UDP
+    - name : udp6169
+      port: 46169
+      targetPort: 46169
+      protocol: UDP
+    - name : udp6170
+      port: 46170
+      targetPort: 46170
+      protocol: UDP
+    - name : udp6171
+      port: 46171
+      targetPort: 46171
+      protocol: UDP
+    - name : udp6172
+      port: 46172
+      targetPort: 46172
+      protocol: UDP
+    - name : udp6173
+      port: 46173
+      targetPort: 46173
+      protocol: UDP
+    - name : udp6174
+      port: 46174
+      targetPort: 46174
+      protocol: UDP
+    - name : udp6175
+      port: 46175
+      targetPort: 46175
+      protocol: UDP
+    - name : udp6176
+      port: 46176
+      targetPort: 46176
+      protocol: UDP
+    - name : udp6177
+      port: 46177
+      targetPort: 46177
+      protocol: UDP
+    - name : udp6178
+      port: 46178
+      targetPort: 46178
+      protocol: UDP
+    - name : udp6179
+      port: 46179
+      targetPort: 46179
+      protocol: UDP
+    - name : udp6180
+      port: 46180
+      targetPort: 46180
+      protocol: UDP
+    - name : udp6181
+      port: 46181
+      targetPort: 46181
+      protocol: UDP
+    - name : udp6182
+      port: 46182
+      targetPort: 46182
+      protocol: UDP
+    - name : udp6183
+      port: 46183
+      targetPort: 46183
+      protocol: UDP
+    - name : udp6184
+      port: 46184
+      targetPort: 46184
+      protocol: UDP
+    - name : udp6185
+      port: 46185
+      targetPort: 46185
+      protocol: UDP
+    - name : udp6186
+      port: 46186
+      targetPort: 46186
+      protocol: UDP
+    - name : udp6187
+      port: 46187
+      targetPort: 46187
+      protocol: UDP
+    - name : udp6188
+      port: 46188
+      targetPort: 46188
+      protocol: UDP
+    - name : udp6189
+      port: 46189
+      targetPort: 46189
+      protocol: UDP
+    - name : udp6190
+      port: 46190
+      targetPort: 46190
+      protocol: UDP
+    - name : udp6191
+      port: 46191
+      targetPort: 46191
+      protocol: UDP
+    - name : udp6192
+      port: 46192
+      targetPort: 46192
+      protocol: UDP
+    - name : udp6193
+      port: 46193
+      targetPort: 46193
+      protocol: UDP
+    - name : udp6194
+      port: 46194
+      targetPort: 46194
+      protocol: UDP
+    - name : udp6195
+      port: 46195
+      targetPort: 46195
+      protocol: UDP
+    - name : udp6196
+      port: 46196
+      targetPort: 46196
+      protocol: UDP
+    - name : udp6197
+      port: 46197
+      targetPort: 46197
+      protocol: UDP
+    - name : udp6198
+      port: 46198
+      targetPort: 46198
+      protocol: UDP
+    - name : udp6199
+      port: 46199
+      targetPort: 46199
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

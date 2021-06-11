@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp20
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp2000
+      port: 42000
+      targetPort: 42000
+      protocol: UDP
+    - name : udp2001
+      port: 42001
+      targetPort: 42001
+      protocol: UDP
+    - name : udp2002
+      port: 42002
+      targetPort: 42002
+      protocol: UDP
+    - name : udp2003
+      port: 42003
+      targetPort: 42003
+      protocol: UDP
+    - name : udp2004
+      port: 42004
+      targetPort: 42004
+      protocol: UDP
+    - name : udp2005
+      port: 42005
+      targetPort: 42005
+      protocol: UDP
+    - name : udp2006
+      port: 42006
+      targetPort: 42006
+      protocol: UDP
+    - name : udp2007
+      port: 42007
+      targetPort: 42007
+      protocol: UDP
+    - name : udp2008
+      port: 42008
+      targetPort: 42008
+      protocol: UDP
+    - name : udp2009
+      port: 42009
+      targetPort: 42009
+      protocol: UDP
+    - name : udp2010
+      port: 42010
+      targetPort: 42010
+      protocol: UDP
+    - name : udp2011
+      port: 42011
+      targetPort: 42011
+      protocol: UDP
+    - name : udp2012
+      port: 42012
+      targetPort: 42012
+      protocol: UDP
+    - name : udp2013
+      port: 42013
+      targetPort: 42013
+      protocol: UDP
+    - name : udp2014
+      port: 42014
+      targetPort: 42014
+      protocol: UDP
+    - name : udp2015
+      port: 42015
+      targetPort: 42015
+      protocol: UDP
+    - name : udp2016
+      port: 42016
+      targetPort: 42016
+      protocol: UDP
+    - name : udp2017
+      port: 42017
+      targetPort: 42017
+      protocol: UDP
+    - name : udp2018
+      port: 42018
+      targetPort: 42018
+      protocol: UDP
+    - name : udp2019
+      port: 42019
+      targetPort: 42019
+      protocol: UDP
+    - name : udp2020
+      port: 42020
+      targetPort: 42020
+      protocol: UDP
+    - name : udp2021
+      port: 42021
+      targetPort: 42021
+      protocol: UDP
+    - name : udp2022
+      port: 42022
+      targetPort: 42022
+      protocol: UDP
+    - name : udp2023
+      port: 42023
+      targetPort: 42023
+      protocol: UDP
+    - name : udp2024
+      port: 42024
+      targetPort: 42024
+      protocol: UDP
+    - name : udp2025
+      port: 42025
+      targetPort: 42025
+      protocol: UDP
+    - name : udp2026
+      port: 42026
+      targetPort: 42026
+      protocol: UDP
+    - name : udp2027
+      port: 42027
+      targetPort: 42027
+      protocol: UDP
+    - name : udp2028
+      port: 42028
+      targetPort: 42028
+      protocol: UDP
+    - name : udp2029
+      port: 42029
+      targetPort: 42029
+      protocol: UDP
+    - name : udp2030
+      port: 42030
+      targetPort: 42030
+      protocol: UDP
+    - name : udp2031
+      port: 42031
+      targetPort: 42031
+      protocol: UDP
+    - name : udp2032
+      port: 42032
+      targetPort: 42032
+      protocol: UDP
+    - name : udp2033
+      port: 42033
+      targetPort: 42033
+      protocol: UDP
+    - name : udp2034
+      port: 42034
+      targetPort: 42034
+      protocol: UDP
+    - name : udp2035
+      port: 42035
+      targetPort: 42035
+      protocol: UDP
+    - name : udp2036
+      port: 42036
+      targetPort: 42036
+      protocol: UDP
+    - name : udp2037
+      port: 42037
+      targetPort: 42037
+      protocol: UDP
+    - name : udp2038
+      port: 42038
+      targetPort: 42038
+      protocol: UDP
+    - name : udp2039
+      port: 42039
+      targetPort: 42039
+      protocol: UDP
+    - name : udp2040
+      port: 42040
+      targetPort: 42040
+      protocol: UDP
+    - name : udp2041
+      port: 42041
+      targetPort: 42041
+      protocol: UDP
+    - name : udp2042
+      port: 42042
+      targetPort: 42042
+      protocol: UDP
+    - name : udp2043
+      port: 42043
+      targetPort: 42043
+      protocol: UDP
+    - name : udp2044
+      port: 42044
+      targetPort: 42044
+      protocol: UDP
+    - name : udp2045
+      port: 42045
+      targetPort: 42045
+      protocol: UDP
+    - name : udp2046
+      port: 42046
+      targetPort: 42046
+      protocol: UDP
+    - name : udp2047
+      port: 42047
+      targetPort: 42047
+      protocol: UDP
+    - name : udp2048
+      port: 42048
+      targetPort: 42048
+      protocol: UDP
+    - name : udp2049
+      port: 42049
+      targetPort: 42049
+      protocol: UDP
+    - name : udp2050
+      port: 42050
+      targetPort: 42050
+      protocol: UDP
+    - name : udp2051
+      port: 42051
+      targetPort: 42051
+      protocol: UDP
+    - name : udp2052
+      port: 42052
+      targetPort: 42052
+      protocol: UDP
+    - name : udp2053
+      port: 42053
+      targetPort: 42053
+      protocol: UDP
+    - name : udp2054
+      port: 42054
+      targetPort: 42054
+      protocol: UDP
+    - name : udp2055
+      port: 42055
+      targetPort: 42055
+      protocol: UDP
+    - name : udp2056
+      port: 42056
+      targetPort: 42056
+      protocol: UDP
+    - name : udp2057
+      port: 42057
+      targetPort: 42057
+      protocol: UDP
+    - name : udp2058
+      port: 42058
+      targetPort: 42058
+      protocol: UDP
+    - name : udp2059
+      port: 42059
+      targetPort: 42059
+      protocol: UDP
+    - name : udp2060
+      port: 42060
+      targetPort: 42060
+      protocol: UDP
+    - name : udp2061
+      port: 42061
+      targetPort: 42061
+      protocol: UDP
+    - name : udp2062
+      port: 42062
+      targetPort: 42062
+      protocol: UDP
+    - name : udp2063
+      port: 42063
+      targetPort: 42063
+      protocol: UDP
+    - name : udp2064
+      port: 42064
+      targetPort: 42064
+      protocol: UDP
+    - name : udp2065
+      port: 42065
+      targetPort: 42065
+      protocol: UDP
+    - name : udp2066
+      port: 42066
+      targetPort: 42066
+      protocol: UDP
+    - name : udp2067
+      port: 42067
+      targetPort: 42067
+      protocol: UDP
+    - name : udp2068
+      port: 42068
+      targetPort: 42068
+      protocol: UDP
+    - name : udp2069
+      port: 42069
+      targetPort: 42069
+      protocol: UDP
+    - name : udp2070
+      port: 42070
+      targetPort: 42070
+      protocol: UDP
+    - name : udp2071
+      port: 42071
+      targetPort: 42071
+      protocol: UDP
+    - name : udp2072
+      port: 42072
+      targetPort: 42072
+      protocol: UDP
+    - name : udp2073
+      port: 42073
+      targetPort: 42073
+      protocol: UDP
+    - name : udp2074
+      port: 42074
+      targetPort: 42074
+      protocol: UDP
+    - name : udp2075
+      port: 42075
+      targetPort: 42075
+      protocol: UDP
+    - name : udp2076
+      port: 42076
+      targetPort: 42076
+      protocol: UDP
+    - name : udp2077
+      port: 42077
+      targetPort: 42077
+      protocol: UDP
+    - name : udp2078
+      port: 42078
+      targetPort: 42078
+      protocol: UDP
+    - name : udp2079
+      port: 42079
+      targetPort: 42079
+      protocol: UDP
+    - name : udp2080
+      port: 42080
+      targetPort: 42080
+      protocol: UDP
+    - name : udp2081
+      port: 42081
+      targetPort: 42081
+      protocol: UDP
+    - name : udp2082
+      port: 42082
+      targetPort: 42082
+      protocol: UDP
+    - name : udp2083
+      port: 42083
+      targetPort: 42083
+      protocol: UDP
+    - name : udp2084
+      port: 42084
+      targetPort: 42084
+      protocol: UDP
+    - name : udp2085
+      port: 42085
+      targetPort: 42085
+      protocol: UDP
+    - name : udp2086
+      port: 42086
+      targetPort: 42086
+      protocol: UDP
+    - name : udp2087
+      port: 42087
+      targetPort: 42087
+      protocol: UDP
+    - name : udp2088
+      port: 42088
+      targetPort: 42088
+      protocol: UDP
+    - name : udp2089
+      port: 42089
+      targetPort: 42089
+      protocol: UDP
+    - name : udp2090
+      port: 42090
+      targetPort: 42090
+      protocol: UDP
+    - name : udp2091
+      port: 42091
+      targetPort: 42091
+      protocol: UDP
+    - name : udp2092
+      port: 42092
+      targetPort: 42092
+      protocol: UDP
+    - name : udp2093
+      port: 42093
+      targetPort: 42093
+      protocol: UDP
+    - name : udp2094
+      port: 42094
+      targetPort: 42094
+      protocol: UDP
+    - name : udp2095
+      port: 42095
+      targetPort: 42095
+      protocol: UDP
+    - name : udp2096
+      port: 42096
+      targetPort: 42096
+      protocol: UDP
+    - name : udp2097
+      port: 42097
+      targetPort: 42097
+      protocol: UDP
+    - name : udp2098
+      port: 42098
+      targetPort: 42098
+      protocol: UDP
+    - name : udp2099
+      port: 42099
+      targetPort: 42099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

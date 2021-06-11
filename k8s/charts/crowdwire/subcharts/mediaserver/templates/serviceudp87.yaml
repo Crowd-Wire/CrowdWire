@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp87
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp8700
+      port: 48700
+      targetPort: 48700
+      protocol: UDP
+    - name : udp8701
+      port: 48701
+      targetPort: 48701
+      protocol: UDP
+    - name : udp8702
+      port: 48702
+      targetPort: 48702
+      protocol: UDP
+    - name : udp8703
+      port: 48703
+      targetPort: 48703
+      protocol: UDP
+    - name : udp8704
+      port: 48704
+      targetPort: 48704
+      protocol: UDP
+    - name : udp8705
+      port: 48705
+      targetPort: 48705
+      protocol: UDP
+    - name : udp8706
+      port: 48706
+      targetPort: 48706
+      protocol: UDP
+    - name : udp8707
+      port: 48707
+      targetPort: 48707
+      protocol: UDP
+    - name : udp8708
+      port: 48708
+      targetPort: 48708
+      protocol: UDP
+    - name : udp8709
+      port: 48709
+      targetPort: 48709
+      protocol: UDP
+    - name : udp8710
+      port: 48710
+      targetPort: 48710
+      protocol: UDP
+    - name : udp8711
+      port: 48711
+      targetPort: 48711
+      protocol: UDP
+    - name : udp8712
+      port: 48712
+      targetPort: 48712
+      protocol: UDP
+    - name : udp8713
+      port: 48713
+      targetPort: 48713
+      protocol: UDP
+    - name : udp8714
+      port: 48714
+      targetPort: 48714
+      protocol: UDP
+    - name : udp8715
+      port: 48715
+      targetPort: 48715
+      protocol: UDP
+    - name : udp8716
+      port: 48716
+      targetPort: 48716
+      protocol: UDP
+    - name : udp8717
+      port: 48717
+      targetPort: 48717
+      protocol: UDP
+    - name : udp8718
+      port: 48718
+      targetPort: 48718
+      protocol: UDP
+    - name : udp8719
+      port: 48719
+      targetPort: 48719
+      protocol: UDP
+    - name : udp8720
+      port: 48720
+      targetPort: 48720
+      protocol: UDP
+    - name : udp8721
+      port: 48721
+      targetPort: 48721
+      protocol: UDP
+    - name : udp8722
+      port: 48722
+      targetPort: 48722
+      protocol: UDP
+    - name : udp8723
+      port: 48723
+      targetPort: 48723
+      protocol: UDP
+    - name : udp8724
+      port: 48724
+      targetPort: 48724
+      protocol: UDP
+    - name : udp8725
+      port: 48725
+      targetPort: 48725
+      protocol: UDP
+    - name : udp8726
+      port: 48726
+      targetPort: 48726
+      protocol: UDP
+    - name : udp8727
+      port: 48727
+      targetPort: 48727
+      protocol: UDP
+    - name : udp8728
+      port: 48728
+      targetPort: 48728
+      protocol: UDP
+    - name : udp8729
+      port: 48729
+      targetPort: 48729
+      protocol: UDP
+    - name : udp8730
+      port: 48730
+      targetPort: 48730
+      protocol: UDP
+    - name : udp8731
+      port: 48731
+      targetPort: 48731
+      protocol: UDP
+    - name : udp8732
+      port: 48732
+      targetPort: 48732
+      protocol: UDP
+    - name : udp8733
+      port: 48733
+      targetPort: 48733
+      protocol: UDP
+    - name : udp8734
+      port: 48734
+      targetPort: 48734
+      protocol: UDP
+    - name : udp8735
+      port: 48735
+      targetPort: 48735
+      protocol: UDP
+    - name : udp8736
+      port: 48736
+      targetPort: 48736
+      protocol: UDP
+    - name : udp8737
+      port: 48737
+      targetPort: 48737
+      protocol: UDP
+    - name : udp8738
+      port: 48738
+      targetPort: 48738
+      protocol: UDP
+    - name : udp8739
+      port: 48739
+      targetPort: 48739
+      protocol: UDP
+    - name : udp8740
+      port: 48740
+      targetPort: 48740
+      protocol: UDP
+    - name : udp8741
+      port: 48741
+      targetPort: 48741
+      protocol: UDP
+    - name : udp8742
+      port: 48742
+      targetPort: 48742
+      protocol: UDP
+    - name : udp8743
+      port: 48743
+      targetPort: 48743
+      protocol: UDP
+    - name : udp8744
+      port: 48744
+      targetPort: 48744
+      protocol: UDP
+    - name : udp8745
+      port: 48745
+      targetPort: 48745
+      protocol: UDP
+    - name : udp8746
+      port: 48746
+      targetPort: 48746
+      protocol: UDP
+    - name : udp8747
+      port: 48747
+      targetPort: 48747
+      protocol: UDP
+    - name : udp8748
+      port: 48748
+      targetPort: 48748
+      protocol: UDP
+    - name : udp8749
+      port: 48749
+      targetPort: 48749
+      protocol: UDP
+    - name : udp8750
+      port: 48750
+      targetPort: 48750
+      protocol: UDP
+    - name : udp8751
+      port: 48751
+      targetPort: 48751
+      protocol: UDP
+    - name : udp8752
+      port: 48752
+      targetPort: 48752
+      protocol: UDP
+    - name : udp8753
+      port: 48753
+      targetPort: 48753
+      protocol: UDP
+    - name : udp8754
+      port: 48754
+      targetPort: 48754
+      protocol: UDP
+    - name : udp8755
+      port: 48755
+      targetPort: 48755
+      protocol: UDP
+    - name : udp8756
+      port: 48756
+      targetPort: 48756
+      protocol: UDP
+    - name : udp8757
+      port: 48757
+      targetPort: 48757
+      protocol: UDP
+    - name : udp8758
+      port: 48758
+      targetPort: 48758
+      protocol: UDP
+    - name : udp8759
+      port: 48759
+      targetPort: 48759
+      protocol: UDP
+    - name : udp8760
+      port: 48760
+      targetPort: 48760
+      protocol: UDP
+    - name : udp8761
+      port: 48761
+      targetPort: 48761
+      protocol: UDP
+    - name : udp8762
+      port: 48762
+      targetPort: 48762
+      protocol: UDP
+    - name : udp8763
+      port: 48763
+      targetPort: 48763
+      protocol: UDP
+    - name : udp8764
+      port: 48764
+      targetPort: 48764
+      protocol: UDP
+    - name : udp8765
+      port: 48765
+      targetPort: 48765
+      protocol: UDP
+    - name : udp8766
+      port: 48766
+      targetPort: 48766
+      protocol: UDP
+    - name : udp8767
+      port: 48767
+      targetPort: 48767
+      protocol: UDP
+    - name : udp8768
+      port: 48768
+      targetPort: 48768
+      protocol: UDP
+    - name : udp8769
+      port: 48769
+      targetPort: 48769
+      protocol: UDP
+    - name : udp8770
+      port: 48770
+      targetPort: 48770
+      protocol: UDP
+    - name : udp8771
+      port: 48771
+      targetPort: 48771
+      protocol: UDP
+    - name : udp8772
+      port: 48772
+      targetPort: 48772
+      protocol: UDP
+    - name : udp8773
+      port: 48773
+      targetPort: 48773
+      protocol: UDP
+    - name : udp8774
+      port: 48774
+      targetPort: 48774
+      protocol: UDP
+    - name : udp8775
+      port: 48775
+      targetPort: 48775
+      protocol: UDP
+    - name : udp8776
+      port: 48776
+      targetPort: 48776
+      protocol: UDP
+    - name : udp8777
+      port: 48777
+      targetPort: 48777
+      protocol: UDP
+    - name : udp8778
+      port: 48778
+      targetPort: 48778
+      protocol: UDP
+    - name : udp8779
+      port: 48779
+      targetPort: 48779
+      protocol: UDP
+    - name : udp8780
+      port: 48780
+      targetPort: 48780
+      protocol: UDP
+    - name : udp8781
+      port: 48781
+      targetPort: 48781
+      protocol: UDP
+    - name : udp8782
+      port: 48782
+      targetPort: 48782
+      protocol: UDP
+    - name : udp8783
+      port: 48783
+      targetPort: 48783
+      protocol: UDP
+    - name : udp8784
+      port: 48784
+      targetPort: 48784
+      protocol: UDP
+    - name : udp8785
+      port: 48785
+      targetPort: 48785
+      protocol: UDP
+    - name : udp8786
+      port: 48786
+      targetPort: 48786
+      protocol: UDP
+    - name : udp8787
+      port: 48787
+      targetPort: 48787
+      protocol: UDP
+    - name : udp8788
+      port: 48788
+      targetPort: 48788
+      protocol: UDP
+    - name : udp8789
+      port: 48789
+      targetPort: 48789
+      protocol: UDP
+    - name : udp8790
+      port: 48790
+      targetPort: 48790
+      protocol: UDP
+    - name : udp8791
+      port: 48791
+      targetPort: 48791
+      protocol: UDP
+    - name : udp8792
+      port: 48792
+      targetPort: 48792
+      protocol: UDP
+    - name : udp8793
+      port: 48793
+      targetPort: 48793
+      protocol: UDP
+    - name : udp8794
+      port: 48794
+      targetPort: 48794
+      protocol: UDP
+    - name : udp8795
+      port: 48795
+      targetPort: 48795
+      protocol: UDP
+    - name : udp8796
+      port: 48796
+      targetPort: 48796
+      protocol: UDP
+    - name : udp8797
+      port: 48797
+      targetPort: 48797
+      protocol: UDP
+    - name : udp8798
+      port: 48798
+      targetPort: 48798
+      protocol: UDP
+    - name : udp8799
+      port: 48799
+      targetPort: 48799
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

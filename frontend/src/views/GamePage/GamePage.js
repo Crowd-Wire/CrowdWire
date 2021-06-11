@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import { withStyles } from "@material-ui/core";
+import classNames from "classnames";
 
 import GameDrawer from 'components/GameDrawer/GameDrawer';
 import Phaser from "./Sections/Phaser.js";
@@ -22,6 +23,7 @@ import Button from "components/CustomButtons/Button.js";
 import CardBody from "components/Card/CardBody.js";
 import Select from '@material-ui/core/Select';
 import useAuthStore from "stores/useAuthStore";
+import usePlayerStore from "stores/usePlayerStore";
 import { useWsHandlerStore } from "webrtc/stores/useWsHandlerStore";
 
 const GamePage = (props) => {
@@ -32,6 +34,7 @@ const GamePage = (props) => {
   const [choosingSettings, setChoosingSettings] = useState(true)
   const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("avatars_1_1")
+  let connecting = usePlayerStore(state => state.connecting);
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -130,22 +133,23 @@ const GamePage = (props) => {
   return (
     <>
       {loading ? 
-        ''
-      : 
-        choosingSettings ?
+        (
+          <div className={classes.backgroundGradient}></div>
+        )
+      : connecting ? 
+        (
+          <div className={classes.backgroundGradient}>
+            <div className={classNames(classes.center, classes.info)}>
+              <img src={logo} className={classes.loader} alt="" />
+              <br />
+              Reconnecting...
+            </div>
+          </div>
+        )
+      : choosingSettings ?
           (
-            <div style={{
-              height: '100%',
-              width: '100%',
-              backgroundColor: '#2B9BFD',
-              backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)'
-            }}>
-              <div style={{
-                position: 'fixed',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}>
+            <div className={classes.backgroundGradient}>
+              <div className={classes.center}>
                 <Card style={{
                   height: '50%',
                   minWidth: 400,

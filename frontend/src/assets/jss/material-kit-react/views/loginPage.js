@@ -60,6 +60,9 @@ const signupPageStyle = {
     marginLeft:"auto", 
     marginRight:"auto",
     width: 200,
+    '& p':{
+      color:'red'
+    },
   },
   socialIcons: {
     maxWidth: "24px",
