@@ -7,7 +7,7 @@ class UserService {
         /*
             id:int
         */
-        let url = 'users/' + id + '/';
+        let url = 'users/' + id;
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
