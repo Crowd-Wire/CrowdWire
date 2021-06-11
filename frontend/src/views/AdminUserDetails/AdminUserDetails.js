@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, Container, Card, CardContent, Divider, CardHeader, Typography } from '@material-ui/core';
+import { Box, Grid, Container, Card, CardContent,CardActions, Divider, CardHeader, Typography, Button } from '@material-ui/core';
 import UserService from 'services/UserService';
 import ReportService from 'services/ReportService';
 import WorldService from 'services/WorldService.ts';
@@ -42,7 +42,7 @@ export default function AdminUserDetails() {
                     setUser(res);
                 })
                 .then(() => {
-                    WorldService.searchAdmin("", [], true, true, true, 1 , null, null, 1, 3)
+                    WorldService.searchAdmin("", [], true, true, 1 , null, null, 1, 3)
                     .then((res) => {
                         if(res.status!==200)
                             return null;
@@ -76,6 +76,18 @@ export default function AdminUserDetails() {
 
     }, []);
 
+    const handleBan = () => {
+        
+        // sends the other status
+        UserService.banUser(user.user_id, user.status ^ 1)
+        .then((res) => {
+            if(res.ok) {
+                setUser((user) => {user.status = user.status ^ 1; return {...user}; });
+            }
+        })
+
+    }
+
     const goBack = () => {
         if(window.location.pathname==="/admin/users/"+url_id){
             navigation("/admin/users")
@@ -97,7 +109,7 @@ export default function AdminUserDetails() {
                     <Box sx={{ backgroundColor: 'background.default', minHeight: '100%', py: 3 }}>
                         <Container maxWidth="lg">
                             <Grid container>
-                                <Grid item lg={10} md={12} xs={12}>
+                                <Grid item lg={11} md={12} xs={12}>
                                     <Card>
                                         <CardHeader title="User Details" />
                                         <Divider />
@@ -125,9 +137,14 @@ export default function AdminUserDetails() {
                                             </Grid>
                                         </CardContent>
                                         <Divider />
+                                        <CardActions>
+                                            <Button onClick={handleBan} color={user.status == 0 ? "primary" : "secondary"} variant="contained">
+                                                { user.status === 0 ? "Ban" : "Unban" }
+                                            </Button>
+                                        </CardActions>
                                     </Card>
                                 </Grid>
-                                <Grid className={classes.paper} item lg={5} md={12} xs={12}>
+                                <Grid className="mt-3" item lg={5} md={12} xs={12}>
                                     <Card>
                                         <CardHeader subheader="User Reports"/>
                                         <Divider/>
@@ -136,7 +153,9 @@ export default function AdminUserDetails() {
                                         </CardContent>
                                     </Card>
                                 </Grid>
-                                <Grid className={classes.paper} item lg={5} md={12} xs={12}>
+                                <Grid item lg={1} md={0} xs={0}>
+                                </Grid>
+                                <Grid className="mt-3" item lg={5} md={12} xs={12}>
                                     <Card>
                                         <CardHeader subheader="Worlds" />
                                         <Divider />
@@ -144,7 +163,7 @@ export default function AdminUserDetails() {
                                             <Col style={{marginLeft:"auto", marginRight:"auto"}}>
                                                 {worlds.map((m,i) => {
                                                     return(
-                                                        <MapCard map={m} key={m.name} baseUrl={"/dashboard/"} banned={m.status}/>
+                                                        <MapCard map={m} key={m.name} baseUrl={"../../worlds/"} banned={m.status}/>
                                                     )
                                                 })}
                                             </Col>
