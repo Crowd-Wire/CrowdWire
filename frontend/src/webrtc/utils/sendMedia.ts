@@ -1,5 +1,7 @@
 import { useRoomStore } from "../stores/useRoomStore";
 import { useMediaStore } from "../stores/useMediaStore";
+import { Producer, Transport } from "mediasoup-client/lib/types";
+
 
 export const sendMedia = async (roomId:string = null) => {
   let { set, media, mediaStream } = useMediaStore.getState();
@@ -8,19 +10,21 @@ export const sendMedia = async (roomId:string = null) => {
   if (roomId && !(roomId in rooms))
     return;
   
-  let sendTransports: {} = {};
+  let sendTransports: Record<string,
+    { recvTransport: Transport;
+      sendTransport: Transport;
+      micProducer: Producer;
+      camProducer: Producer;
+      mediaProducer: Producer;
+    }> = {};
 
-  if (roomId)
-    sendTransports = { roomId: rooms[roomId].sendTransport }
-  else {
+  if (roomId){
+    sendTransports[roomId] = rooms[roomId]
+  } else {
     sendTransports = rooms;
   }
 
-  if (Object.keys(sendTransports).length <= 0) {
-    console.log("no sendTransport in sendVoice");
-    return;
-  }
-
+  
   if (!mediaStream) {
     try {
       // @ts-ignore
@@ -31,22 +35,26 @@ export const sendMedia = async (roomId:string = null) => {
     } catch (err) {
       set({media: null, mediaStream: null})
       console.log(err);
-      return;
     }
+    return;
   }
 
+  if (Object.keys(sendTransports).length <= 0) {
+    return;
+  }
+  
   if (media) {
     try {
       console.log("creating producer...");
       for (const [ key, value ] of Object.entries(sendTransports)) {
-        //@ts-ignore
         if (value && value.sendTransport) {
-          //@ts-ignore
-          value.sendTransport.produce({
+          await value.sendTransport.produce({
             track: media,
+            stopTracks: false,
             appData: { mediaTag: "media" },
           })
           .then((producer) => {
+            console.log(key)
             addProducer(key, producer, 'media');
           })
           .catch((err) => {

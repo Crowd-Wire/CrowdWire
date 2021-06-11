@@ -11,7 +11,7 @@ export const useVoiceStore = create(
     (set) => ({
       nullify: () => {
         set((s) => {
-          if (s.mic) s.mic.stop()
+          if (s.micStream) s.micStream.getTracks().forEach(track => track.stop())
           return {
             mic: null,
             micStream: null,

@@ -2,6 +2,7 @@ import storeDevice from "../../redux/commStore.js";
 import { useMuteStore } from "../stores/useMuteStore";
 import { useVoiceStore } from "../stores/useVoiceStore";
 import { useRoomStore } from "../stores/useRoomStore";
+import { Producer, Transport } from "mediasoup-client/lib/types";
 
 export const sendVoice = async (roomId:string = null) => {
   const { micId } = storeDevice.getState().micId;
@@ -12,17 +13,18 @@ export const sendVoice = async (roomId:string = null) => {
   if ( (roomId && !(roomId in rooms)) || audioMuted)
     return;
 
-  let sendTransports: {} = {};
+  let sendTransports: Record<string,
+    { recvTransport: Transport;
+      sendTransport: Transport;
+      micProducer: Producer;
+      camProducer: Producer;
+      mediaProducer: Producer;
+    }> = {};
 
-  if (roomId)
-    sendTransports = { roomId: rooms[roomId].sendTransport }
-  else {
+  if (roomId){
+    sendTransports[roomId] = rooms[roomId]
+  } else {
     sendTransports = rooms;
-  }
-
-  if (Object.keys(sendTransports).length <= 0) {
-    console.log("no sendTransport in sendVoice");
-    return;
   }
 
   if (!micStream) {
@@ -31,29 +33,30 @@ export const sendVoice = async (roomId:string = null) => {
         audio: micId ? { deviceId: micId } : true,
         video: false
       }).then((micStream) => {
-        mic = micStream.getAudioTracks()[0];
-        set({micStream: micStream, mic: mic});
+        set({micStream: micStream, mic: micStream.getAudioTracks()[0]});
       })
     } catch (err) {
       set({ mic: null, micStream: null });
       console.log(err);
-      return;
     }
+    return;
   }
 
+  if (Object.keys(sendTransports).length <= 0) {
+    console.log("no sendTransport in sendVoice");
+    return;
+  }
+  
   if (mic) {
     console.log("creating producer...");
     for (const [ key, value ] of Object.entries(sendTransports)) {
-      //@ts-ignore
       if (value && value.sendTransport) {
-        //@ts-ignore
-        value.sendTransport.produce({
+        await value.sendTransport.produce({
           track: mic,
+          stopTracks: false,
           appData: { mediaTag: "audio" },
         }).then((producer) => {
-          console.log(useRoomStore.getState())
           addProducer(key, producer, 'mic');
-          console.log(useRoomStore.getState())
         })
         .catch((err) => {
           set({ mic: null, micStream: null });

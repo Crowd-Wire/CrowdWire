@@ -10,7 +10,7 @@ export const useMediaStore = create(
     (set) => ({
       nullify: () => {
         set((s) => {
-          if (s.media) s.media.stop()
+          if (s.mediaStream) s.mediaStream.getTracks().forEach(track => track.stop())
           return {
             media: null,
             mediaStream: null,

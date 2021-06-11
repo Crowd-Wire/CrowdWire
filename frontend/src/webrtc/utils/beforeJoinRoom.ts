@@ -3,6 +3,7 @@ import { useRoomStore } from "../stores/useRoomStore";
 
 export const beforeJoinRoom = async (routerRtpCapabilities: RtpCapabilities, roomId, inRoom?: false) => {
   const { device } = useRoomStore.getState();
+  console.log(roomId)
   if (!inRoom) {
     useRoomStore.getState().addRoom(roomId);
   }

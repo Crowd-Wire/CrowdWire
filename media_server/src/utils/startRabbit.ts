@@ -194,9 +194,6 @@ export const startRabbit = async (handler: HandlerMap) => {
   const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
   let media_server_counter = 0;
   await k8sApi.listNamespacedPod('default').then(async function(res: any)  {
-  //console.log(typeof(res.body));
-  //console.log(payload)
- //console.log(payload.get('V1PodList'))
   for(let i =0; i< res.body.items.length; i ++){
       let pod = res.body.items[i];
       if (pod.metadata.name.includes('crowdwire-mediaserver')){

@@ -20,7 +20,6 @@ import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { useRoomStore } from '../../webrtc/stores/useRoomStore';
 import useWorldUserStore from "../../stores/useWorldUserStore";
-// import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
@@ -211,10 +210,6 @@ export default class RoomCall extends React.Component<{}, State> {
           alignItems: 'center',
         }}>
 
-
-          {/* <ActiveSpeakerListener/> */}
-
-          
               <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600}}>
                 <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
                   {this.state.fullscreen ?

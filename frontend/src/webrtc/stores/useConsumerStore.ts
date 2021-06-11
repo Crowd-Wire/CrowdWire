@@ -214,16 +214,13 @@ export const useConsumerStore = create(
       checkRoomToClose: (roomId) =>
         set((s) => {
           let to_close = true;
-          for (const [key, value] of Object.entries(s.consumerMap)) {
+          for (const value of Object.values(s.consumerMap)) {
             if (value.roomId == roomId) {
               to_close = false;
               break;
             };
           }
-          console.log(to_close)
-          console.log(useRoomStore.getState().rooms)
           if (to_close) useRoomStore.getState().removeRoom(roomId);
-          console.log(useRoomStore.getState().rooms)
           return {
             consumerMap: {
               ...s.consumerMap
@@ -246,9 +243,7 @@ export const useConsumerStore = create(
         }),
       closePeer: (userId) =>
         set((s) => {
-          console.log(userId)
           let user = s.consumerMap[userId]
-          console.log(user)
           if (user) {
             if (user.consumerAudio && !user.consumerAudio.closed) {
               user.consumerAudio.close()

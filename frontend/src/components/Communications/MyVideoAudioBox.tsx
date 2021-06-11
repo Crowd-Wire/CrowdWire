@@ -21,8 +21,6 @@ import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
 import { FileSharing } from "./FileSharing";
-import { useVideoStore } from "../../webrtc/stores/useVideoStore";
-import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useMediaStore } from "../../webrtc/stores/useMediaStore";
 import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
@@ -190,39 +188,30 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoPauseState(!videoPauseState)
     useMuteStore.getState().setVideoMute(videoPauseState);
-    
-    sendVideo().then(() => {
-      let { rooms } = useRoomStore.getState();
-      if (Object.keys(rooms).length > 0) {
-        for (const [key, value] of Object.entries(rooms)) {
-          if (value.camProducer) {
-            if (videoPauseState)
-              value.camProducer.pause();
-            else
-              value.camProducer.resume();
-          }
+    let { rooms } = useRoomStore.getState();
+    if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        if (value.camProducer) {
+          if (videoPauseState) {value.camProducer.pause();}
+          else {value.camProducer.resume();}
         }
       }
-    })
+    }
     wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
   }
   const toggleAudio = () => {
     setAudioPauseState(!audioPauseState)
     useMuteStore.getState().setAudioMute(audioPauseState)
 
-    sendVoice().then(() => {
-      let { rooms } = useRoomStore.getState();
-      if (Object.keys(rooms).length > 0) {
-        for (const [key, value] of Object.entries(rooms)) {
-          if (value.micProducer) {
-            if (videoPauseState)
-              value.micProducer.pause();
-            else
-              value.micProducer.resume();
-          }
+    let { rooms } = useRoomStore.getState();
+    if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        if (value.micProducer) {
+          if (audioPauseState){value.micProducer.pause();}
+          else {value.micProducer.resume();}
         }
       }
-    });
+    }
 
     wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
   }
@@ -257,14 +246,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   useEffect(() => {
     setVideoPauseState(videoTrack ? true : false)
     setAudioPauseState(audioTrack ? true : false)
+    const { videoMuted, audioMuted } = useMuteStore.getState();
 
     const mediaStream = new MediaStream();
 
-    if (videoTrack) {
+    if (videoTrack && !videoMuted) {
       mediaStream.addTrack(videoTrack);
     }
 
-    if (audioTrack) {
+    if (audioTrack && !audioMuted) {
       mediaStream.addTrack(audioTrack);
     }
 
@@ -309,7 +299,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                       style={{display: videoPauseState ? 'block' : 'none'}}/>
                   ) : audioTrack ? (
                     <div style={{verticalAlign: 'middle', textAlign: 'center', width: '100%'}}>
-                      <img src={avatar} style={{paddingTop: 15, paddingBottom: 15}}/>
                       <audio autoPlay id={id+"_audio"} ref={myRef}/>
                     </div>
                   ) : ''

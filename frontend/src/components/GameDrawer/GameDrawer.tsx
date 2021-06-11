@@ -104,7 +104,6 @@ const GameDrawer = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
-    console.log(useWorldUserStore.getState())
     if (!textChat) {
       textChat = document.getElementById('text-chat');
     } else {

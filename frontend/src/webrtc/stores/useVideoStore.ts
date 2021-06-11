@@ -1,4 +1,3 @@
-import { Producer } from "mediasoup-client/lib/Producer";
 import create from "zustand";
 import { combine } from "zustand/middleware";
 
@@ -11,7 +10,7 @@ export const useVideoStore = create(
     (set) => ({
       nullify: () => {
         set((s) => {
-          if (s.cam) s.cam.stop()
+          if (s.camStream) s.camStream.getTracks().forEach(track => track.stop())
           return {
             cam: null,
             camStream: null,

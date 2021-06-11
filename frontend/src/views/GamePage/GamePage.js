@@ -73,6 +73,7 @@ const GamePage = (props) => {
           })
           useWorldUserStore.getState().joinWorld(res);
           setUsername(res.username)
+          setAvatar(res.avatar)
           setLoading(0);
         }
       }
