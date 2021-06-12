@@ -271,7 +271,7 @@ export default function DashDrawer(props){
             </ListItem>
           }
 
-          { !st.is_superuser ?
+          { !st.is_superuser || st.guest_uuid ?
             <></>
             :
             <>
