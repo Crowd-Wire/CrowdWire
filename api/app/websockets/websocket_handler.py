@@ -128,7 +128,8 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         groups_to_remove = groups_to_remove['close-room']
     if add_users_id:
         # add user to a new group with the still nearby users
-        await handle_actions(await redis_connector.add_users_to_group(world_id, manager.get_next_group_id(), *[user_id, *add_users_id]))
+        next_group_id = await redis_connector.get_next_group()
+        await handle_actions(await redis_connector.add_users_to_group(world_id, next_group_id, *[user_id, *add_users_id]))
 
     await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'groups': groups_to_remove, 'merge': True, 'ids': users_id}, user_id)
     await send_groups_snapshot(world_id)
