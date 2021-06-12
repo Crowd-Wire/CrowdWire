@@ -6,6 +6,7 @@ from .base import Base, Tag, User, Role, World, World_User
 from .session import engine
 from datetime import datetime
 from app.core.security import get_password_hash
+from app.utils import choose_avatar
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
@@ -63,15 +64,15 @@ def insert_world_users(target, connection, **kwargs):
     # WORLD_USER CREATION
     connection.execute(World_User.__table__.insert().values(
         user_id=1, world_id=1, role_id=1, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
-        status=0, username="ADMIN"
+        status=0, username="ADMIN", avatar=choose_avatar()
     ))
     connection.execute(World_User.__table__.insert().values(
         user_id=2, world_id=1, role_id=1, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
-        status=0, username="NORMAL"
+        status=0, username="NORMAL", avatar=choose_avatar()
     ))
     connection.execute(World_User.__table__.insert().values(
         user_id=3, world_id=1, role_id=2, join_date=datetime.now(), n_joins=1, last_join=datetime.now(),
-        status=0, username="SPEAKER"
+        status=0, username="SPEAKER", avatar=choose_avatar()
     ))
 
 

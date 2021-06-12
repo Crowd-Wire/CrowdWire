@@ -107,11 +107,12 @@ class RabbitHandler:
         message = (json.dumps(message)).encode()
         async with self.channel_pool.acquire() as channel:  # type: Channel
             for queue in queues_to_send:
-                logger.info("Published message to Queue %r" % queue)
-                await channel.default_exchange.publish(
-                    Message(message),
-                    queue,
-                )
+                if queue:
+                    logger.info("Published message to Queue %r" % queue)
+                    await channel.default_exchange.publish(
+                        Message(message),
+                        queue,
+                    )
 
     async def consume(self) -> None:
         async with self.channel_pool.acquire() as channel:  # type: Channel

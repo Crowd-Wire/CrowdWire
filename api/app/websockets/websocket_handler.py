@@ -153,7 +153,7 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
                     'groups': groups_to_remove,
                     'ids': [user_id]
                 }, uid)
-    await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
+    await redis_connector.add_users_to_group(world_id, conference_id, user_id)
     await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
 
     permission = await redis_connector.can_talk_conference(world_id, user_id)
