@@ -17,6 +17,8 @@ import BuildIcon from '@material-ui/icons/Build';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import Button from "components/CustomButtons/Button.js";
 import { withRouter } from "utils/wrapper";
+import useAuthStore from "stores/useAuthStore.ts";
+
 
 class DashboardStats extends Component{
     
@@ -26,7 +28,8 @@ class DashboardStats extends Component{
             show: false,
             nav: false,
             open: false,
-            page: false
+            page: false,
+            guest: useAuthStore.getState().guest_uuid
         }
         this.navigate = props.navigate;
         this.params = props.params;
@@ -102,6 +105,7 @@ class DashboardStats extends Component{
                         </Row>
                     : ''
                     }
+                    { !this.state.guest ?
                     <Row sm={12}>
                         <Button color="github" onClick={() => {this.handleClickOpen()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
                             <span style={{fontWeight: 500, fontSize: '0.9rem'}}><ReportIcon/>Report World</span>
@@ -109,6 +113,7 @@ class DashboardStats extends Component{
                         <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
                             world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                     </Row>
+                    : '' }
                     { this.props.isCreator ? 
                         <Row sm={12}>
                             <Button color="danger" onClick={() => {this.showModal()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
