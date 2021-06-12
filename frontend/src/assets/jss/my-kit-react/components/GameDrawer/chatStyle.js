@@ -20,7 +20,7 @@ const chatStyle = {
     sendToInput: {
         height: "64px",
         display: 'flex',
-        justifyContent: 'right',
+        justifyContent: 'left',
         padding: '0 10px',
     },
     chat: {

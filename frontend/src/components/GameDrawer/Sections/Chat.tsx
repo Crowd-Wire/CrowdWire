@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     selectEmpty: {
       marginTop: theme.spacing(2),
-    },
+    }
   }),
 );
 
@@ -84,7 +84,7 @@ const Chat = (props) => {
             inputProps={{
               id: 'select-send-to',
             }}
-            style={{color: 'white'}}
+            style={{color: '#black', background: 'transparent'}}
           >
             <option value="ALL">All</option>
             <option value="NEARBY">Nearby</option>
