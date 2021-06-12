@@ -135,8 +135,8 @@ async def world_websocket(
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
         logger.info("disconnected ")
-        await manager.disconnect(world_id, user_id)
         await wh.disconnect_user(world_id, user_id)
+        await manager.disconnect(world_id, user_id)
         if not is_guest_user(user):
             crud_event.create(db=db, user_id=user.user_id, world_id=world_id, event_type=protocol.LEAVE_PLAYER)
     # except BaseException:

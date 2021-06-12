@@ -143,7 +143,7 @@ export const getSocket = (worldId) => {
 
             switch (data.topic) {
                 case "SEND_MESSAGE":
-                    useMessageStore.getState().addMessage({ from: data.from, text: data.text, date: data.date, to: data.to });
+                    useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
                     break;
                 case "JOIN_PLAYER":
                     usePlayerStore.getState().connectPlayer(data.user.user_id, data.position, data.user);
@@ -152,6 +152,11 @@ export const getSocket = (worldId) => {
                     let user_id = data.user_id;
                     useConsumerStore.getState().closePeer(user_id);
                     usePlayerStore.getState().disconnectPlayer(user_id);
+                    if (data.groups) {
+                        for (let i = 0; i < data.groups.length; i++) {
+                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+                        }
+                    }
                     break;
                 case "PLAYER_MOVEMENT":
                     usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
@@ -164,6 +169,11 @@ export const getSocket = (worldId) => {
                     break;
                 case "UNWIRE_PLAYER":
                     usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
+                    if (data.groups) {
+                        for (let i = 0; i < data.groups.length; i++) {
+                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
+                        }
+                    }
                     break;
                 case "GROUPS_SNAPSHOT":
                     usePlayerStore.getState().setGroups(data.groups);
@@ -193,7 +203,7 @@ export const getSocket = (worldId) => {
                     break;
                 case "you-are-now-a-speaker":
                     console.log(data)
-                    beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
+                    beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId, true).then(() => {
                         createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                             sendVideo(data.d.roomId);
                             sendVoice(data.d.roomId);
@@ -211,7 +221,7 @@ export const getSocket = (worldId) => {
                     if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
                         const roomId = data.d.roomId;
                         if (useRoomStore.getState().rooms[roomId].recvTransport) {
-                            consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind);
+                            consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
                         } else {
                             consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
                         }

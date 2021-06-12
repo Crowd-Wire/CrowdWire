@@ -520,10 +520,12 @@ class RedisConnector:
     async def rem_groups_from_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Remove one or more groups from a user
         Returns a dictionary with actions made to groups and users"""
-        actions = {}
+        actions = {'close-room': []}
         groups_id = [group_id, *groups_id]
         for gid in groups_id:
-            actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
+            groups_to_remove = await self.rem_users_from_group(world_id, gid, user_id)
+            for group in groups_to_remove:
+                actions['close-room'].append(group)
         return actions
 
     async def get_user_files(self, world_id: str, user_id: str) -> List[dict]:

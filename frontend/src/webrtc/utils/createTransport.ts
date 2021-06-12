@@ -26,7 +26,6 @@ export async function createTransport(
   // start flowing for the first time. send dtlsParameters to the
   // server, then call callback() on success or errback() on failure.
   transport.on("connect", async ({ dtlsParameters }, callback, errback) => {
-    console.log(sctpParameters)
     useWsHandlerStore
       .getState()
       .addWsListener(`@connect-transport-${direction}-done`, (d) => {
@@ -98,7 +97,6 @@ export async function createTransport(
     transport.on(
       "producedata",
       async (parameters, callback, errback) => {
-        console.log(parameters)
         useWsHandlerStore
           .getState()
           .addWsListener(`@send-file-${direction}-done`, (d) => {
@@ -127,12 +125,5 @@ export async function createTransport(
       }
     );
   }
-
-  transport.on("connectionstatechange", async (state) => {
-    console.log(
-      `${direction} transport ${transport.id} connectionstatechange ${state}`
-    );
-  });
-
   addTransport(direction, transport, _roomId);
 }
