@@ -14,7 +14,7 @@ export const config = {
   mediasoup: {
     worker: {
       rtcMinPort: 40000,
-      rtcMaxPort: 41999,
+      rtcMaxPort: 40999,
       logLevel: "debug",
       logTags: [
         "info",
