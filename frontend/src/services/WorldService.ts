@@ -44,7 +44,6 @@ class WorldService {
         if (query.length !== 0)
             url = url.concat('?' + query.join('&'));
 
-        console.log(url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
@@ -254,6 +253,16 @@ class WorldService {
     
    getWorldUser(world_id, user_id) {
         return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+        })
+    }
+
+    getAllWorldUsers(world_id) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users", {
             method: 'GET',
             mode: 'cors',
             headers: {

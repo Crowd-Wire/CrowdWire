@@ -1,38 +1,103 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { makeStyles } from "@material-ui/core/styles";
 import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import TextField from '@material-ui/core/TextField';
 import Button from 'react-bootstrap/Button';
+import WorldService from 'services/WorldService';
+import UserService from 'services/UserService';
+import UserReportCard from 'components/UserReportCard/UserReportCard';
 
+
+const useStyles = makeStyles((theme) => ({
+	selected: {
+	  backgroundColor:"#54B5B4",
+	},
+  }));
 
 export default function KickBanPanel(props){
-	const { children, users, reports, value, index, ...other } = props;
-	let rows = [];
-	let reportBoxes = [];
+	const classes = useStyles();
+	const { children, reports, value, index, ...other } = props;
+	const [selectedElement, setSelectedElement] = React.useState(0);
+	const [worldUsers, setWorldUsers] = React.useState([]);
+	const [reportBoxes, setReportBoxes] = React.useState([])
+	const [rows, setRows] = React.useState([]);
+	const settingSelElement = (key) => {
+		console.log(key)
+		setSelectedElement(Number.parseInt(key))
+	};
 
+	useEffect(() => {
+		if(props.world.length===1)
+			WorldService.getAllWorldUsers(props.world)
+			.then((res) => {
+				return res.json();
+			})
+			.then((res) => {
+				let flag = true;
+				let users = {};
+				if(res.length!==undefined){
+					res.forEach((worldUsers)=>{
+						users[worldUsers.user_id]={"avatar":worldUsers.avatar,"role_id":worldUsers.role_id,"username":worldUsers.username};
+						if(flag){
+							setSelectedElement(worldUsers.user_id)
+							flag=false;
+						}
+					})
+					setWorldUsers(users);
+				}
+			});
+	},[props.world])
 
-	for(let i=0; i<users.length; i++){
-		rows.push(
-			<Row 
-				key={"user_"+i} style={{height:"40px", border:"solid #54B5B4 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%"}}
-			>
-				<Typography variant="h6" style={{marginLeft:"30px", marginTop:"auto", marginBottom:"auto"}}>
-					{users[i]}
-				</Typography>
-			</Row>
-		);
-	}
-	for(let i=0; i<reports.length; i++){
-		reportBoxes.push(
-			<Row key={"report_box_"+i} style={{marginLeft:"auto",marginRight:"auto",height:"180px", width:"100%", borderBottom:"1px solid black"}}>
-				<Typography style={{marginTop:"auto"}} variant="h5">{reports[i]['Reporter']}</Typography>
-				<Row style={{backgroundColor:"#0B132B", height:"130px", width:"100%", margin:"auto"}}>
-					<Typography variant="body1" style={{color:"white"}}>{reports[i]['Message']}</Typography>
-				</Row>
-			</Row>
-		);
-	}
+	useEffect(() => {
+		let userRows = [];
+		Object.keys(worldUsers).forEach((key) => {
+			if(worldUsers.length !== 0){
+				userRows.push(
+					<Row
+						onClick={()=>{settingSelElement(key)}}
+						className={ selectedElement === Number.parseInt(key) ? classes.selected : null }
+						id={key} key={"user_"+key} style={{height:"40px", border:"solid #54B5B4 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%"}}
+					>
+						<Typography variant="h6" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>
+							{worldUsers[key].username}
+						</Typography>
+						<Typography variant="caption" style={{marginLeft:"5px"}}>
+							<em>#{key}</em>
+						</Typography>
+					</Row>
+				);
+				console.log(document.getElementById("1"))
+			}
+		});
+		setRows(userRows);
+	}, [worldUsers])
+
+	useEffect(()=>{
+		let newReportBoxes = [];
+		console.log("selectedElements")
+		if(selectedElement>=0){
+			UserService.getUserReports(props.world, null, selectedElement, null, null, null, null, null, null)
+			.then((res)=>{
+				return res.json();
+			})
+			.then((res)=>{
+				console.log(res)
+				if(res.length>0)
+				for(let i=0; i<res.length; i++){
+					newReportBoxes.push(
+						<UserReportCard 
+							key={res[i].reporter + '_' + res[i].reported + '_' + res[i].world_id + '_' + res[i].reviewed}
+							report={res[i]}
+						/>
+					);
+				}
+				setReportBoxes(newReportBoxes);
+			})
+		}
+	},[selectedElement])
+	
 	return(
 		<div
 		role="tabpanel"
