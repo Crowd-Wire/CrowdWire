@@ -216,7 +216,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     let { rooms, removeProducer } = useRoomStore.getState();
 
     if (mediaOffState) {
-      sendMedia().then((media) => {
+      sendMedia(true).then((media) => {
         if (media)
           setMediaOffState(!mediaOffState)
       });

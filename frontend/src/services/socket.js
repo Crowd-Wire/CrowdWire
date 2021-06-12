@@ -2,6 +2,7 @@ import { WS_BASE } from "config";
 import { createTransport } from "../webrtc/utils/createTransport";
 import { sendVoice } from "../webrtc/utils/sendVoice";
 import { sendVideo } from "../webrtc/utils/sendVideo";
+import { sendMedia } from "../webrtc/utils/sendMedia";
 import { beforeJoinRoom } from "../webrtc/utils/beforeJoinRoom";
 import { consumeStream } from "../webrtc/utils/consumeStream";
 import { consumeDataStream } from "../webrtc/utils/consumeDataStream";
@@ -187,6 +188,7 @@ export const getSocket = (worldId) => {
                         createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                             sendVoice(data.d.roomId);
                             sendVideo(data.d.roomId);
+                            sendMedia(false, data.d.roomId);
                         });
                     })
                     break;
@@ -207,6 +209,7 @@ export const getSocket = (worldId) => {
                         createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                             sendVideo(data.d.roomId);
                             sendVoice(data.d.roomId);
+                            sendMedia(false, data.d.droomId);
                         });
                     })
                     break;
