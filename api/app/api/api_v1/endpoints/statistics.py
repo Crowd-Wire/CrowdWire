@@ -24,7 +24,7 @@ async def get_platform_statistics(
     return await crud.crud_statistics.get_platform_statistics(db=db)
 
 
-@router.get("/worlds/{world_id}/", response_model=schemas.WorldStatistics)
+@router.get("/worlds/{world_id}", response_model=schemas.WorldStatistics)
 async def get_world_statistics(
     world_id: int,
     db: Session = Depends(deps.get_db),
