@@ -3,10 +3,13 @@ import { useMediaStore } from "../stores/useMediaStore";
 import { Producer, Transport } from "mediasoup-client/lib/types";
 
 
-export const sendMedia = async (roomId:string = null) => {
+export const sendMedia = async (to_create_new: boolean, roomId: string = null) => {
   let { set, media, mediaStream } = useMediaStore.getState();
   const { rooms, addProducer, removeProducer } = useRoomStore.getState();
   
+  if (!to_create_new && !mediaStream)
+    return;
+
   if (roomId && !(roomId in rooms))
     return;
   

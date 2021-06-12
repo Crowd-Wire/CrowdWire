@@ -39,13 +39,14 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
   }))
 
   const closeMedia = () => {
-    let { set } = useMediaStore.getState();
+    let { set, mediaStream } = useMediaStore.getState();
     let { rooms, removeProducer } = useRoomStore.getState();
     if (Object.keys(rooms).length > 0) {
       for (const [key, value] of Object.entries(rooms)) {
         removeProducer(key, 'media');
       }
     }
+    if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
     set({media: null, mediaStream: null})
   }
 

@@ -22,6 +22,7 @@ import { useRoomStore } from '../../webrtc/stores/useRoomStore';
 import useWorldUserStore from "../../stores/useWorldUserStore";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
+import { sendMedia } from 'webrtc/utils/sendMedia';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -71,6 +72,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
     this.mediaStoreSub = useMediaStore.subscribe((media) => {
       this.setState({ media });
+      sendMedia(media ? true : false);
     }, (state) => state.media);
   }
   myUsername: string = useWorldUserStore.getState().world_user.username;
