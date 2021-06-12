@@ -10,7 +10,7 @@ from app.utils import is_guest_user
 router = APIRouter()
 
 
-@router.get("/", response_model=schemas.GlobalStatistics)
+@router.get("", response_model=schemas.GlobalStatistics)
 async def get_platform_statistics(
     db: Session = Depends(deps.get_db),
     user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
