@@ -27,6 +27,7 @@ import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import usePlayerStore from "stores/usePlayerStore";
+import { isDesktop } from 'utils/isDesktop.js';
 import { API_BASE } from "config";
 
 
@@ -99,7 +100,7 @@ export default class RoomCall extends React.Component<{}, State> {
   reInitializeStream = () => {
     const useMic = (this.accessMic && !(useMuteStore.getState().videoMuted))
     const useCam = (this.accessVideo && !(useMuteStore.getState().audioMuted))
-    if (useMic|| useCam) {
+    if (useMic || useCam) {
       const media = getVideoAudioStream(useMic, useCam);
       return new Promise((resolve) => {
         media.then((stream: MediaStream) => {
@@ -136,8 +137,8 @@ export default class RoomCall extends React.Component<{}, State> {
         toast.dark(
           <span>
             <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
-          Microphone Detected 🎙️
-        </span>
+            Microphone Detected 🎙️
+          </span>
           , toast_props);
       }
       if (this.accessVideo) {
@@ -194,28 +195,31 @@ export default class RoomCall extends React.Component<{}, State> {
       hideArrow: !hasNextPage,
       showDots: hasNextPage,
       mobileBreakpoint: 600
-    }
+    };
+    const positionStyle = isDesktop() ? 
+      { right: 10 } : { left: '50%', transform: 'translateX(-50%)' };
+
     return (
       <>
-      {numberUsers > 0 ?
+        {numberUsers > 0 ?
 
-(   
-        <div style={{
-          position: 'fixed',
-          paddingRight: 80,
-          zIndex: 99,
-          // height: this.state.fullscreen ? '100%' : '25%',
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+          (
+            <div style={{
+              position: 'fixed',
+              paddingRight: 80,
+              zIndex: 99,
+              // height: this.state.fullscreen ? '100%' : '25%',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
 
 
-          {/* <ActiveSpeakerListener/> */}
+              {/* <ActiveSpeakerListener/> */}
 
-          
-              <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600}}>
+
+              <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600 }}>
                 <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
                   {this.state.fullscreen ?
                     (<Button variant="contained" color="primary" onClick={this.handleFullscreen}>Reduce View<FullscreenExitIcon /></Button>)
@@ -232,12 +236,12 @@ export default class RoomCall extends React.Component<{}, State> {
                         volume: userVolume, active,
                         videoToggle, audioToggle
                       } = this.state.consumerMap[peerId];
-                      
-                     
+
+
                       let item = <></>
                       let username = peerId;
-                      let avatar= "avatars_1_1";
-                      if (peerId in usePlayerStore.getState().users_info) {
+                      let avatar = "avatars_1_1";
+                      if (peerId in usePlayerStore.getState().users_info) {
                         username = usePlayerStore.getState().users_info[peerId].username;
                         avatar = usePlayerStore.getState().users_info[peerId].avatar;
                       }
@@ -255,28 +259,38 @@ export default class RoomCall extends React.Component<{}, State> {
                         )
                       return [
                         (<Carousel.Item key={peerId + "_crs_item"}>
-                            <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
-                              <VideoAudioBox
-                                avatar={API_BASE + "static/characters/" + avatar + '.png'}
-                                active={active}
-                                username={username}
-                                id={peerId}
-                                audioTrack={consumerAudio ? consumerAudio._track : null}
-                                videoTrack={consumerVideo ? consumerVideo._track : null}
-                                volume={(userVolume / 200)}
-                                videoToggle={videoToggle}
-                                audioToggle={audioToggle}
-                              />
-                            </div>
-                          </Carousel.Item>), item]
+                          <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
+                            <VideoAudioBox
+                              avatar={API_BASE + "static/characters/" + avatar + '.png'}
+                              active={active}
+                              username={username}
+                              id={peerId}
+                              audioTrack={consumerAudio ? consumerAudio._track : null}
+                              videoTrack={consumerVideo ? consumerVideo._track : null}
+                              volume={(userVolume / 200)}
+                              videoToggle={videoToggle}
+                              audioToggle={audioToggle}
+                            />
+                          </div>
+                        </Carousel.Item>), item]
                     })
                   }
 
                 </Carousel>
               </div>
-        </div>
-        ) : null}
-        <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
+            </div>
+          ) : null}
+        <div style={{
+          position: 'fixed',
+          width: '18%',
+          height: 'auto',
+          bottom: 5,
+          zIndex: 99,
+          minWidth: 160,
+          minHeight: 120,
+          ...positionStyle
+        }}
+        >
           {this.state.media ?
             <MyMediaStreamBox
               username={this.myUsername}
@@ -285,7 +299,7 @@ export default class RoomCall extends React.Component<{}, State> {
             />
             : ''}
           <MyVideoAudioBox
-            avatar = {this.avatar}
+            avatar={this.avatar}
             username={this.myUsername}
             id={this.myId}
             audioTrack={this.state.mic}

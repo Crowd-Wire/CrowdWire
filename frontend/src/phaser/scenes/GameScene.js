@@ -68,7 +68,7 @@ class GameScene extends Phaser.Scene {
 
         // listen to the arrow keys
         // this.cursors = this.input.keyboard.createCursorKeys();
-        if (isDesktop() && false) {
+        if (isDesktop()) {
             this.cursors = this.input.keyboard.addKeys({
                 up: Phaser.Input.Keyboard.KeyCodes.W,
                 up2: Phaser.Input.Keyboard.KeyCodes.UP,
@@ -83,17 +83,21 @@ class GameScene extends Phaser.Scene {
         } else {
 
             const joystick = new VirtualJoystick(this, {
-                x: 500,
-                y: 500,
-                base: this.add.circle(0, 0, 50, 0x0B132B, 0.5).setDepth(1100),
-                // thumb: thumbGameObject,
+                x: this.game.canvas.width*0.75 - 50, 
+                y: this.game.canvas.height*0.75 - 50,
+                base: this.add.circle(0, 0, 50, 0x0B132B, 0.6).setDepth(1100),
+                thumb: this.add.circle(0, 0, 25, 0x000000, 0.8).setDepth(1100),
                 // dir: '8dir',
                 // forceMin: 16,
                 // fixed: true,
                 // enable: true
-            });
-            joystick.setPosition(300 ,300).setScrollFactor(0);
+            }).setScrollFactor(0);
+
             this.cursors = joystick.createCursorKeys();
+
+            window.addEventListener('resize', () => {
+                joystick.setPosition(this.game.canvas.width*0.75 - 50, this.game.canvas.height*0.75 - 50);
+            }) ;
         }
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
