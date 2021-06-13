@@ -85,7 +85,9 @@ const usePlayerStore = create(
                     for (const [id, position] of Object.entries(snapshot)) {
                         players[id] = { position, velocity: { x: 0, y: 0 } };
                     }
+                    console.log(users_data)
                     usePlayerStore.getState().setUsersInfo(users_data)
+                    console.log(usePlayerStore.getState().users_info)
                     return { players };
                 });
             },
@@ -93,7 +95,9 @@ const usePlayerStore = create(
                 return set((s) => {
                     const players = {...s.players};
                     players[id] = { position, velocity: { x: 0, y: 0 } };
+                    console.log(user_info)
                     usePlayerStore.getState().addUserInfo(user_info)
+                    console.log(usePlayerStore.getState().users_info)
                     return { players };
                 });
             },
