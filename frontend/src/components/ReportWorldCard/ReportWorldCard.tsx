@@ -155,9 +155,6 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
         });
         return;
       }
-      //@ts-ignore
-      console.log(document.getElementById("user_id-native-required").value)
-      console.log(userToReport)
       if (comment != "") {
         ReportService.sendUserReport(userToReport, useWorldUserStore.getState().world_user.world_id, comment)
           .then((res) => {
