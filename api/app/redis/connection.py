@@ -62,7 +62,6 @@ class RedisConnector:
         return all_keys
 
     async def hget(self, key: str, field: any):
-        # TODO: CHECK ENCODINGS!
         return await self.execute('hget', key, field)
 
     async def hset(self, key: str, field: str, value: any):
@@ -239,7 +238,6 @@ class RedisConnector:
         Checks World_User Data, if present, to be returned to REST API
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
-        # TODO: maybe check encoding instead of converting to string
         username = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'username')
         avatar = await self.hget(
@@ -271,7 +269,6 @@ class RedisConnector:
         Checks World_User Data if present
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
-        # TODO: maybe check encoding instead of converting to string
         user_id = str(user_id)
         world_id = str(world_id)
         username = await self.hget(
@@ -520,10 +517,12 @@ class RedisConnector:
     async def rem_groups_from_user(self, world_id: str, user_id: str, group_id: str, *groups_id: List[str]):
         """Remove one or more groups from a user
         Returns a dictionary with actions made to groups and users"""
-        actions = {}
+        actions = {'close-room': []}
         groups_id = [group_id, *groups_id]
         for gid in groups_id:
-            actions['close-room'] = (await self.rem_users_from_group(world_id, gid, user_id))
+            groups_to_remove = await self.rem_users_from_group(world_id, gid, user_id)
+            for group in groups_to_remove:
+                actions['close-room'].append(group)
         return actions
 
     async def get_user_files(self, world_id: str, user_id: str) -> List[dict]:

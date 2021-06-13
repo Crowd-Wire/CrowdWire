@@ -34,11 +34,6 @@ def generate_guest_username(user_id: uuid4) -> str:
     return f'Guest_{sub_uuid}'
 
 
-# TODO: Remove this function usage!
-def row2dict(model) -> dict:
-    return {c.name: str(getattr(model, c.name)) for c in model.__table__.columns}
-
-
 class EmailSchema(BaseModel):
     email: List[EmailStr]
     body: Dict[str, Any]

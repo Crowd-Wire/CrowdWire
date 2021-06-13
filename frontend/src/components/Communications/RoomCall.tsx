@@ -20,9 +20,9 @@ import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { useRoomStore } from '../../webrtc/stores/useRoomStore';
 import useWorldUserStore from "../../stores/useWorldUserStore";
-// import { ActiveSpeakerListener } from "../../webrtc/components/ActiveSpeakerListener";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
+import { sendMedia } from 'webrtc/utils/sendMedia';
 import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -72,6 +72,7 @@ export default class RoomCall extends React.Component<{}, State> {
 
     this.mediaStoreSub = useMediaStore.subscribe((media) => {
       this.setState({ media });
+      sendMedia(media ? true : false);
     }, (state) => state.media);
   }
   myUsername: string = useWorldUserStore.getState().world_user.username;
@@ -211,10 +212,6 @@ export default class RoomCall extends React.Component<{}, State> {
           alignItems: 'center',
         }}>
 
-
-          {/* <ActiveSpeakerListener/> */}
-
-          
               <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600}}>
                 <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
                   {this.state.fullscreen ?
@@ -238,8 +235,8 @@ export default class RoomCall extends React.Component<{}, State> {
                       let username = peerId;
                       let avatar= "avatars_1_1";
                       if (peerId in usePlayerStore.getState().users_info) {
-                        username = usePlayerStore.getState().users_info[peerId].username;
-                        avatar = usePlayerStore.getState().users_info[peerId].avatar;
+                        username = usePlayerStore.getState().users_info[peerId]?.username;
+                        avatar = usePlayerStore.getState().users_info[peerId]?.avatar;
                       }
                       if (consumerMedia)
                         item = (

@@ -134,7 +134,7 @@ async def world_websocket(
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
-        logger.info("disconnected ")
+        logger.info("disconnected")
         await manager.disconnect(world_id, user_id)
         await wh.disconnect_user(world_id, user_id)
         if not is_guest_user(user):

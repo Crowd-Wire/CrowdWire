@@ -53,10 +53,7 @@ async function main() {
   const createRoom = (send: any) => {
     const { worker, router } = getNextWorker();
     num_rooms += 1;
-    console.log(num_rooms * scalability_config.max_consumers_per_worker)
-    console.log(scalability_config.max_consumers * 0.5)
     if (!already_requested && num_rooms * scalability_config.max_consumers_per_worker * 0.5 >= scalability_config.max_consumers * 0.9){
-      console.log('SEND MESSAGE TO API TO CREATE ANOTHER REPLICA');
       already_requested = true;
       send({
         'topic': 'CREATE_NEW_REPLICA'
@@ -187,7 +184,6 @@ async function main() {
           continue;
         }
       }
-
       send({
         topic: "@get-recv-tracks-done",
         uid,
@@ -228,12 +224,6 @@ async function main() {
           previousProducer.get(appData.mediaTag)!.close();
           consumers.forEach((c) => {
             if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontend to get update, but this can be removed
-              send({
-                rid: roomId,
-                topic: "close_consumer",
-                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
-              });
           })
         }
 
@@ -323,7 +313,7 @@ async function main() {
         return;
       }
       const { state } = rooms[roomId];
-      const { sendTransport, producer: previousProducer, consumers } =
+      const { sendTransport, producer: previousProducer } =
         state[myPeerId];
       const transport = sendTransport;
       
@@ -334,15 +324,6 @@ async function main() {
       try {
         if (previousProducer && previousProducer.has(appData.mediaTag)) {
           previousProducer.get(appData.mediaTag)!.close();
-          consumers.forEach((c) => {
-            if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontend to get update, but this can be removed
-              send({
-                rid: roomId,
-                topic: "close_consumer",
-                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
-              });
-          })
         }
 
         const producer = await transport.produceData({
@@ -431,7 +412,6 @@ async function main() {
         return;
       }
 
-      console.log("connect-transport", peerId, transport.appData);
       try {
         await transport.connect({ dtlsParameters, sctpParameters });
       } catch (e) {

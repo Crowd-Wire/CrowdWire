@@ -85,7 +85,6 @@ const usePlayerStore = create(
                     for (const [id, position] of Object.entries(snapshot)) {
                         players[id] = { position, velocity: { x: 0, y: 0 } };
                     }
-                    console.log(users_data)
                     usePlayerStore.getState().setUsersInfo(users_data)
                     return { players };
                 });

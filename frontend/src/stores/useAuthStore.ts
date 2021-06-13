@@ -27,14 +27,16 @@ const useAuthStore = createStore(
                 set((state) => ({
                     token:token, 
                     expire_date:expire_date, 
-                    guest_uuid:guest_uuid
+                    guest_uuid:guest_uuid,
+                    is_superuser: false,
                 }))
             },
             leave: () => {
                 set((state) => ({
                     token: null,
                     expire_date: null,
-                    guest_uuid: null
+                    guest_uuid: null,
+                    is_superuser: false,
                 }))
             },
             updateToken: (token: string, expire_date: string, is_superuser: boolean) => {

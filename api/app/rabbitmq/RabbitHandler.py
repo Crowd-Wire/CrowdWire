@@ -41,18 +41,14 @@ async def on_message(message: IncomingMessage) -> None:
             await manager.send_personal_message(msg, user_id)
 
         elif topic == protocol.CREATE_NEW_REPLICA:
-            # TODO:
             logger.info("Received Request to scale replicas..")
             logger.info("Scaling Replicas")
             k8s_handler.scale_mediaserver_replicas()
-            # handle concurrency here with other api replicas
-            # to avoid each one of them creating a media server
             await redis_connector.add_media_server()
 
-        elif topic == protocol.CLOSE_CONSUMER:
-            logger.info(msg)
         elif topic == protocol.ERROR:
             logger.info(msg)
+
         else:
             logger.error(f"Unknown topic \"{topic}\"")
 
@@ -107,11 +103,12 @@ class RabbitHandler:
         message = (json.dumps(message)).encode()
         async with self.channel_pool.acquire() as channel:  # type: Channel
             for queue in queues_to_send:
-                logger.info("Published message to Queue %r" % queue)
-                await channel.default_exchange.publish(
-                    Message(message),
-                    queue,
-                )
+                if queue:
+                    logger.info("Published message to Queue %r" % queue)
+                    await channel.default_exchange.publish(
+                        Message(message),
+                        queue,
+                    )
 
     async def consume(self) -> None:
         async with self.channel_pool.acquire() as channel:  # type: Channel

@@ -2,62 +2,67 @@ import storeDevice from "../../redux/commStore.js";
 import { useMuteStore } from "../stores/useMuteStore";
 import { useVoiceStore } from "../stores/useVoiceStore";
 import { useRoomStore } from "../stores/useRoomStore";
-import { Transport } from "mediasoup-client/lib/Transport";
+import { Producer, Transport } from "mediasoup-client/lib/types";
 
 export const sendVoice = async (roomId:string = null) => {
   const { micId } = storeDevice.getState().micId;
   let { set, mic, micStream } = useVoiceStore.getState();
-  const { rooms } = useRoomStore.getState();
+  const { rooms, addProducer, removeProducer } = useRoomStore.getState();
   const { audioMuted } = useMuteStore.getState();
 
   if ( (roomId && !(roomId in rooms)) || audioMuted)
     return;
 
-  const sendTransports: Transport[] = [];
+  let sendTransports: Record<string,
+    { recvTransport: Transport;
+      sendTransport: Transport;
+      micProducer: Producer;
+      camProducer: Producer;
+      mediaProducer: Producer;
+    }> = {};
 
-  if (roomId)
-    sendTransports.push(rooms[roomId].sendTransport)
-  else {
-    for (let value of Object.values(rooms))
-      sendTransports.push(value.sendTransport)
+  if (roomId){
+    sendTransports[roomId] = rooms[roomId]
+  } else {
+    sendTransports = rooms;
   }
 
-  if (sendTransports.length <= 0) {
-    console.log("no sendTransport in sendVoice");
-    return;
-  }
   if (!micStream) {
     try {
       await navigator.mediaDevices.getUserMedia({
         audio: micId ? { deviceId: micId } : true,
         video: false
       }).then((micStream) => {
-        mic = micStream.getAudioTracks()[0];
-        set({micStream: micStream, mic: mic});
+        set({micStream: micStream, mic: micStream.getAudioTracks()[0]});
       })
     } catch (err) {
       set({ mic: null, micStream: null });
       console.log(err);
-      return;
     }
+    return;
   }
 
+  if (Object.keys(sendTransports).length <= 0) {
+    return;
+  }
+  
   if (mic) {
     console.log("creating producer...");
-    sendTransports.forEach(function (sendTransport) {
-      if (sendTransport) {
-        sendTransport.produce({
+    for (const [ key, value ] of Object.entries(sendTransports)) {
+      if (value && value.sendTransport) {
+        await value.sendTransport.produce({
           track: mic,
+          stopTracks: false,
           appData: { mediaTag: "audio" },
         }).then((producer) => {
-          set({micProducer: producer});
-          producer.on("transportclose", () => {
-            producer.close();
-          })
-        }).catch((err) => {
+          addProducer(key, producer, 'mic');
+        })
+        .catch((err) => {
+          set({ mic: null, micStream: null });
+          removeProducer(key, 'mic');
           console.log(err)
         })
       }
-    });
+    }
   }
 };

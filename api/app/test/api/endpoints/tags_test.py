@@ -18,7 +18,6 @@ async def override_dependency(token: str = None):
 app.dependency_overrides[get_current_user] = override_dependency
 
 
-# TODO: add more tests for guests and users
 class TestTags(TestCase):
     def test_get_all(self):
         """

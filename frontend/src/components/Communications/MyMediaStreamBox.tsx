@@ -8,6 +8,7 @@ import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
+import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 
 interface MyMediaStreamBoxProps {
   username?: string;
@@ -38,9 +39,15 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
   }))
 
   const closeMedia = () => {
-    let { set } = useMediaStore.getState();
-    useMediaStore.getState().mediaProducer.close();
-    set({media: null, mediaStream: null, mediaProducer: null})
+    let { set, mediaStream } = useMediaStore.getState();
+    let { rooms, removeProducer } = useRoomStore.getState();
+    if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        removeProducer(key, 'media');
+      }
+    }
+    if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
+    set({media: null, mediaStream: null})
   }
 
   useEffect(() => {

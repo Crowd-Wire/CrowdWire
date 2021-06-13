@@ -21,8 +21,6 @@ import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
 import { FileSharing } from "./FileSharing";
-import { useVideoStore } from "../../webrtc/stores/useVideoStore";
-import { useVoiceStore } from "../../webrtc/stores/useVoiceStore";
 import { useMediaStore } from "../../webrtc/stores/useMediaStore";
 import { useRoomStore } from "../../webrtc/stores/useRoomStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
@@ -99,7 +97,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
       let username = d.user_requested;
       if (d.user_requested in usePlayerStore.getState().users_info) {
-        username = usePlayerStore.getState().users_info[d.user_requested].username;
+        username = usePlayerStore.getState().users_info[d.user_requested]?.username;
       }
       usePlayerStore.getState().setRequested(d.user_requested, true)
       toast.info(
@@ -185,50 +183,48 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const toggleVideo = () => {
     setVideoPauseState(!videoPauseState)
     useMuteStore.getState().setVideoMute(videoPauseState);
-    let { camProducer } = useVideoStore.getState();
     let { rooms } = useRoomStore.getState();
-
-    sendVideo().then(() => camProducer = useVideoStore.getState().camProducer);
-
-    if (camProducer) {
-      if (videoPauseState)
-        camProducer.pause();
-      else
-        camProducer.resume();
-      for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
+    if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        if (value.camProducer) {
+          if (videoPauseState) { value.camProducer.pause(); }
+          else { value.camProducer.resume(); }
+        }
+      }
     }
+    wsend({ topic: "toggle-producer", d: { kind: 'video', pause: videoPauseState } })
   }
   const toggleAudio = () => {
     setAudioPauseState(!audioPauseState)
     useMuteStore.getState().setAudioMute(audioPauseState)
-    let { micProducer } = useVoiceStore.getState();
+
     let { rooms } = useRoomStore.getState();
-
-    sendVoice().then(() => micProducer = useVoiceStore.getState().micProducer);
-
-    if (micProducer) {
-      if (audioPauseState)
-        micProducer.pause();
-      else {
-        micProducer.resume();
+    if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        if (value.micProducer) {
+          if (audioPauseState) { value.micProducer.pause(); }
+          else { value.micProducer.resume(); }
+        }
       }
-      for (let roomId in rooms)
-        wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
     }
+
+    wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
   }
 
   const toggleMedia = () => {
-    let { mediaProducer, set } = useMediaStore.getState();
+    let { set } = useMediaStore.getState();
+    let { rooms, removeProducer } = useRoomStore.getState();
 
-    if (mediaOffState)
-      sendMedia().then((media) => {
+    if (mediaOffState) {
+      sendMedia(true).then((media) => {
         if (media)
           setMediaOffState(!mediaOffState)
       });
-    else if (mediaProducer) {
-      mediaProducer.close()
-      set({ media: null, mediaStream: null, mediaProducer: null })
+    } else if (Object.keys(rooms).length > 0) {
+      for (const [key, value] of Object.entries(rooms)) {
+        removeProducer(key, 'media');
+      }
+      set({ media: null, mediaStream: null })
     }
   }
 
@@ -245,14 +241,15 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   useEffect(() => {
     setVideoPauseState(videoTrack ? true : false)
     setAudioPauseState(audioTrack ? true : false)
+    const { videoMuted, audioMuted } = useMuteStore.getState();
 
     const mediaStream = new MediaStream();
 
-    if (videoTrack) {
+    if (videoTrack && !videoMuted) {
       mediaStream.addTrack(videoTrack);
     }
 
-    if (audioTrack) {
+    if (audioTrack && !audioMuted) {
       mediaStream.addTrack(audioTrack);
     }
 
@@ -290,7 +287,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 style={{ display: videoPauseState ? 'block' : 'none' }} />
             ) : audioTrack ? (
               <div style={{ verticalAlign: 'middle', textAlign: 'center', width: '100%' }}>
-                <img src={avatar} style={{ paddingTop: 15, paddingBottom: 15 }} />
                 <audio autoPlay id={id + "_audio"} ref={myRef} />
               </div>
             ) : ''

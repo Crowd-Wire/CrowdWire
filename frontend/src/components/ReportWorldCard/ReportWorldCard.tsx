@@ -98,7 +98,7 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
     const theme = useTheme();
     const [value, setValue] = React.useState(0);
     const [userToReport, setUserToReport] = React.useState("");
-    const users = usePlayerStore(state => state.groupPlayers);
+    const users = usePlayerStore(state => state.users_info);
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
       setValue(newValue);
@@ -262,8 +262,10 @@ export const ReportWorldCard: React.FC<ReportWorldCardProps> = ({open, closeModa
                         }}
                         >
                         <option aria-label="None" value="" />
-                        {users && Object.keys(users).map((user_id, index) => (
-                          <option key={index} value={user_id}>{usePlayerStore.getState().users_info[user_id].username}</option>
+                        {users && Object.values(users).map((user, index) => (
+                          <option key={index} value={user.user_id}>
+                            {user.username}
+                          </option>
                         ))}
                       </Select>
                       <FormHelperText>Required</FormHelperText>

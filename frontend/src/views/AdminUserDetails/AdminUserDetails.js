@@ -44,13 +44,13 @@ export default function AdminUserDetails() {
                 .then(() => {
                     WorldService.searchAdmin("", [], true, true, 1 , null, null, 1, 3)
                     .then((res) => {
-                        if(res.status!==200)
+                        if (res.status!==200)
                             return null;
                         return res.json();
                     })
                     .then((res) => {
                         // TODO: handle errors
-                        if(!res.detail){
+                        if(res && !res.detail) {
                             setWorlds(res);
                         }
                     })                    

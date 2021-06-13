@@ -92,10 +92,8 @@ class UpdatePassword extends React.Component {
         let pass = document.getElementById("pass").value;
         let cpass = document.getElementById("cpass").value;
         let passed = true;
-        console.log(pass);
-        console.log(cpass);
+
         if(pass !== cpass){
-            console.log("passwords not cool")
             this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
             passed = false;
         }
@@ -122,9 +120,7 @@ class UpdatePassword extends React.Component {
                 if(res.status == 400){
                     this.setState({opassHelperText: "Your old password is incorrect"});
                 }
-                
                 return res.json();
-                
             }
             )
             .then(
@@ -135,9 +131,7 @@ class UpdatePassword extends React.Component {
         )
         .catch(
             (error) => {
-            console.log(error);
-
-            // TODO: change state to show error;
+                console.log(error);
             }
         );
 

@@ -84,7 +84,7 @@ const UserList = (props) => {
         <div key={index} className={classes.user} >
             <div className={classes.avatar}></div>
             <div className={classes.content}>
-              <div className={classes.username}>{usePlayerStore.getState().users_info[user_id].username}</div>
+              <div className={classes.username}>{usePlayerStore.getState().users_info[user_id]?.username}</div>
               {
                 users[user_id].requested && 
                   <div className={classes.request}>
