@@ -26,8 +26,8 @@ const useMessageStore = create(
                     if (from == useWorldUserStore.getState().world_user.user_id)
                         from = useWorldUserStore.getState().world_user.username
                     else if (from in usePlayerStore.getState().users_info) {
-                        color = usePlayerStore.getState().users_info[from].color
-                        from  = usePlayerStore.getState().users_info[from].username
+                        color = usePlayerStore.getState().users_info[from]?.color
+                        from  = usePlayerStore.getState().users_info[from]?.username
                     }
                     message.from = from;
                     message.color = color;

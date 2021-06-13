@@ -242,7 +242,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
             if (!sendingFile) {
               let username = d.user_id;
               if (d.user_id in usePlayerStore.getState().users_info) {
-                username = usePlayerStore.getState().users_info[d.user_id].username;
+                username = usePlayerStore.getState().users_info[d.user_id]?.username;
               }
               toast.info(
                 <span>
@@ -359,7 +359,7 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
                       { listOfFiles.map((file, index) => {
                         let owner = file.owner;
                         if (file.owner in usePlayerStore.getState().users_info)
-                          owner = usePlayerStore.getState().users_info[file.owner].username
+                          owner = usePlayerStore.getState().users_info[file.owner]?.username
                         else if (file.owner == myUserId && useWorldUserStore.getState().world_user)
                           owner = useWorldUserStore.getState().world_user.username
                         return (

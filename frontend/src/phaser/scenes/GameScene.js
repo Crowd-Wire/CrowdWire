@@ -291,7 +291,7 @@ class Player extends Phaser.GameObjects.Container {
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
         } else {
-            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
+            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id]?.avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
@@ -443,7 +443,7 @@ class RemotePlayer extends Player {
         this.id = id;
         this.username = id;
         if (id in usePlayerStore.getState().users_info)
-            this.username = usePlayerStore.getState().users_info[id].username
+            this.username = usePlayerStore.getState().users_info[id]?.username
         this.getText().setText([
             `${this.username}`,
             'G???',
