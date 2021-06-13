@@ -2,6 +2,9 @@ import React from "react";
 
 import classNames from 'classnames';
 
+import LockIcon from '@material-ui/icons/Lock';
+import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
 import TilesTab from "./sections/TilesTab.tsx";
 import WallsTab from "./sections/WallsTab.tsx";

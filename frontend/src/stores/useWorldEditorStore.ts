@@ -28,7 +28,7 @@ export interface Conference {
     color: string;
 }
 
-interface Layer {
+export interface Layer {
     visible: boolean;
     blocked: boolean;
     active: boolean;
