@@ -11,8 +11,17 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
+
 import GridOnIcon from '@material-ui/icons/GridOn';
 import CategoryIcon from '@material-ui/icons/Category';
+import VideocamIcon from '@material-ui/icons/Videocam';
+import HomeWorkIcon from '@material-ui/icons/HomeWork';
+
+import GridOnTwoToneIcon from '@material-ui/icons/GridOnTwoTone';
+import CategoryTwoToneIcon from '@material-ui/icons/CategoryTwoTone';
+import VideocamTwoToneIcon from '@material-ui/icons/VideocamTwoTone';
+import HomeWorkTwoToneIcon from '@material-ui/icons/HomeWorkTwoTone';
+
 import InfoIcon from '@material-ui/icons/Info';
 
 

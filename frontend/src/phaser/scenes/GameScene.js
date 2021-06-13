@@ -164,7 +164,7 @@ class GameScene extends Phaser.Scene {
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();
-                    this.player.ws.joinConference(conferenceId);
+                    this.player.ws.joinConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
                 }
             }
             else {
@@ -172,7 +172,7 @@ class GameScene extends Phaser.Scene {
                     const conferenceId = useWorldUserStore.getState().world_user.in_conference;
                     useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    this.player.ws.leaveConference(conferenceId);
+                    this.player.ws.leaveConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
                 }
             }
         }

@@ -30,11 +30,6 @@ class WorldEditorScene extends Scene {
         })
         this.objectGroups = this.mapManager.buildObjects(this);
 
-        this.wallManager = new WallManager(
-            this.map.getLayer('__Collision'),
-            this.map.getLayer('__Float')
-        );
-
         // Initialize layers on stores
         const layers = {};
         this.map.objects.concat(this.map.layers).forEach((layer) =>
@@ -60,29 +55,12 @@ class WorldEditorScene extends Scene {
                 tile.tint = `0x${intToHex(cyrb53Hash(cid))}`;
             });
 
-        const width = this.map.widthInPixels,
-            height = this.map.heightInPixels,
-            margin = 100,
-            paddingX = (window.screen.width - width - 2 * margin) / 4,
-            paddingY = (window.screen.height - height - 2 * margin) / 4;
+        this.wallManager = new WallManager(
+            this.map.getLayer('__Collision'),
+            this.map.getLayer('__Float')
+        );
 
-        this.cameras.main
-            .setBounds(
-                -margin - paddingX, -margin - paddingY,
-                width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
-            .setBackgroundColor("#0C1117")
-            .setZoom(1.5).centerToBounds();
-        this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
-
-        const grid1 = this.add.grid(width / 2, height / 2, width, height, 32, 32)
-            .setOutlineStyle(0x000000, 0.8)
-            .setDepth(1001);
-        grid1.showOutline = false;
-
-        const grid2 = this.add.grid(width / 2, height / 2, width, height, 16, 16)
-            .setOutlineStyle(0x000000, 0.3)
-            .setDepth(1001);
-        grid2.showOutline = false;
+        this.handleReady(true);
 
         this.cursors = this.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -117,10 +95,16 @@ class WorldEditorScene extends Scene {
             this.handleConferencesChange, state => Object.keys(state.conferences)));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
-            (grid) => { grid1.showOutline = grid2.showOutline = grid }, state => state.grid));
+            (grid) => { this.grid1.showOutline = this.grid2.showOutline = grid }, state => state.grid));
 
         this.subscriptions.push(useWorldEditorStore.subscribe(
             (save) => { this.save = save }, state => state.save));
+
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (save) => { this.save = save }, state => state.save));
+
+        this.subscriptions.push(useWorldEditorStore.subscribe(
+            (resized) => this.handleReady(resized), state => state.resized));
 
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
@@ -128,11 +112,45 @@ class WorldEditorScene extends Scene {
 
         // Emit READY to dependent components
         useWorldEditorStore.getState().setState({ ready: true });
+    }
 
-        this.flag = false;
-        this.input.keyboard.on('keydown-P', () => {
-            this.flag = !this.flag;
-        }, this);
+    handleReady = (resized) => {
+        if (!resized)
+            return;
+
+        useWorldEditorStore.getState().setState({ resized: false });
+
+        this.wallManager.buildData();
+
+        const width = this.map.widthInPixels,
+            height = this.map.heightInPixels,
+            margin = 100,
+            paddingX = (window.screen.width - width - 2 * margin) / 4,
+            paddingY = (window.screen.height - height - 2 * margin) / 4;
+
+        this.cameras.main
+            .setBounds(
+                -margin - paddingX, -margin - paddingY,
+                width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
+            .setBackgroundColor("#0C1117")
+            .setZoom(1.5).centerToBounds();
+        this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
+        
+        this.grid1 && this.grid1.destroy();
+        this.grid2 && this.grid2.destroy();
+        this.rec && this.rec.destroy();
+
+        this.grid1 = this.add.grid(width / 2, height / 2, width, height, 32, 32)
+            .setOutlineStyle(0x000000, 0.8)
+            .setDepth(1001);
+        this.grid1.showOutline = false;
+
+        this.grid2 = this.add.grid(width / 2, height / 2, width, height, 16, 16)
+            .setOutlineStyle(0x000000, 0.3)
+            .setDepth(1001);
+        this.grid2.showOutline = false;
+
+        this.rec = this.add.rectangle(width/2, height/2, width, height, 0xffffff, 0).setStrokeStyle( 1, 0xffffff, 1);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -236,7 +254,7 @@ class WorldEditorScene extends Scene {
                     if (!activeTile && activeWall) {
                         // Wall selected
                         this.preview.setTexture('__DEFAULT');
-
+                  
                         const isDown = this.input.manager.activePointer.isDown;
                         if (this.tool.type === ToolType.DRAW) {
                             const [firstgid, type] = activeWall.split('-').map((s) => parseInt(s, 10));
@@ -244,6 +262,9 @@ class WorldEditorScene extends Scene {
                             this.preview.setBounds(
                                 { x: -32 * (type), y: 0, width: 32 * (type + 1), height: 32 }
                             );
+
+                            if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
+                                return false;
 
                             if (isDown) {
                                 if (this.wallManager.place(firstgid, type, tileX, tileY)) {
@@ -259,6 +280,9 @@ class WorldEditorScene extends Scene {
                             return this.wallManager.checkPlace(type, tileX, tileY);
 
                         } else if (this.tool.type === ToolType.ERASE) {
+                            if (x < 0 || this.map.widthInPixels <= x || y < 0 || this.map.heightInPixels <= y)
+                                return false;
+
                             if (isDown) {
                                 let extremes;
                                 if ((extremes = this.wallManager.remove(tileX, tileY))) {
@@ -321,9 +345,6 @@ class WorldEditorScene extends Scene {
                                     !this.save && useWorldEditorStore.getState().setState({ save: true });
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
-
-                                    this.flag && this.wallManager.place(16, 0, tileX, tileY);
-                                    !this.flag && this.wallManager.remove(tileX, tileY);
                                 }
                                 return true;
                             }
@@ -390,7 +411,6 @@ class WorldEditorScene extends Scene {
                                 // Check collision with collidable tiles
                                 for (let i = x; i < x + width; i += 16)
                                     for (let j = y; j < y + height; j += 16) {
-                                        this.flag && console.log(i, j)
                                         const tile = this.map.getLayer('__Collision').tilemapLayer.getTileAtWorldXY(i, j, false);
                                         if (tile && !onWall) {
                                             return false;
