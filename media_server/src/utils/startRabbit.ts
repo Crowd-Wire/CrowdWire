@@ -102,10 +102,6 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId: string;
   };
-  close_consumer: {
-    producerId: string;
-    roomId: string;
-  };
   "new-peer-producer": {
     roomId: string;
     peerId: string;

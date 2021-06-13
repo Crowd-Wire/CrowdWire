@@ -313,7 +313,7 @@ async function main() {
         return;
       }
       const { state } = rooms[roomId];
-      const { sendTransport, producer: previousProducer, consumers } =
+      const { sendTransport, producer: previousProducer } =
         state[myPeerId];
       const transport = sendTransport;
       
@@ -324,15 +324,6 @@ async function main() {
       try {
         if (previousProducer && previousProducer.has(appData.mediaTag)) {
           previousProducer.get(appData.mediaTag)!.close();
-          consumers.forEach((c) => {
-            if (c.appData.mediaTag == appData.mediaTag ) c.close()
-              // @todo give some time for frontend to get update, but this can be removed
-              send({
-                rid: roomId,
-                topic: "close_consumer",
-                d: { producerId: previousProducer.get(appData.mediaTag)!.id, roomId },
-              });
-          })
         }
 
         const producer = await transport.produceData({

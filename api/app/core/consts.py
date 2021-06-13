@@ -103,6 +103,5 @@ class RabbitProtocol:
     YOU_ARE_NOW_A_SPEAKER = 'you-are-now-a-speaker'
     NEW_PEER_PRODUCER = 'new-peer-producer'
     NEW_PEER_DATA_PRODUCER = 'new-peer-data-producer'
-    CLOSE_CONSUMER = 'close_consumer'
     ERROR = 'error'
     CREATE_NEW_REPLICA = 'CREATE_NEW_REPLICA'
