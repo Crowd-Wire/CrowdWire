@@ -51,7 +51,7 @@ class World_UserInDBBase(BaseModel):
     # user_id is an UUID4 for Guest Users
     user_id: Optional[Union[UUID4, int]]
     world_id: int
-
+    status: Optional[int]
     class Config:
         orm_mode = True
 

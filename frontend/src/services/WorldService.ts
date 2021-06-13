@@ -282,6 +282,17 @@ class WorldService {
         })
     }
 
+    changeUserStatus(world_id,  user_id, status) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({status: status})
+        })
+    }
+
 }
 
 export default new WorldService();
