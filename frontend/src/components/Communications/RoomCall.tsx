@@ -28,6 +28,7 @@ import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import usePlayerStore from "stores/usePlayerStore";
 import { API_BASE } from "config";
+import Iframe from 'react-iframe'
 
 
 interface State {
@@ -37,6 +38,7 @@ interface State {
   cam: any;
   mic: any;
   media: any;
+  showIFrame: any;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -44,6 +46,7 @@ export default class RoomCall extends React.Component<{}, State> {
   videoStoreSub: () => void;
   voiceStoreSub: () => void;
   mediaStoreSub: () => void;
+  showIFrameSub: () => void;
 
   constructor(props) {
     super(props);
@@ -53,8 +56,13 @@ export default class RoomCall extends React.Component<{}, State> {
       consumerMap: useConsumerStore.getState().consumerMap,
       cam: useVideoStore.getState().cam,
       mic: useVoiceStore.getState().mic,
-      media: useMediaStore.getState().media
+      media: useMediaStore.getState().media,
+      showIFrame: useWorldUserStore.getState().showIFrame
     }
+
+    this.showIFrameSub = useWorldUserStore.subscribe((showIFrame) => {
+      this.setState({ showIFrame })
+    }, (state) => state.showIFrame);
 
     this.consumerStoreSub = useConsumerStore.subscribe((consumerMap) => {
       this.setState({ consumerMap })
@@ -159,6 +167,7 @@ export default class RoomCall extends React.Component<{}, State> {
   componentWillUnmount() {
     this.consumerStoreSub();
     this.videoStoreSub();
+    this.showIFrameSub();
     this.voiceStoreSub();
     this.mediaStoreSub();
     useVideoStore.getState().nullify();
@@ -196,16 +205,22 @@ export default class RoomCall extends React.Component<{}, State> {
       showDots: hasNextPage,
       mobileBreakpoint: 600
     }
+
+    let IFrame_height = null;
+    if (numberUsers === 0) {
+      IFrame_height = 0;
+    }
     return (
       <>
       {numberUsers > 0 ?
 
 (   
-        <div style={{
+        <div
+        id="my_carousel"
+        style={{
           position: 'fixed',
           paddingRight: 80,
-          zIndex: 99,
-          // height: this.state.fullscreen ? '100%' : '25%',
+          zIndex: 100,
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
@@ -276,19 +291,42 @@ export default class RoomCall extends React.Component<{}, State> {
         <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
           {this.state.media ?
             <MyMediaStreamBox
-              username={this.myUsername}
-              id={this.myId + '_media'}
-              mediaTrack={this.state.media}
+            username={this.myUsername}
+            id={this.myId + '_media'}
+            mediaTrack={this.state.media}
             />
             : ''}
+
           <MyVideoAudioBox
             avatar = {this.avatar}
             username={this.myUsername}
             id={this.myId}
             audioTrack={this.state.mic}
             videoTrack={this.state.cam}
-          />
+            />
         </div>
+        { this.state.showIFrame ?
+          <>
+            <div style={{ position: 'fixed', top: IFrame_height === 0 ? IFrame_height : document.getElementById('my_carousel').offsetHeight, left: 65, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
+              <Button onClick={() => useWorldUserStore.setState({ showIFrame: false })} variant="contained" color="primary" style={{ top: 10 }}>
+                Close External Service
+              </Button>
+            </div>
+            {/* urls: 
+            https://downforacross.com/  
+            https://www.gameflare.com/embed/mini-survival/
+            https://www.chesshotel.com/pt/"
+            https://r7.whiteboardfox.com/
+            */}
+            <div style={{ position: 'fixed', top: IFrame_height === 0 ? '60px' : `calc(${document.getElementById("my_carousel").offsetHeight}px + 65px)`, left: 65, width: 'calc(100% - 60px)', height: 'calc(100% - 60px)', background: 'white' }}>
+              <Iframe url="https://r7.whiteboardfox.com/"
+                position="absolute"
+                width="100%"
+                id="myIframe"
+                height="100%" />
+            </div>
+          </>
+        : ''}
       </>
     );
   }
