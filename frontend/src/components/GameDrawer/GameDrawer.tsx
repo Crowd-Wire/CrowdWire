@@ -22,7 +22,7 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import CancelIcon from '@material-ui/icons/Cancel';
 import LinkIcon from '@material-ui/icons/Link';
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import GenerateInviteCard from "components/InGame/GenerateInviteCard.js";
 
@@ -103,7 +103,6 @@ const GameDrawer = () => {
   const navigation = useNavigate();
 
   useEffect(() => {
-    console.log(useWorldUserStore.getState())
     if (!textChat) {
       textChat = document.getElementById('text-chat');
     } else {
@@ -256,7 +255,7 @@ const GameDrawer = () => {
             >
               <LinkIcon style={iconsStyle} />
             </IconButton>
-            : '' }
+            : null }
           <IconButton onClick={handleFullscreen}>
           { fullScreen ?
               <FullscreenExitIcon style={iconsStyle} />
@@ -270,7 +269,7 @@ const GameDrawer = () => {
             >
               <SettingsIcon style={iconsStyle} />
             </IconButton>
-            : '' }
+            : null }
           { !useAuthStore.getState().guest_uuid ?
             <IconButton
               aria-label="open report modal"
@@ -278,7 +277,7 @@ const GameDrawer = () => {
             >
               <ReportIcon style={iconsStyle} />
             </IconButton>
-          : '' }
+          : null }
           <IconButton
             onClick={() => leaveWorld()}
           >

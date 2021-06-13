@@ -28,12 +28,11 @@ async def world_websocket(
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_websockets_user),
         db: Session = Depends(dependencies.get_db)
 ) -> Any:
-    # overwrites user_id given by token TODO: remove after tests
-    # user_id = manager.get_next_user_id()
     user_id = str(user.user_id)
     world_id = str(world_id)
     logger.info(user_id)
-    await manager.connect(world_id, websocket, user_id)
+    if not await manager.connect(world_id, websocket, user_id):
+        return
     # TODO: maybe refactor to Chain of Responsibility pattern, maybe not
     try:
         while True:
@@ -135,7 +134,7 @@ async def world_websocket(
             else:
                 logger.error(f"Unknown topic \"{topic}\"")
     except WebSocketDisconnect:
-        logger.info("disconnected ")
+        logger.info("disconnected")
         await manager.disconnect(world_id, user_id)
         await wh.disconnect_user(world_id, user_id)
         if not is_guest_user(user):

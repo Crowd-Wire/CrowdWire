@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp18
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1800
+      port: 41800
+      targetPort: 41800
+      protocol: UDP
+    - name : udp1801
+      port: 41801
+      targetPort: 41801
+      protocol: UDP
+    - name : udp1802
+      port: 41802
+      targetPort: 41802
+      protocol: UDP
+    - name : udp1803
+      port: 41803
+      targetPort: 41803
+      protocol: UDP
+    - name : udp1804
+      port: 41804
+      targetPort: 41804
+      protocol: UDP
+    - name : udp1805
+      port: 41805
+      targetPort: 41805
+      protocol: UDP
+    - name : udp1806
+      port: 41806
+      targetPort: 41806
+      protocol: UDP
+    - name : udp1807
+      port: 41807
+      targetPort: 41807
+      protocol: UDP
+    - name : udp1808
+      port: 41808
+      targetPort: 41808
+      protocol: UDP
+    - name : udp1809
+      port: 41809
+      targetPort: 41809
+      protocol: UDP
+    - name : udp1810
+      port: 41810
+      targetPort: 41810
+      protocol: UDP
+    - name : udp1811
+      port: 41811
+      targetPort: 41811
+      protocol: UDP
+    - name : udp1812
+      port: 41812
+      targetPort: 41812
+      protocol: UDP
+    - name : udp1813
+      port: 41813
+      targetPort: 41813
+      protocol: UDP
+    - name : udp1814
+      port: 41814
+      targetPort: 41814
+      protocol: UDP
+    - name : udp1815
+      port: 41815
+      targetPort: 41815
+      protocol: UDP
+    - name : udp1816
+      port: 41816
+      targetPort: 41816
+      protocol: UDP
+    - name : udp1817
+      port: 41817
+      targetPort: 41817
+      protocol: UDP
+    - name : udp1818
+      port: 41818
+      targetPort: 41818
+      protocol: UDP
+    - name : udp1819
+      port: 41819
+      targetPort: 41819
+      protocol: UDP
+    - name : udp1820
+      port: 41820
+      targetPort: 41820
+      protocol: UDP
+    - name : udp1821
+      port: 41821
+      targetPort: 41821
+      protocol: UDP
+    - name : udp1822
+      port: 41822
+      targetPort: 41822
+      protocol: UDP
+    - name : udp1823
+      port: 41823
+      targetPort: 41823
+      protocol: UDP
+    - name : udp1824
+      port: 41824
+      targetPort: 41824
+      protocol: UDP
+    - name : udp1825
+      port: 41825
+      targetPort: 41825
+      protocol: UDP
+    - name : udp1826
+      port: 41826
+      targetPort: 41826
+      protocol: UDP
+    - name : udp1827
+      port: 41827
+      targetPort: 41827
+      protocol: UDP
+    - name : udp1828
+      port: 41828
+      targetPort: 41828
+      protocol: UDP
+    - name : udp1829
+      port: 41829
+      targetPort: 41829
+      protocol: UDP
+    - name : udp1830
+      port: 41830
+      targetPort: 41830
+      protocol: UDP
+    - name : udp1831
+      port: 41831
+      targetPort: 41831
+      protocol: UDP
+    - name : udp1832
+      port: 41832
+      targetPort: 41832
+      protocol: UDP
+    - name : udp1833
+      port: 41833
+      targetPort: 41833
+      protocol: UDP
+    - name : udp1834
+      port: 41834
+      targetPort: 41834
+      protocol: UDP
+    - name : udp1835
+      port: 41835
+      targetPort: 41835
+      protocol: UDP
+    - name : udp1836
+      port: 41836
+      targetPort: 41836
+      protocol: UDP
+    - name : udp1837
+      port: 41837
+      targetPort: 41837
+      protocol: UDP
+    - name : udp1838
+      port: 41838
+      targetPort: 41838
+      protocol: UDP
+    - name : udp1839
+      port: 41839
+      targetPort: 41839
+      protocol: UDP
+    - name : udp1840
+      port: 41840
+      targetPort: 41840
+      protocol: UDP
+    - name : udp1841
+      port: 41841
+      targetPort: 41841
+      protocol: UDP
+    - name : udp1842
+      port: 41842
+      targetPort: 41842
+      protocol: UDP
+    - name : udp1843
+      port: 41843
+      targetPort: 41843
+      protocol: UDP
+    - name : udp1844
+      port: 41844
+      targetPort: 41844
+      protocol: UDP
+    - name : udp1845
+      port: 41845
+      targetPort: 41845
+      protocol: UDP
+    - name : udp1846
+      port: 41846
+      targetPort: 41846
+      protocol: UDP
+    - name : udp1847
+      port: 41847
+      targetPort: 41847
+      protocol: UDP
+    - name : udp1848
+      port: 41848
+      targetPort: 41848
+      protocol: UDP
+    - name : udp1849
+      port: 41849
+      targetPort: 41849
+      protocol: UDP
+    - name : udp1850
+      port: 41850
+      targetPort: 41850
+      protocol: UDP
+    - name : udp1851
+      port: 41851
+      targetPort: 41851
+      protocol: UDP
+    - name : udp1852
+      port: 41852
+      targetPort: 41852
+      protocol: UDP
+    - name : udp1853
+      port: 41853
+      targetPort: 41853
+      protocol: UDP
+    - name : udp1854
+      port: 41854
+      targetPort: 41854
+      protocol: UDP
+    - name : udp1855
+      port: 41855
+      targetPort: 41855
+      protocol: UDP
+    - name : udp1856
+      port: 41856
+      targetPort: 41856
+      protocol: UDP
+    - name : udp1857
+      port: 41857
+      targetPort: 41857
+      protocol: UDP
+    - name : udp1858
+      port: 41858
+      targetPort: 41858
+      protocol: UDP
+    - name : udp1859
+      port: 41859
+      targetPort: 41859
+      protocol: UDP
+    - name : udp1860
+      port: 41860
+      targetPort: 41860
+      protocol: UDP
+    - name : udp1861
+      port: 41861
+      targetPort: 41861
+      protocol: UDP
+    - name : udp1862
+      port: 41862
+      targetPort: 41862
+      protocol: UDP
+    - name : udp1863
+      port: 41863
+      targetPort: 41863
+      protocol: UDP
+    - name : udp1864
+      port: 41864
+      targetPort: 41864
+      protocol: UDP
+    - name : udp1865
+      port: 41865
+      targetPort: 41865
+      protocol: UDP
+    - name : udp1866
+      port: 41866
+      targetPort: 41866
+      protocol: UDP
+    - name : udp1867
+      port: 41867
+      targetPort: 41867
+      protocol: UDP
+    - name : udp1868
+      port: 41868
+      targetPort: 41868
+      protocol: UDP
+    - name : udp1869
+      port: 41869
+      targetPort: 41869
+      protocol: UDP
+    - name : udp1870
+      port: 41870
+      targetPort: 41870
+      protocol: UDP
+    - name : udp1871
+      port: 41871
+      targetPort: 41871
+      protocol: UDP
+    - name : udp1872
+      port: 41872
+      targetPort: 41872
+      protocol: UDP
+    - name : udp1873
+      port: 41873
+      targetPort: 41873
+      protocol: UDP
+    - name : udp1874
+      port: 41874
+      targetPort: 41874
+      protocol: UDP
+    - name : udp1875
+      port: 41875
+      targetPort: 41875
+      protocol: UDP
+    - name : udp1876
+      port: 41876
+      targetPort: 41876
+      protocol: UDP
+    - name : udp1877
+      port: 41877
+      targetPort: 41877
+      protocol: UDP
+    - name : udp1878
+      port: 41878
+      targetPort: 41878
+      protocol: UDP
+    - name : udp1879
+      port: 41879
+      targetPort: 41879
+      protocol: UDP
+    - name : udp1880
+      port: 41880
+      targetPort: 41880
+      protocol: UDP
+    - name : udp1881
+      port: 41881
+      targetPort: 41881
+      protocol: UDP
+    - name : udp1882
+      port: 41882
+      targetPort: 41882
+      protocol: UDP
+    - name : udp1883
+      port: 41883
+      targetPort: 41883
+      protocol: UDP
+    - name : udp1884
+      port: 41884
+      targetPort: 41884
+      protocol: UDP
+    - name : udp1885
+      port: 41885
+      targetPort: 41885
+      protocol: UDP
+    - name : udp1886
+      port: 41886
+      targetPort: 41886
+      protocol: UDP
+    - name : udp1887
+      port: 41887
+      targetPort: 41887
+      protocol: UDP
+    - name : udp1888
+      port: 41888
+      targetPort: 41888
+      protocol: UDP
+    - name : udp1889
+      port: 41889
+      targetPort: 41889
+      protocol: UDP
+    - name : udp1890
+      port: 41890
+      targetPort: 41890
+      protocol: UDP
+    - name : udp1891
+      port: 41891
+      targetPort: 41891
+      protocol: UDP
+    - name : udp1892
+      port: 41892
+      targetPort: 41892
+      protocol: UDP
+    - name : udp1893
+      port: 41893
+      targetPort: 41893
+      protocol: UDP
+    - name : udp1894
+      port: 41894
+      targetPort: 41894
+      protocol: UDP
+    - name : udp1895
+      port: 41895
+      targetPort: 41895
+      protocol: UDP
+    - name : udp1896
+      port: 41896
+      targetPort: 41896
+      protocol: UDP
+    - name : udp1897
+      port: 41897
+      targetPort: 41897
+      protocol: UDP
+    - name : udp1898
+      port: 41898
+      targetPort: 41898
+      protocol: UDP
+    - name : udp1899
+      port: 41899
+      targetPort: 41899
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

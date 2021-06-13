@@ -44,8 +44,6 @@ class LoginPage extends React.Component {
 
 
   componentDidMount() {
-    console.log(useAuthStore.getState())
-    // console.log(this.goBack())
     this.setState({ cardAnimaton: "cardHidden" })
   }
 
@@ -91,7 +89,7 @@ class LoginPage extends React.Component {
           this.notify("Auth");
           AuthenticationService.setToken(res,"AUTH");
         }
-        else if(res.detail==="Invalid email or password.")
+        else if(res.detail === "Invalid email or password.")
           this.setState({passwSt: res.detail,emailSt: res.detail});
         else if(res.detail instanceof Object && res.detail.length===1 & res.detail[0].loc[1]==="username")
           this.setState({passwSt:"", emailSt:"Email Required"});
@@ -99,6 +97,8 @@ class LoginPage extends React.Component {
           this.setState({passwSt:"Password Required", emailSt:""});
         else if(res.detail instanceof Object && res.detail.length===2 & res.detail[0].loc[1]==="username" && res.detail[1].loc[1]==="password")
           this.setState({passwSt:"Password Required", emailSt:"Email Required"});
+        else if(res.detail === "User is Inactive or the account has been banned.")
+          toast.error(res.detail, {position: toast.POSITION.TOP_CENTER});
       }
     )    
   }
@@ -113,7 +113,6 @@ class LoginPage extends React.Component {
     AuthenticationService.joinAsGuest()
       .then((res) => {return res.json()})
       .then((res) => {
-        console.log(res)
         if(res.access_token!==undefined){
           this.notify("Guest");
           AuthenticationService.setToken(res, "GUEST");
@@ -138,8 +137,6 @@ class LoginPage extends React.Component {
 
   handleGoogleFail = (response) =>{
     console.log("fail")
-    // TODO: handle this case
-
   }
 
 

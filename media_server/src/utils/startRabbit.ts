@@ -102,10 +102,6 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId: string;
   };
-  close_consumer: {
-    producerId: string;
-    roomId: string;
-  };
   "new-peer-producer": {
     roomId: string;
     peerId: string;
@@ -192,23 +188,23 @@ export const startRabbit = async (handler: HandlerMap) => {
   kc.loadFromDefault();
   
   const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
-  let mediaserver_counter = 0;
+  let media_server_counter = 0;
   await k8sApi.listNamespacedPod('default').then(async function(res: any)  {
-  //console.log(typeof(res.body));
-  //console.log(payload)
- //console.log(payload.get('V1PodList'))
   for(let i =0; i< res.body.items.length; i ++){
       let pod = res.body.items[i];
       if (pod.metadata.name.includes('crowdwire-mediaserver')){
-        mediaserver_counter++;
+        media_server_counter++;
         console.log("Found pod")
       }
     }
     
-  }).catch((err: any) => {console.log(err);});
+  }).catch((err: any) => {
+    console.log(err);
+    media_server_counter = 1;
+  });
   const channel = await conn.createChannel();
   const sendQueue = "rest_api_queue";
-  const receiveQueue = "media_server_" + String(mediaserver_counter);
+  const receiveQueue = "media_server_" + String(media_server_counter);
   console.log(receiveQueue)
   await Promise.all([
     channel.assertQueue(receiveQueue),

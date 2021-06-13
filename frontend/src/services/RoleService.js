@@ -4,7 +4,7 @@ import AuthenticationService from "services/AuthenticationService.js";
 
 class RoleService {
     getAllRoles(id) {
-        return fetch(API_BASE + 'worlds/'+id+'/roles', {
+        return fetch(API_BASE + 'worlds/'+id+'/roles/', {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -28,8 +28,7 @@ class RoleService {
             method: 'POST',
             mode: 'cors',
             headers: {
-                'accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'Authorization' : "Bearer "+ AuthenticationService.getToken()  
             },
             body: JSON.stringify({ world_id: world_id, name: name, is_default: false})
@@ -41,8 +40,7 @@ class RoleService {
             method: 'POST',
             mode: 'cors',
             headers: {
-                'accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/json',
                 'Authorization' : "Bearer "+ AuthenticationService.getToken()  
             },
         })
@@ -67,7 +65,6 @@ class RoleService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // TODO: change hashed_password to password after backend update
             body: JSON.stringify({ name: state.name, interact: state.obj_int, walk: state.walk, talk: state.talk, talk_conference: state.talk_conf,
             world_mute: state.world_mute,role_manage: state.role_manage, conference_manage: state.conf_manage, chat: state.chat, invite: state.inv_users, ban: state.ban
         })

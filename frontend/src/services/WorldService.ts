@@ -103,7 +103,6 @@ class WorldService {
                         "Authorization": "Bearer " + AuthenticationService.getToken(),
                         'Content-Type': 'application/json',
                     },
-                    // TODO: change hashed_password to password after backend update
                     body: JSON.stringify({
                         name: wName,
                         public: accessibility,

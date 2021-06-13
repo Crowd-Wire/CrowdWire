@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     selectEmpty: {
       marginTop: theme.spacing(2),
-    },
+    }
   }),
 );
 
@@ -34,7 +34,7 @@ const Chat = (props) => {
   const messages = useMessageStore(state => state.messages);
   const chat = React.useRef();
   const classes2 = useStyles();
-  const [sendTo, setSendTo] = React.useState('all');
+  const [sendTo, setSendTo] = React.useState('ALL');
 
   const handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
     setSendTo(event.target.value)
@@ -58,18 +58,11 @@ const Chat = (props) => {
         <div className={classes.chat} ref={chat} id="text-chat">
           {
             messages.map((m, index) => {
-              let from = m.from;
-              let color = 'white';
-              if (from == useWorldUserStore.getState().world_user.user_id)
-                from = useWorldUserStore.getState().world_user.username
-              else if (from in usePlayerStore.getState().users_info) {
-                color = usePlayerStore.getState().users_info[from].color
-                from  = usePlayerStore.getState().users_info[from].username
-              }
               return (
                 <div key={index} className={classes.message}>
-                  <p style={{ margin: '0 0.5rem', fontWeight: 'bold', color: color }}>
-                    <span>{from}</span>
+                  <p style={{ margin: '0 0.5rem', fontWeight: 'bold', color: m.color }}>
+                  <span style={{color: '#0c132b', fontWeight: 900, fontSize: '0.7rem'}}>{m.to} {' '}</span>
+                  <span>{m.from}</span>
                     <span style={{ float: 'right' }}>{m.date}</span>
                   </p>
                   <p style={{ margin: '0 0.5rem' }}>
@@ -91,10 +84,10 @@ const Chat = (props) => {
             inputProps={{
               id: 'select-send-to',
             }}
-            style={{color: 'white'}}
+            style={{color: '#black', background: 'transparent'}}
           >
-            <option value="all">All</option>
-            <option value="nearby">Nearby</option>
+            <option value="ALL">All</option>
+            <option value="NEARBY">Nearby</option>
           </Select>
         </FormControl>
       </div>

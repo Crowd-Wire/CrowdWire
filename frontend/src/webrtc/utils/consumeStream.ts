@@ -25,7 +25,6 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
   }
   
   console.log("new consumer" + peerId)
-  console.log(consumerParameters)
 
   const consumer = await recvTransport.consume({
     ...consumerParameters,
@@ -44,6 +43,5 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
   else if (kind === 'video')
     useConsumerStore.getState().addVideoToggle(peerId, consumerParameters.producerPaused);
 
-    console.log(useConsumerStore.getState())
   return true;
 };

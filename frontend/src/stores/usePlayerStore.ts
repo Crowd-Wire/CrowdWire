@@ -66,6 +66,7 @@ const rndInt = randomIntFromInterval(20)
 const usePlayerStore = create(
     combine(
         {
+            connecting: false,
             groups: {} as Record<string, string[]>,
             players: {} as Record<string, Player>,
             groupPlayers: {} as Record<string, Player2>,
@@ -73,13 +74,17 @@ const usePlayerStore = create(
             users_info: {} as Record<string, WorldUser> | null,
         },
         (set) => ({
+            setConnecting: (connecting: boolean) => {
+                return set(() => {
+                    return { connecting }
+                })
+            },
             connectPlayers: (snapshot: Record<string, Vector>, users_data) => {
                 return set(() => {
                     const players = {};
                     for (const [id, position] of Object.entries(snapshot)) {
                         players[id] = { position, velocity: { x: 0, y: 0 } };
                     }
-                    console.log(users_data)
                     usePlayerStore.getState().setUsersInfo(users_data)
                     return { players };
                 });

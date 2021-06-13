@@ -5,7 +5,7 @@ import AuthenticationService from "./AuthenticationService";
 class StatisticService {
 
     getStatistics() {
-        return fetch(API_BASE + 'statistics/', {
+        return fetch(API_BASE + 'statistics', {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -41,7 +41,7 @@ class StatisticService {
     }
 
     getWorldStats(world_id) {
-        return fetch(API_BASE + 'statistics/worlds/' + world_id + '/', {
+        return fetch(API_BASE + 'statistics/worlds/' + world_id, {
             method: 'GET',
             mode: 'cors',
             headers: {
@@ -54,7 +54,7 @@ class StatisticService {
         let query = "?start_date=" + start_date
         if (end_date)
             query += "&end_date=" + end_date
-        return fetch(API_BASE + 'statistics/worlds/' + world_id + '/charts/'+ query, {
+        return fetch(API_BASE + 'statistics/worlds/' + world_id + '/charts'+ query, {
             method: 'GET',
             mode: 'cors',
             headers: {

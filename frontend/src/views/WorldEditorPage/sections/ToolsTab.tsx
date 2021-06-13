@@ -16,6 +16,7 @@ import {
 interface ToolsTabState {
   toolType: string;
   tileStyle: Record<string, string>;
+  activeButtons: boolean[];
 }
 
 const tileStaticStyle = {
@@ -37,11 +38,15 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     this.state = {
       toolType: ToolType.DRAW,
       tileStyle: {},
+      activeButtons: [],
     }
     useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
       this.handleActiveChange, state => Object.entries(state.active)));
+
+    this.subscriptions.push(useWorldEditorStore.subscribe(
+      (type) => this.setState({ toolType: type as ToolType }), state => state.tool.type));
   }
 
   componentWillUnmount() {
@@ -52,19 +57,27 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     for (const [key, value] of active) {
       if (value) {
         let tileStyle = {};
+        let activeButtons = [];
         switch (key) {
           case 'tile':
-          case 'object':
           case 'conference':
+            activeButtons = [true, true, true, true];
+            tileStyle = useWorldEditorStore.getState().tiles[value].style;
+            break;
+          case 'object':
+            activeButtons = [true, true, false, false];
             tileStyle = useWorldEditorStore.getState().tiles[value].style;
             break;
           case 'wall':
+            activeButtons = [true, true, false, false];
             break;
         }
+        this.setState({ activeButtons });
         this.setState({ tileStyle });
         return;
       }
     }
+    this.setState({ activeButtons: [] })
     this.setState({ tileStyle: {} });
   }
 
@@ -74,7 +87,7 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   render() {
-    const { toolType, tileStyle } = this.state;
+    const { toolType, tileStyle, activeButtons } = this.state;
 
     return (
       <>
@@ -91,14 +104,15 @@ class ToolsTab extends Component<{}, ToolsTabState> {
                 { type: ToolType.DRAW, Icon: FaPencilAlt },
                 { type: ToolType.ERASE, Icon: FaEraser },
                 { type: ToolType.FILL, Icon: FaFill },
-                { type: ToolType.SELECT, Icon: FaRegSquare },
+                // { type: ToolType.SELECT, Icon: FaRegSquare },
                 { type: ToolType.PICK, Icon: FaEyeDropper },
               ].map(({ type, Icon }, index) => {
                 return (
                   <Button
                     key={index}
-                    color={toolType === type ? 'primary' : null}
-                    onClick={() => this.handlePaintToolChange(type)}
+                    style={!activeButtons[index] ? {opacity: 0.5, cursor: 'default'} : {opacity: 1, cursor: 'pointer'} }
+                    color={toolType === type && activeButtons[index] ? 'primary' : null}
+                    onClick={() => activeButtons[index] && this.handlePaintToolChange(type)}
                   >
                     <Icon style={{ fontSize: '1.5rem' }} />
                   </Button>

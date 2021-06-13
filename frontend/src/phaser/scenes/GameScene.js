@@ -184,7 +184,7 @@ class GameScene extends Phaser.Scene {
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();
-                    this.player.ws.joinConference(conferenceId);
+                    this.player.ws.joinConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
                 }
             }
             else {
@@ -192,7 +192,7 @@ class GameScene extends Phaser.Scene {
                     const conferenceId = useWorldUserStore.getState().world_user.in_conference;
                     useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    this.player.ws.leaveConference(conferenceId);
+                    this.player.ws.leaveConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
                 }
             }
         }
@@ -209,11 +209,12 @@ class GameScene extends Phaser.Scene {
                     < Math.hypot(playerPos.x - curr.center.x, playerPos.y - curr.center.y) ?
                     prev : curr;
             });
-            const { x, y, width, height } = closestBody.gameObject;
+            const { x, y, width, height, depth } = closestBody.gameObject;
             this.selectedObject.setTexture(closestBody.gameObject.texture)
                 .setPosition(x, y)
                 .setSize(width, height)
-                .setVisible(true);
+                .setVisible(true)
+                .setDepth(depth - 1);
             this.interact = closestBody.gameObject.data.list.interact;
         } else {
             this.selectedObject.setVisible(false);
@@ -221,14 +222,24 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+    updateInteract() {
+        if (this.cursors.interact.isDown) {
+            if (this.interact === 'FILE_SHARE') {
+                useWorldUserStore.getState().setShowFileSharing();
+            } else if (this.interact === 'WHITEBOARD') {
+                useWorldUserStore.getState().setShowIFrame();
+            }
+        }
+    }
+
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
             // Detect surrounding players
-            const bodies = this.physics.overlapCirc(
-                this.player.body.center.x, this.player.body.center.y, 150);
-            if (bodies.length && bodies.length - 1 != GameScene.inRangePlayers.size) {
-                const rangePlayers = bodies.filter((b) => b.gameObject instanceof RemotePlayer)
-                    .map((b) => b.gameObject.id);
+            const bodies = this.physics
+                .overlapCirc(this.player.body.center.x, this.player.body.center.y, 150)
+                .filter((b) => b.gameObject instanceof RemotePlayer);
+            if (bodies.length != GameScene.inRangePlayers.size) {
+                const rangePlayers = bodies.map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
                     // Wire players
                     this.ws.wirePlayer(
@@ -247,7 +258,7 @@ class GameScene extends Phaser.Scene {
                                 GameScene.inRangePlayers.delete(id);
                                 // Close media connections to this user
                                 useConsumerStore.getState().closePeer(id);
-                            };
+                            }
                             return left;
                         })
                     );
@@ -257,9 +268,9 @@ class GameScene extends Phaser.Scene {
     }
 
     updateDepth() {
-        this.player.depth = this.player.y + this.player.height/2;
+        this.player.depth = this.player.body.y;
         Object.values(this.remotePlayers).forEach((player) => {
-            player.depth = player.y + player.height/2;
+            player.depth = player.body.y;
         });
     }
 
@@ -267,10 +278,7 @@ class GameScene extends Phaser.Scene {
         this.player.update();
         this.updateDepth();
         this.updateRangePlayers();
-
-        if (this.cursors.interact?.isDown) {
-            console.log(this.interact);
-        }
+        this.updateInteract();
     }
 }
 
@@ -300,12 +308,11 @@ class Player extends Phaser.GameObjects.Container {
         
         let avatar_chosen_sprite = "avatars_1_1"
 
-        // if (user_id == null) {
-        //     avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
-        // } else {
-        //     avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
-        // }
-        avatar_chosen_sprite = "avatars_1_1"
+        if (user_id == null) {
+            avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
+        } else {
+            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id]?.avatar
+        }
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
         const avatar_number = avatar_chosen[2]
@@ -456,7 +463,7 @@ class RemotePlayer extends Player {
         this.id = id;
         this.username = id;
         if (id in usePlayerStore.getState().users_info)
-            this.username = usePlayerStore.getState().users_info[id].username
+            this.username = usePlayerStore.getState().users_info[id]?.username
         this.getText().setText([
             `${this.username}`,
             'G???',

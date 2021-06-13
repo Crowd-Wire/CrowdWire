@@ -1,13 +1,12 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
-import InputLabel from '@material-ui/core/InputLabel';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import TabHeader, { TabSelect } from './TabHeader';
+import GridOnTwoToneIcon from '@material-ui/icons/GridOnTwoTone';
 
-import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import MapManager from 'phaser/MapManager';
+import useWorldEditorStore, { ToolType } from 'stores/useWorldEditorStore';
 
-import { API_BASE } from "config";
+import { API_BASE } from 'config';
 
 
 interface TilesTabState {
@@ -23,7 +22,7 @@ const tileStyle = {
 }
 
 
-class TilesTab extends Component<{}, TilesTabState> {
+class TilesTab extends Component<{ classes: any }, TilesTabState> {
 
   state = {
     filterType: '',
@@ -52,12 +51,12 @@ class TilesTab extends Component<{}, TilesTabState> {
 
     const tilesetTiles = {};
     for (const tileset of mapManager.map.tilesets) {
-      if (!tileset.name.startsWith('_')) {
-        // Not private
+      if (!tileset.name.startsWith('_') && !mapManager.tilesetProps[tileset.name]?.properties?.isWall) {
+        // Not private and not a wall tileset
         const tiles = [],
           tilesetImage = mapManager.tilesetProps[tileset.name]?.image,
           { firstgid, tileWidth, tileHeight, rows, columns } = tileset;
-        
+
         if (!tilesetImage) {
           // Not a tileset
           break;
@@ -96,39 +95,25 @@ class TilesTab extends Component<{}, TilesTabState> {
   }
 
   handleClick = (id: string) => {
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
     useWorldEditorStore.getState().setActive('tile', id);
   }
 
   render() {
     const { filterType, tilesetTiles } = this.state;
+    const classes = this.props.classes;
 
     return (
       <>
-        <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
-          <InputLabel htmlFor="select-tileset">Tileset:</InputLabel>
-          <Select
-            native
-            value={filterType}
-            onChange={this.handleSelectChange}
-            inputProps={{
-              id: 'select-tileset',
-            }}
-            style={{ minWidth: '15ch' }}
-          >
-            <option aria-label="None" value="" />
-            {
-              Object.keys(tilesetTiles).map((name, index) => (
-                <option key={index} value={name}>{name}</option>
-              ))
-            }
-          </Select>
-        </FormControl>
-        <hr />
+        <TabHeader names={['Float', 'Collision', 'Ground2', 'Ground']} Icon={GridOnTwoToneIcon}>
+          <TabSelect placeholder="Tileset" value={filterType} options={Object.keys(tilesetTiles)} handle={this.handleSelectChange} />
+        </TabHeader>
+
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-        {
-          filterType ? 
-            tilesetTiles[filterType] : Object.values(tilesetTiles)
-        }
+          {
+            filterType ?
+              tilesetTiles[filterType] : Object.values(tilesetTiles)
+          }
         </div>
       </>
     )

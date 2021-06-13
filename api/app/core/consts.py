@@ -63,6 +63,8 @@ class WebsocketProtocol:
     PLAYERS_SNAPSHOT = 'PLAYERS_SNAPSHOT'
     CHANGE_ROOM = 'CHANGE_ROOM'
     WIRE_PLAYER = 'WIRE_PLAYER'
+    MESSAGE_TO_ALL = 'ALL'
+    MESSAGE_TO_NEARBY = 'NEARBY'
     REQUEST_TO_SPEAK = 'REQUEST_TO_SPEAK'
     PERMISSION_TO_SPEAK = 'PERMISSION_TO_SPEAK'
     GET_ROOM_USERS_FILES = 'GET_ROOM_USERS_FILES'
@@ -86,6 +88,7 @@ class WebsocketProtocol:
     CLOSE_MEDIA = 'close-media'
     TOGGLE_PRODUCER = 'toggle-producer'
     TOGGLE_PEER_PRODUCER = 'toggle-peer-producer'
+    KICKED = 'KICKED'
     SPEAKING_CHANGE = 'speaking_change'
 
 
@@ -100,6 +103,5 @@ class RabbitProtocol:
     YOU_ARE_NOW_A_SPEAKER = 'you-are-now-a-speaker'
     NEW_PEER_PRODUCER = 'new-peer-producer'
     NEW_PEER_DATA_PRODUCER = 'new-peer-data-producer'
-    CLOSE_CONSUMER = 'close_consumer'
     ERROR = 'error'
     CREATE_NEW_REPLICA = 'CREATE_NEW_REPLICA'

@@ -19,6 +19,7 @@ const useStyles = makeStyles((theme) => ({
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
+        color: 'black'
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -106,7 +107,9 @@ export default function UserReports() {
     }, [page]);
 
     return (
-        <div style={{ paddingTop: '100px' }}>
+        <div style={{ paddingTop: '100px', width: '100%', height: '100%',
+            position: 'absolute', paddingLeft: '100px', left: '50%', top: '50%',
+            transform: 'translate(-50%, -50%)' }}>
             <Input className="mx-3"
                 type="number"
                 id="world_id"
@@ -128,6 +131,7 @@ export default function UserReports() {
             />
 
             <FormControlLabel
+                className={classes.formControl}
                 control={
                     <Checkbox
                         checked={reviewed}
@@ -171,7 +175,7 @@ export default function UserReports() {
                     return (<UserReportCard key={r.reporter + '_' + r.reported + '_' + r.world_id + '_' + r.reviewed}
                         report={r} />)
 
-            }) : <h1>No reports found for this search...</h1>}
+            }) : <h2 style={{paddingTop: 100, paddingBottom: 100}}>No reports found for this search...</h2>}
             <hr/>
             <Paginator hasNext={reports.length === limit + 1} page={page} changePage={(page) => { changePage(page) }} />
         </div>

@@ -18,6 +18,7 @@ import useAuthStore from "stores/useAuthStore.ts";
 import created_worlds from "assets/img/save-the-planet.svg";
 import EqualizerIcon from '@material-ui/icons/Equalizer';
 import userStats from "assets/img/polling.svg";
+import ReportIcon from '@material-ui/icons/Report';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import Popover from "@material-ui/core/Popover";
 import Row from "react-bootstrap/Row";
@@ -270,7 +271,7 @@ export default function DashDrawer(props){
             </ListItem>
           }
 
-          { !st.is_superuser ?
+          { !st.is_superuser || st.guest_uuid ?
             <></>
             :
             <>
@@ -311,17 +312,17 @@ export default function DashDrawer(props){
                   <Row style={{width: 210, background: 'rgb(12 19 43)', paddingLeft: 15}}>
                     <ListItem onClick={onClickPlatformWorldStats} button key="Pop Platform World Statistics">
                       <ListItemIcon>
-                          <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                        <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
                       </ListItemIcon>
                       <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
                     </ListItem>
                   </Row>
                   <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
                     <ListItem onClick={onClickPlatformWorldReports} button key="Pop Platform World Reports">
-                    <ListItemIcon>
-                        <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-                    </ListItemIcon>
-                    <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
+                      <ListItemIcon>
+                        <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      </ListItemIcon>
+                      <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
                     </ListItem>
                   </Row>
                 </>
@@ -362,7 +363,7 @@ export default function DashDrawer(props){
                   <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
                     <ListItem onClick={onClickPlatformUserReports} button key="Pop Platform User Reports">
                     <ListItemIcon>
-                        <img src={userStats} className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
                     </ListItem>

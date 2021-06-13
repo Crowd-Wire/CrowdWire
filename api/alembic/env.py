@@ -48,8 +48,6 @@ def run_migrations_offline():
     script output.
 
     """
-    # TODO: Change this in production
-    # url = get_url()
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -69,13 +67,6 @@ def run_migrations_online():
     and associate a connection with the context.
 
     """
-
-    # TODO: Change this in production
-    # configuration = config.get_section(config.config_ini_section)
-    # configuration["sqlalchemy.url"] = get_url()
-    # connectable = engine_from_config(
-    #     configuration, prefix="sqlalchemy.", poolclass=pool.NullPool,
-    # )
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section),

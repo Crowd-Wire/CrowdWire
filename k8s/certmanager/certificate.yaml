@@ -5,7 +5,7 @@ metadata:
   namespace: default
 spec:
   dnsNames:
-    - crowdwire.duckdns.org
+    - atnog-crowdwire1.av.it.pt 
   secretName: example-app-tls
   issuerRef:
     name: letsencrypt-cluster-issuer

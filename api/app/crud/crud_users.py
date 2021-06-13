@@ -8,7 +8,6 @@ from app.crud.base import CRUDBase
 from app.models.user import User
 from app.schemas.users import UserCreate, UserUpdate, UserCreateGoogle
 from app.core import strings, consts
-from loguru import logger
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
@@ -61,9 +60,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if not user_obj:
             return user_obj, strings.USER_NOT_FOUND
         if request_user.user_id != id and not request_user.is_superuser:
-            logger.debug(request_user.user_id)
-            logger.debug(id)
-            logger.debug(request_user.is_superuser)
             return None, strings.USER_EDITION_FORBIDDEN
         return user_obj, ""
 
@@ -209,7 +205,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None, strings.INVALID_CREDENTIALS
         return db_user, strings.AUTHENTICATION_SUCCESS
 
-    # TODO: change imports to be models.User
     def is_active(self, db: Session, *, user: User) -> bool:
         """
         A user is active if it's status is 0

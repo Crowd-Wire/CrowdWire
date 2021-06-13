@@ -34,6 +34,8 @@ import AdminWorldDetails from "views/AdminWorldDetails/AdminWorldDetails.js";
 import AdminUserReports from 'views/AdminUserReports/AdminUserReports.js';
 import AdminUserDetails from "views/AdminUserDetails/AdminUserDetails";
 import AdminUsers from "views/AdminUsers/AdminUsers";
+import SendEmailConfirmation from "views/SendEmailConfirmation/SendEmailConfirmation";
+import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail.js';
 import WorldStatistics from "views/WorldStatistics/WorldStatistics";
 
 /**
@@ -54,6 +56,8 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
 			{ path: "/comms", element: <Communications /> },
+			{ path: "/confirm", element: <SendEmailConfirmation /> },
+			{ path: "/confirm/:str", element: <ConfirmEmail />},
 			{ path: "/template-components", element: <ComponentsPage /> },
 		],
 	},
@@ -77,6 +81,8 @@ const routes = (token, guest_uuid, last_location,is_superuser) => [
 		path: "/dashboard", 
 		element: token  ? <DrawerLayout/> : <Navigate to="/login"/>,
 		children: [
+			{path: "/", element: <Navigate to="/dashboard/search/public" />},
+			{path: "/search", element: <Navigate to="/dashboard/search/public" />},
 			{path: "/:id", element: <DashboardContent/>},
 			{path:"/search/:type", element: <SearchAllMaps/>},
 			{path: "/user", element: <UserSettings /> },

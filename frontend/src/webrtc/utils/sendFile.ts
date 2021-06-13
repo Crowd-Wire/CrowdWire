@@ -10,7 +10,6 @@ export const sendFile = async (roomId:string = null) => {
   
   const sendTransports: Transport[] = [];
 
-  console.log(rooms)
 
   if (roomId)
     sendTransports.push(rooms[roomId].sendTransport)
@@ -20,11 +19,9 @@ export const sendFile = async (roomId:string = null) => {
   }
 
   if (sendTransports.length <= 0) {
-    console.log("no sendTransport in sendFile");
     return dataProducers;
   }
 
-  console.log("creating producer...");
   for (let i = 0; i<sendTransports.length; i++) {
     if (sendTransports[i]) {
       console.log('producing data')

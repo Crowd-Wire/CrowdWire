@@ -75,6 +75,7 @@ async def join_world(
         user: Union[models.User, schemas.GuestUser] = Depends(deps.get_current_user),
 ) -> Any:
     """
+    Checks if the user is already inside the world.
     Checks if the world is available for that type of user.
     If the user is registered it will try to get its information for that world from cache.
     If it is not there, check the database.
@@ -82,6 +83,10 @@ async def join_world(
     created.
     Returns the Information as a world_user object and also the role and map of the world.
     """
+
+    msg = await redis_connector.check_user_in_world(world_id, user.user_id)
+    if msg:
+        raise HTTPException(status_code=400, detail=msg)
 
     if not is_guest_user(user):
 

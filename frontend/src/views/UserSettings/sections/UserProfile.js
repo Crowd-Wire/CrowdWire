@@ -27,12 +27,10 @@ import useAuthStore from "stores/useAuthStore";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-
-
 class UserProfile extends React.Component {
     constructor(props){
         super(props);
-    
+
     this.state = {
         navigate: false,
         emailHelperText: "",
@@ -99,8 +97,10 @@ class UserProfile extends React.Component {
             this.setState({nameHelperText:""});
 
         if(dDate > new Date()){
-            console.log("date must be past")
             this.setState({birthdayHelperText:"Birthdays are in the past."});
+            passed = false;
+        } else if(dDate == 'Invalid Date'){
+            this.setState({birthdayHelperText:"Invalid Date"});
             passed = false;
         }
         else
@@ -115,12 +115,15 @@ class UserProfile extends React.Component {
             )
             .then(
             (res) => {
-                console.log(res.status);
                 return res.json();
             }
             )
             .then(
             (res) => {
+                if(res.detail) {
+                    this.setState({emailHelperText: res.detail});
+                    return;
+                }
                 this.setState({email_val: res.email, name_val: res.name, bdate_val: res.birth})
                 this.notify()
             }
@@ -128,7 +131,6 @@ class UserProfile extends React.Component {
         .catch(
             (error) => {
                 console.log(error);
-                // TODO: change state to show error;
             }
         );
 
@@ -166,7 +168,7 @@ class UserProfile extends React.Component {
                         />
                         }
                         {this.state.emailHelperText!==""?
-                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.emailHelperText}</Typography>
+                        <Typography variant="caption" style={{color:"red"}}>{this.state.emailHelperText}</Typography>
                         :
                         <></>
                         }
@@ -189,12 +191,12 @@ class UserProfile extends React.Component {
                         }}
                         />
                         {this.state.nameHelperText!==""?
-                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.nameHelperText}</Typography>
+                        <Typography variant="caption" style={{color:"red"}}>{this.state.nameHelperText}</Typography>
                         :
                         <></>
                         }
                         {this.state.cPassHelperText!==""?
-                        <Typography variant="caption" id="component-error-text" style={{color:"red"}}>{this.state.cPassHelperText}</Typography>
+                        <Typography variant="caption" style={{color:"red"}}>{this.state.cPassHelperText}</Typography>
                         :
                         <></>
                         }

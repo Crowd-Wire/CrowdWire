@@ -3,6 +3,8 @@ import { API_BASE } from "config";
 
 import WorldService from "services/WorldService";
 import useWorldUserStore from "stores/useWorldUserStore";
+import WallManager from "./WallManager";
+import useWorldEditorStore from "stores/useWorldEditorStore";
 
 
 enum MapManagerState {
@@ -143,6 +145,8 @@ class MapManager {
                     const objBody = obj.body as Phaser.Physics.Arcade.Body;
                     objBody.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(objBody.y);
+                } else {
+                    obj.setDepth(1);
                 }
                 if (properties) {
                     obj.setData(properties);
@@ -197,6 +201,9 @@ class MapManager {
     }
 
     removeConference(cid: string): void {
+        if (this.state !== MapManagerState.BUILT)
+            throw Error(`Illegal call to function with the current state ${this.state}`);
+
         // Remove tileset from map
         let arr = this.map.tilesets;
         for (let i = 0; i < arr.length; i++) {
@@ -225,6 +232,100 @@ class MapManager {
             }
         }
         (<any>conferenceLayer).setTilesets(conferenceLayer.tileset);
+    }
+
+    resizeMap(width: number, height: number): void {
+        if (this.state !== MapManagerState.BUILT)
+            throw Error(`Illegal call to function with the current state ${this.state}`);
+
+        const wallManager = new WallManager(
+            this.map.getLayer('__Collision'),
+            this.map.getLayer('__Float')
+        );
+
+        for (const layer of this.map.layers) {
+            // Apply offset to layer
+            
+            // if (offsetX > 0) {
+            //     layer.tilemapLayer.forEachTile((tile) => {
+
+            //     })
+            //     for (let y = 0; y < height; y++) {
+            //         layer.data.push(Array.from(
+            //             Array(height - this.map.height), 
+            //             (_, x) => new Tilemaps.Tile(layer, -1, x, y, 32, 32, 32, 32)));
+            //     }
+            // }
+
+            // console.log(layer)
+            // layer.tilemapLayer.copy(0, 0, 10, 10, 1, 1);
+            // layer.tilemapLayer.copy(0, 0, this.map.width, this.map.height, -offsetX, -offsetY);
+            // layer.tilemapLayer.fill(-1, (this.map.width - offsetX) % this.map.width, 0, Math.abs(offsetX), this.map.height);
+            // layer.tilemapLayer.fill(-1, 0, (this.map.height - offsetY) % this.map.height, this.map.width, Math.abs(offsetY));
+            
+            // Apply size to layer
+            if (this.map.height > height) {
+                layer.data.splice(height);
+                for (let y = height; y < this.map.height; y++) {
+                    wallManager.removeLine(y);
+                }
+            } else if (this.map.height < height) {
+                for (let y = this.map.height; y < height; y++) {
+                    layer.data.push(Array.from(
+                        Array(this.map.width), 
+                        (_, x) => new Tilemaps.Tile(layer, -1, x, y, 32, 32, 32, 32)));
+                }
+            }
+            if (this.map.width > width) {
+                for (let y = 0; y < height; y++) {
+                    layer.data[y].splice(width);
+                }
+                for (let x = width; x < this.map.width; x++) {
+                    wallManager.removeColumn(x);
+                }
+            } else if (this.map.width < width) {
+                for (let y = 0; y < height; y++) {
+                    layer.data[y].push(...Array.from(
+                        Array(width - this.map.width), 
+                        (_, x) => new Tilemaps.Tile(layer, -1, x + this.map.width, y, 32, 32, 32, 32)));
+                }
+            }
+            layer.width = width;
+            layer.height = height;
+        }
+        for (const group of Object.values(this.objectGroups)) {
+            // Apply offset to objects
+            // for (const obj of group.children.entries) {
+            //     const sprite = obj as GameObjects.Sprite,
+            //         body = obj.body as Phaser.Physics.Arcade.Body,
+            //         newX = body.x - 32*offsetX,
+            //         newY = body.y - 32*offsetY;
+            //     if (newX < 0 || 32*width < newX + body.width
+            //         || newY < 0 || 32*height < newY + body.height) {
+            //         // Out of world bounds
+            //         obj.destroy();
+            //     } else {
+            //         // Apply offset
+            //         sprite.setPosition(sprite.x - 32*offsetX, sprite.y - 32*offsetY);
+            //     }
+            // }
+            // Remove objects out of bounds
+            for (const obj of group.children.entries) {
+                const body = obj.body as Phaser.Physics.Arcade.Body;
+                if (body.x < 0 || 32*width < body.x + body.width
+                    || body.y < 0 || 32*height < body.y + body.height) {
+                    // Out of world bounds
+                    body.gameObject.destroy();
+                }
+            }
+        }
+        // Apply size to map
+        this.map.width = width;
+        this.map.height = height;
+        this.map.widthInPixels = width*32;
+        this.map.heightInPixels = height*32;
+
+        useWorldEditorStore.getState().setState({ save: true, resized: true });
     }
 
     saveMap(): Promise<Response> {

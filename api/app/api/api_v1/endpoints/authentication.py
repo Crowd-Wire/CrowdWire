@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app import crud, models, schemas
 from app.api import dependencies
-from app.core import security, strings
+from app.core import security, strings, consts
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from app.core.config import settings
@@ -30,7 +30,7 @@ async def register(
     if not user:
         raise HTTPException(status_code=400, detail=message)
 
-    await send_email('brunosb@ua.pt', user.user_id)
+    await send_email(user_data.email, user.user_id)
 
     return {'status': 'ok'}
 
@@ -186,6 +186,9 @@ async def auth(token: schemas.GoogleToken, db: Session = Depends(dependencies.ge
 
     if not user_db:
         raise HTTPException(status_code=400, detail=msg)
+
+    if user_db.status != consts.USER_NORMAL_STATUS:
+        raise HTTPException(status_code=400, detail=strings.INACTIVE_USER)
 
     access_token, expires = security.create_access_token(user_db.user_id)
 

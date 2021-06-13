@@ -31,9 +31,17 @@ interface WorldUser {
 const useWorldUserStore = create(
     combine(
         {   
+            showFileSharing: false,
+            showIFrame: false,
             world_user: null as WorldUser | null,
         },
         (set) => ({
+            setShowFileSharing: () => {
+                return set({showFileSharing: true});
+            },
+            setShowIFrame: () => {
+                return set({showIFrame: true});
+            },
             joinWorld: (world_user: WorldUser) => {
                 return set((s) => {
                     world_user.in_conference = null;

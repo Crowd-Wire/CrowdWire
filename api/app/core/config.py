@@ -16,13 +16,12 @@ class Settings(BaseSettings):
     # INVITE_SECRET_TOKEN: str = 'XaubnQhlErKhadxlAuN5arvrqlBJmkqzogP59Wi_SHM'
     PROJECT_NAME: str = "CrowdWire"
 
-    FRONTEND_URL = "https://crowdwire.duckdns.org/" if PRODUCTION else "http://localhost:3000/"
+    FRONTEND_URL = "atnog-crowdwire1.av.it.pt/" if PRODUCTION else "http://localhost:3000/"
 
     HOSTNAME = os.getenv('HOSTNAME', '')
 
-    # TODO: Change this
     # Auth
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 720
     ACCESS_GUEST_TOKEN_EXPIRE_HOURS: int = 12  # 12 hours For Guests
 
     # PostgreSQL Db

@@ -1,4 +1,20 @@
+import loaderStyle from "../loaderStyle";
+
 const mapEditorStyle = {
+    ...loaderStyle,
+
+    backgroundGradient: {
+        height: '100%',
+        width: '100%',
+        backgroundColor: '#2B9BFD',
+        backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',
+    },
+    center: {
+        position: 'absolute',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)'
+    },
     wrapper: {
         display: 'flex',
         height: '100vh',

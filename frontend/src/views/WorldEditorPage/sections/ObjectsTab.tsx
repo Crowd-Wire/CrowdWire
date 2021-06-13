@@ -3,9 +3,11 @@ import React, { Component } from "react";
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import CategoryTwoToneIcon from '@material-ui/icons/CategoryTwoTone';
 
+import TabHeader, { TabSelect } from './TabHeader';
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore";
 
 import { API_BASE } from "config";
 
@@ -90,6 +92,7 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
   }
 
   handleClick = (id: string) => {
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
     useWorldEditorStore.getState().setActive('object', id);
   }
 
@@ -98,26 +101,10 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
 
     return (
       <>
-        <FormControl style={{ marginLeft: 15, marginTop: 15 }}>
-          <InputLabel htmlFor="select-collection">Collection:</InputLabel>
-          <Select
-            native
-            value={filterType}
-            onChange={this.handleSelectChange}
-            inputProps={{
-              id: 'select-collection',
-            }}
-            style={{ minWidth: '15ch' }}
-          >
-            <option aria-label="None" value="" />
-            {
-              Object.keys(collectionObjects).map((name, index) => (
-                <option key={index} value={name}>{name}</option>
-              ))
-            }
-          </Select>
-        </FormControl>
-        <hr />
+        <TabHeader names={['Object', 'ObjectCollision']} Icon={CategoryTwoToneIcon}>
+          <TabSelect placeholder="Collection" value={filterType} options={Object.keys(collectionObjects)} handle={this.handleSelectChange} />
+        </TabHeader>
+
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {
           filterType ? 

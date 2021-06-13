@@ -8,8 +8,6 @@ from app.redis.connection import redis_connector
 
 
 class ConnectionManager:
-    user_count = -1  # TODO: remove after tests
-    group_count = -1
 
     def __init__(self):
         """
@@ -17,21 +15,17 @@ class ConnectionManager:
         """
         self.users_ws: Dict[str, WebSocket] = {}
 
-    # TODO: remove after tests
-    def get_next_user_id(self):
-        self.user_count += 1
-        return str(self.user_count)
-
-    def get_next_group_id(self):
-        self.group_count += 1
-        return str(self.group_count)
-
-    async def connect(self, world_id: str, websocket: WebSocket, user_id: int):
+    async def connect(self, world_id: str, websocket: WebSocket, user_id: int) -> bool:
         await websocket.accept()
+
+        msg = await redis_connector.check_user_in_world(world_id, user_id)
+        if msg:
+            await websocket.send_json({'topic': protocol.KICKED, 'd': {'reason': 'An user with the same account is already in this world.'}})
+            return False
 
         # store user's corresponding websockets
         self.users_ws[user_id] = websocket
-        logger.info(self.users_ws)
+
         # send players snapshot
         players_snapshot = {}
         # send players information like username, avatars..
@@ -53,6 +47,7 @@ class ConnectionManager:
         logger.info(
             f"Connected User {user_id} to World {world_id}"
         )
+        return True
 
     async def disconnect(self, world_id: str, user_id: str):
         if user_id in self.users_ws:

@@ -22,20 +22,30 @@ class AuthenticationService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // TODO: change hashed_password to password after backend update
             body: JSON.stringify({ name: name, email: email, hashed_password: password, birth: birth })
         })
     }
+
+    confirmEmail(token) {
+        return fetch(API_BASE + 'confirm/' + token, {
+            method: 'GET',
+            mode: 'cors',
+        });
+    }
+
     getToken() {
         return useAuthStore.getState().token;
     }
 
     setToken(auth, type) {
-        if(type==="GUEST"){
+        if(type === "GUEST"){
             useAuthStore.getState().joinGuest(auth.access_token, auth.expire_date, auth.guest_uuid);
         }
-        else if(type==="AUTH"){
+        else if(type === "AUTH"){
             useAuthStore.getState().login(auth.access_token, auth.expire_date, auth.is_superuser);
+        }
+        else if(type === "REGISTER"){
+            useAuthStore.getState().login(auth.access_token, auth.expire_date, false);
         }
     }
 
@@ -55,7 +65,6 @@ class AuthenticationService {
     }
 
     joinAsGuest(){
-        console.log(API_BASE)
         return fetch(API_BASE + 'join-guest', {
             method: 'POST',
             mode: 'cors',

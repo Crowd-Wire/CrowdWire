@@ -204,7 +204,8 @@ export const useConsumerStore = create(
             };
           }
           to_del_users.forEach((x) => delete s.consumerMap[x])
-
+          useRoomStore.getState().removeRoom(roomId);
+          
           return {
             consumerMap: {
               ...s.consumerMap
@@ -214,7 +215,7 @@ export const useConsumerStore = create(
       checkRoomToClose: (roomId) =>
         set((s) => {
           let to_close = true;
-          for (const [key, value] of Object.entries(s.consumerMap)) {
+          for (const value of Object.values(s.consumerMap)) {
             if (value.roomId == roomId) {
               to_close = false;
               break;

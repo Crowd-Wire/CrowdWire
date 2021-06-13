@@ -26,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
     },
     checkboxes:{
         marginTop: theme.spacing(2),
-        minWidth: 120
+        minWidth: 120,
+        color:'black'
     },
 }));
 
@@ -52,7 +53,6 @@ export default function WorldsList() {
     }
 
     const handleCreator = (event) => {
-        // TODO: find a cleaner way of doing this
         let value = event.target.value;
         if (value === '')
             value = null;
@@ -211,7 +211,7 @@ export default function WorldsList() {
                     />
                 </Col>
                 <Col sm={12} md={2} style={{marginLeft:"auto", marginRight:"auto"}}>
-                    <Button className={classes.checkboxes} style={{marginLeft:"auto", marginRight:"auto"}} id="search" onClick={handleSearch}>Search</Button>
+                    <Button style={{marginLeft:"auto", marginRight:"auto"}} id="search" onClick={handleSearch}>Search</Button>
                 </Col>
             </Row>
             <hr/>

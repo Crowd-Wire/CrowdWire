@@ -1,0 +1,416 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mediaserver.fullname" . }}-udp10
+  labels:
+    {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+     metallb.universe.tf/allow-shared-ip: crowdwire
+spec:
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
+  #externalTrafficPolicy: Local
+  ports:
+    - name : udp1000
+      port: 41000
+      targetPort: 41000
+      protocol: UDP
+    - name : udp1001
+      port: 41001
+      targetPort: 41001
+      protocol: UDP
+    - name : udp1002
+      port: 41002
+      targetPort: 41002
+      protocol: UDP
+    - name : udp1003
+      port: 41003
+      targetPort: 41003
+      protocol: UDP
+    - name : udp1004
+      port: 41004
+      targetPort: 41004
+      protocol: UDP
+    - name : udp1005
+      port: 41005
+      targetPort: 41005
+      protocol: UDP
+    - name : udp1006
+      port: 41006
+      targetPort: 41006
+      protocol: UDP
+    - name : udp1007
+      port: 41007
+      targetPort: 41007
+      protocol: UDP
+    - name : udp1008
+      port: 41008
+      targetPort: 41008
+      protocol: UDP
+    - name : udp1009
+      port: 41009
+      targetPort: 41009
+      protocol: UDP
+    - name : udp1010
+      port: 41010
+      targetPort: 41010
+      protocol: UDP
+    - name : udp1011
+      port: 41011
+      targetPort: 41011
+      protocol: UDP
+    - name : udp1012
+      port: 41012
+      targetPort: 41012
+      protocol: UDP
+    - name : udp1013
+      port: 41013
+      targetPort: 41013
+      protocol: UDP
+    - name : udp1014
+      port: 41014
+      targetPort: 41014
+      protocol: UDP
+    - name : udp1015
+      port: 41015
+      targetPort: 41015
+      protocol: UDP
+    - name : udp1016
+      port: 41016
+      targetPort: 41016
+      protocol: UDP
+    - name : udp1017
+      port: 41017
+      targetPort: 41017
+      protocol: UDP
+    - name : udp1018
+      port: 41018
+      targetPort: 41018
+      protocol: UDP
+    - name : udp1019
+      port: 41019
+      targetPort: 41019
+      protocol: UDP
+    - name : udp1020
+      port: 41020
+      targetPort: 41020
+      protocol: UDP
+    - name : udp1021
+      port: 41021
+      targetPort: 41021
+      protocol: UDP
+    - name : udp1022
+      port: 41022
+      targetPort: 41022
+      protocol: UDP
+    - name : udp1023
+      port: 41023
+      targetPort: 41023
+      protocol: UDP
+    - name : udp1024
+      port: 41024
+      targetPort: 41024
+      protocol: UDP
+    - name : udp1025
+      port: 41025
+      targetPort: 41025
+      protocol: UDP
+    - name : udp1026
+      port: 41026
+      targetPort: 41026
+      protocol: UDP
+    - name : udp1027
+      port: 41027
+      targetPort: 41027
+      protocol: UDP
+    - name : udp1028
+      port: 41028
+      targetPort: 41028
+      protocol: UDP
+    - name : udp1029
+      port: 41029
+      targetPort: 41029
+      protocol: UDP
+    - name : udp1030
+      port: 41030
+      targetPort: 41030
+      protocol: UDP
+    - name : udp1031
+      port: 41031
+      targetPort: 41031
+      protocol: UDP
+    - name : udp1032
+      port: 41032
+      targetPort: 41032
+      protocol: UDP
+    - name : udp1033
+      port: 41033
+      targetPort: 41033
+      protocol: UDP
+    - name : udp1034
+      port: 41034
+      targetPort: 41034
+      protocol: UDP
+    - name : udp1035
+      port: 41035
+      targetPort: 41035
+      protocol: UDP
+    - name : udp1036
+      port: 41036
+      targetPort: 41036
+      protocol: UDP
+    - name : udp1037
+      port: 41037
+      targetPort: 41037
+      protocol: UDP
+    - name : udp1038
+      port: 41038
+      targetPort: 41038
+      protocol: UDP
+    - name : udp1039
+      port: 41039
+      targetPort: 41039
+      protocol: UDP
+    - name : udp1040
+      port: 41040
+      targetPort: 41040
+      protocol: UDP
+    - name : udp1041
+      port: 41041
+      targetPort: 41041
+      protocol: UDP
+    - name : udp1042
+      port: 41042
+      targetPort: 41042
+      protocol: UDP
+    - name : udp1043
+      port: 41043
+      targetPort: 41043
+      protocol: UDP
+    - name : udp1044
+      port: 41044
+      targetPort: 41044
+      protocol: UDP
+    - name : udp1045
+      port: 41045
+      targetPort: 41045
+      protocol: UDP
+    - name : udp1046
+      port: 41046
+      targetPort: 41046
+      protocol: UDP
+    - name : udp1047
+      port: 41047
+      targetPort: 41047
+      protocol: UDP
+    - name : udp1048
+      port: 41048
+      targetPort: 41048
+      protocol: UDP
+    - name : udp1049
+      port: 41049
+      targetPort: 41049
+      protocol: UDP
+    - name : udp1050
+      port: 41050
+      targetPort: 41050
+      protocol: UDP
+    - name : udp1051
+      port: 41051
+      targetPort: 41051
+      protocol: UDP
+    - name : udp1052
+      port: 41052
+      targetPort: 41052
+      protocol: UDP
+    - name : udp1053
+      port: 41053
+      targetPort: 41053
+      protocol: UDP
+    - name : udp1054
+      port: 41054
+      targetPort: 41054
+      protocol: UDP
+    - name : udp1055
+      port: 41055
+      targetPort: 41055
+      protocol: UDP
+    - name : udp1056
+      port: 41056
+      targetPort: 41056
+      protocol: UDP
+    - name : udp1057
+      port: 41057
+      targetPort: 41057
+      protocol: UDP
+    - name : udp1058
+      port: 41058
+      targetPort: 41058
+      protocol: UDP
+    - name : udp1059
+      port: 41059
+      targetPort: 41059
+      protocol: UDP
+    - name : udp1060
+      port: 41060
+      targetPort: 41060
+      protocol: UDP
+    - name : udp1061
+      port: 41061
+      targetPort: 41061
+      protocol: UDP
+    - name : udp1062
+      port: 41062
+      targetPort: 41062
+      protocol: UDP
+    - name : udp1063
+      port: 41063
+      targetPort: 41063
+      protocol: UDP
+    - name : udp1064
+      port: 41064
+      targetPort: 41064
+      protocol: UDP
+    - name : udp1065
+      port: 41065
+      targetPort: 41065
+      protocol: UDP
+    - name : udp1066
+      port: 41066
+      targetPort: 41066
+      protocol: UDP
+    - name : udp1067
+      port: 41067
+      targetPort: 41067
+      protocol: UDP
+    - name : udp1068
+      port: 41068
+      targetPort: 41068
+      protocol: UDP
+    - name : udp1069
+      port: 41069
+      targetPort: 41069
+      protocol: UDP
+    - name : udp1070
+      port: 41070
+      targetPort: 41070
+      protocol: UDP
+    - name : udp1071
+      port: 41071
+      targetPort: 41071
+      protocol: UDP
+    - name : udp1072
+      port: 41072
+      targetPort: 41072
+      protocol: UDP
+    - name : udp1073
+      port: 41073
+      targetPort: 41073
+      protocol: UDP
+    - name : udp1074
+      port: 41074
+      targetPort: 41074
+      protocol: UDP
+    - name : udp1075
+      port: 41075
+      targetPort: 41075
+      protocol: UDP
+    - name : udp1076
+      port: 41076
+      targetPort: 41076
+      protocol: UDP
+    - name : udp1077
+      port: 41077
+      targetPort: 41077
+      protocol: UDP
+    - name : udp1078
+      port: 41078
+      targetPort: 41078
+      protocol: UDP
+    - name : udp1079
+      port: 41079
+      targetPort: 41079
+      protocol: UDP
+    - name : udp1080
+      port: 41080
+      targetPort: 41080
+      protocol: UDP
+    - name : udp1081
+      port: 41081
+      targetPort: 41081
+      protocol: UDP
+    - name : udp1082
+      port: 41082
+      targetPort: 41082
+      protocol: UDP
+    - name : udp1083
+      port: 41083
+      targetPort: 41083
+      protocol: UDP
+    - name : udp1084
+      port: 41084
+      targetPort: 41084
+      protocol: UDP
+    - name : udp1085
+      port: 41085
+      targetPort: 41085
+      protocol: UDP
+    - name : udp1086
+      port: 41086
+      targetPort: 41086
+      protocol: UDP
+    - name : udp1087
+      port: 41087
+      targetPort: 41087
+      protocol: UDP
+    - name : udp1088
+      port: 41088
+      targetPort: 41088
+      protocol: UDP
+    - name : udp1089
+      port: 41089
+      targetPort: 41089
+      protocol: UDP
+    - name : udp1090
+      port: 41090
+      targetPort: 41090
+      protocol: UDP
+    - name : udp1091
+      port: 41091
+      targetPort: 41091
+      protocol: UDP
+    - name : udp1092
+      port: 41092
+      targetPort: 41092
+      protocol: UDP
+    - name : udp1093
+      port: 41093
+      targetPort: 41093
+      protocol: UDP
+    - name : udp1094
+      port: 41094
+      targetPort: 41094
+      protocol: UDP
+    - name : udp1095
+      port: 41095
+      targetPort: 41095
+      protocol: UDP
+    - name : udp1096
+      port: 41096
+      targetPort: 41096
+      protocol: UDP
+    - name : udp1097
+      port: 41097
+      targetPort: 41097
+      protocol: UDP
+    - name : udp1098
+      port: 41098
+      targetPort: 41098
+      protocol: UDP
+    - name : udp1099
+      port: 41099
+      targetPort: 41099
+      protocol: UDP
+  selector:
+    {{- include "mediaserver.selectorLabels" . | nindent 4 }}

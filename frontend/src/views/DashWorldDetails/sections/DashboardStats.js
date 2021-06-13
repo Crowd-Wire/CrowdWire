@@ -13,8 +13,11 @@ import WorldService from "services/WorldService.ts";
 import DeleteIcon from '@material-ui/icons/Delete';
 import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
 import ReportIcon from '@material-ui/icons/Report';
+import BuildIcon from '@material-ui/icons/Build';
+import AssignmentIcon from '@material-ui/icons/Assignment';
 import Button from "components/CustomButtons/Button.js";
-import { useNavigate } from 'react-router-dom';
+import { withRouter } from "utils/wrapper";
+import useAuthStore from "stores/useAuthStore.ts";
 
 
 class DashboardStats extends Component{
@@ -25,8 +28,11 @@ class DashboardStats extends Component{
             show: false,
             nav: false,
             open: false,
-            page: false
+            page: false,
+            guest: useAuthStore.getState().guest_uuid
         }
+        this.navigate = props.navigate;
+        this.params = props.params;
     }
 
    
@@ -86,11 +92,20 @@ class DashboardStats extends Component{
                     { this.props.canManage ? 
                         <Row sm={12}>
                             <Button color="primary" onClick={() => {this.showWorldManagement()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
-                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Manage Map</span>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><AssignmentIcon/>Manage World</span>
                             </Button>
                         </Row>
                     : ''
                     }
+                    { this.props.isCreator ? 
+                        <Row sm={12}>
+                            <Button color="primary" onClick={() => this.navigate('/world/' + this.params.id + '/editor')} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><BuildIcon/>Edit World</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
+                    { !this.state.guest ?
                     <Row sm={12}>
                         <Button color="github" onClick={() => {this.handleClickOpen()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
                             <span style={{fontWeight: 500, fontSize: '0.9rem'}}><ReportIcon/>Report World</span>
@@ -98,6 +113,7 @@ class DashboardStats extends Component{
                         <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
                             world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                     </Row>
+                    : '' }
                     { this.props.isCreator ? 
                         <Row sm={12}>
                             <Button color="danger" onClick={() => {this.showModal()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
@@ -146,4 +162,4 @@ class DashboardStats extends Component{
     }
 }
 
-export default (DashboardStats);
+export default withRouter(DashboardStats);
