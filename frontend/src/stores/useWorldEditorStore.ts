@@ -45,6 +45,7 @@ const useWorldEditorStore = create(
     combine(
         {
             ready: false,
+            resized: false,
             grid: false,
             highlight: false,
             save: false,

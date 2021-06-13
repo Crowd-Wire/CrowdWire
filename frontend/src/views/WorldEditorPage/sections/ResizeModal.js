@@ -44,8 +44,8 @@ const ResizeModal = (props) => {
 
   useEffect(() => {
     setError(error => {
-      error.width = ( value.width < 1 || 500 < value.width );
-      error.height = ( value.height < 1 || 500 < value.height );
+      error.width = ( value.width < 1 || 400 < value.width );
+      error.height = ( value.height < 1 || 400 < value.height );
       error.offsetX = ( Math.abs(value.offsetX) >= value.width );
       error.offsetY = ( Math.abs(value.offsetY) >= value.height );
       return {...error};
@@ -75,9 +75,9 @@ const ResizeModal = (props) => {
     const mapManager = new MapManager();
     mapManager.resizeMap(
       parseInt(value.width, 10),
-      parseInt(value.height, 10),
-      parseInt(value.offsetX, 10),
-      parseInt(value.offsetY, 10));
+      parseInt(value.height, 10));
+      // parseInt(value.offsetX, 10),
+      // parseInt(value.offsetY, 10));
     handleClose();
   }
 
@@ -89,7 +89,7 @@ const ResizeModal = (props) => {
           <DialogContent>
 
             <div style={{ display: 'flex' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 50px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '1rem' }}>
                   <TextField
                     name="width"
@@ -119,7 +119,7 @@ const ResizeModal = (props) => {
                   />tiles
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 20px' }}>
+              {/* <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 20px' }}>
                 <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '1rem' }}>
                   <TextField
                     name="offsetX"
@@ -148,7 +148,7 @@ const ResizeModal = (props) => {
                     style={{ maxWidth: '10ch' }}
                   />tiles
                 </div>
-              </div>
+              </div> */}
             </div>
 
           </DialogContent>
