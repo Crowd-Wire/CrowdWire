@@ -33,7 +33,6 @@ export default function KickBanPanel(props){
 	};
 
 	const getUsers = (change) => {
-		console.log(props.world)
 		if(props.world.length===1)
 			WorldService.getAllWorldUsers(props.world)
 			.then((res) => {
@@ -58,7 +57,6 @@ export default function KickBanPanel(props){
 							</Row>);
 	
 	const selectButtons = (key) => {
-		console.log(key)
 		if(Number.parseInt(worldUsers[key].status)===0){
 			setSelectionButtons(<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
 				<Button variant="danger" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto", marginLeft:"15px"}}  onClick={()=>changeStatus(1)}>Ban</Button>{' '}
@@ -83,7 +81,6 @@ export default function KickBanPanel(props){
 
 	useEffect(() => {
 		let userRows = [];
-		console.log(props.world)
 		Object.keys(worldUsers).forEach((key) => {
 			if(worldUsers.length !== 0){
 				if(Number.parseInt(worldUsers[key].status)===0){
@@ -129,13 +126,11 @@ export default function KickBanPanel(props){
 	useEffect(()=>{
 		let newReportBoxes = [];
 		if(selectedElement>=0 && props.world.length===1){
-			console.log(props.world)
 			UserService.getUserReports(props.world, null, selectedElement, null, null, null, null, null, null)
 			.then((res)=>{
 				return res.json();
 			})
 			.then((res)=>{
-				console.log(res)
 				if(res.length>0){
 					for(let i=0; i<res.length; i++){
 						res[i].world_name = res[i].comment;
