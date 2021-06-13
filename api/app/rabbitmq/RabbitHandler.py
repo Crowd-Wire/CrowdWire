@@ -49,10 +49,9 @@ async def on_message(message: IncomingMessage) -> None:
             # to avoid each one of them creating a media server
             await redis_connector.add_media_server()
 
-        elif topic == protocol.CLOSE_CONSUMER:
-            logger.info(msg)
         elif topic == protocol.ERROR:
             logger.info(msg)
+
         else:
             logger.error(f"Unknown topic \"{topic}\"")
 
