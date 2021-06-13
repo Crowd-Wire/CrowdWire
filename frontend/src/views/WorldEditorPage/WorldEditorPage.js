@@ -2,10 +2,8 @@ import React from "react";
 
 import classNames from 'classnames';
 
-import LockIcon from '@material-ui/icons/Lock';
-import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
-
 import GameUITabs from "components/CustomTabs/GameUITabs.js";
+import ResizeModal from './sections/ResizeModal.js';
 import TilesTab from "./sections/TilesTab.tsx";
 import WallsTab from "./sections/WallsTab.tsx";
 import ObjectsTab from "./sections/ObjectsTab.tsx";
@@ -47,6 +45,7 @@ class WorldEditorPage extends React.Component {
     this.phaserRef = React.createRef();
     this.state = {
       loading: true,
+      openModal: false,
       grid: [
         {
           size: 40,
@@ -269,7 +268,16 @@ class WorldEditorPage extends React.Component {
     );
   }
 
+  handleOpen = () => {
+    this.setState({openModal: true});
+  }
+
+  handleClose = () => {
+    this.setState({openModal: false});
+  }
+
   render() {
+    const { openModal } = this.state;
     const { classes } = this.props;
 
     this.gameWindows = {
@@ -315,12 +323,13 @@ class WorldEditorPage extends React.Component {
           {gridBuilder(this.state.grid2)}
         </div> */}
 
-        <EditorNavbar />
+        <EditorNavbar handleOpen={this.handleOpen} />
 
         <div className={classes.wrapperCol} style={{ backgroundColor: "#ddd", maxHeight: 'calc(100vh - 30px)', height: '100%' }}>
           {this.gridBuild()}
         </div>
 
+        <ResizeModal open={openModal} handleClose={this.handleClose} />
       </>
     );
   }

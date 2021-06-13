@@ -26,6 +26,7 @@ class EditorNavbar extends React.Component {
 
   constructor(props) {
     super(props);
+    this.handleOpen = props.handleOpen;
     this.navigate = props.navigate;
   }
 
@@ -103,7 +104,10 @@ class EditorNavbar extends React.Component {
             <Dropdown.Item className={classes.dropdownItem} eventKey="1">
               New Blank World
             </Dropdown.Item>
-            <Dropdown.Item className={classes.dropdownItem} eventKey="1">
+            <Dropdown.Item 
+              className={classes.dropdownItem} eventKey="1"
+              onClick={this.handleOpen}
+            >
               Resize World
             </Dropdown.Item>
           </Dropdown.Menu>
