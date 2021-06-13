@@ -53,6 +53,7 @@ class GameScene extends Phaser.Scene {
             .setTintFill(0xffff00)
             .setVisible(false);
         this.interact = null;
+        this.interactObject = null;
         
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
@@ -216,18 +217,33 @@ class GameScene extends Phaser.Scene {
                 .setVisible(true)
                 .setDepth(depth - 1);
             this.interact = closestBody.gameObject.data.list.interact;
+            this.interactObject = closestBody.gameObject;
         } else {
             this.selectedObject.setVisible(false);
             this.interact = null;
+            this.interactObject = null;
         }
     }
 
     updateInteract() {
-        if (this.cursors.interact.isDown) {
+        const callService = () => {
             if (this.interact === 'FILE_SHARE') {
                 useWorldUserStore.getState().setShowFileSharing();
             } else if (this.interact === 'WHITEBOARD') {
                 useWorldUserStore.getState().setShowIFrame();
+            }
+        };
+        if (this.cursors.interact?.isDown) {
+            callService();
+        }
+        if (this.interactObject && this.input.manager.activePointer.isDown) {
+            let { x, y, width, height } = this.interactObject,
+                worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+            x -= width/2;
+            y -= height/2;
+
+            if (x < worldPoint.x && worldPoint.x < x + width && y < worldPoint.y && worldPoint.y < y + height) {
+                callService();
             }
         }
     }
