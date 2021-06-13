@@ -136,18 +136,16 @@ const GamePage = (props) => {
   }
 
   useEffect(() => {
-    if (connecting) {
-      if (!reconnect) {
-        reconnect = setInterval(() => {
-          let socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket
-          console.log(socket)
-          if (socket && socket.readyState === 1) {
-            clearInterval(reconnect);
-            reconnect = null;
-            usePlayerStore.getState().setConnecting(false);
-          }
-        }, 5000);
-      }
+    if (connecting && !reconnect) {
+      reconnect = setInterval(() => {
+        let socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket
+        console.log(socket)
+        if (socket && socket.readyState === 1) {
+          clearInterval(reconnect);
+          reconnect = null;
+          usePlayerStore.getState().setConnecting(false);
+        }
+      }, 5000);
     }
   }, [connecting])
 
