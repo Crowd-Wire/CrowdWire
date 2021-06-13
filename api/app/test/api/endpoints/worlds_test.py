@@ -39,7 +39,6 @@
 #
 # app.dependency_overrides[get_db] = override_get_db
 #
-# # TODO: add more tests for guests and users
 # class TestWorlds(TestCase):
 #
 #     def test_get_world_correct_id_user(self):

@@ -271,7 +271,6 @@ class RedisConnector:
         Checks World_User Data if present
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
-        # TODO: maybe check encoding instead of converting to string
         user_id = str(user_id)
         world_id = str(world_id)
         username = await self.hget(

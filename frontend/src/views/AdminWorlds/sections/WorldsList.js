@@ -53,7 +53,6 @@ export default function WorldsList() {
     }
 
     const handleCreator = (event) => {
-        // TODO: find a cleaner way of doing this
         let value = event.target.value;
         if (value === '')
             value = null;

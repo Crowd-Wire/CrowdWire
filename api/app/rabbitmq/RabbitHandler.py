@@ -41,12 +41,9 @@ async def on_message(message: IncomingMessage) -> None:
             await manager.send_personal_message(msg, user_id)
 
         elif topic == protocol.CREATE_NEW_REPLICA:
-            # TODO:
             logger.info("Received Request to scale replicas..")
             logger.info("Scaling Replicas")
             k8s_handler.scale_mediaserver_replicas()
-            # handle concurrency here with other api replicas
-            # to avoid each one of them creating a media server
             await redis_connector.add_media_server()
 
         elif topic == protocol.ERROR:
