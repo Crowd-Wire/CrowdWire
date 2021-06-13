@@ -80,7 +80,6 @@ def init_db(db: Session) -> None:
     # Tables should be created with Alembic migrations
     # But if you don't want to use migrations, create
     # the tables un-commenting the next line
-    # TODO: change this so that tables are created with alembic
 
     # Check Database Schema Creation
     if not engine.dialect.has_schema(engine, schema=settings.SCHEMA_NAME):

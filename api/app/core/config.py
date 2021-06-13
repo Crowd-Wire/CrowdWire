@@ -20,9 +20,8 @@ class Settings(BaseSettings):
 
     HOSTNAME = os.getenv('HOSTNAME', '')
 
-    # TODO: Change this
     # Auth
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 720
     ACCESS_GUEST_TOKEN_EXPIRE_HOURS: int = 12  # 12 hours For Guests
 
     # PostgreSQL Db

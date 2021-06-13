@@ -521,7 +521,6 @@
 #         with patch("app.redis.connection.RedisConnector.get_world_user_data") as cache:
 #             with patch("app.crud.crud_world_users.CRUDWorld_User.join_world") as join:
 #                 with patch("app.crud.crud_world.update_online_users") as online_users:
-#                     # TODO: Change later
 #                     access.return_value = models.World(world_map="".encode()), ""
 #                     online_users.return_value = access.return_value
 #                     cache.return_value = None
