@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
@@ -42,8 +42,18 @@ const ResizeModal = (props) => {
         handleReady, state => state.ready));
   },[]);
 
+  useEffect(() => {
+    setError(error => {
+      error.width = ( value.width < 1 || 500 < value.width );
+      error.height = ( value.height < 1 || 500 < value.height );
+      error.offsetX = ( Math.abs(value.offsetX) >= value.width );
+      error.offsetY = ( Math.abs(value.offsetY) >= value.height );
+      return {...error};
+    });
+  },[value]);
+
   const handleReady = () => {
-    const mapManager = new MapManager;
+    const mapManager = new MapManager();
 
     setValue(value => {
       value.width = mapManager.map.width;
@@ -53,12 +63,22 @@ const ResizeModal = (props) => {
   }
 
   const handleChange = (event) => {
-    const { name, val } = event.target;
+    const { name, value } = event.target;
 
-    setValue(value => {
-      value[name] = val;
-      return {...value};
+    setValue(val => {
+      val[name] = value;
+      return {...val};
     });
+  }
+
+  const handleSubmit = () => {
+    const mapManager = new MapManager();
+    mapManager.resizeMap(
+      parseInt(value.width, 10),
+      parseInt(value.height, 10),
+      parseInt(value.offsetX, 10),
+      parseInt(value.offsetY, 10));
+    handleClose();
   }
 
   return (
@@ -70,28 +90,26 @@ const ResizeModal = (props) => {
 
             <div style={{ display: 'flex' }}>
               <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '1rem' }}>
                   <TextField
                     name="width"
                     value={value.width}
                     onChange={handleChange}
                     error={error.width}
-                    id="world-width"
                     label="Width"
                     type="number"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    style={{ marginBottom: '1rem', maxWidth: '10ch' }}
+                    style={{ maxWidth: '10ch' }}
                   />tiles
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
                   <TextField
                     name="height"
                     value={value.height}
                     onChange={handleChange}
                     error={error.height}
-                    id="world-height"
                     label="Height"
                     type="number"
                     InputLabelProps={{
@@ -102,28 +120,26 @@ const ResizeModal = (props) => {
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', margin: '10px 20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '1rem' }}>
                   <TextField
                     name="offsetX"
                     value={value.offsetX}
                     onChange={handleChange}
                     error={error.offsetX}
-                    id="offset-x"
                     label="Offset X"
                     type="number"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    style={{ marginBottom: '1rem', maxWidth: '10ch' }}
+                    style={{ maxWidth: '10ch' }}
                   />tiles
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline' }}>
                   <TextField
                     name="offsetY"
                     value={value.offsetY}
                     onChange={handleChange}
                     error={error.offsetY}
-                    id="offset-y"
                     label="Offset Y"
                     type="number"
                     InputLabelProps={{
@@ -140,7 +156,7 @@ const ResizeModal = (props) => {
             <Button onClick={handleClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={handleClose} color="primary">
+            <Button onClick={handleSubmit} color="primary" disabled={Object.values(error).some(e => e)}>
               OK
             </Button>
           </DialogActions>
