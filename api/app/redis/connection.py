@@ -282,6 +282,7 @@ class RedisConnector:
         if username and avatar and role:
             role = pickle.loads(role).__dict__
             return {
+                'user_id': user_id,
                 'username': pickle.loads(username),
                 'avatar': pickle.loads(avatar),
                 'role': {'role_id': role['role_id'], 'name': role['name']},
