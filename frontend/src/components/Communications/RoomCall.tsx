@@ -213,20 +213,18 @@ export default class RoomCall extends React.Component<{}, State> {
     return (
       <>
       {numberUsers > 0 ?
-
-(   
-        <div
-        id="my_carousel"
-        style={{
-          position: 'fixed',
-          paddingRight: 80,
-          zIndex: 100,
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-
+        (   
+          <div
+          id="my_carousel"
+          style={{
+            position: 'fixed',
+            paddingRight: 80,
+            zIndex: 100,
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
               <div style={{ height: '100%', padding: 2, width: numberUsers < 4 ? `${23 * numberUsers}%` : '100%', minWidth: numberUsers < 4 ? 240 * numberUsers : 600}}>
                 <div style={{ position: 'relative', top: 0, textAlign: 'right', paddingRight: 20, zIndex: 100 }}>
                   {this.state.fullscreen ?
@@ -245,7 +243,6 @@ export default class RoomCall extends React.Component<{}, State> {
                         videoToggle, audioToggle
                       } = this.state.consumerMap[peerId];
                       
-                     
                       let item = <></>
                       let username = peerId;
                       let avatar= "avatars_1_1";
@@ -283,11 +280,13 @@ export default class RoomCall extends React.Component<{}, State> {
                           </Carousel.Item>), item]
                     })
                   }
-
                 </Carousel>
               </div>
-        </div>
-        ) : null}
+           </div>
+          ) 
+        : 
+          <div id="my_carousel" style={{height: 0}} /> 
+        }
         <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
           {this.state.media ?
             <MyMediaStreamBox
@@ -318,7 +317,7 @@ export default class RoomCall extends React.Component<{}, State> {
             https://www.chesshotel.com/pt/"
             https://r7.whiteboardfox.com/
             */}
-            <div style={{ position: 'fixed', top: IFrame_height === 0 ? '60px' : `calc(${document.getElementById("my_carousel").offsetHeight}px + 65px)`, left: 65, width: 'calc(100% - 60px)', height: 'calc(100% - 60px)', background: 'white' }}>
+            <div style={{ position: 'fixed', top: IFrame_height === 0 ? '60px' : `calc(${document.getElementById("my_carousel").offsetHeight}px + 60px)`, left: 65, width: 'calc(100% - 60px)', height: 'calc(100% - 60px)', background: 'white' }}>
               <Iframe url="https://r7.whiteboardfox.com/"
                 position="absolute"
                 width="100%"
