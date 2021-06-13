@@ -65,7 +65,6 @@ class RoleService {
             headers: {
                 'Content-Type': 'application/json',
             },
-            // TODO: change hashed_password to password after backend update
             body: JSON.stringify({ name: state.name, interact: state.obj_int, walk: state.walk, talk: state.talk, talk_conference: state.talk_conf,
             world_mute: state.world_mute,role_manage: state.role_manage, conference_manage: state.conf_manage, chat: state.chat, invite: state.inv_users, ban: state.ban
         })

@@ -153,7 +153,7 @@ async def join_conference(world_id: str, user_id: str, payload: dict):
                     'groups': groups_to_remove,
                     'ids': [user_id]
                 }, uid)
-    await redis_connector.add_groups_to_user(world_id, user_id, conference_id)
+    await redis_connector.add_users_to_group(world_id, conference_id, user_id)
     await redis_connector.delete(f"world:{world_id}:user:{user_id}:users")
 
     permission = await redis_connector.can_talk_conference(world_id, user_id)
@@ -284,9 +284,6 @@ async def leave_conference(world_id: str, user_id: str, payload: dict):
 
 
 async def disconnect_user(world_id: str, user_id: str):
-    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
-    await redis_connector.remove_all_user_files(world_id, user_id)
-
     group_ids = set()
     group_ids.update(await redis_connector.get_user_groups(world_id, user_id))
     groups_to_remove = []
@@ -305,6 +302,9 @@ async def disconnect_user(world_id: str, user_id: str):
                     'groups': groups_to_remove,
                     'ids': [user_id]
                 }, uid)
+
+    await manager.broadcast_to_user_rooms(world_id, {'topic': protocol.REMOVE_ALL_USER_FILES, 'd': {'user_id': user_id}}, user_id)
+    await redis_connector.remove_all_user_files(world_id, user_id)
 
 
 async def handle_actions(actions: dict):

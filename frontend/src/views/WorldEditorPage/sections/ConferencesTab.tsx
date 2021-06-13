@@ -1,8 +1,11 @@
 import React, { Component, useState } from "react";
 
 import classNames from "classnames";
+
+import VideocamTwoToneIcon from '@material-ui/icons/VideocamTwoTone';
 import Input from '@material-ui/core/Input';
 
+import TabHeader from './TabHeader';
 import useWorldEditorStore, { Conference, ToolType } from "stores/useWorldEditorStore";
 import { cyrb53Hash, intToHex, hexToRGB } from "utils/color.js";
 
@@ -139,33 +142,9 @@ const useConferenceLayerStyles = makeStyles({
 
 const ConferenceLayer: React.FC<{ children: React.ReactNode[] }> = ({ children }) => {
   const classes = useConferenceLayerStyles();
-  let visible = useWorldEditorStore(state => state.layers['__Conference'].visible);
-  let blocked = useWorldEditorStore(state => state.layers['__Conference'].blocked);
-
-  const handleVisible = (event) => {
-    event.stopPropagation();
-    useWorldEditorStore.setState(state => {
-      state.layers['__Conference'].visible = !visible;
-    });
-  }
-
-  const handleBlocked = (event) => {
-    event.stopPropagation();
-    useWorldEditorStore.setState(state => {
-      state.layers['__Conference'].blocked = !blocked;
-    });
-  }
 
   return (
     <div className={classes.root}>
-      <div className={classes.header}>
-        <div className={classes.icon} onClick={handleVisible}>
-          {visible ? <VisibilityIcon /> : <VisibilityOffIcon />}
-        </div>
-        <div className={classes.icon} onClick={handleBlocked}>
-          {blocked ? <LockIcon /> : <LockOpenIcon />}
-        </div>
-      </div>
       {children}
     </div>
   );
@@ -277,21 +256,24 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
     const { activeConference, conferences } = this.state;
 
     return (
-      <ConferenceLayer>
-        {Object.entries(conferences).map(([id, conference], index) => (
-          <ConferenceItem
-            key={index}
-            id={id} {...conference}
-            handle={this.handleChange}
-            active={activeConference === id}
-          />
-        ))}
+      <>
+        <TabHeader names={['__Conference']} Icon={VideocamTwoToneIcon} />
+        <ConferenceLayer>
+          {Object.entries(conferences).map(([id, conference], index) => (
+            <ConferenceItem
+              key={index}
+              id={id} {...conference}
+              handle={this.handleChange}
+              active={activeConference === id}
+            />
+          ))}
 
-        <AddIcon
-          onClick={this.addConference}
-          style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
-        />
-      </ConferenceLayer>
+          <AddIcon
+            onClick={this.addConference}
+            style={{ cursor: 'pointer', margin: '.25rem .75rem', float: 'right' }}
+          />
+        </ConferenceLayer>
+      </>
     );
   }
 }

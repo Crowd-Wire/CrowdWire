@@ -1,5 +1,8 @@
 import React, { Component } from "react";
 
+import HomeWorkTwoToneIcon from '@material-ui/icons/HomeWorkTwoTone';
+
+import TabHeader from './TabHeader';
 import MapManager from "phaser/MapManager";
 import useWorldEditorStore from "stores/useWorldEditorStore";
 
@@ -161,6 +164,8 @@ class WallsTab extends Component<{}, WallsTabState> {
     const { tilesetWalls } = this.state;
     return (
       <>
+        <TabHeader names={['__Float', '__Collision']} Icon={HomeWorkTwoToneIcon} />
+
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {
             tilesetWalls

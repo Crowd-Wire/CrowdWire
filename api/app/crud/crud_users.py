@@ -205,7 +205,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None, strings.INVALID_CREDENTIALS
         return db_user, strings.AUTHENTICATION_SUCCESS
 
-    # TODO: change imports to be models.User
     def is_active(self, db: Session, *, user: User) -> bool:
         """
         A user is active if it's status is 0

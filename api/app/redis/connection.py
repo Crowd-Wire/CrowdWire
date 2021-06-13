@@ -62,7 +62,6 @@ class RedisConnector:
         return all_keys
 
     async def hget(self, key: str, field: any):
-        # TODO: CHECK ENCODINGS!
         return await self.execute('hget', key, field)
 
     async def hset(self, key: str, field: str, value: any):
@@ -239,7 +238,6 @@ class RedisConnector:
         Checks World_User Data, if present, to be returned to REST API
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
-        # TODO: maybe check encoding instead of converting to string
         username = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'username')
         avatar = await self.hget(
@@ -271,7 +269,6 @@ class RedisConnector:
         Checks World_User Data if present
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
-        # TODO: maybe check encoding instead of converting to string
         user_id = str(user_id)
         world_id = str(world_id)
         username = await self.hget(
@@ -285,6 +282,7 @@ class RedisConnector:
         if username and avatar and role:
             role = pickle.loads(role).__dict__
             return {
+                'user_id': user_id,
                 'username': pickle.loads(username),
                 'avatar': pickle.loads(avatar),
                 'role': {'role_id': role['role_id'], 'name': role['name']},

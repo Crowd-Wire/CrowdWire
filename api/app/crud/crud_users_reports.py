@@ -28,7 +28,6 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate])
 
         # only superusers can search without passing the world_id
         if not world_id and not user.is_superuser:
-            # TODO: change this
             return None, strings.ROLE_INVALID_PERMISSIONS
 
         # check if the user has access to the world provided
@@ -54,10 +53,12 @@ class CRUDReport_User(CRUDBase[Report_User, ReportUserCreate, ReportUserUpdate])
             reported.username.label('reported_name')
         ).filter(
             Report_User.reported == reported.user_id,
-            Report_User.reported == reported_user.user_id,
+            reported.user_id == reported_user.user_id,
             Report_User.reporter == reporter.user_id,
-            Report_User.reporter == reporter_user.user_id,
+            reporter.user_id == reporter_user.user_id,
             World.world_id == Report_User.world_id,
+            World.world_id == reported.world_id,
+            World.world_id == reporter.world_id,
         )
 
         if world_id:

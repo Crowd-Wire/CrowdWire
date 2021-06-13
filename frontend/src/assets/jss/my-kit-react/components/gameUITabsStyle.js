@@ -14,7 +14,7 @@ const gameUITabsStyle = {
     minHeight: '0', // for Firefox
   },
   cardHeader: {
-    padding: "3px 0 0 0",
+    padding: 0,
     margin: "0",
     borderRadius: "3px 3px 0 0",
     boxShadow: "none"
@@ -39,6 +39,7 @@ const gameUITabsStyle = {
     }
   },
   tabRootButton: {
+    padding: '3px 0px',
     minHeight: "unset !important",
     minWidth: "unset !important",
     width: "unset !important",
@@ -46,17 +47,30 @@ const gameUITabsStyle = {
     maxWidth: "unset !important",
     maxHeight: "unset !important",
     borderRadius: "3px 3px 0 0",
-    lineHeight: "6px",
     backgroundColor: "rgba(11, 19, 43, 0.5) !important",
     border: "0 !important",
-    color: "#fff !important",
-    fontWeight: "500",
-    fontSize: "12px",
   },
   tabSelected: {
     backgroundColor: "rgba(11, 19, 43, 1) !important",
     transition: "0.2s background-color 0.1s"
   },
+  tabWrapper: {
+    padding: '0 12px',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    letterSpacing: 'normal',
+    fontWeight: 500,
+    fontSize: 12,
+    height: 12,
+    color: "#fff !important",
+    "&>svg": {
+      fontSize: 'inherit',
+      position: 'relative',
+      left: 10,
+      transform: 'scale(1.1)'
+    },
+  }
 };
 
 export default gameUITabsStyle;

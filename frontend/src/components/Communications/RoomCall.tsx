@@ -235,8 +235,8 @@ export default class RoomCall extends React.Component<{}, State> {
                       let username = peerId;
                       let avatar= "avatars_1_1";
                       if (peerId in usePlayerStore.getState().users_info) {
-                        username = usePlayerStore.getState().users_info[peerId].username;
-                        avatar = usePlayerStore.getState().users_info[peerId].avatar;
+                        username = usePlayerStore.getState().users_info[peerId]?.username;
+                        avatar = usePlayerStore.getState().users_info[peerId]?.avatar;
                       }
                       if (consumerMedia)
                         item = (
