@@ -22,6 +22,7 @@ class Phaser extends React.Component {
 
   componentWillUnmount() {
     this.game.input.events.emit('unsubscribe');
+    this.game.destroy();
   }
 
   resizePhaser = (width, height) => {
