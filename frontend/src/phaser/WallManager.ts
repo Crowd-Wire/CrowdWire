@@ -23,50 +23,7 @@ class WallManager {
         if (!WallManager._instance) {
             this.wallLayer = wallLayer;
             this.roofLayer = roofLayer;
-            const { width, height } = wallLayer;
-            this.data = Array.from(Array(height), _ => Array(width).fill(0));
-            this.firstGids = Array.from(Array(height), _ => Array(width).fill(0));
-
-            for (let y = 0; y < height; y++)
-                for (let x = 0; x < width; x++) {
-                    const tile = wallLayer.data[y][x];
-
-                    if (y === 0 || tile.index === -1
-                        || wallLayer.data[y - 1][x].index === -1) {
-                        continue;
-                    }
-                    // TODO: Fix error when tileset is not loaded
-                    let id = tile.index - tile.tileset.firstgid;
-                    if (id < 7 || 12 < id) {
-                        // Search correct id
-                        if (wallLayer.data[y - 2][x].index - tile.tileset.firstgid === 13
-                            || roofLayer.data[y - 2][x].index - tile.tileset.firstgid === 6) {
-                            id = 7;
-                        } else {
-                            continue;
-                        }
-                    }
-                    if ([8, 9].includes(id)) {
-                        this.data[y - 1][x] |= WallManager.LOCKED_TOP;
-                        y + 1 < height && (this.data[y + 1][x] |= WallManager.LOCKED_BOT);
-                    } else if (id === 10) {
-                        this.data[y - 1][x + 1] |= WallManager.LOCKED_TOP;
-                        this.data[y + 1][x + 1] |= WallManager.LOCKED_BOT;
-
-                        // Hack to address an id to the door empty tile
-                        this.data[y][x + 1] |= 11;
-                        this.firstGids[y][x + 1] = tile.tileset.firstgid;
-                    } else if (id === 12) {
-                        this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
-                        this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT;
-
-                        // Hack to address an id to the door empty tile
-                        this.data[y][x - 1] |= 11;
-                        this.firstGids[y][x - 1] = tile.tileset.firstgid;
-                    }
-                    this.data[y][x] |= id;
-                    this.firstGids[y][x] |= tile.tileset.firstgid;
-                }
+            this.buildData();
             WallManager._instance = this;
         }
         return WallManager._instance;
@@ -130,6 +87,55 @@ class WallManager {
             fill[i] && this.wallLayer.tilemapLayer.fill(fill[i], x, y + i - 2, 1, 1);
             fillRoof[i] && this.roofLayer.tilemapLayer.fill(fillRoof[i], x, y + i - 2, 1, 1);
         }
+    }
+
+    buildData(): WallManager {
+        const { wallLayer, roofLayer } = this;
+        const { width, height } = wallLayer;
+        this.data = Array.from(Array(height), _ => Array(width).fill(0));
+        this.firstGids = Array.from(Array(height), _ => Array(width).fill(0));
+
+        for (let y = 0; y < height; y++)
+            for (let x = 0; x < width; x++) {
+                const tile = wallLayer.data[y][x];
+
+                if (y === 0 || tile.index === -1
+                    || wallLayer.data[y - 1][x].index === -1) {
+                    continue;
+                }
+                // TODO: Fix error when tileset is not loaded
+                let id = tile.index - tile.tileset.firstgid;
+                if (id < 7 || 12 < id) {
+                    // Search correct id
+                    if (wallLayer.data[y - 2][x].index - tile.tileset.firstgid === 13
+                        || roofLayer.data[y - 2][x].index - tile.tileset.firstgid === 6) {
+                        id = 7;
+                    } else {
+                        continue;
+                    }
+                }
+                if ([8, 9].includes(id)) {
+                    this.data[y - 1][x] |= WallManager.LOCKED_TOP;
+                    y + 1 < height && (this.data[y + 1][x] |= WallManager.LOCKED_BOT);
+                } else if (id === 10) {
+                    this.data[y - 1][x + 1] |= WallManager.LOCKED_TOP;
+                    this.onBounds(x + 1, y + 1) && (this.data[y + 1][x + 1] |= WallManager.LOCKED_BOT);
+
+                    // Hack to address an id to the door empty tile
+                    this.data[y][x + 1] |= 11;
+                    this.firstGids[y][x + 1] = tile.tileset.firstgid;
+                } else if (id === 12) {
+                    this.data[y - 1][x - 1] |= WallManager.LOCKED_TOP;
+                    this.onBounds(x - 1, y + 1) && (this.data[y + 1][x - 1] |= WallManager.LOCKED_BOT);
+
+                    // Hack to address an id to the door empty tile
+                    this.data[y][x - 1] |= 11;
+                    this.firstGids[y][x - 1] = tile.tileset.firstgid;
+                }
+                this.data[y][x] |= id;
+                this.firstGids[y][x] |= tile.tileset.firstgid;
+            }
+        return this;
     }
 
     checkPlace(type: WallType, x: number, y: number): boolean {
@@ -241,6 +247,18 @@ class WallManager {
             this.fill(z, y);
         }
         return [endLeft, endRight];
+    }
+
+    removeLine(y: number): void {
+        for (let x = 0; x < this.wallLayer.width; x++) {
+            this.remove(x, y);
+        }
+    }
+
+    removeColumn(x: number): void {
+        for (let y = 0; y < this.wallLayer.height; y++) {
+            this.remove(x, y);
+        }
     }
 }
 

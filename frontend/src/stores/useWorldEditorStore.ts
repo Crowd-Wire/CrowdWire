@@ -28,7 +28,7 @@ export interface Conference {
     color: string;
 }
 
-interface Layer {
+export interface Layer {
     visible: boolean;
     blocked: boolean;
     active: boolean;
@@ -45,6 +45,7 @@ const useWorldEditorStore = create(
     combine(
         {
             ready: false,
+            resized: false,
             grid: false,
             highlight: false,
             save: false,
