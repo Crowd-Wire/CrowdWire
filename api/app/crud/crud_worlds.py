@@ -165,7 +165,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             del update_data['creator']
 
         if 'tags' in update_data:
-            # TODO Check best way to do this
             lst = []
             # Obtain the Tag Objects
             for tag_name in update_data['tags']:
@@ -235,7 +234,6 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
             query = query.join(World.tags).filter(Tag.name.in_(tags))
 
         ord = desc if order == 'desc' else asc
-        # TODO: change this to add more filters, also change the name of this one it is only an example
         if order_by == 'timestamp':
             query = query.order_by(ord(World.creation_date))
 

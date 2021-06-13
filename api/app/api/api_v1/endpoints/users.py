@@ -12,7 +12,6 @@ from app.schemas import ReportUserInDB, ReportUserCreate, ReportUserInDBDetailed
 router = APIRouter()
 
 
-# TODO: Endpoint to get all/specific user(s), idk
 @router.get("/me", response_model=schemas.UserInDB)
 async def user_in_request(
         current_user: models.User = Depends(deps.get_current_user)
