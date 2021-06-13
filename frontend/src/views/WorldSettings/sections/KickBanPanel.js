@@ -32,9 +32,11 @@ export default function KickBanPanel(props){
 	const [rows, setRows] = React.useState([]);
 	const settingSelElement = (key) => {
 		setSelectedElement(Number.parseInt(key))
+		selectButtons(key);
 	};
 
-	useEffect(() => {
+	const getUsers = (change) => {
+		console.log(props.world)
 		if(props.world.length===1)
 			WorldService.getAllWorldUsers(props.world)
 			.then((res) => {
@@ -45,9 +47,8 @@ export default function KickBanPanel(props){
 				let users = {};
 				if(res.length!==undefined){
 					res.forEach((worldUsers)=>{
-						console.log(worldUsers)
 						users[worldUsers.user_id]={"avatar":worldUsers.avatar,"role_id":worldUsers.role_id,"username":worldUsers.username, "status": worldUsers.status};
-						if(flag){
+						if(change && flag){
 							setSelectedElement(worldUsers.user_id)
 							flag=false;
 						}
@@ -55,13 +56,40 @@ export default function KickBanPanel(props){
 					setWorldUsers(users);
 				}
 			});
+	}
+	const [selectionButtons, setSelectionButtons] = React.useState(<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
+							</Row>);
+	
+	const selectButtons = (key) => {
+		console.log(key)
+		if(Number.parseInt(worldUsers[key].status)===0){
+			setSelectionButtons(<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
+				<Button variant="danger" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto", marginLeft:"15px"}}  onClick={()=>changeStatus(1)}>Ban</Button>{' '}
+			</Row>);
+		}
+		else if(Number.parseInt(worldUsers[key].status)===1){
+			setSelectionButtons(
+				<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
+					<Button variant="success" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto", marginLeft:"15px"}} onClick={()=>changeStatus(0)}>Allow</Button>{' '}
+				</Row>
+			);
+		}
+		else{
+			setSelectionButtons(
+				<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}/>
+			);
+		}
+	}
+	useEffect(() => {
+		getUsers(true)
 	},[props.world])
 
 	useEffect(() => {
 		let userRows = [];
+		console.log(props.world)
 		Object.keys(worldUsers).forEach((key) => {
 			if(worldUsers.length !== 0){
-				if(Number.parseInt(worldUsers[key].status)===0)
+				if(Number.parseInt(worldUsers[key].status)===0){
 					userRows.push(
 						<Row
 							onClick={()=>{settingSelElement(key)}}
@@ -76,7 +104,8 @@ export default function KickBanPanel(props){
 							</Typography>
 						</Row>
 					);
-				if(Number.parseInt(worldUsers[key].status)===1)
+				}
+				else if(Number.parseInt(worldUsers[key].status)===1){
 					userRows.push(
 						<Row
 							onClick={()=>{settingSelElement(key)}}
@@ -91,21 +120,10 @@ export default function KickBanPanel(props){
 							</Typography>
 						</Row>
 					);
-				if(Number.parseInt(worldUsers[key].status)===2)
-					userRows.push(
-						<Row
-							onClick={()=>{settingSelElement(key)}}
-							className={ selectedElement === Number.parseInt(key) ? classes.selectedDeleted : null }
-							id={key} key={"user_"+key} style={{height:"40px", border:"solid #f5e900 1px", borderRadius:"10px", marginTop:"3px", width:"98%", marginLeft:"1%", cursor:"pointer"}}
-						>
-							<Typography variant="h6" style={{marginLeft:"10px", marginTop:"auto", marginBottom:"auto"}}>
-								{worldUsers[key].username}
-							</Typography>
-							<Typography variant="caption" style={{marginLeft:"5px"}}>
-								<em>#{key}</em>
-							</Typography>
-						</Row>
-					);
+				}
+			}
+			if(Number.parseInt(key)===selectedElement){
+				selectButtons(key);
 			}
 		});
 		setRows(userRows);
@@ -113,12 +131,14 @@ export default function KickBanPanel(props){
 
 	useEffect(()=>{
 		let newReportBoxes = [];
-		if(selectedElement>=0){
+		if(selectedElement>=0 && props.world.length===1){
+			console.log(props.world)
 			UserService.getUserReports(props.world, null, selectedElement, null, null, null, null, null, null)
 			.then((res)=>{
 				return res.json();
 			})
 			.then((res)=>{
+				console.log(res)
 				if(res.length>0){
 					for(let i=0; i<res.length; i++){
 						res[i].world_name = res[i].comment;
@@ -132,7 +152,7 @@ export default function KickBanPanel(props){
 					setReportBoxes(newReportBoxes);
 				}
 				else{
-					setReportBoxes(<Typography variant="h5">No unreviewed reports for this user</Typography>);
+					setReportBoxes(<Typography variant="h5"> This user has no pending reports</Typography>)
 				}
 			})
 		}
@@ -144,19 +164,22 @@ export default function KickBanPanel(props){
 			return res.json();
 		})
 		.then((res)=>{
-			if(res.status===status)
-				if(res.status===1){
+			if(res.status===status){
+				if(Number.parseInt(res.status)===1){
 					toast.success("User was banned successfully!", {
-						position: toast.POSITION.TOP_CENTER
-					});		
-				}
-				else if(res.status===2){
-					toast.success("User was deleted successfully!", {
 						position: toast.POSITION.TOP_CENTER
 					});
 				}
+				else if(Number.parseInt(res.status)===0){
+					toast.success("User is now allowed in this world!", {
+						position: toast.POSITION.TOP_CENTER
+					});
+				}
+				getUsers(false)
+			}
 		})
 	}
+
 	return(
 		<div
 		role="tabpanel"
@@ -189,16 +212,7 @@ export default function KickBanPanel(props){
 									{reportBoxes}
 								</Col>
 							</Row>
-							{Number.parseInt(worldUsers[selectedElement].status)===0 ?
-								<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
-									<Button variant="warning" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto", marginLeft:"15px"}} onClick={()=>changeStatus(2)}>Delete</Button>{' '}
-									<Button variant="danger" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto"}}  onClick={()=>changeStatus(1)} >Ban</Button>{' '}
-								</Row>
-								:
-								<Row style={{marginTop:"3px", height:"12%", backgroundColor:"#0B132B", borderBottomRightRadius:"10px"}}>
-									<Button variant="success" size="sm" style={{height:"80%", minWidth:"70px", marginRight:"10px", marginTop:"auto",marginBottom:"auto", marginLeft:"15px"}} onClick={()=>changeStatus(0)}>Allow</Button>{' '}
-								</Row>
-							}
+							{selectionButtons}
 					</Col>
 				</Row>
 			)}
