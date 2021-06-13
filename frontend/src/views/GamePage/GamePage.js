@@ -35,6 +35,7 @@ const GamePage = (props) => {
   const [username, setUsername] = useState('')
   const [avatar, setAvatar] = useState("avatars_1_1")
   let connecting = usePlayerStore(state => state.connecting);
+  let reconnect = null;
 
   const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -133,6 +134,20 @@ const GamePage = (props) => {
         }
       )
   }
+
+  useEffect(() => {
+    if (connecting && !reconnect) {
+      reconnect = setInterval(() => {
+        let socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket
+        console.log(socket)
+        if (socket && socket.readyState === 1) {
+          clearInterval(reconnect);
+          reconnect = null;
+          usePlayerStore.getState().setConnecting(false);
+        }
+      }, 5000);
+    }
+  }, [connecting])
 
   return (
     <>
