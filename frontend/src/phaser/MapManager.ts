@@ -289,7 +289,6 @@ class MapManager {
                         Array(width - this.map.width), 
                         (_, x) => new Tilemaps.Tile(layer, -1, x + this.map.width, y, 32, 32, 32, 32)));
                 }
-                console.log(layer)
             }
             layer.width = width;
             layer.height = height;
