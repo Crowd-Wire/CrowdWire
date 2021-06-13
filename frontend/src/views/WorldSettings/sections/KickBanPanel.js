@@ -15,9 +15,6 @@ const useStyles = makeStyles((theme) => ({
 	selected: {
 	  backgroundColor:"#54B5B4",
 	},
-	selectedDeleted: {
-		backgroundColor:"#f5e900",
-	},
 	selectedBanned: {
 		backgroundColor:"#e01212",
 	},
