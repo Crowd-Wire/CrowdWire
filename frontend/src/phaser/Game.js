@@ -1,7 +1,9 @@
 import * as Phaser from 'phaser';
-import BootScene from './BootScene';
-import GameScene from './GameScene';
-import FillTilesScene from './FillTilesScene';
+
+import BootScene from './scenes/BootScene.js';
+import GameScene from './scenes/GameScene.js';
+import WorldEditorScene from './scenes/WorldEditorScene.js';
+
 
 const gameConfig = {
   title: 'Sample',
@@ -10,57 +12,43 @@ const gameConfig = {
 
   // prevent the blur of the textures when scaled
   pixelArt: true, 
-  zoom: 2,
-
-  // width: window.innerWidth,
-  // height: window.innerHeight,
 
   scale: {
-      parent: "game-container",
-
-      // mode: Phaser.Scale.WIDTH_CONTROLS_HEIGHT,
-      // mode: Phaser.DOM.RESIZE,
-
-      // mode: Phaser.DOM.ENVELOP,
-      // autoCenter: Phaser.DOM.CENTER_BOTH,
-
-      // mode: Phaser.Scale.FIT,
-
-      // mode: Phaser.Scale.RESIZE,
-
-      mode: Phaser.DOM.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-
-      width: '100%',
-      height: '100%',
-      // min: {
-      //   width: 800,
-      //   height: 800
-      // },
-      max: {
-        width: window.innerWidth,
-        height: window.innerHeight
-      }
+    parent: "game-container",
+    mode: Phaser.Scale.RESIZE,
+    autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+    width: '100%',
+    height: '100%',
+    // max: {
+    //   width: window.innerWidth,
+    //   height: window.innerHeight
+    // }
   },
 
   // autoResize: true,//n faz nasda
   physics: {
     default: 'arcade',
     arcade: {
-        debug: true,
-        gravity: { y: 0 }
-    }
+      debug: false,
+      gravity: { y: 0 },
+      fps: 60,
+    },
   },
-  scene: [
-    BootScene,
-    GameScene,
-    FillTilesScene
-  ],
-  backgroundColor: '#434366',
 };
 
+const sceneConfig = {
+  GameScene: {
+    zoom: 2,
+    scene: [BootScene, GameScene],
+  },
+  WorldEditorScene: {
+    zoom: 1,
+    scene: [BootScene, WorldEditorScene],
+  }
+}
 
-export function setupGame() {
-  const game = new Phaser.Game(gameConfig);
+export function setupGame(scene) {
+  const game = new Phaser.Game({...gameConfig, ...sceneConfig[scene]});
+  game.registry.set('scene', scene);
   return game;
 }

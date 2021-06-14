@@ -1,74 +1,214 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import UserPermissions from 'views/WorldSettings/sections/UserPermissions.js';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import CheckIcon from '@material-ui/icons/Check';
+import RoleUserList from 'components/RoleUserList/RoleUserList.js';
+import RoleService from 'services/RoleService.js';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import Button from "@material-ui/core/Button";
+import { toast } from 'react-toastify';
 
 export default function RolePanel(props){
-	const { children, users, roles,value, index, ...other } = props;
-	console.log(index+","+value+children);
-	let rows = [];
-	let rolekeys = [];
-    for(let i=0; i<users.length; i++){
-      rows.push(
-		<Row style={{height:"50px"}}>
-			<Typography variant="h4" style={{marginLeft:"10px",fontSize:"2em", marginTop:"auto", marginBottom:"auto"}}>{users[i]}</Typography>
-			<CheckIcon style={{marginTop:"auto", marginBottom:"auto", float:"right"}}/>
-		</Row>
-	  );
-    }
-	Object.keys(roles).forEach(function(key) {
-		console.log(key,roles[key]);
-		rolekeys.push(
-			<Row style={{marginTop:"5px"}}>
-				<Typography variant="h5">{key}</Typography>
-			</Row>
-		);
-	});
+	const { children, users, value, index , ...other } = props;
+	const [roles, setRoles] = React.useState([]);
+	const [rolekeys,setRolekeys] = React.useState([]);
+	const [showDialog, setShowDialog] = React.useState(false);
+	const [name, setName] = React.useState("");
+	const [usersInRole, setUsersInRole] = React.useState([]);
+	const [roleAmount, setRoleAmount] = React.useState(0);
+	const [selectedRole, setSelectedRole] = React.useState({});
+	const [roleId, setRoleId] = React.useState(-1);
+	let roleUsers;
+
+	const handleClose = () => {
+		setShowDialog(false);
+	};
+
+	const setUsers = (item, rId) => {
+		RoleService.assignRoleToUser(props.world,rId,item.id)
+		.then((res)=>{
+			return res.json();
+		})
+		.then((res)=>{
+			setUsersInRole(prevUsersInRole => {
+				const usersInRole = {...prevUsersInRole};
+				const userId = item.id;
+	
+				for (let [key, value] of Object.entries(usersInRole)) {
+					if (value.user_id == userId) {
+						value.role_id = Number(rId);
+						break;
+					}
+				}
+	
+				let temp = [];
+	
+				Object.keys(roles).forEach((key) => {
+					let roleUsers = [];
+					for(let user of Object.values(usersInRole)){
+						if(user.role_id===parseInt(key)){
+							roleUsers.push(user);
+						}
+					}
+	
+					temp.push(
+						<div id={key} key={key} index={key}>
+							<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
+						</div>
+					);
+				});
+				setRolekeys(temp);
+	
+				return usersInRole;
+			})
+		})
+	}
+
+	const confirm = () => {
+		if(name===""){
+			toast.error("Name cannot be empty!", {
+				position: toast.POSITION.TOP_CENTER
+			});
+			return;
+		}
+		RoleService.addRole(props.world,name).then((res)=>{
+			if(res.status!==200){
+				toast.error("Something went wrong!", {
+					position: toast.POSITION.TOP_CENTER
+				});
+				return null;
+			}
+			return res.json();
+		})
+		.then((res)=>{
+			if(!res)
+				return;
+			setRoles([]);
+			toast.success("Role added successfully!", {
+				position: toast.POSITION.TOP_CENTER
+			});
+			setShowDialog(false)
+		});
+	};
+
+	const handleChange = (event) => {
+		setName(event.target.value);
+	};
+
+	const selectRole = (key) =>{
+		setSelectedRole(roles[key]);
+		setRoleId(key)
+	}
+
+	useEffect(()=>{
+		if(roles.length===0 && props.world.split("/").length===1){
+			RoleService.getAllRoles(props.world)
+			.then((res) => {
+				return res.json();
+			})
+			.then((res) => {
+				let newRoles = {};
+				if(res.length!==undefined){
+					res.forEach((role)=>{
+						newRoles[role.role_id]={"ban":role.ban,"chat":role.chat,"conference_manage":role.conference_manage,"invite":role.invite,"is_default":role.is_default,"name":role.name,"role_manage":role.role_manage,"talk":role.talk,"talk_conference":role.talk_conference,"walk":role.walk,"world_mute":role.world_mute, "interact":role.interact};
+					})
+					setRoles(newRoles);
+				}
+			});
+			RoleService.getWorldUsersWRoles(props.world)
+			.then((res)=>{
+				return res.json();
+			})
+			.then((res)=>{
+				setRoleAmount(res.length)
+				setUsersInRole(res);
+			})
+		}
+		else if(roles && roles.length!==0 && usersInRole.length!== 0 && usersInRole.length === roleAmount){
+			let temp = [];
+			let flag = true;
+			Object.keys(roles).forEach((key) => {
+				if(flag){
+					setSelectedRole(roles[key]);
+					setRoleId(key)
+					flag=false;
+				}
+
+				roleUsers = [];
+				if(usersInRole.length){
+					let i = 0;
+					for(let user of usersInRole){
+						if(user.role_id===parseInt(key)){
+							roleUsers.push(user);
+						}
+						i++;
+					}
+				}
+				temp.push(
+					<div id={key} key={key}>
+						<RoleUserList selectRole={selectRole} roleId={key} setUsers={setUsers} roleName={roles[key].name} value={roleUsers} allRoles={Object.keys(roles)}/>
+					</div>
+				);
+				setRolekeys(temp);
+			})
+			setRoleAmount(0)
+		}
+	},[roles, props.world, usersInRole])
+
+
+
 	return(
 		<div
-		role="tabpanel"
-		hidden={value !== index}
-		id={`simple-tabpanel-${index}`}
-		aria-labelledby={`simple-tab-${index}`}
-		{...other}
+			role="tabpanel"
+			hidden={value !== index}
+			id={`simple-tabpanel-${index}`}
+			aria-labelledby={`simple-tab-${index}`}
+			{...other}
 		>
 			{value === index && (
-				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
-					<Col xs={3} sm={3} md={3} style = {{borderRight:"1px solid black",height:"100%"}}>
-						<Row style={{ height:"10%"}}>
-							<Typography variant="h5" style={{marginTop:"10px", marginLeft:"10px"}}>Roles:</Typography>
-						</Row>
-						<hr/>
-						<Row style={{overflowY:"auto", height:"65%"}}>
+				<Row style={{borderStyle:"solid", borderColor:"black", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
+					<Col xs={4} sm={4} md={4} style = {{borderRight:"1px solid black",height:"100%"}}>
+						<Row style={{overflowY:"auto", height:"80%"}}>
 							<Col style={{marginLeft:"10px"}}>
 								{rolekeys}
 							</Col>
 						</Row>
-						<Row style={{position:"absolute", bottom:"0", height:"15%", width:"100%",borderTop:"1px solid black"}}>
+						<Row style={{cursor:"pointer", position:"absolute", bottom:"0", height:"15%", width:"100%",borderTop:"1px solid black"}} onClick={()=>{setShowDialog(true);}}>
 							<Typography variant="h5" style={{margin:"auto"}}><AddIcon/>Add Role</Typography>
 						</Row>
 					</Col>
-					<Col xs={6} sm={6} md={6}>
-						<UserPermissions/>				
-					</Col>
-					<Col xs={3} sm={3} md={3} style={{height:"100%", borderLeft:"solid 1px black"}}>
-						<Row style={{ height:"10%"}}>
-							<TextField id="filled-search" label="Search field" type="search" variant="filled" style={{width:"100%"}}/>
-							{/* <Typography variant="h5" style={{marginLeft:"10px", marginTop:"10px"}}>Users:</Typography> */}
-						</Row>
-						<hr/>
-						<Row style={{overflowY:"auto", height:"80%"}}>
-							<Col>
-								{rows}
-							</Col>
-						</Row>
+					<Col xs={8} sm={8} md={8}>
+						<UserPermissions setRoles={setRoles} world_id={props.world} roleName={selectedRole} roleId={roleId}/>				
 					</Col>
 				</Row>
 			)}
+			<Dialog open={showDialog} onClose={handleClose} aria-labelledby="form-dialog-title">
+				<DialogTitle id="form-dialog-title">Add role</DialogTitle>
+				<DialogContent>
+					<TextField
+					autoFocus
+					margin="dense"
+					id="name"
+					label="Role Name"
+					type="string"
+					onChange={handleChange}
+					/>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleClose} color="primary">
+						Cancel
+					</Button>
+					<Button onClick={confirm} color="primary">
+						Add
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 }

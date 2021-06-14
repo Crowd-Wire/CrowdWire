@@ -8,6 +8,7 @@ import Tab from "@material-ui/core/Tab";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
+import CloseIcon from '@material-ui/icons/Close';
 
 import { useDrag } from "react-dnd";
 
@@ -26,15 +27,15 @@ const GameUITabs = (props) => {
   };
   const { classes, headerColor, plainTabs, tabs } = props;
 
-  const [{ opacity }, drag, preview] = useDrag(() => ({
-		type: DragTypes.CARD,
-		collect: (monitor) => ({
-			opacity: monitor.isDragging() ? 0.4 : 1,
-		}), 
-	}));
+  // const [{ opacity }, drag, preview] = useDrag(() => ({
+	// 	type: DragTypes.CARD,
+	// 	collect: (monitor) => ({
+	// 		opacity: monitor.isDragging() ? 0.4 : 1,
+	// 	}), 
+	// }));
 
   return (
-    <Card ref={preview} plain={plainTabs} classes={{ card: classes.card }} >
+    <Card plain={plainTabs} classes={{ card: classes.card }} > {/*ref={preview}*/}
       <CardHeader
         // ref={drag}
         classes={{ cardHeader: classes.cardHeader }}
@@ -51,7 +52,7 @@ const GameUITabs = (props) => {
         >
           {tabs.map((prop, key) => (
               <Tab 
-                ref={drag}
+                // ref={drag}
                 classes={{
                   root: classes.tabRootButton,
                   label: classes.tabLabel,
@@ -59,18 +60,18 @@ const GameUITabs = (props) => {
                   wrapper: classes.tabWrapper
                 }}
                 key={key}
-                label={prop.tabName}
+                label={
+                  <>
+                    {prop.tabName}
+                    {/* {value === key && <CloseIcon onClick={() => console.log('close')} />} */}
+                  </>
+                }
               />
           ))}
         </Tabs>
       </CardHeader>
-      <CardBody classes={{ cardBody: classes.cardBody }}>
-        {tabs.map((prop, key) => {
-          if (key === value) {
-            return <div key={key}>{prop.tabContent}</div>;
-          }
-          return null;
-        })}
+      <CardBody classes={{ cardBody: classes.cardBody }} >
+        {tabs[value].tabContent}
       </CardBody>
     </Card>
   )

@@ -338,9 +338,7 @@ master:
   ## Commands will be completely disabled by renaming each to an empty string.
   ## ref: https://redis.io/topics/security#disabling-of-specific-commands
   ##
-  disableCommands:
-    - FLUSHDB
-    - FLUSHALL
+  disableCommands: {}
 
   ## Redis(TM) Master additional pod labels and annotations
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
@@ -572,9 +570,7 @@ slave:
   extraFlags: []
   ## List of Redis(TM) commands to disable
   ##
-  disableCommands:
-    - FLUSHDB
-    - FLUSHALL
+  disableCommands: {}
 
   ## Redis(TM) Slave pod/node affinity/anti-affinity
   ##
@@ -666,6 +662,8 @@ slave:
     ## The path the volume will be mounted at, useful when using different
     ## Redis(TM) images.
     ##
+    storageClass: "nfs-client" 
+    storageClassName: "nfs-client"
     path: /data
     ## The subdirectory of the volume to mount to, useful in dev environments
     ## and one PV for multiple services.

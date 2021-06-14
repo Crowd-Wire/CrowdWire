@@ -56,6 +56,14 @@ const signupPageStyle = {
     padding: "20px 0",
     marginBottom: "15px"
   },
+  textField: {
+    marginLeft:"auto", 
+    marginRight:"auto",
+    width: 200,
+    '& p':{
+      color:'red'
+    },
+  },
   socialIcons: {
     maxWidth: "24px",
     marginTop: "0",

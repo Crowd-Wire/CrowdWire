@@ -1,0 +1,41 @@
+
+name: Push to DockerHub
+
+on:
+  pull_request:
+      branches:
+          - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: docker login
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}   
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} 
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - uses: actually-colab/github-action-create-env-file@v2.3
+      name: Make envfile for MediaSoup
+      with:
+        envkey_SENTRY_DNS: ${{ secrets.SENTRY_DNS }}
+        envkey_MAX_CONSUMERS_PER_WORKER: 480
+        directory: ./media_server
+        file_name: .env      
+    - name: Build FastAPI
+      run: |
+        docker build ./api -t dagomes/api:latest 
+    - name: Build MediaSoup
+      run: |
+        ls -a ./media_server
+        docker build ./media_server -t dagomes/mediaserver:latest 
+    - name: Build Frontend
+      run: |
+        docker build ./frontend -t dagomes/frontend:latest
+    - name: docker push
+      run: |
+        docker push dagomes/api:latest
+        docker push dagomes/mediaserver:latest
+        docker push dagomes/frontend:latest

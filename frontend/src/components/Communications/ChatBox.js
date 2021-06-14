@@ -49,7 +49,7 @@ function ChatBox(props) {
                                 <div className="message-container">
                                     <div className={`message-wrapper ${!userData.userID ? 'message-wrapper-right' : ''}`}>
                                         <div className="message-title-wrapper">
-                                            <h5 className="message-name">{userData?.name}</h5>
+                                            <h5 className="message-name">{useWorldUserStore.users_info[userData.userID]?.username}</h5>
                                             <span className="message-timestamp">{getMessageDateOrTime(message.timestamp)}</span>
                                         </div>
                                         <p className="actual-message">{message.message}</p>

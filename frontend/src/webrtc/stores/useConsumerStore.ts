@@ -1,0 +1,273 @@
+import { Consumer, DataConsumer } from "mediasoup-client/lib/types";
+import create from "zustand";
+import { combine } from "zustand/middleware";
+import { useRoomStore } from "./useRoomStore";
+
+export const useConsumerStore = create(
+  combine(
+    {
+      consumerMap: {} as Record<
+        string,
+        {
+          roomId: string;
+          consumerAudio: Consumer;
+          consumerVideo: Consumer;
+          consumerMedia: Consumer;
+          dataConsumer: DataConsumer;
+          volume: number;
+          active: boolean;
+          videoToggle: boolean;
+          audioToggle: boolean;
+        }
+      >,
+    },
+    (set) => ({
+      setVolume: (userId: string, volume: number) => {
+        set((s) =>
+          userId in s.consumerMap
+            ? {
+                consumerMap: {
+                  ...s.consumerMap,
+                  [userId]: {
+                    ...s.consumerMap[userId],
+                    volume,
+                  },
+                }
+              }
+            : s
+        );
+      },
+      addDataConsumer: (c: DataConsumer, userId: string, roomId: any) => {
+        set((s) => {
+          let ori_consumer : {
+            roomId: string;
+            consumerAudio: Consumer;
+            consumerVideo: Consumer;
+            consumerMedia: Consumer;
+            dataConsumer: DataConsumer;
+            volume: number;
+            active: boolean;
+            videoToggle: boolean;
+            audioToggle: boolean;
+          } = {roomId: roomId, consumerAudio: null, consumerMedia: null, consumerVideo: null, dataConsumer: null,
+            volume: null, active: null, videoToggle: null, audioToggle: null};
+          let consumer_map = {...s.consumerMap};
+          if (consumer_map[userId]) {
+            consumer_map[userId].dataConsumer = c;
+          } else{
+            ori_consumer.dataConsumer = c;
+            consumer_map[userId] = ori_consumer;
+          }
+          return {
+            consumerMap: consumer_map,
+          }
+        });
+      },
+      add: (c: Consumer, roomId:string, userId: string, kind: string) =>
+        set((s) => {
+          let volume = 100;
+          let consumerAudio = null;
+          let consumerVideo = null;
+          let consumerMedia = null;
+          let dataConsumer = null;
+          let videoToggle = false;
+          let audioToggle = false;
+          
+          if (kind === 'audio')
+            consumerAudio = c;
+          else if (kind === 'video')
+            consumerVideo = c;
+          else
+            consumerMedia = c;
+
+          if (userId in s.consumerMap) {
+            const x = s.consumerMap[userId];
+            volume = x.volume;
+            dataConsumer = x.dataConsumer;
+            videoToggle = x.videoToggle;
+            audioToggle = x.audioToggle;
+            if (kind === "audio") {
+              consumerVideo = x.consumerVideo;
+              consumerMedia = x.consumerMedia;
+              if (x.consumerAudio) x.consumerAudio.close();
+            } else if (kind === "video") {
+              consumerAudio = x.consumerAudio;
+              consumerMedia = x.consumerMedia;
+              if (x.consumerVideo) x.consumerVideo.close();
+            } else {
+              consumerAudio = x.consumerAudio;
+              consumerVideo = x.consumerVideo;
+              if (x.consumerMedia) x.consumerMedia.close();
+            }
+          }
+          return {
+            consumerMap: {
+              ...s.consumerMap,
+              [userId]: {
+                consumerAudio,
+                consumerVideo,
+                consumerMedia,
+                dataConsumer,
+                volume,
+                active: false,
+                videoToggle,
+                audioToggle,
+                roomId
+              },
+            }
+          }
+        }),
+      addAudioToggle: (userId: string, audioToggle: boolean) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            let user = {...s.consumerMap[userId]}
+            user.audioToggle = audioToggle
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      addVideoToggle: (userId: string, videoToggle: boolean) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            let user = {...s.consumerMap[userId]}
+            user.videoToggle = videoToggle
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      closeMedia: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            s.consumerMap[userId].consumerMedia?.close();
+            let user = {...s.consumerMap[userId]}
+            user.consumerMedia = null;
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      addActiveSpeaker: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            const user = {...s.consumerMap[userId]}
+            user.active = true
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      removeActiveSpeaker: (userId: string) =>
+        set((s) => {
+          if (s.consumerMap[userId]) {
+            const user = {...s.consumerMap[userId]}
+            user.active = false
+            return {
+              consumerMap: {
+                ...s.consumerMap,
+                [userId]: user,
+              }
+            };
+          }
+        }),
+      closeRoom: (roomId) =>
+        set((s) => {
+          let to_del_users = [];
+          for (const [key, value] of Object.entries(s.consumerMap)) {
+            if (value.roomId == roomId) {
+              if (value.consumerAudio && !value.consumerAudio.closed) {
+                value.consumerAudio.close()
+              }
+              if (value.consumerVideo && !value.consumerVideo.closed) {
+                value.consumerVideo.close()
+              }
+              if (value.consumerMedia && !value.consumerMedia.closed) {
+                value.consumerMedia.close()
+              }
+              if (value.dataConsumer && !value.dataConsumer.closed) {
+                value.dataConsumer.close()
+              }
+              to_del_users.push(key)
+            };
+          }
+          to_del_users.forEach((x) => delete s.consumerMap[x])
+          useRoomStore.getState().removeRoom(roomId);
+          
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          };
+        }),
+      checkRoomToClose: (roomId) =>
+        set((s) => {
+          let to_close = true;
+          for (const value of Object.values(s.consumerMap)) {
+            if (value.roomId == roomId) {
+              to_close = false;
+              break;
+            };
+          }
+          if (to_close) useRoomStore.getState().removeRoom(roomId);
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          }
+        }),
+      closeDataConsumers: () =>
+        set((s) => {
+          for (const [key, value] of Object.entries(s.consumerMap)) {
+            if (value.dataConsumer) {
+              value.dataConsumer.close()
+              s.consumerMap[key].dataConsumer = null;
+            };
+          }
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          }
+        }),
+      closePeer: (userId) =>
+        set((s) => {
+          let user = s.consumerMap[userId]
+          if (user) {
+            if (user.consumerAudio && !user.consumerAudio.closed) {
+              user.consumerAudio.close()
+            }
+            if (user.consumerVideo && !user.consumerVideo.closed) {
+              user.consumerVideo.close()
+            }
+            if (user.consumerMedia && !user.consumerMedia.closed) {
+              user.consumerMedia.close()
+            }
+            if (user.dataConsumer && !user.dataConsumer.closed) {
+              user.dataConsumer.close()
+            }
+            delete s.consumerMap[userId];
+            useConsumerStore.getState().checkRoomToClose(user.roomId);
+          }
+
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          };
+        })
+    })
+  )
+);

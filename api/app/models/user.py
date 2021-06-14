@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
@@ -9,11 +9,12 @@ class User(Base):
     """
 
     user_id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, index=True)
-    email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    name = Column(String(50), index=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    hashed_password = Column(String(256))
     birth = Column(Date)
     register_date = Column(DateTime, nullable=False)
     status = Column(Integer, nullable=False)
-
-    world = relationship("World")
+    is_superuser = Column(Boolean, nullable=False)
+    sub = Column(String(50))
+    worlds = relationship("World_User", back_populates="user")

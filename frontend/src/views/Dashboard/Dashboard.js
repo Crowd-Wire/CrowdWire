@@ -1,42 +1,63 @@
 import React, { Component } from "react";
 import CssBaseline from '@material-ui/core/CssBaseline';
-import SearchAllMaps from 'views/Dashboard/sections/SearchAllMaps.js';
-import DashboardContent from 'views/Dashboard/sections/DashboardContent.js';
+import SearchAllMaps from 'views/DashSearch/sections/SearchAllMaps.js';
+import DashboardContent from 'views/DashWorldDetails/sections/DashboardContent.js';
 import DashDrawer from 'components/DashDrawer/DashDrawer.js';
 import { withStyles } from '@material-ui/core/styles';
-
+import UserService from 'services/UserService.js';
 
 const useStyles = theme => ({
   root: {
     display: 'flex',
-    backgroundColor: '#5BC0BE',
     height:'100%',width:'100%', overflow:"auto"
   },
 });
 class Dashboard extends Component {
-  state={focus: false};
+
+  state={
+    focus: false,
+    joined:false,
+    fMap: null
+  };
   constructor(props){
     super(props);
   }
-  handler = (focused) => {
+
+  componentDidMount(){
+    UserService.getUserInfo()
+    .then((res) => {
+        if (res.status == 200)
+            return res.json();
+    })
+    .then( (res) => {
+      if (res)
+        this.setState({user_id:res.user_id});
+    }).catch((error) => {useAuthStore.getState().leave()});
+  };
+
+  userId = (my_id) => {
     this.setState({
-      focus: focused
+      my_id:my_id
+    })
+  }
+
+  // handler to change the state of the SearchAllMaps component based on the sidebar
+  sidebar_handler = (joined) => {
+    this.setState({
+      joined: joined,
     });
   }
-  unDo = () => {
-    console.log("fez?");
-    }
 
   render() {
     const { classes } = this.props;
     return(
       <div className={classes.root}>
         <CssBaseline />
-        <DashDrawer/>
+        <DashDrawer my_id={this.userId} handler={this.sidebar_handler}/>
         {this.state.focus ? 
-          <SearchAllMaps handler = {this.handler} />
+          <DashboardContent />
           :
-          <DashboardContent handler = {this.handler} />
+          <SearchAllMaps joined={this.state.joined} user_id={this.state.my_id}/>
         }
       </div>
     );

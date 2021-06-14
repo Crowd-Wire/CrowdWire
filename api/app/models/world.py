@@ -2,6 +2,7 @@ from app.db.base_class import Base
 from sqlalchemy import ForeignKey, Integer, Column, String, TIMESTAMP, LargeBinary, Boolean
 from sqlalchemy.orm import relationship
 from app.core.config import settings
+from .world_tag import world_tag
 
 
 class World(Base):
@@ -17,7 +18,9 @@ class World(Base):
     description = Column(String(300))
     max_users = Column(Integer)
     public = Column(Boolean, nullable=False)
+    allow_guests = Column(Boolean, nullable=False)
     world_map = Column(LargeBinary, nullable=False)
+    profile_image = Column(LargeBinary)
     status = Column(Integer, nullable=False)
-
-    tags = relationship("Tag", secondary="world_tag")
+    tags = relationship("Tag", lazy="subquery", secondary=world_tag)
+    users = relationship("World_User", back_populates="world")
