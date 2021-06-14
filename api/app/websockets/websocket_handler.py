@@ -4,6 +4,8 @@ from app.redis.connection import redis_connector
 from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
+import asyncio
+import time
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
@@ -72,10 +74,35 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     for uid in users_id:
         sorted_users = sorted([user_id, uid])
         common_key = f"world:{world_id}:lock:{sorted_users[0]}:{sorted_users[1]}"
-        if not await redis_connector.sadd(common_key, 1):
-            # hack to check if user already claimed proximity
-            add_users.add(uid)
-            await redis_connector.delete(common_key)
+
+        if uid < user_id:
+            threshold = 2
+            while True:
+                item = await redis_connector.rpop(f"{common_key}")
+                if item:
+                    # create group
+                    logger.info(f'[WIRE] user {user_id} criou o grupo | {item}')
+                    add_users.add(uid)
+                    break
+                if (threshold := threshold - .1):
+                    logger.info('[WIRE] IGNORE')
+                    # ignore
+                    break
+                await asyncio.sleep(.1)
+        else:
+            item = time.time()
+            logger.info(f'[WIRE] user {user_id} | {item}')
+            await redis_connector.lpush(f"{common_key}", item)
+
+        # if not (test:=await redis_connector.master.execute('sadd', common_key, 1)):
+        #     # hack to check if user already claimed proximity
+        #     logger.info(f'[WIRE] user {user_id} criou o grupo')
+        #     add_users.add(uid)
+        #     logger.debug(test)
+        #     await redis_connector.delete(common_key)
+        #     logger.debug(f" {user_id} deleted {common_key}")
+        # else:
+        #     logger.debug(test)
 
     actions = {}
     # create new group and let it normalize
@@ -128,6 +155,7 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         groups_to_remove = groups_to_remove['close-room']
     if add_users_id:
         # add user to a new group with the still nearby users
+        logger.info(f'[UNWIRE] user {user_id} criou o grupo')
         next_group_id = await redis_connector.get_next_group()
         await handle_actions(await redis_connector.add_users_to_group(world_id, next_group_id, *[user_id, *add_users_id]))
 

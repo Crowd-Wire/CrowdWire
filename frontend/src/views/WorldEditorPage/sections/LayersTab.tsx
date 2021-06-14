@@ -1,9 +1,10 @@
-import React, { Component, useState } from "react";
+import React, { Component, useState, useEffect } from "react";
 
 import { makeStyles } from '@material-ui/core/styles';
+import classNames from 'classnames';
 
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { Layer } from "stores/useWorldEditorStore";
 
 import Tooltip from "@material-ui/core/Tooltip";
 
@@ -22,42 +23,49 @@ import CategoryTwoToneIcon from '@material-ui/icons/CategoryTwoTone';
 import VideocamTwoToneIcon from '@material-ui/icons/VideocamTwoTone';
 import HomeWorkTwoToneIcon from '@material-ui/icons/HomeWorkTwoTone';
 
-import InfoIcon from '@material-ui/icons/Info';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
 
+import styles from 'assets/jss/my-kit-react/views/WorldEditorPage/tabHeaderStyle.js';
 
-
-interface LayerProps {
+interface SubLayerProps {
+  title: string;
   name: string;
-  object: boolean;
-  selected: boolean;
+  info: string;
 }
 
 const useLayerStyles = makeStyles({
   root: {
-    boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
-    margin: 2,
-    borderRadius: 5,
+    margin: '2px 0',
     display: 'flex',
     cursor: 'pointer',
+    backgroundColor: 'rgba(11, 19, 43, 0.5)',
+    color: 'white',
   },
-  name: {
+  title: {
+    marginLeft: 32,
+    padding: '0 10px',
     flexGrow: 1,
-    paddingLeft: 10,
-    fontSize: '1rem'
+    fontSize: 14,
+    fontWeight: 300,
   },
   buttons: {
     display: 'flex',
   },
-  button: {
-    fontSize: '1.125rem',
-    margin: '0 3px',
-  }
+  icon: {
+    fontSize: 16,
+    margin: '0 7px',
+  },
+  tooltip: {
+    backgroundColor: 'rgba(11, 19, 43, 1)',
+    fontSize: '0.8rem',
+  },
 });
 
-const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
+const SubLayer: React.FC<SubLayerProps> = ({ title, name, info }) => {
   const classes = useLayerStyles();
   let visible = useWorldEditorStore(state => state.layers[name].visible);
   let blocked = useWorldEditorStore(state => state.layers[name].blocked);
+  let selected = useWorldEditorStore(state => state.layers[name].active);
 
   const handleVisible = (event) => {
     event.stopPropagation();
@@ -73,18 +81,52 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
     });
   }
 
+  const handleSelected = (event) => {
+    event.stopPropagation();
+    if (event.ctrlKey) {
+      useWorldEditorStore.setState(state => {
+        state.layers[name].active = true;
+      });
+    } else {
+      useWorldEditorStore.setState(state => {
+        const layers = state.layers;
+        for (const n of Object.keys(layers))
+          layers[n].active = n === name;
+        return { layers };
+      });
+    }
+  }
+
   return (
-    <div className={classes.root} style={{ backgroundColor: selected ? "#3f51b5" : 'white' }}>
-      {object ? <CategoryIcon color="secondary" /> : <GridOnIcon color="secondary" />}
-      <div className={classes.name}>
-        {name}
+    <div
+      className={classes.root}
+      style={selected ? { backgroundColor: "#2B9BFD" } : {}}
+      onClick={handleSelected}
+    >
+      <div className={classes.title}>
+        {title}
       </div>
       <div className={classes.buttons}>
+        <div>
+          <Tooltip
+            title={info}
+            placement="bottom-end"
+            classes={{ tooltip: classes.tooltip }}
+          >
+            <InfoOutlinedIcon className={classes.icon} style={{ fontSize: 14 }} />
+          </Tooltip>
+        </div>
         <div onClick={handleVisible}>
-          {visible ? <VisibilityIcon className={classes.button} /> : <VisibilityOffIcon className={classes.button} />}
+          {visible ?
+            <VisibilityIcon className={classes.icon} /> :
+            <VisibilityOffIcon className={classes.icon} />
+          }
         </div>
         <div onClick={handleBlocked}>
-          {blocked ? <LockIcon className={classes.button} /> : <LockOpenIcon className={classes.button} />}
+          {blocked ?
+            <LockIcon className={classes.icon} /> :
+            <LockOpenIcon className={classes.icon} />
+          }
         </div>
       </div>
     </div>
@@ -93,49 +135,153 @@ const Layer: React.FC<LayerProps> = ({ name, object, selected }) => {
 
 
 interface LayerGroupProps {
-  name: string;
-  info: string;
-  children: React.ReactNode;
+  title: string;
+  Icon: any,
+  names: string[],
+  children?: React.ReactNode | React.ReactNode[],
 }
 
 const useLayerGroupStyles = makeStyles({
+  ...styles,
   root: {
-    display: 'flex',
-    flexDirection: 'column',
-    border: '2px solid rgb(11, 19, 43)',
-    backgroundColor: 'rgba(11, 19, 43, 0.8)',
-    margin: 6,
-    borderRadius: 5,
-    padding: 5,
-  },
-  title: {
-    display: 'flex',
-    fontSize: '1.125rem',
-    margin: 3,
+    boxShadow: "rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px",
+    margin: '2px 0',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    '&:first-of-type': {
+      marginTop: 4,
+    },
     color: 'white',
   },
-  tooltip: {
-    backgroundColor: 'rgba(11, 19, 43, 1)',
-    fontSize: '0.8rem',
+  subroot: {
+    backgroundColor: 'rgba(11, 19, 43, 0.6)',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '4px 0',
   },
+  iconroot: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 32,
+    color: "#9c27b0"
+  },
+  textroot: {
+    padding: '0 10px',
+    fontSize: 16,
+    fontWeight: 400,
+    display: 'block',
+    whiteSpace: 'nowrap',
+  },
+  icon: {
+    fontSize: 18,
+    margin: '0 6px',
+  },
+  body: {
+    display: 'flex',
+  },
+  leftDivider: {
+    borderLeft: '1px solid rgba(255, 255, 255, 0.3)',
+  },
+  rightDivider: {
+    borderRight: '1px solid rgba(255, 255, 255, 0.3)',
+  }
+
 });
 
-const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
+const LayerGroup: React.FC<LayerGroupProps> = ({ title, Icon, names, children }) => {
   const classes = useLayerGroupStyles();
+  const [visible, setVisible] = useState(true);
+  const [locked, setLocked] = useState(false);
+  const [selected, setSelected] = useState(false);
+
+  useEffect(() => {
+    handleLayerChange(Object.entries(useWorldEditorStore.getState().layers));
+    const unsubscribe = useWorldEditorStore.subscribe(
+      handleLayerChange, state => Object.entries(state.layers));
+
+    return (() => {
+      unsubscribe();
+    })
+  })
+
+  const handleLayerChange = (layers: [string, Layer][]) => {
+    setVisible(
+      layers.some(([name, layer]) => names.includes(name) && layer.visible));
+    setLocked(
+      !layers.some(([name, layer]) => names.includes(name) && !layer.blocked));
+    setSelected(
+      !layers.some(([name, layer]) => names.includes(name) && !layer.active));
+
+    // console.log(
+    //   !layers.some(([name, layer]) => {console.log(layer); return names.includes(name) && !layer.active;})
+    // );
+  }
+
+  const handleVisible = () => {
+    useWorldEditorStore.setState(state => {
+      const layers = state.layers;
+      for (const name of names)
+        layers[name].visible = !visible;
+      return { layers };
+    });
+  }
+
+  const handleLocked = () => {
+    useWorldEditorStore.setState(state => {
+      const layers = state.layers;
+      for (const name of names)
+        layers[name].blocked = !locked;
+      return { layers };
+    });
+  }
+
+  const handleSelected = (event) => {
+    event.stopPropagation();
+    if (event.ctrlKey) {
+      useWorldEditorStore.setState(state => {
+        const layers = state.layers;
+        for (const name of names)
+          layers[name].active = true;
+        return { layers };
+      });
+    } else {
+      useWorldEditorStore.setState(state => {
+        const layers = state.layers;
+        for (const name of Object.keys(layers))
+          layers[name].active = names.includes(name);
+        return { layers };
+      });
+    }
+  }
 
   return (
-    <div className={classes.root}>
-      <div className={classes.title}>
-        <div style={{ flexGrow: 1 }}>
-          {name}
+    <div className={classes.root} onClick={handleSelected}>
+      <div className={classes.subroot} style={selected ? { backgroundColor: "#2B9BFD" } : {}}>
+        <div className={classes.body}>
+          <div className={classes.rootLeft}>
+            <div className={classNames(classes.iconroot, classes.rightDivider)}>
+              <Icon />
+            </div>
+            <div className={classes.textroot}>
+              {title}
+            </div>
+          </div>
+          <div className={classes.rootRight}>
+            <div className={classes.leftDivider} onClick={handleVisible}>
+              {visible ?
+                <VisibilityIcon className={classes.icon} /> :
+                <VisibilityOffIcon className={classes.icon} />
+              }
+            </div>
+            <div className={classes.leftDivider} onClick={handleLocked}>
+              {locked ?
+                <LockIcon className={classes.icon} /> :
+                <LockOpenIcon className={classes.icon} />
+              }
+            </div>
+          </div>
         </div>
-        <Tooltip
-          title={info}
-          placement="bottom-end"
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <InfoIcon style={{ fontSize: '1rem', marginLeft: 5, }} />
-        </Tooltip>
       </div>
       {children}
     </div>
@@ -144,8 +290,7 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ name, info, children }) => {
 
 
 interface LayersTabState {
-  activeLayers: Set<string>;
-  map: any;
+  ready: boolean;
 }
 
 class LayersTab extends Component<{}, LayersTabState> {
@@ -156,130 +301,48 @@ class LayersTab extends Component<{}, LayersTabState> {
     this.subscriptions = [];
 
     this.state = {
-      activeLayers: new Set(),
-      map: {},
+      ready: false,
     }
   }
 
   componentDidMount() {
     if (useWorldEditorStore.getState().ready)
-      this.handleReady();
+      this.setState({ ready: true });
     else
       this.subscriptions.push(useWorldEditorStore.subscribe(
-        this.handleReady, state => state.ready));
-
-    this.subscriptions.push(useWorldEditorStore.subscribe(
-      this.handleReady, state => state.layers));
-
-    this.setState({
-      activeLayers: new Set(
-        Object.entries(useWorldEditorStore.getState().layers)
-          .filter(([_, l]) => l.active)
-          .map(([name, _]) => name) as string[]
-      )
-    });
+        () => this.setState({ ready: true }), state => state.ready));
   }
 
   componentWillUnmount() {
     this.subscriptions.forEach((unsub) => unsub());
   }
 
-  handleReady = () => {
-    this.setState({ map: new MapManager().map });
-  }
-
-  handleActiveLayer = (event, activeLayer) => {
-    event.stopPropagation();
-    useWorldEditorStore.getState().setState({ activeLayer });
-
-    if (event.ctrlKey) {
-      const activeLayers = this.state.activeLayers;
-      if (activeLayers.has(activeLayer)) {
-        activeLayers.delete(activeLayer);
-        useWorldEditorStore.getState().setLayer(activeLayer, { active: false });
-      }
-      else {
-        activeLayers.add(activeLayer);
-        useWorldEditorStore.getState().setLayer(activeLayer, { active: true });
-      }
-      this.setState({ activeLayers });
-    } else {
-      useWorldEditorStore.getState().setLayers({ active: false });
-      useWorldEditorStore.getState().setLayer(activeLayer, { active: true });
-
-      this.setState({ activeLayers: new Set([activeLayer]) });
-    }
+  handleActiveLayer = () => {
+    useWorldEditorStore.getState().setLayers({ active: false });
   }
 
   render() {
-    const { activeLayers, map } = this.state;
+    const { ready } = this.state;
 
     return (
       <div
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
-        onClick={(e) => this.handleActiveLayer(e, null)}
+        onClick={this.handleActiveLayer}
       >
-        <LayerGroup name="Float Layers" info="Every tile on these layers float over everything">
-          {
-            map.layers?.map((layer, index) => {
-              if (!layer.name.startsWith('_') && layer.name.includes("Float")) {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
+        <LayerGroup title="Wall Layer" names={['__Float', '__Collision']} Icon={HomeWorkIcon} />
+        <LayerGroup title="Conference Layer" names={['__Conference']} Icon={VideocamIcon} />
+        <LayerGroup title="Object Layer" names={['Object', 'ObjectCollision']} Icon={CategoryIcon} />
+        <LayerGroup title="Tile Layer" names={['Float', 'Collision', 'Ground2', 'Ground']} Icon={GridOnIcon} >
+          {ready && (
+            <>
+              <SubLayer title="Floating Tiles" name='Float' info="Tiles that float over everything" />
+              <SubLayer title="Collision Tiles" name='Collision' info="Tiles that are collidable" />
+              <SubLayer title="Surface Tiles" name='Ground2' info="Tiles which stand on top of Floor Tiles" />
+              <SubLayer title="Floor Tiles" name='Ground' info="Tiles which make the world ground" />
+            </>
+          )}
         </LayerGroup>
-        <LayerGroup name="Collision Layers" info="Every tiles and objects on these layers are collidable">
-          {
-            map.objects?.map((layer, index) => {
-              if (!layer.name.startsWith('_') && layer.name.includes("Collision")) {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
-          {
-            map.layers?.map((layer, index) => {
-              if (!layer.name.startsWith('_') && layer.name.includes("Collision")) {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
-        </LayerGroup>
-        <LayerGroup name="Ground Layers" info="These layers are non collidable">
-          {
-            map.objects?.map((layer, index) => {
-              if (!layer.name.startsWith('_') && !layer.name.includes("Collision")) {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={true} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
-          {
-            map.layers?.map((layer, index) => {
-              if (!layer.name.startsWith('_') && layer.name.includes("Ground")) {
-                return (
-                  <div key={index} onClick={(e) => this.handleActiveLayer(e, layer.name)}>
-                    <Layer name={layer.name} object={false} selected={activeLayers.has(layer.name)} />
-                  </div>
-                );
-              }
-            }).reverse()
-          }
-        </LayerGroup>
+
       </div>
     );
   }

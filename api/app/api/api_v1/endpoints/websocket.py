@@ -56,7 +56,6 @@ async def world_websocket(
                 protocol.CONNECT_TRANSPORT_SEND_DONE, protocol.SEND_TRACK, protocol.SEND_FILE
             ):
                 await wh.handle_transport_or_track(world_id, user_id, payload)
-
             elif topic == protocol.WIRE_PLAYER:
                 await wh.wire_players(world_id, user_id, payload)
 

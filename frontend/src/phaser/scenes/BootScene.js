@@ -84,7 +84,7 @@ class BootScene extends Phaser.Scene {
 
         const mapManager = new MapManager();
         
-        // mapManager.fetchMap().then(() => mapManager.loadMap(this));
+        this.load.crossOrigin = "Anonymous";
         mapManager.loadMap(this);
 
         this.load.image('__CONFERENCE', API_BASE + "static/maps/tilesets/tiles/conference.png");

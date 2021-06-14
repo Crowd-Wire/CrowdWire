@@ -169,7 +169,7 @@ class GameScene extends Phaser.Scene {
             for (const id of prevPlayers) {
                 if (!(id in storePlayers)) {
                     if (this.remotePlayers[id]) {
-                        this.remotePlayers[id].disconnect();
+                        this.remotePlayers[id].destroy();
                         delete this.remotePlayers[id];
                     }
                 }
@@ -502,9 +502,9 @@ class RemotePlayer extends Player {
     /**
      * Destroys the object cleanly.
      */
-    disconnect() {
+    destroy() {
         this.unsubscribe();
-        this.destroy();
+        super.destroy();
     }
 }
 

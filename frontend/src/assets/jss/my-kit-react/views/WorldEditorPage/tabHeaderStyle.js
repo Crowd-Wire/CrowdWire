@@ -37,8 +37,8 @@ const tabHeaderStyle = {
 
     icon: {
         ...iconStyle,
-        color: '#aaa',
-        
+        color: '#9c27b0',
+        backgroundColor: 'rgba(0, 0, 0, 0.15)',
     },
     button: {
         ...iconStyle,
