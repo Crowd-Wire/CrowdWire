@@ -44,7 +44,6 @@ class WorldService {
         if (query.length !== 0)
             url = url.concat('?' + query.join('&'));
 
-        console.log(url);
         return fetch(API_BASE + url, {
             method: 'GET',
             mode: 'cors',
@@ -261,6 +260,16 @@ class WorldService {
         })
     }
 
+    getAllWorldUsers(world_id) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users", {
+            method: 'GET',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+        })
+    }
+
     updateWorldUser(world_id, user_id, avatar, username) {
         return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
             method: 'PUT',
@@ -269,6 +278,17 @@ class WorldService {
                 "Authorization" : "Bearer "+ AuthenticationService.getToken()
             },
             body: JSON.stringify({username: username, avatar: avatar})
+        })
+    }
+
+    changeUserStatus(world_id,  user_id, status) {
+        return fetch(API_BASE + 'worlds/' + world_id + "/users/" + user_id, {
+            method: 'PUT',
+            mode: 'cors',
+            headers: {
+                "Authorization" : "Bearer "+ AuthenticationService.getToken()
+            },
+            body: JSON.stringify({status: status})
         })
     }
 

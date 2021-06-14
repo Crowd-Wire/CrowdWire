@@ -16,12 +16,6 @@ class WSettingsContent extends Component {
 		this.state = 
 		{
 			value: 0,
-			users: ['Silvia','Marco','Teixeira'],
-			reports: [
-				{'Reported':'Silva','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'},
-				{'Reported':'Marco','Reporter':'Silvia','Message':'Lorem ipsum dolor sit amet'},
-				{'Reported':'Silvia','Reporter':'Marco','Message':'Maecenas ac mauris sit amet odio elementum euismod nec ac enim.'}
-			],
 			path: window.location.pathname,
 			details: null,
 			mapName:""
@@ -90,8 +84,8 @@ class WSettingsContent extends Component {
 						</Tabs>
 					</Row>
 					<div style={{height:"400px"}}>
-						<RolePanel world={this.state.path} users={this.users} style={{height:"100%"}} value={this.state.value} index={0} /*setUsers={this.setUsers}*/>CHEFAO</RolePanel>
-						<KickBanPanel users={this.state.users} reports={this.state.reports} value={this.state.value} index={1}>ADMIN</KickBanPanel>
+						<RolePanel world={this.state.path} style={{height:"100%"}} value={this.state.value} index={0} >CHEFAO</RolePanel>
+						<KickBanPanel world={this.state.path} value={this.state.value} index={1}>ADMIN</KickBanPanel>
 					</div>
 			</div>
 		);
