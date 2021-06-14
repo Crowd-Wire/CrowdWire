@@ -1,4 +1,5 @@
 import Phaser, { GameObjects } from 'phaser';
+import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
 
 import { getSocket } from "services/socket";
 
@@ -7,7 +8,7 @@ import usePlayerStore from "stores/usePlayerStore.ts";
 import { useConsumerStore } from "webrtc/stores/useConsumerStore";
 import useWorldUserStore from "stores/useWorldUserStore";
 import MapManager from '../MapManager';
-
+import { isDesktop } from 'utils/isDesktop';
 
 const sceneConfig = {
     active: false,
@@ -52,6 +53,7 @@ class GameScene extends Phaser.Scene {
             .setTintFill(0xffff00)
             .setVisible(false);
         this.interact = null;
+        this.interactObject = null;
         
         // main player
         let last_pos = useWorldUserStore.getState().world_user.last_pos;
@@ -67,18 +69,37 @@ class GameScene extends Phaser.Scene {
 
         // listen to the arrow keys
         // this.cursors = this.input.keyboard.createCursorKeys();
-        this.cursors = this.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
-            up2: Phaser.Input.Keyboard.KeyCodes.UP,
-            down: Phaser.Input.Keyboard.KeyCodes.S,
-            down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
-            right: Phaser.Input.Keyboard.KeyCodes.D,
-            right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
-            interact: Phaser.Input.Keyboard.KeyCodes.X,
-        }, false);
+        if (isDesktop()) {
+            this.cursors = this.input.keyboard.addKeys({
+                up: Phaser.Input.Keyboard.KeyCodes.W,
+                up2: Phaser.Input.Keyboard.KeyCodes.UP,
+                down: Phaser.Input.Keyboard.KeyCodes.S,
+                down2: Phaser.Input.Keyboard.KeyCodes.DOWN,
+                left: Phaser.Input.Keyboard.KeyCodes.A,
+                left2: Phaser.Input.Keyboard.KeyCodes.LEFT,
+                right: Phaser.Input.Keyboard.KeyCodes.D,
+                right2: Phaser.Input.Keyboard.KeyCodes.RIGHT,
+                interact: Phaser.Input.Keyboard.KeyCodes.X,
+            }, false);
+        } else {
 
+            const joystick = new VirtualJoystick(this, {
+                x: this.game.canvas.width*0.75 - 50, 
+                y: this.game.canvas.height*0.75 - 50,
+                base: this.add.circle(0, 0, 50, 0x0B132B, 0.6).setDepth(1100),
+                thumb: this.add.circle(0, 0, 25, 0x000000, 0.8).setDepth(1100),
+                // dir: '8dir',
+                // forceMin: 16,
+                // fixed: true,
+                // enable: true
+            }).setScrollFactor(0);
+
+            this.cursors = joystick.createCursorKeys();
+
+            window.addEventListener('resize', () => {
+                joystick.setPosition(this.game.canvas.width*0.75 - 50, this.game.canvas.height*0.75 - 50);
+            }) ;
+        }
         this.game.input.events.on('reset', () => { this.input.keyboard.resetKeys() });
 
         // connect to room
@@ -196,18 +217,33 @@ class GameScene extends Phaser.Scene {
                 .setVisible(true)
                 .setDepth(depth - 1);
             this.interact = closestBody.gameObject.data.list.interact;
+            this.interactObject = closestBody.gameObject;
         } else {
             this.selectedObject.setVisible(false);
             this.interact = null;
+            this.interactObject = null;
         }
     }
 
     updateInteract() {
-        if (this.cursors.interact.isDown) {
+        const callService = () => {
             if (this.interact === 'FILE_SHARE') {
                 useWorldUserStore.getState().setShowFileSharing();
             } else if (this.interact === 'WHITEBOARD') {
                 useWorldUserStore.getState().setShowIFrame();
+            }
+        };
+        if (this.cursors.interact?.isDown) {
+            callService();
+        }
+        if (this.interactObject && this.input.manager.activePointer.isDown) {
+            let { x, y, width, height } = this.interactObject,
+                worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+            x -= width/2;
+            y -= height/2;
+
+            if (x < worldPoint.x && worldPoint.x < x + width && y < worldPoint.y && worldPoint.y < y + height) {
+                callService();
             }
         }
     }
@@ -382,13 +418,13 @@ class Player extends Phaser.GameObjects.Container {
         this.body.setVelocity(0);
 
         // get resultant direction
-        if (this.scene.cursors.left.isDown || this.scene.cursors.left2.isDown)
+        if (this.scene.cursors.left.isDown || this.scene.cursors.left2?.isDown)
             direction.x += -1;
-        if (this.scene.cursors.right.isDown || this.scene.cursors.right2.isDown)
+        if (this.scene.cursors.right.isDown || this.scene.cursors.right2?.isDown)
             direction.x += 1;
-        if (this.scene.cursors.up.isDown || this.scene.cursors.up2.isDown)
+        if (this.scene.cursors.up.isDown || this.scene.cursors.up2?.isDown)
             direction.y += -1;
-        if (this.scene.cursors.down.isDown || this.scene.cursors.down2.isDown)
+        if (this.scene.cursors.down.isDown || this.scene.cursors.down2?.isDown)
             direction.y += 1;
 
         // set normalized velocity (player doesn't move faster on diagonals)
