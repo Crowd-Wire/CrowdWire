@@ -52,6 +52,7 @@ class World_UserInDBBase(BaseModel):
     user_id: Optional[Union[UUID4, int]]
     world_id: int
     status: Optional[int]
+    
     class Config:
         orm_mode = True
 
