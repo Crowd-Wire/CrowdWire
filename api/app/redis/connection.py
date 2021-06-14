@@ -48,6 +48,10 @@ class RedisConnector:
     async def incrby(self, key: str, value: int):
         return await self.execute('incrby', key, value)
 
+    async def keys(self, matcher: str) -> List[str]:
+        """Scans keys that contain a matcher string"""
+        return await self.execute('keys', matcher)
+
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
         return await self.execute('scan', 0, 'match', f"*{matcher}*")
@@ -78,6 +82,10 @@ class RedisConnector:
     async def lpush(self, key: str, item: any):
         """Adds one item to a list"""
         return await self.execute('lpush', key, item)
+
+    async def rpop(self, key: str):
+        """Pops one item from the list"""
+        return await self.execute('rpop', key)
 
     async def llen(self, key: str):
         """Checks the length of the list"""
