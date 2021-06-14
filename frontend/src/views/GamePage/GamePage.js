@@ -96,6 +96,11 @@ const GamePage = (props) => {
       if (useWorldUserStore.getState().world_user) {
         getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
       }
+      if (reconnect) {
+        clearInterval(reconnect);
+        reconnect = null;
+      }
+      usePlayerStore.getState().setConnecting(false);
     }
   }, [])
 
