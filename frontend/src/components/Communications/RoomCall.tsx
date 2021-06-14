@@ -27,6 +27,7 @@ import { useMediaStore } from 'webrtc/stores/useMediaStore';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import usePlayerStore from "stores/usePlayerStore";
+import { isDesktop } from 'utils/isDesktop.js';
 import { API_BASE } from "config";
 import Iframe from 'react-iframe'
 
@@ -108,7 +109,7 @@ export default class RoomCall extends React.Component<{}, State> {
   reInitializeStream = () => {
     const useMic = (this.accessMic && !(useMuteStore.getState().videoMuted))
     const useCam = (this.accessVideo && !(useMuteStore.getState().audioMuted))
-    if (useMic|| useCam) {
+    if (useMic || useCam) {
       const media = getVideoAudioStream(useMic, useCam);
       return new Promise((resolve) => {
         media.then((stream: MediaStream) => {
@@ -145,8 +146,8 @@ export default class RoomCall extends React.Component<{}, State> {
         toast.dark(
           <span>
             <img src={logo} style={{ height: 22, width: 22, display: "block", float: "left", paddingRight: 3 }} />
-          Microphone Detected 🎙️
-        </span>
+            Microphone Detected 🎙️
+          </span>
           , toast_props);
       }
       if (this.accessVideo) {
@@ -210,6 +211,10 @@ export default class RoomCall extends React.Component<{}, State> {
     if (numberUsers === 0) {
       IFrame_height = 0;
     }
+    
+    const positionStyle = isDesktop() ? 
+      { right: 10 } : { left: '50%', transform: 'translateX(-50%)' };
+
     return (
       <>
       {numberUsers > 0 ?
@@ -242,7 +247,7 @@ export default class RoomCall extends React.Component<{}, State> {
                         volume: userVolume, active,
                         videoToggle, audioToggle
                       } = this.state.consumerMap[peerId];
-                      
+
                       let item = <></>
                       let username = peerId;
                       let avatar= "avatars_1_1";
@@ -264,20 +269,20 @@ export default class RoomCall extends React.Component<{}, State> {
                         )
                       return [
                         (<Carousel.Item key={peerId + "_crs_item"}>
-                            <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
-                              <VideoAudioBox
-                                avatar={API_BASE + "static/characters/" + avatar + '.png'}
-                                active={active}
-                                username={username}
-                                id={peerId}
-                                audioTrack={consumerAudio ? consumerAudio._track : null}
-                                videoTrack={consumerVideo ? consumerVideo._track : null}
-                                volume={(userVolume / 200)}
-                                videoToggle={videoToggle}
-                                audioToggle={audioToggle}
-                              />
-                            </div>
-                          </Carousel.Item>), item]
+                          <div key={peerId + "_crs_item2"} style={{ height: '100%' }}>
+                            <VideoAudioBox
+                              avatar={API_BASE + "static/characters/" + avatar + '.png'}
+                              active={active}
+                              username={username}
+                              id={peerId}
+                              audioTrack={consumerAudio ? consumerAudio._track : null}
+                              videoTrack={consumerVideo ? consumerVideo._track : null}
+                              volume={(userVolume / 200)}
+                              videoToggle={videoToggle}
+                              audioToggle={audioToggle}
+                            />
+                          </div>
+                        </Carousel.Item>), item]
                     })
                   }
                 </Carousel>
@@ -287,7 +292,18 @@ export default class RoomCall extends React.Component<{}, State> {
         : 
           <div id="my_carousel" style={{height: 0}} /> 
         }
-        <div style={{ position: 'fixed', width: '18%', height: 'auto', right: 10, bottom: 5, zIndex: 99, minWidth: 160, minHeight: 120}}>
+
+        <div style={{
+          position: 'fixed',
+          width: '18%',
+          height: 'auto',
+          bottom: 5,
+          zIndex: 99,
+          minWidth: 160,
+          minHeight: 120,
+          ...positionStyle
+        }}
+        >
           {this.state.media ?
             <MyMediaStreamBox
             username={this.myUsername}
@@ -297,7 +313,7 @@ export default class RoomCall extends React.Component<{}, State> {
             : ''}
 
           <MyVideoAudioBox
-            avatar = {this.avatar}
+            avatar={this.avatar}
             username={this.myUsername}
             id={this.myId}
             audioTrack={this.state.mic}
