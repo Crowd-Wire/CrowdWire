@@ -92,22 +92,15 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
       })
       
       useWsHandlerStore.getState().addWsListener(`ADD_USER_FILES`, (d) => {
-        console.log(d)
         setListOfFiles(listOfFiles => listOfFiles.concat(d.files))
       })
   
       useWsHandlerStore.getState().addWsListener(`REMOVE_USER_FILE`, (d) => {
-        console.log(d)
-        console.log(listOfFiles)
         setListOfFiles(listOfFiles => listOfFiles.filter( file => file.id != d.file.id ))
-        console.log(listOfFiles)
       })
   
       useWsHandlerStore.getState().addWsListener(`REMOVE_ALL_USER_FILES`, (d) => {
-        console.log(d)
-        console.log(listOfFiles)
         setListOfFiles(listOfFiles => listOfFiles.filter( file => file.owner != d.user_id ))
-        console.log(listOfFiles)
       })
 
       useWsHandlerStore.getState().addWsListener(`ACCEPT_DOWNLOAD_REQUEST`, (d) => {
