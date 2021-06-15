@@ -85,7 +85,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   useEffect(() => {
-    if (showFileSharing) {
+    if (!showFileSharing) {
       wsend({ topic: "REMOVE_ALL_USER_FILES" });
       useConsumerStore.getState().closeDataConsumers();
     }
