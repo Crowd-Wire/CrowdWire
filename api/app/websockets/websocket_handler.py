@@ -65,6 +65,12 @@ async def send_groups_snapshot(world_id: str):
 
 
 async def wire_players(world_id: str, user_id: str, payload: dict):
+
+    while not await redis_connector.sadd(f"world:{world_id}:lock", 1):
+        asyncio.sleep(.1)
+
+    logger.warning('lock from wire')
+
     users_id = payload['users_id']
 
     # add nearby users
@@ -72,37 +78,9 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
 
     add_users = set()
     for uid in users_id:
-        sorted_users = sorted([user_id, uid])
-        common_key = f"world:{world_id}:lock:{sorted_users[0]}:{sorted_users[1]}"
-
-        if uid < user_id:
-            threshold = 2
-            while True:
-                item = await redis_connector.rpop(f"{common_key}")
-                if item:
-                    # create group
-                    logger.info(f'[WIRE] user {user_id} criou o grupo | {item}')
-                    add_users.add(uid)
-                    break
-                if (threshold := threshold - .1):
-                    logger.info('[WIRE] IGNORE')
-                    # ignore
-                    break
-                await asyncio.sleep(.1)
-        else:
-            item = time.time()
-            logger.info(f'[WIRE] user {user_id} | {item}')
-            await redis_connector.lpush(f"{common_key}", item)
-
-        # if not (test:=await redis_connector.master.execute('sadd', common_key, 1)):
-        #     # hack to check if user already claimed proximity
-        #     logger.info(f'[WIRE] user {user_id} criou o grupo')
-        #     add_users.add(uid)
-        #     logger.debug(test)
-        #     await redis_connector.delete(common_key)
-        #     logger.debug(f" {user_id} deleted {common_key}")
-        # else:
-        #     logger.debug(test)
+        if await redis_connector.sismember(f"world:{world_id}:user:{uid}:users", user_id):
+            # check if user already claimed proximity
+            add_users.add(uid)
 
     actions = {}
     # create new group and let it normalize
@@ -120,8 +98,17 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
         await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - {uid})}, uid)
     await send_groups_snapshot(world_id)
 
+    logger.warning('unlock from wire')
+    await redis_connector.srem(f"world:{world_id}:lock", 1)
+
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
+
+    while not await redis_connector.sadd(f"world:{world_id}:lock", 1):
+        asyncio.sleep(.1)
+
+    logger.warning('lock from unwire')
+
     users_id = payload['users_id']
     # remove faraway users from confirm structure
     await redis_connector.rem_users_from_user(world_id, user_id, *users_id)
@@ -161,6 +148,9 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
 
     await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'groups': groups_to_remove, 'merge': True, 'ids': users_id}, user_id)
     await send_groups_snapshot(world_id)
+
+    logger.warning('unlock from unwire')
+    await redis_connector.srem(f"world:{world_id}:lock", 1)
 
 
 async def join_conference(world_id: str, user_id: str, payload: dict):
@@ -352,14 +342,14 @@ async def handle_actions(actions: dict):
         await remove_user(rem_action['worldId'], rem_action['groupIds'], rem_action['peerId'])
 
 
-async def remove_user(word_id: str, room_ids: list, user_id: str):
+async def remove_user(world_id: str, room_ids: list, user_id: str):
     payload = {'topic': "remove-user-from-groups",
                'd': {'roomIds': list(room_ids), 'peerId': user_id}}
 
     await rabbit_handler.publish(payload)
 
 
-async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, permission: bool = True):
+async def join_as_new_peer_or_speaker(world_id: str, room_id: str, user_id: str, permission: bool = True):
     """
     join-as-new-peer:
         create a room if it doesnt exit and add that user to that room
@@ -377,7 +367,7 @@ async def join_as_new_peer_or_speaker(word_id: str, room_id: str, user_id: str, 
     await rabbit_handler.publish(payload)
 
 
-async def add_speaker(word_id: str, room_id: str, user_id: str):
+async def add_speaker(world_id: str, room_id: str, user_id: str):
     """
     add-speaker:
         allows an user that is already in a room call but only
@@ -387,7 +377,7 @@ async def add_speaker(word_id: str, room_id: str, user_id: str):
     await rabbit_handler.publish(payload)
 
 
-async def destroy_room(word_id: str, room_id: str, media_server: str):
+async def destroy_room(world_id: str, room_id: str, media_server: str):
     payload = {'topic': "destroy-room", 'd': {'roomId': room_id}}
     logger.info(media_server)
     await rabbit_handler.publish(payload, media_server)
