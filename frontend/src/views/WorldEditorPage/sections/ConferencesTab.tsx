@@ -229,7 +229,6 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
 
       if (id === activeConference) {
         activeConference = null;
-        useWorldEditorStore.getState().setState({ activeLayer: null });
         useWorldEditorStore.getState().setLayer('__Conference', { active: false });
         useWorldEditorStore.getState().remActive('conference');
         this.setState({ activeConference });
@@ -245,8 +244,14 @@ class ConferencesTab extends Component<{}, ConferencesTabState> {
         props.properties = { name };
       }
       useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
-      useWorldEditorStore.getState().setState({ conferences, activeLayer: '__Conference' });
-      useWorldEditorStore.getState().setLayer('__Conference', { active: true });
+      useWorldEditorStore.getState().setState({ conferences });
+      useWorldEditorStore.setState(state => {
+        const layers = state.layers;
+        for (const name of Object.keys(layers))
+          layers[name].active = name === '__Conference';
+        return { layers };
+      });
+      useWorldEditorStore.setState({ activeLayer: 'Conference Layer' });
       useWorldEditorStore.getState().setActive('conference', id);
       this.setState({ conferences, activeConference: id });
     }

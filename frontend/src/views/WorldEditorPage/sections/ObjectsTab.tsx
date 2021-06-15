@@ -93,6 +93,13 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
 
   handleClick = (id: string) => {
     useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
+    useWorldEditorStore.setState({ activeLayer: 'Object Layer' });
+    useWorldEditorStore.setState(state => {
+      const layers = state.layers;
+      for (const name of Object.keys(layers))
+        layers[name].active = ['Object', 'ObjectCollision'].includes(name);
+      return { layers };
+    });
     useWorldEditorStore.getState().setActive('object', id);
   }
 

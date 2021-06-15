@@ -98,7 +98,6 @@ export const getSocket = (worldId) => {
             topic: "WIRE_PLAYER",
             users_id: usersId,
         }
-        console.log("[SENT][WIRE_PLAYER]", payload);
         await wsend(payload);
     }
 
@@ -107,7 +106,6 @@ export const getSocket = (worldId) => {
             topic: "UNWIRE_PLAYER",
             users_id: usersId,
         }
-        console.log("[SENT][UNWIRE_PLAYER]", payload);
         await wsend(payload);
     }
 
@@ -185,7 +183,7 @@ export const getSocket = (worldId) => {
                     usePlayerStore.getState().setGroups(data.groups);
                     break;
                 case "you-joined-as-speaker":
-                    // console.log(data)
+                    console.log(data)
                     beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
                         createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                             receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
@@ -198,7 +196,7 @@ export const getSocket = (worldId) => {
                     })
                     break;
                 case "you-joined-as-peer":
-                    // console.log(data)
+                    console.log(data)
                     beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {
                         createTransport(data.d.roomId, "recv", data.d.recvTransportOptions).then(() => {
                             receiveVideoVoice(data.d.roomId, () => flushConsumerQueue(data.d.roomId));
@@ -209,7 +207,7 @@ export const getSocket = (worldId) => {
                     })
                     break;
                 case "you-are-now-a-speaker":
-                    // console.log(data)
+                    console.log(data)
                     beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId, true).then(() => {
                         createTransport(data.d.roomId, "send", data.d.sendTransportOptions).then(() => {
                             sendVideo(data.d.roomId);
@@ -219,11 +217,11 @@ export const getSocket = (worldId) => {
                     })
                     break;
                 case "@get-recv-tracks-done":
-                    // console.log(data)
+                    console.log(data)
                     consumeAll(data.d.consumerParametersArr, data.d.roomId);
                     break;
                 case "new-peer-producer":
-                    // console.log(data)
+                    console.log(data)
                     // check if tile im currently on is a conference type or not
                     // else check if player is in range
                     if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
@@ -236,28 +234,28 @@ export const getSocket = (worldId) => {
                     }
                     break;
                 case "new-peer-data-producer":
-                    // console.log(data)
+                    console.log(data)
                     const roomId = data.d.roomId;
                     if (useRoomStore.getState().rooms[roomId].recvTransport) {
                         consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
                     }
                     break;
                 case "active-speaker":
-                    // console.log(data)
+                    console.log(data)
                     if (data.value)
                         useConsumerStore.getState().addActiveSpeaker(data.peerId)
                     else
                         useConsumerStore.getState().removeActiveSpeaker(data.peerId)
                     break;
                 case "toggle-peer-producer":
-                    // console.log(data)
+                    console.log(data)
                     if (data.kind === 'audio')
                         useConsumerStore.getState().addAudioToggle(data.peerId, data.pause)
                     else
                         useConsumerStore.getState().addVideoToggle(data.peerId, data.pause)
                     break;
                 case "close-media":
-                    // console.log(data)
+                    console.log(data)
                     useConsumerStore.getState().closeMedia(data.peerId)
                     break;
                 default:

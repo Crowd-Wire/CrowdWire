@@ -135,7 +135,7 @@ class WorldEditorScene extends Scene {
             .setBackgroundColor("#0C1117")
             .setZoom(1.5).centerToBounds();
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
-        
+
         this.grid1 && this.grid1.destroy();
         this.grid2 && this.grid2.destroy();
         this.rec && this.rec.destroy();
@@ -150,7 +150,7 @@ class WorldEditorScene extends Scene {
             .setDepth(1001);
         this.grid2.showOutline = false;
 
-        this.rec = this.add.rectangle(width/2, height/2, width, height, 0xffffff, 0).setStrokeStyle( 1, 0xffffff, 1);
+        this.rec = this.add.rectangle(width / 2, height / 2, width, height, 0xffffff, 0).setStrokeStyle(1, 0xffffff, 1);
     }
 
     handleConferencesChange = (conferences, prevConferences) => {
@@ -220,16 +220,20 @@ class WorldEditorScene extends Scene {
             // Mouse is over canvas
 
             const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main),
-                storeActiveLayer = useWorldEditorStore.getState().activeLayer,
-                activeConference = useWorldEditorStore.getState().active.conference,
-                activeWall = useWorldEditorStore.getState().active.wall;
+                store = useWorldEditorStore.getState(),
+                storeActiveLayer = store.activeLayer,
+                activeObject = store.active.object,
+                activeConference = store.active.conference,
+                activeWall = store.active.wall;
 
             this.preview.setVisible(true);
 
-            const activeLayerName = (activeWall && !useWorldEditorStore.getState().layers['__Collision'].blocked) ? '__Collision' :
-                (activeConference && !useWorldEditorStore.getState().layers['__Conference'].blocked) ? '__Conference' :
-                    (storeActiveLayer && !useWorldEditorStore.getState().layers[storeActiveLayer].blocked) ? storeActiveLayer :
-                        undefined;
+            let activeLayerName = (activeWall && !store.layers['__Collision'].blocked && store.layers['__Collision'].active) ? '__Collision' :
+                (activeConference && !store.layers['__Conference'].blocked && store.layers['__Conference'].active) ? '__Conference' :
+                    (activeObject && !store.layers['ObjectCollision'].blocked && store.layers['ObjectCollision'].active) ? 'ObjectCollision' :
+                        (storeActiveLayer && store.layers[storeActiveLayer]
+                            && !store.layers[storeActiveLayer].blocked && store.layers[storeActiveLayer].active) ? storeActiveLayer :
+                            undefined;
 
             if (activeLayerName) {
                 // Conference selected and not blocked 
@@ -242,19 +246,20 @@ class WorldEditorScene extends Scene {
                     const x = Math.Snap.Floor(worldPoint.x, 32),
                         y = Math.Snap.Floor(worldPoint.y, 32);
 
-                    this.preview.setPosition(x + 16, y + 16).setBounds();
+
 
                     // Rounds down to nearest tile
                     const tileX = this.map.worldToTileX(x),
                         tileY = this.map.worldToTileY(y);
 
-                    const activeTile = useWorldEditorStore.getState().active.tile
+                    const activeTile = store.active.tile
                         || activeConference;
 
-                    if (!activeTile && activeWall) {
+                    if (!activeTile && activeWall && activeLayerName === '__Collision') {
                         // Wall selected
+                        this.preview.setPosition(x + 16, y + 16).setBounds();
                         this.preview.setTexture('__DEFAULT');
-                  
+
                         const isDown = this.input.manager.activePointer.isDown;
                         if (this.tool.type === ToolType.DRAW) {
                             const [firstgid, type] = activeWall.split('-').map((s) => parseInt(s, 10));
@@ -268,7 +273,7 @@ class WorldEditorScene extends Scene {
 
                             if (isDown) {
                                 if (this.wallManager.place(firstgid, type, tileX, tileY)) {
-                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                    !this.save && store.setState({ save: true });
                                     // Destroy objects
                                     const { x, y, width, height } = this.preview.body,
                                         crushed = this.physics.overlapRect(
@@ -286,11 +291,11 @@ class WorldEditorScene extends Scene {
                             if (isDown) {
                                 let extremes;
                                 if ((extremes = this.wallManager.remove(tileX, tileY))) {
-                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                    !this.save && store.setState({ save: true });
                                     // Destroy objects
                                     const { y, height } = this.preview.body,
-                                        x = extremes[0]*32,
-                                        width = (extremes[1] - extremes[0])*32 + 32,
+                                        x = extremes[0] * 32,
+                                        width = (extremes[1] - extremes[0]) * 32 + 32,
                                         crushed = this.physics.overlapRect(
                                             x + 1, y + 1 - 32, width - 2, height - 2 + 32, true, true);
                                     crushed.forEach((body) => body != this.preview.body && body.gameObject.destroy());
@@ -299,6 +304,8 @@ class WorldEditorScene extends Scene {
                             }
                             return this.wallManager.checkRemove(tileX, tileY);
                         }
+                        return false;
+                    } else if (!activeTile) {
                         return false;
                     }
 
@@ -309,13 +316,14 @@ class WorldEditorScene extends Scene {
                             return false;
                         }
                         activeGid = this.mapManager.getConferenceGid(activeTile);
-                        tint = `0x${useWorldEditorStore.getState().conferences[activeTile].color.substr(1)}`;
+                        tint = `0x${store.conferences[activeTile].color.substr(1)}`;
 
                         if (!activeGid)
                             throw Error(`Could not find GID of ${activeTile}`);
                     } else {
                         activeGid = activeTile;
                     }
+                    this.preview.setPosition(x + 16, y + 16).setBounds();
 
                     let clickedGid, clickedCid;
                     const clickedTile = activeLayer.getTileAt(tileX, tileY, true);
@@ -342,7 +350,7 @@ class WorldEditorScene extends Scene {
                         case ToolType.DRAW:
                             if (activeGid) {
                                 if (isDown) {
-                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                    !this.save && store.setState({ save: true });
                                     activeLayer.fill(activeGid, tileX, tileY, 1, 1);
                                     clickedTile && (clickedTile.tint = tint);
                                 }
@@ -351,14 +359,14 @@ class WorldEditorScene extends Scene {
                             break;
                         case ToolType.ERASE:
                             if (isDown) {
-                                !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                !this.save && store.setState({ save: true });
                                 activeLayer.fill(-1, tileX, tileY, 1, 1);
                             }
                             return true;
                         case ToolType.PICK:
                             if (clickedGid != -1) {
                                 if (isDown) {
-                                    useWorldEditorStore.getState().setActive('tile', clickedCid || clickedGid);
+                                    store.setActive('tile', clickedCid || clickedGid);
                                 }
                                 return true;
                             }
@@ -366,7 +374,7 @@ class WorldEditorScene extends Scene {
                         case ToolType.FILL:
                             if (activeGid) {
                                 if (isDown) {
-                                    !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                    !this.save && store.setState({ save: true });
                                     this.fillBFS(activeLayer, activeGid, tileX, tileY, tint);
                                 }
                                 return true;
@@ -377,14 +385,15 @@ class WorldEditorScene extends Scene {
                     }
                     return false;
                 }
+                const activeObject = store.active.object;
+                activeLayerName = this.mapManager.objectProps[activeObject].properties?.collides ?
+                    'ObjectCollision' : 'Object';
                 const activeObjectGroup = this.objectGroups[activeLayerName];
-                if (activeObjectGroup) {
+                if (activeObject && activeObjectGroup) {
                     // ObjectGroup exists
 
                     const pointerX = Math.Snap.Floor(worldPoint.x, 16),
                         pointerY = Math.Snap.Floor(worldPoint.y, 16);
-
-                    const activeObject = useWorldEditorStore.getState().active.object;
 
                     this.preview.setPosition(pointerX + 16, pointerY + 16)
                         .setTint(0xffffff);
@@ -420,10 +429,10 @@ class WorldEditorScene extends Scene {
                                         }
                                     }
 
-                                if (hovered.length < 2) {
+                                if (hovered.length < 2 || activeLayerName === "Object") {
                                     if (this.input.manager.activePointer.isDown) {
                                         if (this.mouseClick) {
-                                            !this.save && useWorldEditorStore.getState().setState({ save: true });
+                                            !this.save && store.setState({ save: true });
                                             const obj = this.add.sprite(this.preview.x, this.preview.y, activeObject),
                                                 properties = this.mapManager.objectProps[activeObject].properties;
                                             if (properties) {
