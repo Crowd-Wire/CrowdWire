@@ -17,6 +17,11 @@ def insert_tags(target, connection, **kwargs):
     connection.execute(target.insert().values(name="Science"))
     connection.execute(target.insert().values(name="Technology"))
     connection.execute(target.insert().values(name="Fun"))
+    connection.execute(target.insert().values(name="Office"))
+    connection.execute(target.insert().values(name="Education"))
+    connection.execute(target.insert().values(name="Social"))
+
+
 
 
 @event.listens_for(User.__table__, "after_create")
@@ -41,7 +46,7 @@ def insert_users(target, connection, **kwargs):
 def insert_worlds(target, connection, **kwargs):
     # WORLD CREATION
     connection.execute(World.__table__.insert().values(
-        creator=1, name="Test", creation_date=datetime.now(), max_users=10, public=True, allow_guests=True,
+        creator=1, name="Normal World", creation_date=datetime.now(), max_users=10, public=True, allow_guests=True,
         world_map=bytes(open("static/maps/default_map.json", 'r').read().encode()), status=0
     ))
 
