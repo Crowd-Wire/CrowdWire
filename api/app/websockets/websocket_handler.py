@@ -5,7 +5,6 @@ from app.websockets.connection_manager import manager
 from datetime import datetime
 from loguru import logger
 import asyncio
-import time
 
 
 async def join_player(world_id: str, user_id: str, payload: dict):
