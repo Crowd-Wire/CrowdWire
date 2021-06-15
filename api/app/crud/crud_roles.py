@@ -156,7 +156,7 @@ class CRUDRole(CRUDBase[Role, RoleCreate, RoleUpdate]):
             return None, msg
         # verify if there's already a role with this name
         role, msg = self.get_by_name(db=db, world_id=obj_in.world_id, name=obj_in.name)
-        if not role:
+        if role:
             return None, strings.ROLE_NAME_ALREADY_IN_USE
         if obj_in.is_default:
             return None, strings.ROLE_DEFAULT_ALREADY_EXISTS
