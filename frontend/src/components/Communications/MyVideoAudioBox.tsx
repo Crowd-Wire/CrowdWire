@@ -54,6 +54,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
   const showIframe = useWorldUserStore(state => state.showIFrame);
+  const iFrame = useWorldUserStore(state => state.iFrame);
   const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
@@ -399,7 +400,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
              https://r7.whiteboardfox.com/
             */}
             <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
-              <Iframe url="http://138.68.191.32/"
+              <Iframe url={iFrame}
                 position="absolute"
                 width="100%"
                 id="myIframe"

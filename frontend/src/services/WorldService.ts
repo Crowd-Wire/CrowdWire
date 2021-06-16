@@ -93,7 +93,7 @@ class WorldService {
     }
 
     create(wName, accessibility, guests, maxUsers, tag_array, desc): Promise<Response> {
-        return fetch(API_BASE + "static/maps/default_map.json")
+        return fetch(API_BASE + "static/maps/deti.json")
             .then((res) => res.json())
             .then((worldMap) => 
                 fetch(API_BASE + 'worlds/', {

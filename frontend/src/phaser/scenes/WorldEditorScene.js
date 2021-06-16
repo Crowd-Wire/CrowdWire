@@ -132,11 +132,12 @@ class WorldEditorScene extends Scene {
             paddingY = (window.screen.height - height - 2 * margin) / 4;
 
         this.cameras.main
-            .setBounds(
-                -margin - paddingX, -margin - paddingY,
-                width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
+            // .setBounds(
+            //     -margin - paddingX, -margin - paddingY,
+            //     width + 2 * margin + 2 * paddingX, height + 2 * margin + 2 * paddingY, true)
             .setBackgroundColor("#0C1117")
-            .setZoom(1.5).centerToBounds();
+            .setZoom(1.5)
+            // .centerToBounds();
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
         this.grid1 && this.grid1.destroy();
@@ -237,7 +238,8 @@ class WorldEditorScene extends Scene {
                         (storeActiveLayer && store.layers[storeActiveLayer]
                             && !store.layers[storeActiveLayer].blocked && store.layers[storeActiveLayer].active) ? storeActiveLayer :
                             undefined;
-
+            
+            console.log(activeLayerName)
             if (activeLayerName) {
                 // Conference selected and not blocked 
                 // or other layer selected and not blocked
@@ -391,9 +393,11 @@ class WorldEditorScene extends Scene {
                 const activeObject = store.active.object;
                 activeLayerName = this.mapManager.objectProps[activeObject].properties?.collides ?
                     'ObjectCollision' : 'Object';
+                console.log(activeLayerName)
                 const activeObjectGroup = this.objectGroups[activeLayerName];
                 if (activeObject && activeObjectGroup) {
                     // ObjectGroup exists
+                    console.log(activeObjectGroup)
 
                     const pointerX = Math.Snap.Floor(worldPoint.x, 16),
                         pointerY = Math.Snap.Floor(worldPoint.y, 16);
