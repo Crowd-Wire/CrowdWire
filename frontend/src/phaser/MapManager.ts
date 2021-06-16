@@ -37,8 +37,8 @@ class MapManager {
     public objectProps: Record<string, ObjectProps>;
     public objectGroups: Record<string, Physics.Arcade.Group | Physics.Arcade.StaticGroup>;
 
-    constructor() {
-        if (!MapManager._instance) {
+    constructor(refresh: boolean=false) {
+        if (!MapManager._instance || refresh) {
             const worldUser = useWorldUserStore.getState().world_user;
             this.worldId = worldUser.world_id;
             this.mapJson = JSON.parse(worldUser.world_map);
