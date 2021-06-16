@@ -82,7 +82,7 @@ class BootScene extends Phaser.Scene {
         }, this);
         
 
-        const mapManager = new MapManager();
+        const mapManager = new MapManager(true);
         
         this.load.crossOrigin = "Anonymous";
         mapManager.loadMap(this);
