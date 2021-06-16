@@ -49,9 +49,14 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const myRef = useRef<any>(null);
   const [videoPauseState, setVideoPauseState] = useState(true);
   const [audioPauseState, setAudioPauseState] = useState(true);
-  const [mediaOffState, setMediaOffState] = useState(true);
+  // const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
+
+  const showIframe = useWorldUserStore(state => state.showIFrame);
+  const iFrame = useWorldUserStore(state => state.iFrame);
+  const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
+  
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -215,8 +220,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
     if (mediaOffState) {
       sendMedia(true).then((media) => {
-        if (media)
-          setMediaOffState(!mediaOffState)
+        if (media) {
+          useWorldUserStore.getState().setShowMediaOffState(!mediaOffState);
+          // setMediaOffState(!mediaOffState)
+        }
       });
     } else if (Object.keys(rooms).length > 0) {
       for (const [key, value] of Object.entries(rooms)) {
@@ -229,7 +236,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   useEffect(() => {
     let { rooms } = useRoomStore.getState();
 
-    setMediaOffState(useMediaStore.getState().media ? false : true)
+    useWorldUserStore.getState().setShowMediaOffState(
+      useMediaStore.getState().media ? false : true
+    )
+    // setMediaOffState(useMediaStore.getState().media ? false : true)
     for (let roomId in rooms)
       wsend({ topic: "close-media" })
 
@@ -376,6 +386,22 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         {showFileSharing ?
           <FileSharing closeModal={() => useWorldUserStore.setState({ showFileSharing: false })} />
           : ''}
+        {/* {showIframe ?
+          <>
+            <div style={{ position: 'fixed', top: 0, left: 65, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
+              <Button onClick={() => useWorldUserStore.setState({ showIFrame: false })} variant="contained" color="primary" style={{ top: 10 }}>
+                Close External Service
+              </Button>
+            </div>
+            <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
+              <Iframe url={iFrame}
+                position="absolute"
+                width="100%"
+                id="myIframe"
+                height="100%" />
+            </div>
+          </>
+          : ''} */}
       </FullScreen>
     </div>
   );

@@ -41,7 +41,9 @@ class GameScene extends Phaser.Scene {
             else if (layer.name.includes("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name.includes("Float"))
+            else if (layer.name === "__Float")
+                layer.tilemapLayer.setDepth(999);
+            else if (layer.name === "Float")
                 layer.tilemapLayer.setDepth(1000);
         })
 
@@ -229,8 +231,18 @@ class GameScene extends Phaser.Scene {
         const callService = () => {
             if (this.interact === 'FILE_SHARE') {
                 useWorldUserStore.getState().setShowFileSharing();
+            } else if (this.interact === 'SCREEN_SHARE') {
+                useWorldUserStore.getState().setShowMediaOffState(false);
             } else if (this.interact === 'WHITEBOARD') {
-                useWorldUserStore.getState().setShowIFrame();
+                useWorldUserStore.getState().setShowIFrame('https://r7.whiteboardfox.com/');
+            } else if (this.interact === 'CHESS') {
+                useWorldUserStore.getState().setShowIFrame('https://www.chesshotel.com/pt/');
+            } else if (this.interact === 'MATH_GAMES') {
+                useWorldUserStore.getState().setShowIFrame('http://138.68.191.32/');
+            } else if (this.interact === 'CROSS_WORDS') {
+                useWorldUserStore.getState().setShowIFrame('https://downforacross.com/');
+            } else if (this.interact === 'SURVIVAL') {
+                useWorldUserStore.getState().setShowIFrame('https://www.gameflare.com/embed/mini-survival/');
             }
         };
         if (this.cursors.interact?.isDown) {

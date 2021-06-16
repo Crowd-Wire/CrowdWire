@@ -154,9 +154,14 @@ class WallsTab extends Component<{}, WallsTabState> {
   }
 
   handleClick = (id: string) => {
-    useWorldEditorStore.getState().setState({ activeLayer: '__Collision' });
-    useWorldEditorStore.getState().setLayer('__Collision', { active: true });
-    useWorldEditorStore.getState().setLayer('__Float', { active: true });
+    useWorldEditorStore.setState(state => {
+      const layers = state.layers;
+      useWorldEditorStore.setState({ activeLayer: 'Wall Layer' });
+      for (const name of Object.keys(layers))
+        layers[name].active = ['__Collision', '__Float'].includes(name);
+      console.log(layers);
+      return { layers };
+    });
     useWorldEditorStore.getState().setActive('wall', id);
   }
 

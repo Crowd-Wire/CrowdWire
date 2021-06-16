@@ -96,6 +96,13 @@ class TilesTab extends Component<{ classes: any }, TilesTabState> {
 
   handleClick = (id: string) => {
     useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
+    useWorldEditorStore.setState({ activeLayer: 'Ground' });
+    useWorldEditorStore.setState(state => {
+      const layers = state.layers;
+      for (const name of Object.keys(layers))
+        layers[name].active = name === 'Ground';
+      return { layers };
+    });
     useWorldEditorStore.getState().setActive('tile', id);
   }
 

@@ -46,6 +46,9 @@ class ToolsTab extends Component<{}, ToolsTabState> {
       this.handleActiveChange, state => Object.entries(state.active)));
 
     this.subscriptions.push(useWorldEditorStore.subscribe(
+      this.handleActiveLayerChange, state => state.activeLayer));
+
+    this.subscriptions.push(useWorldEditorStore.subscribe(
       (type) => this.setState({ toolType: type as ToolType }), state => state.tool.type));
   }
 
@@ -57,28 +60,43 @@ class ToolsTab extends Component<{}, ToolsTabState> {
     for (const [key, value] of active) {
       if (value) {
         let tileStyle = {};
-        let activeButtons = [];
         switch (key) {
           case 'tile':
           case 'conference':
-            activeButtons = [true, true, true, true];
             tileStyle = useWorldEditorStore.getState().tiles[value].style;
             break;
           case 'object':
-            activeButtons = [true, true, false, false];
             tileStyle = useWorldEditorStore.getState().tiles[value].style;
             break;
-          case 'wall':
-            activeButtons = [true, true, false, false];
-            break;
         }
-        this.setState({ activeButtons });
         this.setState({ tileStyle });
         return;
       }
     }
-    this.setState({ activeButtons: [] })
     this.setState({ tileStyle: {} });
+  }
+
+  handleActiveLayerChange = (layer: string) => {
+    console.log(layer)
+    let activeButtons = [false, false, false, false];
+    switch (layer) {
+      case "Wall Layer":
+        activeButtons = [true, true, false, false];
+        break;
+      case "Conference Layer":
+        activeButtons = [true, true, true, true];
+        break;
+      case "Object Layer":
+        activeButtons = [true, true, false, false];
+        break;
+      case "Tile Layer":
+        break;
+      default:
+        if (layer) {
+          activeButtons = [true, true, true, true];
+        }
+    }
+    this.setState({ activeButtons });
   }
 
   handlePaintToolChange = (toolType: ToolType) => {

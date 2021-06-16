@@ -13,11 +13,6 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import LockIcon from '@material-ui/icons/Lock';
 import LockOpenIcon from '@material-ui/icons/LockOpen';
 
-import GridOnIcon from '@material-ui/icons/GridOn';
-import CategoryIcon from '@material-ui/icons/Category';
-import VideocamIcon from '@material-ui/icons/Videocam';
-import HomeWorkIcon from '@material-ui/icons/HomeWork';
-
 import GridOnTwoToneIcon from '@material-ui/icons/GridOnTwoTone';
 import CategoryTwoToneIcon from '@material-ui/icons/CategoryTwoTone';
 import VideocamTwoToneIcon from '@material-ui/icons/VideocamTwoTone';
@@ -35,7 +30,6 @@ interface SubLayerProps {
 
 const useLayerStyles = makeStyles({
   root: {
-    margin: '2px 0',
     display: 'flex',
     cursor: 'pointer',
     backgroundColor: 'rgba(11, 19, 43, 0.5)',
@@ -83,6 +77,7 @@ const SubLayer: React.FC<SubLayerProps> = ({ title, name, info }) => {
 
   const handleSelected = (event) => {
     event.stopPropagation();
+    useWorldEditorStore.setState({ activeLayer: name });
     if (event.ctrlKey) {
       useWorldEditorStore.setState(state => {
         state.layers[name].active = true;
@@ -212,13 +207,10 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ title, Icon, names, children })
       !layers.some(([name, layer]) => names.includes(name) && !layer.blocked));
     setSelected(
       !layers.some(([name, layer]) => names.includes(name) && !layer.active));
-
-    // console.log(
-    //   !layers.some(([name, layer]) => {console.log(layer); return names.includes(name) && !layer.active;})
-    // );
   }
 
-  const handleVisible = () => {
+  const handleVisible = (event) => {
+    event.stopPropagation();
     useWorldEditorStore.setState(state => {
       const layers = state.layers;
       for (const name of names)
@@ -227,7 +219,8 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ title, Icon, names, children })
     });
   }
 
-  const handleLocked = () => {
+  const handleLocked = (event) => {
+    event.stopPropagation();
     useWorldEditorStore.setState(state => {
       const layers = state.layers;
       for (const name of names)
@@ -238,6 +231,7 @@ const LayerGroup: React.FC<LayerGroupProps> = ({ title, Icon, names, children })
 
   const handleSelected = (event) => {
     event.stopPropagation();
+    useWorldEditorStore.setState({ activeLayer: title });
     if (event.ctrlKey) {
       useWorldEditorStore.setState(state => {
         const layers = state.layers;
@@ -329,10 +323,10 @@ class LayersTab extends Component<{}, LayersTabState> {
         style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
         onClick={this.handleActiveLayer}
       >
-        <LayerGroup title="Wall Layer" names={['__Float', '__Collision']} Icon={HomeWorkIcon} />
-        <LayerGroup title="Conference Layer" names={['__Conference']} Icon={VideocamIcon} />
-        <LayerGroup title="Object Layer" names={['Object', 'ObjectCollision']} Icon={CategoryIcon} />
-        <LayerGroup title="Tile Layer" names={['Float', 'Collision', 'Ground2', 'Ground']} Icon={GridOnIcon} >
+        <LayerGroup title="Wall Layer" names={['__Float', '__Collision']} Icon={HomeWorkTwoToneIcon} />
+        <LayerGroup title="Conference Layer" names={['__Conference']} Icon={VideocamTwoToneIcon} />
+        <LayerGroup title="Object Layer" names={['Object', 'ObjectCollision']} Icon={CategoryTwoToneIcon} />
+        <LayerGroup title="Tile Layer" names={['Float', 'Collision', 'Ground2', 'Ground']} Icon={GridOnTwoToneIcon} >
           {ready && (
             <>
               <SubLayer title="Floating Tiles" name='Float' info="Tiles that float over everything" />

@@ -19,8 +19,8 @@ class WallManager {
     private data: number[][];
     private firstGids: number[][];
 
-    constructor(wallLayer: Tilemaps.LayerData, roofLayer: Tilemaps.LayerData) {
-        if (!WallManager._instance) {
+    constructor(wallLayer: Tilemaps.LayerData, roofLayer: Tilemaps.LayerData, refresh: boolean=false) {
+        if (!WallManager._instance || refresh) {
             this.wallLayer = wallLayer;
             this.roofLayer = roofLayer;
             this.buildData();
