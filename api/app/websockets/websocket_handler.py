@@ -66,9 +66,7 @@ async def send_groups_snapshot(world_id: str):
 async def wire_players(world_id: str, user_id: str, payload: dict):
 
     while not await redis_connector.sadd(f"world:{world_id}:lock", 1):
-        asyncio.sleep(.1)
-
-    logger.warning('lock from wire')
+        asyncio.sleep(0)
 
     users_id = payload['users_id']
 
@@ -95,18 +93,15 @@ async def wire_players(world_id: str, user_id: str, payload: dict):
     add_users.add(user_id)
     for uid in add_users:
         await manager.send_personal_message({'topic': protocol.WIRE_PLAYER, 'merge': True, 'ids': list(add_users - {uid})}, uid)
-    await send_groups_snapshot(world_id)
+    # await send_groups_snapshot(world_id)
 
-    logger.warning('unlock from wire')
     await redis_connector.srem(f"world:{world_id}:lock", 1)
 
 
 async def unwire_players(world_id: str, user_id: str, payload: dict):
 
     while not await redis_connector.sadd(f"world:{world_id}:lock", 1):
-        asyncio.sleep(.1)
-
-    logger.warning('lock from unwire')
+        asyncio.sleep(0)
 
     users_id = payload['users_id']
     # remove faraway users from confirm structure
@@ -146,9 +141,8 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions(await redis_connector.add_users_to_group(world_id, next_group_id, *[user_id, *add_users_id]))
 
     await manager.send_personal_message({'topic': protocol.UNWIRE_PLAYER, 'groups': groups_to_remove, 'merge': True, 'ids': users_id}, user_id)
-    await send_groups_snapshot(world_id)
+    # await send_groups_snapshot(world_id)
 
-    logger.warning('unlock from unwire')
     await redis_connector.srem(f"world:{world_id}:lock", 1)
 
 

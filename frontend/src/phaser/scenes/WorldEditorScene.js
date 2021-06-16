@@ -26,9 +26,9 @@ class WorldEditorScene extends Scene {
         this.map = this.mapManager.buildMap(this);
         this.map.layers.forEach((layer) => {
             if (layer.name === "__Float")
-                layer.tilemapLayer.setDepth(999);
+                layer.tilemapLayer.setDepth(this.map.heightInPixels);
             else if (layer.name === "Float")
-                layer.tilemapLayer.setDepth(1000);
+                layer.tilemapLayer.setDepth(this.map.heightInPixels + 1);
         })
         this.objectGroups = this.mapManager.buildObjects(this);
 
@@ -78,7 +78,7 @@ class WorldEditorScene extends Scene {
             out: Phaser.Input.Keyboard.KeyCodes.E,
         }, false);
 
-        this.preview = new PreviewSprite(this, 0, 0);
+        this.preview = new PreviewSprite(this, 0, 0).setDepth(this.map.heightInPixels);
         this.mouseClick = true;
         this.save = false;
 

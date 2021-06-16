@@ -4,7 +4,7 @@ import HomeWorkTwoToneIcon from '@material-ui/icons/HomeWorkTwoTone';
 
 import TabHeader from './TabHeader';
 import MapManager from "phaser/MapManager";
-import useWorldEditorStore from "stores/useWorldEditorStore";
+import useWorldEditorStore, { ToolType } from "stores/useWorldEditorStore";
 
 import { API_BASE } from "config";
 
@@ -154,6 +154,7 @@ class WallsTab extends Component<{}, WallsTabState> {
   }
 
   handleClick = (id: string) => {
+    useWorldEditorStore.getState().setTool({ type: ToolType.DRAW });
     useWorldEditorStore.setState(state => {
       const layers = state.layers;
       useWorldEditorStore.setState({ activeLayer: 'Wall Layer' });
