@@ -120,6 +120,7 @@ async def join_world(
         # guests cannot join worlds that dont allow guests
         world_obj, msg = await crud.crud_world.get_available_for_guests(db=db, world_id=world_id,
                                                                         user_id=user.user_id)
+
         if not world_obj:
             raise HTTPException(status_code=400, detail=msg)
 
@@ -153,8 +154,9 @@ async def update_world(
         raise HTTPException(status_code=403, detail=strings.ACCESS_FORBIDDEN)
 
     # first checking if this user can edit the world(creator only)
-    world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id)
-
+    world_obj, message = crud.crud_world.is_editable_to_user(db=db, world_id=world_id, user_id=user.user_id,
+                                                             issuperuser=user.is_superuser)
+    logger.debug(message)
     # admins can also change the status of the world whenever they want
     if not world_obj and not user.is_superuser:
         raise HTTPException(

@@ -19,15 +19,24 @@ from app.core import consts
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
-    def is_editable_to_user(self, db: Session, world_id: int, user_id: int):
-        world_obj = db.query(World).join(User).filter(
-            World.creator == user_id,
-            World.world_id == world_id,
-            World.status != consts.WORLD_DELETED_STATUS
-        ).first()
-        if not world_obj:
-            return None, strings.EDITION_FORBIDDEN
-        return world_obj, ""
+    def is_editable_to_user(self, db: Session, world_id: int, user_id: int, issuperuser: bool = False):
+        msg = ""
+        if issuperuser:
+            world_obj = db.query(World).filter(
+                World.world_id == world_id,
+                World.status != consts.WORLD_DELETED_STATUS
+            ).first()
+            if not world_obj:
+                msg = strings.WORLD_NOT_FOUND
+        else:
+            world_obj = db.query(World).join(User).filter(
+                World.creator == user_id,
+                World.world_id == world_id,
+                World.status != consts.WORLD_DELETED_STATUS
+            ).first()
+            if not world_obj:
+                msg = strings.EDITION_FORBIDDEN
+        return world_obj, msg
 
     def is_name_in_use(self, db: Session, world_name) -> Tuple[Optional[World], str]:
         """

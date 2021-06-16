@@ -7,6 +7,8 @@ from .session import engine
 from datetime import datetime
 from app.core.security import get_password_hash
 from app.utils import choose_avatar
+
+
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
@@ -22,11 +24,8 @@ def insert_tags(target, connection, **kwargs):
     connection.execute(target.insert().values(name="Social"))
 
 
-
-
 @event.listens_for(User.__table__, "after_create")
 def insert_users(target, connection, **kwargs):
-
     # USER CREATION
     connection.execute(target.insert().values(
         name="Admin", email=settings.DB_ADMIN_EMAIL, register_date=datetime.now(), status=0, is_superuser=True,
