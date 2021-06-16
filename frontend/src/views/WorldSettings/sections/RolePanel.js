@@ -172,7 +172,7 @@ export default function RolePanel(props){
 			{...other}
 		>
 			{value === index && (
-				<Row style={{borderStyle:"solid", borderColor:"black", backgroundColor:"#5BC0BE", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
+				<Row style={{borderStyle:"solid", borderColor:"black", height:"450px", borderBottomLeftRadius:"15px", borderBottomRightRadius:"15px", borderTopRightRadius:"15px"}}>
 					<Col xs={4} sm={4} md={4} style = {{borderRight:"1px solid black",height:"100%"}}>
 						<Row style={{overflowY:"auto", height:"80%"}}>
 							<Col style={{marginLeft:"10px"}}>

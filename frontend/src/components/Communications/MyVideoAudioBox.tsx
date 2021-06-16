@@ -13,7 +13,6 @@ import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import Iframe from 'react-iframe'
 
 import { wsend } from "../../services/socket.js";
 import { sendVoice } from "../../webrtc/utils/sendVoice";
@@ -53,9 +52,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   // const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
+
   const showIframe = useWorldUserStore(state => state.showIFrame);
   const iFrame = useWorldUserStore(state => state.iFrame);
   const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
+  
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -89,7 +90,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   }
 
   useEffect(() => {
-    if (showFileSharing) {
+    if (!showFileSharing) {
       wsend({ topic: "REMOVE_ALL_USER_FILES" });
       useConsumerStore.getState().closeDataConsumers();
     }
@@ -385,20 +386,13 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         {showFileSharing ?
           <FileSharing closeModal={() => useWorldUserStore.setState({ showFileSharing: false })} />
           : ''}
-        {showIframe ?
+        {/* {showIframe ?
           <>
             <div style={{ position: 'fixed', top: 0, left: 65, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
               <Button onClick={() => useWorldUserStore.setState({ showIFrame: false })} variant="contained" color="primary" style={{ top: 10 }}>
                 Close External Service
               </Button>
             </div>
-            {/* urls: 
-              http://138.68.191.32/
-             https://downforacross.com/  
-             https://www.gameflare.com/embed/mini-survival/
-             https://www.chesshotel.com/pt/"
-             https://r7.whiteboardfox.com/
-            */}
             <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
               <Iframe url={iFrame}
                 position="absolute"
@@ -407,7 +401,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 height="100%" />
             </div>
           </>
-          : ''}
+          : ''} */}
       </FullScreen>
     </div>
   );

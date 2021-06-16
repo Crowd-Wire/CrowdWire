@@ -162,6 +162,12 @@ export default function DashDrawer(props){
       navigation("/admin/worlds/reports");
   }
 
+  const onClickPlatformEvents = () => {
+    handlePopCloseWorlds()
+    if(location.pathname!=="/admin/statistics")
+      navigation("/admin/statistics");
+  }
+
   const onClickPlatformUserStats = () => {
     handlePopCloseUsers()
     if(location.pathname!=="/admin/users")
@@ -323,6 +329,14 @@ export default function DashDrawer(props){
                         <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
                       </ListItemIcon>
                       <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
+                    </ListItem>
+                  </Row>
+                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
+                    <ListItem onClick={onClickPlatformEvents} button key="Pop Platform World Reports">
+                      <ListItemIcon>
+                        <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      </ListItemIcon>
+                      <ListItemText style={{ color: '#FFFFFF' }} primary="EVENTS" />
                     </ListItem>
                   </Row>
                 </>

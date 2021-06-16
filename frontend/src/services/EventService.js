@@ -5,7 +5,7 @@ class EventService {
 
     getEvents(event_type, world_id, user_id, start_date, end_date, order_desc, limit, page_num){
 
-        let url = 'worlds/' + world_id + '/events';
+        let url = 'worlds/' + world_id + '/events/';
 
         let query = []
 

@@ -239,7 +239,6 @@ class WorldEditorScene extends Scene {
                             && !store.layers[storeActiveLayer].blocked && store.layers[storeActiveLayer].active) ? storeActiveLayer :
                             undefined;
             
-            console.log(activeLayerName)
             if (activeLayerName) {
                 // Conference selected and not blocked 
                 // or other layer selected and not blocked
@@ -393,11 +392,9 @@ class WorldEditorScene extends Scene {
                 const activeObject = store.active.object;
                 activeLayerName = this.mapManager.objectProps[activeObject].properties?.collides ?
                     'ObjectCollision' : 'Object';
-                console.log(activeLayerName)
                 const activeObjectGroup = this.objectGroups[activeLayerName];
                 if (activeObject && activeObjectGroup) {
                     // ObjectGroup exists
-                    console.log(activeObjectGroup)
 
                     const pointerX = Math.Snap.Floor(worldPoint.x, 16),
                         pointerY = Math.Snap.Floor(worldPoint.y, 16);

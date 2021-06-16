@@ -22,6 +22,7 @@ import { createBrowserHistory } from 'history';
 import { toast } from 'react-toastify';
 import logo from 'assets/crowdwire_white_logo.png';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import useWorldUserStore from "../../../stores/useWorldUserStore";
 
 const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -88,13 +89,13 @@ class DashboardContent extends Component{
 
 	enterMap = () => {
 		const url = window.location.pathname;
-		let path = `/world/`+url[url.length - 1];
+		let path = `/world/`+url.split("/")[2];
 		this.setState({goToWorld: path})
 	}
 
 	componentDidMount(){
 		const url = window.location.pathname;
-		WorldService.getWorldDetails(url[url.length - 1])
+		WorldService.getWorldDetails(url.split("/")[2])
 		  .then((res) => {
 			if (res.status == 200)
 			  return res.json()
@@ -186,7 +187,8 @@ class DashboardContent extends Component{
 
 
 	updateWorldInfo({world_picture = undefined}) {
-		const url = window.location.pathname;
+		let url = window.location.pathname;
+		let id  = url.split("/")[2];
 		if (world_picture === undefined && document.getElementById("world_pic").files.item(0)) {
 			let file = document.getElementById("world_pic").files.item(0)
 			this.uploadFile(file)
@@ -199,12 +201,13 @@ class DashboardContent extends Component{
 		let tag_array =  this.state.chosenTags;
 		let desc = document.getElementById("world_desc").innerText;
 
-		WorldService.putWorld(url[url.length - 1],
+		WorldService.putWorld(id,
 			{
 				wName,
 				accessibility,
 				guests,
 				maxUsers,
+
 				tag_array,
 				desc,
 				world_picture
