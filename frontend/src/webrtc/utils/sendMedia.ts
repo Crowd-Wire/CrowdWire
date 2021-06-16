@@ -74,7 +74,6 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
             addProducer(key, producer, 'media');
           })
           .catch((err) => {
-            console.log("tou")
             console.log(err)
             let { rooms } = useRoomStore.getState();
             if (Object.keys(rooms).length > 0) {
