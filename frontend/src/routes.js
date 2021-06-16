@@ -37,6 +37,7 @@ import AdminUsers from "views/AdminUsers/AdminUsers";
 import SendEmailConfirmation from "views/SendEmailConfirmation/SendEmailConfirmation";
 import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail.js';
 import WorldStatistics from "views/WorldStatistics/WorldStatistics";
+import LandingLayout from './layouts/LandingLayout/index.js'
 
 /**
  * Public and protected routes list 
@@ -49,9 +50,15 @@ import WorldStatistics from "views/WorldStatistics/WorldStatistics";
 const routes = (token, guest_uuid, last_location,is_superuser) => [
 	{
 		path: "/",
-		element: <MainLayout />,
+		element: <LandingLayout />,
 		children: [
             { path: "/", element: <LandingPage /> },
+		],
+	},
+	{
+		path: "/",
+		element: <MainLayout />,
+		children: [
             { path: "/contacts", element: <ContactUs /> },
             { path: "/about", element: <AboutUs /> },
             { path: "/FAQs", element: <FAQs /> },
