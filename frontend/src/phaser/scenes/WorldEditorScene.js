@@ -25,7 +25,9 @@ class WorldEditorScene extends Scene {
 
         this.map = this.mapManager.buildMap(this);
         this.map.layers.forEach((layer) => {
-            if (layer.name.includes("Float"))
+            if (layer.name === "__Float")
+                layer.tilemapLayer.setDepth(999);
+            else if (layer.name === "Float")
                 layer.tilemapLayer.setDepth(1000);
         })
         this.objectGroups = this.mapManager.buildObjects(this);

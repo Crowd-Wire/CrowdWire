@@ -41,7 +41,9 @@ class GameScene extends Phaser.Scene {
             else if (layer.name.includes("Collision"))
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name.includes("Float"))
+            else if (layer.name === "__Float")
+                layer.tilemapLayer.setDepth(999);
+            else if (layer.name === "Float")
                 layer.tilemapLayer.setDepth(1000);
         })
 

@@ -386,13 +386,14 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
               </Button>
             </div>
             {/* urls: 
+              http://138.68.191.32/
              https://downforacross.com/  
              https://www.gameflare.com/embed/mini-survival/
              https://www.chesshotel.com/pt/"
              https://r7.whiteboardfox.com/
             */}
             <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
-              <Iframe url="https://r7.whiteboardfox.com/"
+              <Iframe url="http://138.68.191.32/"
                 position="absolute"
                 width="100%"
                 id="myIframe"
