@@ -22,6 +22,7 @@ import { createBrowserHistory } from 'history';
 import { toast } from 'react-toastify';
 import logo from 'assets/crowdwire_white_logo.png';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import useWorldUserStore from "../../../stores/useWorldUserStore";
 
 const toast_props = {
     position: toast.POSITION.TOP_RIGHT,
@@ -187,6 +188,7 @@ class DashboardContent extends Component{
 
 	updateWorldInfo({world_picture = undefined}) {
 		const url = window.location.pathname;
+		url = url.split("/")[2];
 		if (world_picture === undefined && document.getElementById("world_pic").files.item(0)) {
 			let file = document.getElementById("world_pic").files.item(0)
 			this.uploadFile(file)
@@ -199,7 +201,7 @@ class DashboardContent extends Component{
 		let tag_array =  this.state.chosenTags;
 		let desc = document.getElementById("world_desc").innerText;
 
-		WorldService.putWorld(url.split("/")[2]),
+		WorldService.putWorld(url,
 			{
 				wName,
 				accessibility,
