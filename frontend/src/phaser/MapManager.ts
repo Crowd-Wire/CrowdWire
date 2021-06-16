@@ -146,7 +146,7 @@ class MapManager {
                     objBody.setOffset(x, y).setSize(width, height, false);
                     obj.setDepth(objBody.y);
                 } else {
-                    obj.setDepth(1);
+                    obj.setDepth(obj.y);
                 }
                 if (properties) {
                     obj.setData(properties);

@@ -42,9 +42,9 @@ class GameScene extends Phaser.Scene {
                 // -1 makes all tiles on this layer collidable
                 this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
             else if (layer.name === "__Float")
-                layer.tilemapLayer.setDepth(999);
+                layer.tilemapLayer.setDepth(this.map.heightInPixels);
             else if (layer.name === "Float")
-                layer.tilemapLayer.setDepth(1000);
+                layer.tilemapLayer.setDepth(this.map.heightInPixels + 1);
         })
 
         this.objectGroups = mapManager.buildObjects(this);
@@ -114,7 +114,7 @@ class GameScene extends Phaser.Scene {
         // make camera follow player
         this.cameras.main
             .startFollow(this.player)
-            .setBackgroundColor("#0C1117")//'#080C10');
+            .setBackgroundColor("#0C1117")
             .setZoom(1.5);
         this.cameras.main.roundPixels = true;   // prevent tiles bleeding (showing border lines on tiles)
 
@@ -131,8 +131,8 @@ class GameScene extends Phaser.Scene {
             usePlayerStore.subscribe(this.handlePlayerConnection, state => Object.keys(state.players)));
 
         // TODO: remove after testing
-        this.subscriptions.push(
-            usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups })));
+        // this.subscriptions.push(
+        //     usePlayerStore.subscribe(this.handleGroups, state => ({ ...state.groups })));
 
         this.game.input.events.on('unsubscribe', () => {
             this.subscriptions.forEach((unsub) => unsub());
@@ -361,13 +361,9 @@ class Player extends Phaser.GameObjects.Container {
                 "Me",
                 '',
             ]);
-        const circle = scene.add.circle(0, 0, 150)
-            .setOrigin(0.5)
-            .setStrokeStyle(1, 0x1a65ac);
 
         this.addSprite(sprite)
-            .addText(text)
-            .add(circle);
+            .addText(text);
 
         this.body.setSize(26, 10)
             .setOffset(-14, 10);
@@ -494,7 +490,7 @@ class RemotePlayer extends Player {
             this.username = usePlayerStore.getState().users_info[id]?.username
         this.getText().setText([
             `${this.username}`,
-            'G???',
+            // 'G???',
         ]);
 
         this.unsubscribe = usePlayerStore.subscribe(
