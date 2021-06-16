@@ -199,7 +199,7 @@ class DashboardContent extends Component{
 		let tag_array =  this.state.chosenTags;
 		let desc = document.getElementById("world_desc").innerText;
 
-		WorldService.putWorld(url[url.length - 1],
+		WorldService.putWorld(url.split("/")[2]),
 			{
 				wName,
 				accessibility,
