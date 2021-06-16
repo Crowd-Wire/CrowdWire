@@ -19,7 +19,7 @@ from app.core import consts
 
 class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
 
-    def is_editable_to_user(self, db: Session, world_id: int, user_id: int, issuperuser:bool = False):
+    def is_editable_to_user(self, db: Session, world_id: int, user_id: int, issuperuser: bool = False):
         msg = ""
         if issuperuser:
             world_obj = db.query(World).filter(
