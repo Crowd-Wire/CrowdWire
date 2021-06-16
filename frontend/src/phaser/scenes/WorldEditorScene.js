@@ -59,7 +59,8 @@ class WorldEditorScene extends Scene {
 
         this.wallManager = new WallManager(
             this.map.getLayer('__Collision'),
-            this.map.getLayer('__Float')
+            this.map.getLayer('__Float'),
+            true
         );
 
         this.handleReady(true);
