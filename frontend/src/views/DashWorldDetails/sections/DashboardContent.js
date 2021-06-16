@@ -187,8 +187,8 @@ class DashboardContent extends Component{
 
 
 	updateWorldInfo({world_picture = undefined}) {
-		const url = window.location.pathname;
-		url = url.split("/")[2];
+		let url = window.location.pathname;
+		let id  = url.split("/")[2];
 		if (world_picture === undefined && document.getElementById("world_pic").files.item(0)) {
 			let file = document.getElementById("world_pic").files.item(0)
 			this.uploadFile(file)
@@ -201,12 +201,13 @@ class DashboardContent extends Component{
 		let tag_array =  this.state.chosenTags;
 		let desc = document.getElementById("world_desc").innerText;
 
-		WorldService.putWorld(url,
+		WorldService.putWorld(id,
 			{
 				wName,
 				accessibility,
 				guests,
 				maxUsers,
+
 				tag_array,
 				desc,
 				world_picture
