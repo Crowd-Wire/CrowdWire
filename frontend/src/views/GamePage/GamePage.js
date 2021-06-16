@@ -50,7 +50,6 @@ const GamePage = (props) => {
 
   useEffect(() => {
     useAuthStore.getState().setLastLocation(null);
-    console.log(window.location.pathname.split('/')[2])
     WorldService.joinWorld(window.location.pathname.split('/')[2])
       .then((res) => {
         return res.json();
