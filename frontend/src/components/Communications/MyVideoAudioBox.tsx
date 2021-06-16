@@ -49,12 +49,9 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const myRef = useRef<any>(null);
   const [videoPauseState, setVideoPauseState] = useState(true);
   const [audioPauseState, setAudioPauseState] = useState(true);
-  // const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
 
-  const showIframe = useWorldUserStore(state => state.showIFrame);
-  const iFrame = useWorldUserStore(state => state.iFrame);
   const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
   
   const [fullscreen, setFullscreen] = useState(false);
@@ -214,6 +211,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
     wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
   }
 
+  useEffect(() => {
+    console.log('sad', mediaOffState)
+    useWorldUserStore.getState().setShowMediaOffState(false);
+    toggleMedia();
+  }, [mediaOffState]);
+
   const toggleMedia = () => {
     let { set } = useMediaStore.getState();
     let { rooms, removeProducer } = useRoomStore.getState();
@@ -222,7 +225,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       sendMedia(true).then((media) => {
         if (media) {
           useWorldUserStore.getState().setShowMediaOffState(!mediaOffState);
-          // setMediaOffState(!mediaOffState)
         }
       });
     } else if (Object.keys(rooms).length > 0) {
@@ -386,22 +388,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
         {showFileSharing ?
           <FileSharing closeModal={() => useWorldUserStore.setState({ showFileSharing: false })} />
           : ''}
-        {/* {showIframe ?
-          <>
-            <div style={{ position: 'fixed', top: 0, left: 65, width: '100%', height: 60, textAlign: 'center', background: 'white' }}>
-              <Button onClick={() => useWorldUserStore.setState({ showIFrame: false })} variant="contained" color="primary" style={{ top: 10 }}>
-                Close External Service
-              </Button>
-            </div>
-            <div style={{ position: 'fixed', top: 60, left: 65, width: 'calc(100% - 65px)', height: 'calc(100% - 60px)', background: 'white' }}>
-              <Iframe url={iFrame}
-                position="absolute"
-                width="100%"
-                id="myIframe"
-                height="100%" />
-            </div>
-          </>
-          : ''} */}
       </FullScreen>
     </div>
   );

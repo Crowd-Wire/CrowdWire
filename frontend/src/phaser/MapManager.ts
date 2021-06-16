@@ -42,7 +42,6 @@ class MapManager {
             const worldUser = useWorldUserStore.getState().world_user;
             this.worldId = worldUser.world_id;
             this.mapJson = JSON.parse(worldUser.world_map);
-            console.log(JSON.stringify(this.mapJson))
             this.conferenceMap = {};
             MapManager._instance = this;
         }

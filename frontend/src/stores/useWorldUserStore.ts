@@ -33,7 +33,7 @@ const useWorldUserStore = create(
         {   
             showFileSharing: false,
             showIFrame: false,
-            showMediaOffState: true,
+            showMediaOffState: false,
             iFrame: '',
             world_user: null as WorldUser | null,
         },
