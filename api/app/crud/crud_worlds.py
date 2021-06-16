@@ -42,7 +42,8 @@ class CRUDWorld(CRUDBase[World, WorldCreate, WorldUpdate]):
         """
         Check if the name of a World is already in use
         """
-        world_obj = db.query(World).filter(World.name == world_name).first()
+        world_obj = db.query(World)\
+            .filter(World.name == world_name, World.status != consts.WORLD_DELETED_STATUS).first()
         if not world_obj:
             return world_obj, ""
         return world_obj, strings.WORLD_NAME_ALREADY_IN_USE
