@@ -50,10 +50,11 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const myRef = useRef<any>(null);
   const [videoPauseState, setVideoPauseState] = useState(true);
   const [audioPauseState, setAudioPauseState] = useState(true);
-  const [mediaOffState, setMediaOffState] = useState(true);
+  // const [mediaOffState, setMediaOffState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
   const showIframe = useWorldUserStore(state => state.showIFrame);
+  const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -217,8 +218,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
     if (mediaOffState) {
       sendMedia(true).then((media) => {
-        if (media)
-          setMediaOffState(!mediaOffState)
+        if (media) {
+          useWorldUserStore.getState().setShowMediaOffState(!mediaOffState);
+          // setMediaOffState(!mediaOffState)
+        }
       });
     } else if (Object.keys(rooms).length > 0) {
       for (const [key, value] of Object.entries(rooms)) {
@@ -231,7 +234,10 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   useEffect(() => {
     let { rooms } = useRoomStore.getState();
 
-    setMediaOffState(useMediaStore.getState().media ? false : true)
+    useWorldUserStore.getState().setShowMediaOffState(
+      useMediaStore.getState().media ? false : true
+    )
+    // setMediaOffState(useMediaStore.getState().media ? false : true)
     for (let roomId in rooms)
       wsend({ topic: "close-media" })
 
