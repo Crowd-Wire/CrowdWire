@@ -40,6 +40,7 @@ interface State {
   mic: any;
   media: any;
   showIFrame: any;
+  iFrame: string;
 }
 
 export default class RoomCall extends React.Component<{}, State> {
@@ -58,12 +59,17 @@ export default class RoomCall extends React.Component<{}, State> {
       cam: useVideoStore.getState().cam,
       mic: useVoiceStore.getState().mic,
       media: useMediaStore.getState().media,
-      showIFrame: useWorldUserStore.getState().showIFrame
+      showIFrame: useWorldUserStore.getState().showIFrame,
+      iFrame: '',
     }
 
     this.showIFrameSub = useWorldUserStore.subscribe((showIFrame) => {
       this.setState({ showIFrame })
     }, (state) => state.showIFrame);
+
+    this.showIFrameSub = useWorldUserStore.subscribe((iFrame: string) => {
+      this.setState({ iFrame })
+    }, (state) => state.iFrame);
 
     this.consumerStoreSub = useConsumerStore.subscribe((consumerMap) => {
       this.setState({ consumerMap })
@@ -334,7 +340,7 @@ export default class RoomCall extends React.Component<{}, State> {
             https://r7.whiteboardfox.com/
             */}
             <div style={{ position: 'fixed', top: IFrame_height === 0 ? '60px' : `calc(${document.getElementById("my_carousel").offsetHeight}px + 60px)`, left: 65, width: 'calc(100% - 60px)', height: 'calc(100% - 60px)', background: 'white' }}>
-              <Iframe url="https://r7.whiteboardfox.com/"
+              <Iframe url={this.state.iFrame}
                 position="absolute"
                 width="100%"
                 id="myIframe"
