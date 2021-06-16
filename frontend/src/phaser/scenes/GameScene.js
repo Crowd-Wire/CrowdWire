@@ -232,7 +232,7 @@ class GameScene extends Phaser.Scene {
             if (this.interact === 'FILE_SHARE') {
                 useWorldUserStore.getState().setShowFileSharing();
             } else if (this.interact === 'SCREEN_SHARE') {
-                useWorldUserStore.getState().setShowMediaOffState(false);
+                useWorldUserStore.getState().setShowMedia(true);
             } else if (this.interact === 'WHITEBOARD') {
                 useWorldUserStore.getState().setShowIFrame('https://r7.whiteboardfox.com/');
             } else if (this.interact === 'CHESS') {

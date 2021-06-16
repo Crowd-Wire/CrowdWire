@@ -33,7 +33,7 @@ const useWorldUserStore = create(
         {   
             showFileSharing: false,
             showIFrame: false,
-            showMediaOffState: false,
+            showMedia: false,
             iFrame: '',
             world_user: null as WorldUser | null,
         },
@@ -44,8 +44,8 @@ const useWorldUserStore = create(
             setShowIFrame: (iFrame: string) => {
                 return set({showIFrame: true, iFrame});
             },
-            setShowMediaOffState: (showMediaOffState: boolean) => {
-                return set({showMediaOffState});
+            setShowMedia: (showMedia: boolean) => {
+                return set({showMedia});
             },
             joinWorld: (world_user: WorldUser) => {
                 return set((s) => {

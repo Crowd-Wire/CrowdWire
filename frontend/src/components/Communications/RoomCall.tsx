@@ -19,7 +19,7 @@ import { useVideoStore } from "../../webrtc/stores/useVideoStore";
 import { useMuteStore } from "../../webrtc/stores/useMuteStore";
 import { useConsumerStore } from "../../webrtc/stores/useConsumerStore";
 import { useRoomStore } from '../../webrtc/stores/useRoomStore';
-import useWorldUserStore from "../../stores/useWorldUserStore";
+import useWorldUserStore from "stores/useWorldUserStore";
 import { sendVoice } from 'webrtc/utils/sendVoice';
 import { sendVideo } from 'webrtc/utils/sendVideo';
 import { sendMedia } from 'webrtc/utils/sendMedia';

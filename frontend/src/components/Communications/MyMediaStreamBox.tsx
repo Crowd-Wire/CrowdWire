@@ -9,6 +9,8 @@ import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
 import { useRoomStore } from "../../webrtc/stores/useRoomStore";
+import { wsend } from "../../services/socket.js";
+import useWorldUserStore from "stores/useWorldUserStore";
 
 interface MyMediaStreamBoxProps {
   username?: string;
@@ -39,25 +41,33 @@ export const MyMediaStreamBox: React.FC<MyMediaStreamBoxProps> = ({
   }))
 
   const closeMedia = () => {
-    let { set, mediaStream } = useMediaStore.getState();
+    let { set, media, mediaStream } = useMediaStore.getState();
     let { rooms, removeProducer } = useRoomStore.getState();
     if (Object.keys(rooms).length > 0) {
       for (const [key, value] of Object.entries(rooms)) {
         removeProducer(key, 'media');
       }
     }
+    if (media) media.stop();
     if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
     set({media: null, mediaStream: null})
+    wsend({ topic: "close-media" })
+    useWorldUserStore.getState().setShowMedia(false);
   }
 
   useEffect(() => {
     const mediaStream = new MediaStream();
     mediaStream.addTrack(mediaTrack);
+
     if (myRef.current) {
       myRef.current.srcObject = mediaStream;
       myRef.current.muted = true
     }
-  }, [])
+
+    return () => {
+      closeMedia();
+    }
+    }, [])
 
   const classes = useStyles();
 
