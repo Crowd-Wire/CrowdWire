@@ -88,13 +88,13 @@ class DashboardContent extends Component{
 
 	enterMap = () => {
 		const url = window.location.pathname;
-		let path = `/world/`+url[url.length - 1];
+		let path = `/world/`+url.split("/")[2];
 		this.setState({goToWorld: path})
 	}
 
 	componentDidMount(){
 		const url = window.location.pathname;
-		WorldService.getWorldDetails(url[url.length - 1])
+		WorldService.getWorldDetails(url.split("/")[2])
 		  .then((res) => {
 			if (res.status == 200)
 			  return res.json()
