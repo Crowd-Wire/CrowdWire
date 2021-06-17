@@ -46,12 +46,14 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
           set({media: null, mediaStream: null});
           useWorldUserStore.getState().setShowMedia(false);
         }
-        
         set({mediaStream: mediaStream, media: media})
       })
     } catch (err) {
-      set({media: null, mediaStream: null})
       console.log(err);
+      if (media) media.stop();
+      if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
+      set({media: null, mediaStream: null});
+      useWorldUserStore.getState().setShowMedia(false);
     }
     return;
   }
