@@ -1,5 +1,6 @@
 import { useRoomStore } from "../stores/useRoomStore";
 import { useMediaStore } from "../stores/useMediaStore";
+import useWorldUserStore from "stores/useWorldUserStore";
 import { Producer, Transport } from "mediasoup-client/lib/types";
 
 
@@ -33,6 +34,19 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
       // @ts-ignore
       await navigator.mediaDevices.getDisplayMedia().then((mediaStream) => {
         media = mediaStream.getVideoTracks()[0];
+        media.onended = function(event) {
+          let { rooms } = useRoomStore.getState();
+          if (Object.keys(rooms).length > 0) {
+            for (const [key, value] of Object.entries(rooms)) {
+              removeProducer(key, 'media');
+            }
+          }
+          if (media) media.stop();
+          if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
+          set({media: null, mediaStream: null});
+          useWorldUserStore.getState().setShowMedia(false);
+        }
+        
         set({mediaStream: mediaStream, media: media})
       })
     } catch (err) {
@@ -61,20 +75,19 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
           })
           .catch((err) => {
             console.log(err)
-            removeProducer(key, 'media');
-            set({media: null, mediaStream: null})
+            let { rooms } = useRoomStore.getState();
+            if (Object.keys(rooms).length > 0) {
+              for (const [key, value] of Object.entries(rooms)) {
+                removeProducer(key, 'media');
+              }
+            }
+            if (media) media.stop();
+            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
+            set({media: null, mediaStream: null});
+            useWorldUserStore.getState().setShowMedia(false);
           })
         }
       };
-      media.onended = function(event) {
-        let { rooms } = useRoomStore.getState();
-        if (Object.keys(rooms).length > 0) {
-          for (const [key, value] of Object.entries(rooms)) {
-            removeProducer(key, 'media');
-          }
-        }
-        set({media: null, mediaStream: null})
-      }
       return true;
     } catch (err) {
       console.log(err)

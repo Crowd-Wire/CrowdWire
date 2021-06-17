@@ -5,8 +5,6 @@ import MicIcon from '@material-ui/icons/Mic';
 import MicOffIcon from '@material-ui/icons/MicOff';
 import VideocamIcon from '@material-ui/icons/Videocam';
 import SettingsIcon from '@material-ui/icons/SettingsApplicationsTwoTone';
-import ScreenShareIcon from '@material-ui/icons/ScreenShare';
-import StopScreenShareIcon from '@material-ui/icons/StopScreenShare';
 import VideocamOffIcon from '@material-ui/icons/VideocamOff';
 import FullscreenIcon from '@material-ui/icons/Fullscreen';
 import FullscreenExitIcon from '@material-ui/icons/FullscreenExit';
@@ -15,8 +13,6 @@ import Col from 'react-bootstrap/Col';
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 import { wsend } from "../../services/socket.js";
-import { sendVoice } from "../../webrtc/utils/sendVoice";
-import { sendVideo } from "../../webrtc/utils/sendVideo";
 import { sendMedia } from "../../webrtc/utils/sendMedia";
 import { DeviceSettings } from "./DeviceSettings";
 import { FileSharing } from "./FileSharing";
@@ -51,9 +47,7 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
   const [audioPauseState, setAudioPauseState] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const showFileSharing = useWorldUserStore(state => state.showFileSharing);
-
-  const mediaOffState = useWorldUserStore(state => state.showMediaOffState);
-  
+  const showMedia = useWorldUserStore(state => state.showMedia);
   const [fullscreen, setFullscreen] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
   const handle = useFullScreenHandle();
@@ -92,6 +86,12 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       useConsumerStore.getState().closeDataConsumers();
     }
   }, [showFileSharing])
+
+  useEffect(() => {
+    if (showMedia && !useMediaStore.getState().media) {
+      sendMedia(true);
+    }
+  }, [showMedia])
 
   useEffect(() => {
     useWsHandlerStore.getState().addWsListener(`REQUEST_TO_SPEAK`, (d) => {
@@ -210,43 +210,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
 
     wsend({ topic: "toggle-producer", d: { kind: 'audio', pause: audioPauseState } });
   }
-
-  useEffect(() => {
-    console.log('sad', mediaOffState)
-    useWorldUserStore.getState().setShowMediaOffState(false);
-    toggleMedia();
-  }, [mediaOffState]);
-
-  const toggleMedia = () => {
-    let { set } = useMediaStore.getState();
-    let { rooms, removeProducer } = useRoomStore.getState();
-
-    if (mediaOffState) {
-      sendMedia(true).then((media) => {
-        if (media) {
-          useWorldUserStore.getState().setShowMediaOffState(!mediaOffState);
-        }
-      });
-    } else if (Object.keys(rooms).length > 0) {
-      for (const [key, value] of Object.entries(rooms)) {
-        removeProducer(key, 'media');
-      }
-      set({ media: null, mediaStream: null })
-    }
-  }
-
-  useEffect(() => {
-    let { rooms } = useRoomStore.getState();
-
-    useWorldUserStore.getState().setShowMediaOffState(
-      useMediaStore.getState().media ? false : true
-    )
-    // setMediaOffState(useMediaStore.getState().media ? false : true)
-    for (let roomId in rooms)
-      wsend({ topic: "close-media" })
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useMediaStore.getState().media])
 
   useEffect(() => {
     setVideoPauseState(videoTrack ? true : false)
@@ -372,13 +335,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
                 }
               </Col>
 
-              <Col style={{ textAlign: 'right', paddingRight: '10%' }} sm={6}>
-                {mediaOffState ?
-                  <ScreenShareIcon style={{ 'cursor': 'pointer', color: 'white' }} onClick={() => toggleMedia()} />
-                  :
-                  <StopScreenShareIcon style={{ 'cursor': 'pointer' }} color="secondary" onClick={() => toggleMedia()} />
-                }
-              </Col>
             </Row>
           </div>
         </Card>
