@@ -15,18 +15,19 @@ const mapEditorStyle = {
         alignItems: 'center',
         height: '100%',
         flexWrap: 'wrap',
+
+        ['@media (min-width:769px)']: {
+            flexWrap: 'nowrap',
+        },
+    },
+    img : {
+        width: 'auto',
+        ['@media (min-width:769px)']: {
+            width: '25%',
+        }, 
     },
     card: {
-        margin: 0,
-        ['@media (min-width:767px)']: {
-            margin: '0 50px',
-        },
-        ['@media (min-width:1023px)']: {
-            margin: '0 150px'
-        },
-        ['@media (min-width:1439px)']: {
-            margin: '0 50px',
-        }
+        margin: '0 25px',
     },
     wrapper: {
         display: 'flex',

@@ -24,6 +24,7 @@ import Popover from "@material-ui/core/Popover";
 import Row from "react-bootstrap/Row";
 import MapIcon from '@material-ui/icons/Map';
 import PersonIcon from '@material-ui/icons/Person';
+import classNames from 'classnames';
 
 const drawerWidth = 240;
 
@@ -76,24 +77,36 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
-  },  
-  iconDrawer: {
-    fill:"white",
   },
+  iconDrawer: {
+    fill: "white",
+  },
+  active: {
+    "&:before": {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: '#2B9BFD',
+      'clip-path': 'polygon(75% 50%, 100% 75%, 100% 25%)',
+    }
+  }
 }));
 
-export default function DashDrawer(props){
+function DashDrawer(props) {
   const st = useAuthStore.getState();
   const navigation = useNavigate();
   const location = useLocation();
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
-  const addWorld = theme.spacing(2)+100;
-  const definitions = theme.spacing(2)+50;
-  const stats = theme.spacing(2)+200;
-  const userstats = theme.spacing(2)+150;
-  const dashboard = theme.spacing(2)+250;
+  const addWorld = theme.spacing(2) + 100;
+  const definitions = theme.spacing(2) + 50;
+  const stats = theme.spacing(2) + 200;
+  const userstats = theme.spacing(2) + 150;
+  const dashboard = theme.spacing(2) + 250;
   const [anchorElUsers, setAnchorElUsers] = React.useState(null);
   const [anchorElWorlds, setAnchorElWorlds] = React.useState(null);
 
@@ -124,12 +137,12 @@ export default function DashDrawer(props){
   };
 
   const onClickAllWorlds = () => {
-    if(location.pathname!=="/dashboard/search/public")
+    if (location.pathname !== "/dashboard/search/public")
       navigation("/dashboard/search/public");
   }
 
   const onClickJoinedWorlds = () => {
-    if(location.pathname!=="/dashboard/search/joined")
+    if (location.pathname !== "/dashboard/search/joined")
       navigation("/dashboard/search/joined");
   }
 
@@ -138,280 +151,309 @@ export default function DashDrawer(props){
   }
 
   const onClickCreateWorld = () => {
-    if(location.pathname!=="/create-world")
-    navigation("/create-world");
+    if (location.pathname !== "/create-world")
+      navigation("/create-world");
   }
   const onClickCreatedWorlds = () => {
-    if(location.pathname!=="/dashboard/search/owned")
+    if (location.pathname !== "/dashboard/search/owned")
       navigation("/dashboard/search/owned");
   }
   const onClickUserSettings = () => {
-    if(location.pathname!=="/dashboard/user")
+    if (location.pathname !== "/dashboard/user")
       navigation("/dashboard/user");
   }
 
   const onClickPlatformWorldStats = () => {
     handlePopCloseWorlds()
-    if(location.pathname!=="/admin/worlds")
+    if (location.pathname !== "/admin/worlds")
       navigation("/admin/worlds");
   }
 
   const onClickPlatformWorldReports = () => {
     handlePopCloseWorlds()
-    if(location.pathname!=="/admin/worlds/reports")
+    if (location.pathname !== "/admin/worlds/reports")
       navigation("/admin/worlds/reports");
   }
 
   const onClickPlatformEvents = () => {
     handlePopCloseWorlds()
-    if(location.pathname!=="/admin/statistics")
+    if (location.pathname !== "/admin/statistics")
       navigation("/admin/statistics");
   }
 
   const onClickPlatformUserStats = () => {
     handlePopCloseUsers()
-    if(location.pathname!=="/admin/users")
+    if (location.pathname !== "/admin/users")
       navigation("/admin/users");
   }
 
   const onClickPlatformUserReports = () => {
     handlePopCloseUsers()
-    if(location.pathname!=="/admin/users/reports")
+    if (location.pathname !== "/admin/users/reports")
       navigation("/admin/users/reports");
   }
 
   const onClickPlatformDashboard = () => {
-    if(location.pathname!=="/admin/dashboard")
+    if (location.pathname !== "/admin/dashboard")
       navigation("/admin/dashboard");
   }
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
-    return(
-        <Drawer
-        variant="permanent"
-        className={clsx(classes.drawer, {
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,
-        })}
-        classes={{
-            paper: clsx({
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,
-            }),
-        }}
-        >
-        <div className={classes.toolbar}
+  return (
+    <Drawer
+      variant="permanent"
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open,
+      })}
+      classes={{
+        paper: clsx({
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        }),
+      }}
+    >
+      <div className={classes.toolbar}
         className={clsx(classes.menuButton, {
-        [classes.hide]: open,
+          [classes.hide]: open,
         })}>
         <IconButton
-        aria-label="open drawer"
-        onClick={handleDrawerOpen}
-        className={clsx(classes.menuButton, {
+          aria-label="open drawer"
+          onClick={handleDrawerOpen}
+          className={clsx(classes.menuButton, {
             [classes.hide]: open,
-        })}
+          })}
         >
-        <MenuIcon className={classes.iconDrawer}/>
+          <MenuIcon className={classes.iconDrawer} />
         </IconButton>
-        </div>
-        <div className={classes.toolbar}
-                className={clsx(classes.menuButton, {
-                    [classes.hide]: !open,
-                })}>
+      </div>
+      <div className={classes.toolbar}
+        className={clsx(classes.menuButton, {
+          [classes.hide]: !open,
+        })}>
         <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon className={classes.iconDrawer}/>
+          <ChevronLeftIcon className={classes.iconDrawer} />
         </IconButton>
-        </div>
-        <Divider />
-        <List>
-            <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
-            className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}>
-              <ListItemIcon>
-                <Explore className={classes.iconDrawer}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary='Public Worlds' className={classes.toolbar}
-                    className={clsx(classes.menuButton, {
-                        [classes.hide]: !open,
-                    })}/>
-            </ListItem>
-          {st.guest_uuid ? <></> :
-            <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,})}>
-              <ListItemIcon>
-                <Public className={classes.iconDrawer}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
-                    className={clsx(classes.menuButton, {
-                        [classes.hide]: !open,
-                    })}/>
-            </ListItem>
-          }
-          {st.guest_uuid ? <></> :
-            <ListItem button key='Created Worlds' onClick={onClickCreatedWorlds} className={clsx(classes.drawer, {
-                [classes.drawerOpen]: open,
-                [classes.drawerClose]: !open,})}>
-              <ListItemIcon>
-                <img src={created_worlds} className={classes.iconDrawer} style={{height:"25px", width:"25px"}}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary='Created Worlds' className={classes.toolbar}
-                    className={clsx(classes.menuButton, {
-                        [classes.hide]: !open,
-                    })}/>
-            </ListItem>
-          }
-          { st.guest_uuid ?
-            <></>
-            :
-            <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})} button key="Create World" style={{position: "fixed", bottom: addWorld}}
+      </div>
+      <Divider />
+      <List>
+        <ListItem button key='Public Worlds' onClick={onClickAllWorlds}
+          className={clsx({[classes.active]: location.pathname === "/dashboard/search/public"}, classes.drawer, { [classes.drawerOpen]: open, [classes.drawerClose]: !open, })}>
+          <ListItemIcon>
+            <Explore className={classes.iconDrawer} />
+          </ListItemIcon>
+          <ListItemText style={{ color: '#FFFFFF' }} primary='Public Worlds' className={classes.toolbar}
+            className={clsx(classes.menuButton, {
+              [classes.hide]: !open,
+            })} />
+        </ListItem>
+        {st.guest_uuid ? <></> :
+          <ListItem button key='Joined Worlds' onClick={onClickJoinedWorlds} className={clsx(classes.drawer, {
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+            [classes.active]: location.pathname === "/dashboard/search/joined",
+          })}>
+            <ListItemIcon>
+              <Public className={classes.iconDrawer} />
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary='Joined Worlds' className={classes.toolbar}
+              className={clsx(classes.menuButton, {
+                [classes.hide]: !open,
+              })} />
+          </ListItem>
+        }
+        {st.guest_uuid ? <></> :
+          <ListItem button key='Created Worlds' onClick={onClickCreatedWorlds} className={clsx(classes.drawer, {
+            [classes.drawerOpen]: open,
+            [classes.drawerClose]: !open,
+            [classes.active]: location.pathname === "/dashboard/search/owned",
+          })}>
+            <ListItemIcon>
+              <img src={created_worlds} className={classes.iconDrawer} style={{ height: "25px", width: "25px" }} />
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary='Created Worlds' className={classes.toolbar}
+              className={clsx(classes.menuButton, {
+                [classes.hide]: !open,
+              })} />
+          </ListItem>
+        }
+        {st.guest_uuid ?
+          <></>
+          :
+          <ListItem className={clsx(classes.drawer, { 
+            [classes.drawerOpen]: open, 
+            [classes.drawerClose]: !open, 
+          })} button key="Create World" style={{ position: "fixed", bottom: addWorld }}
             onClick={onClickCreateWorld}>
-              <ListItemIcon>
-                  <AddCircleOutlined className={classes.iconDrawer}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
-                  className={clsx(classes.menuButton, {
-                      [classes.hide]: !open,
-                  })}/>
-            </ListItem>
-          }
+            <ListItemIcon>
+              <AddCircleOutlined className={classes.iconDrawer} />
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary="CREATE WORLD" className={classes.toolbar}
+              className={clsx(classes.menuButton, {
+                [classes.hide]: !open,
+              })} />
+          </ListItem>
+        }
 
-          { !st.is_superuser || st.guest_uuid ?
-            <></>
-            :
-            <>
-              <ListItem onClick={onClickPlatformDashboard} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-                button key="Admin Dashboard" style={{position: "fixed", bottom: dashboard}}>
+        {!st.is_superuser || st.guest_uuid ?
+          <></>
+          :
+          <>
+            <ListItem onClick={onClickPlatformDashboard} 
+              className={clsx(classes.drawer, { 
+                [classes.drawerOpen]: open, 
+                [classes.drawerClose]: !open, 
+                [classes.active]: location.pathname === "/admin/dashboard",
+              })}
+              button key="Admin Dashboard" style={{ position: "fixed", bottom: dashboard }}>
               <ListItemIcon>
-                <DashboardIcon className={classes.iconDrawer}/>
+                <DashboardIcon className={classes.iconDrawer} />
               </ListItemIcon>
               <ListItemText style={{ color: '#FFFFFF' }} primary="DASHBOARD"
-                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-              </ListItem>
+                className={clsx(classes.menuButton, { [classes.hide]: !open, })} />
+            </ListItem>
 
 
-              <ListItem onClick={handlePopClickWorlds} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-                button key="Platform World Statistics" style={{position: "fixed", bottom: stats}}>
+            <ListItem onClick={handlePopClickWorlds} 
+              className={clsx(classes.drawer, { 
+                [classes.drawerOpen]: open, 
+                [classes.drawerClose]: !open, 
+                [classes.active]: location.pathname.includes("/admin/statistics") || location.pathname.includes("/admin/worlds"),
+              })}
+              button key="Platform World Statistics" style={{ position: "fixed", bottom: stats }}>
               <ListItemIcon>
-                  <MapIcon className={classes.iconDrawer}/>
+                <MapIcon className={classes.iconDrawer} />
               </ListItemIcon>
               <ListItemText style={{ color: '#FFFFFF' }} primary="WORLD"
-                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-              </ListItem>
+                className={clsx(classes.menuButton, { [classes.hide]: !open, })} />
+            </ListItem>
 
-              <Popover
-                id={pop_id_worlds}
-                open={pop_open_worlds}
-                anchorEl={anchorElWorlds}
-                onClose={handlePopCloseWorlds}
-                anchorOrigin={{
-                  vertical: "center",
-                  horizontal: "right"
-                }}
-                transformOrigin={{
-                  vertical: "center",
-                  horizontal: "left"
-                }}
-              >
-                <>
-                  <Row style={{width: 210, background: 'rgb(12 19 43)', paddingLeft: 15}}>
-                    <ListItem onClick={onClickPlatformWorldStats} button key="Pop Platform World Statistics">
-                      <ListItemIcon>
-                        <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-                      </ListItemIcon>
-                      <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
-                    </ListItem>
-                  </Row>
-                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
-                    <ListItem onClick={onClickPlatformWorldReports} button key="Pop Platform World Reports">
-                      <ListItemIcon>
-                        <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-                      </ListItemIcon>
-                      <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
-                    </ListItem>
-                  </Row>
-                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
-                    <ListItem onClick={onClickPlatformEvents} button key="Pop Platform World Reports">
-                      <ListItemIcon>
-                        <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-                      </ListItemIcon>
-                      <ListItemText style={{ color: '#FFFFFF' }} primary="EVENTS" />
-                    </ListItem>
-                  </Row>
-                </>
-              </Popover>
-
-              <ListItem onClick={handlePopClickUsers} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-                button key="Platform User Statistics" style={{position: "fixed", bottom: userstats}}>
-              <ListItemIcon>
-                <PersonIcon className={classes.iconDrawer}/>
-              </ListItemIcon>
-              <ListItemText style={{ color: '#FFFFFF' }} primary="USER"
-                className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-              </ListItem>
-
-              <Popover
-                id={pop_id_users}
-                open={pop_open_users}
-                anchorEl={anchorElUsers}
-                onClose={handlePopCloseUsers}
-                anchorOrigin={{
-                  vertical: "center",
-                  horizontal: "right"
-                }}
-                transformOrigin={{
-                  vertical: "center",
-                  horizontal: "left"
-                }}
-              >
-                <>
-                  <Row style={{width: 210, background: 'rgb(12 19 43)', paddingLeft: 15}}>
-                    <ListItem onClick={onClickPlatformUserStats} button key="Pop Platform User Statistics">
-                      <ListItemIcon>
-                          <EqualizerIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
-                      </ListItemIcon>
-                      <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
-                    </ListItem>
-                  </Row>
-                  <Row style={{width: 200, background: 'rgb(12 19 43)', paddingLeft: 15}}>
-                    <ListItem onClick={onClickPlatformUserReports} button key="Pop Platform User Reports">
+            <Popover
+              id={pop_id_worlds}
+              open={pop_open_worlds}
+              anchorEl={anchorElWorlds}
+              onClose={handlePopCloseWorlds}
+              anchorOrigin={{
+                vertical: "center",
+                horizontal: "right"
+              }}
+              transformOrigin={{
+                vertical: "center",
+                horizontal: "left"
+              }}
+            >
+              <>
+                <Row style={{ width: 210, background: 'rgb(12 19 43)', paddingLeft: 15 }}>
+                  <ListItem onClick={onClickPlatformWorldStats} button key="Pop Platform World Statistics">
                     <ListItemIcon>
-                      <ReportIcon className={classes.iconDrawer} style={{height:"23px", width:"23px"}}/>
+                      <EqualizerIcon className={classes.iconDrawer} style={{ height: "23px", width: "23px" }} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
+                  </ListItem>
+                </Row>
+                <Row style={{ width: 200, background: 'rgb(12 19 43)', paddingLeft: 15 }}>
+                  <ListItem onClick={onClickPlatformWorldReports} button key="Pop Platform World Reports">
+                    <ListItemIcon>
+                      <ReportIcon className={classes.iconDrawer} style={{ height: "23px", width: "23px" }} />
                     </ListItemIcon>
                     <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
-                    </ListItem>
-                  </Row>
-                </>
-              </Popover>
-            </>
-          }
-          { st.guest_uuid ?
-            <></>
-            :
-          <ListItem onClick={onClickUserSettings} className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Settings" style={{position: "fixed", bottom: definitions}}>
-          <ListItemIcon>
-              <Settings className={classes.iconDrawer}/>
-          </ListItemIcon>
-          <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
-            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
+                  </ListItem>
+                </Row>
+                <Row style={{ width: 200, background: 'rgb(12 19 43)', paddingLeft: 15 }}>
+                  <ListItem onClick={onClickPlatformEvents} button key="Pop Platform World Reports">
+                    <ListItemIcon>
+                      <ReportIcon className={classes.iconDrawer} style={{ height: "23px", width: "23px" }} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="EVENTS" />
+                  </ListItem>
+                </Row>
+              </>
+            </Popover>
+
+            <ListItem onClick={handlePopClickUsers} 
+              className={clsx(classes.drawer, { 
+                [classes.drawerOpen]: open, 
+                [classes.drawerClose]: !open, 
+                [classes.active]: location.pathname === "/admin/users" || location.pathname === "/admin/users/reports",
+              })}
+              button key="Platform User Statistics" style={{ position: "fixed", bottom: userstats }}>
+              <ListItemIcon>
+                <PersonIcon className={classes.iconDrawer} />
+              </ListItemIcon>
+              <ListItemText style={{ color: '#FFFFFF' }} primary="USER"
+                className={clsx(classes.menuButton, { [classes.hide]: !open, })} />
+            </ListItem>
+
+            <Popover
+              id={pop_id_users}
+              open={pop_open_users}
+              anchorEl={anchorElUsers}
+              onClose={handlePopCloseUsers}
+              anchorOrigin={{
+                vertical: "center",
+                horizontal: "right"
+              }}
+              transformOrigin={{
+                vertical: "center",
+                horizontal: "left"
+              }}
+            >
+              <>
+                <Row style={{ width: 210, background: 'rgb(12 19 43)', paddingLeft: 15 }}>
+                  <ListItem onClick={onClickPlatformUserStats} button key="Pop Platform User Statistics">
+                    <ListItemIcon>
+                      <EqualizerIcon className={classes.iconDrawer} style={{ height: "23px", width: "23px" }} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="STATISTICS" />
+                  </ListItem>
+                </Row>
+                <Row style={{ width: 200, background: 'rgb(12 19 43)', paddingLeft: 15 }}>
+                  <ListItem onClick={onClickPlatformUserReports} button key="Pop Platform User Reports">
+                    <ListItemIcon>
+                      <ReportIcon className={classes.iconDrawer} style={{ height: "23px", width: "23px" }} />
+                    </ListItemIcon>
+                    <ListItemText style={{ color: '#FFFFFF' }} primary="REPORTS" />
+                  </ListItem>
+                </Row>
+              </>
+            </Popover>
+          </>
+        }
+        {st.guest_uuid ?
+          <></>
+          :
+          <ListItem onClick={onClickUserSettings} 
+            className={clsx(classes.drawer, { 
+              [classes.drawerOpen]: open, 
+              [classes.drawerClose]: !open, 
+              [classes.active]: location.pathname === "/dashboard/user",
+            })}
+            button key="Settings" style={{ position: "fixed", bottom: definitions }}>
+            <ListItemIcon>
+              <Settings className={classes.iconDrawer} />
+            </ListItemIcon>
+            <ListItemText style={{ color: '#FFFFFF' }} primary="SETTINGS"
+              className={clsx(classes.menuButton, { [classes.hide]: !open, })} />
           </ListItem>
-          }
+        }
 
 
 
-          <ListItem className={clsx(classes.drawer, {[classes.drawerOpen]: open,[classes.drawerClose]: !open,})}
-            button key="Leave" style={{position: "fixed", bottom: theme.spacing(2)}}
-            onClick={() => logout()}
-          >
+        <ListItem className={clsx(classes.drawer, { [classes.drawerOpen]: open, [classes.drawerClose]: !open, })}
+          button key="Leave" style={{ position: "fixed", bottom: theme.spacing(2) }}
+          onClick={() => logout()}
+        >
           <ListItemIcon>
-              <MeetingRoomIcon className={classes.iconDrawer}/>
+            <MeetingRoomIcon className={classes.iconDrawer} />
           </ListItemIcon>
           <ListItemText style={{ color: '#FFFFFF' }} primary="LOGOUT"
-            className={clsx(classes.menuButton, {[classes.hide]: !open,})}/>
-          </ListItem>
-        </List>
-      </Drawer>
-    );
+            className={clsx(classes.menuButton, { [classes.hide]: !open, })} />
+        </ListItem>
+      </List>
+    </Drawer>
+  );
 }
+
+export default DashDrawer;
