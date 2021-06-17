@@ -85,7 +85,10 @@ const UserList = (props) => {
         <div key={index} className={classes.user} >
             <div 
               className={classes.avatar}
-              style={{backgroundImage: `url(${API_BASE + 'static/characters/' + usePlayerStore.getState().users_info[user_id]?.avatar}.png)`}}
+              style={{
+                backgroundImage: `url(${API_BASE + 'static/characters/' + usePlayerStore.getState().users_info[user_id]?.avatar}.png)`,
+                backgroundPosition: 'center',
+              }}
             >
             </div>
             <div className={classes.content}>
