@@ -203,34 +203,34 @@ const GamePage = (props) => {
                             defaultValue={avatar}
                             onChange={(event, value) => { setAvatar(event.target.value) }}
                           >
-                            <option value={'avatars_1_1'}>Avatar 1</option>
+                            <option value={'avatars_1_1'}>Simão</option>
                             <option value={'avatars_1_2'}>Leandro</option>
                             <option value={'avatars_1_3'}>Lionel</option>
                             <option value={'avatars_1_4'}>Leonardo</option>
-                            <option value={'avatars_1_5'}>BSS</option>
+                            <option value={'avatars_1_5'}>Rita</option>
                             <option value={'avatars_1_6'}>Sasha</option>
-                            <option value={'avatars_1_7'}>Avatar 7</option>
-                            <option value={'avatars_1_8'}>Avatar 8</option>
-                            <option value={'avatars_2_1'}>Avatar 9</option>
-                            <option value={'avatars_2_2'}>Avatar 10</option>
-                            <option value={'avatars_2_3'}>Avatar 11</option>
-                            <option value={'avatars_2_4'}>Avatar 12</option>
-                            <option value={'avatars_2_5'}>Avatar 12</option>
-                            <option value={'avatars_2_6'}>Avatar 13</option>
+                            <option value={'avatars_1_7'}>Carolina</option>
+                            <option value={'avatars_1_8'}>Jéssica</option>
+                            <option value={'avatars_2_1'}>Duarte</option>
+                            <option value={'avatars_2_2'}>Ana</option>
+                            <option value={'avatars_2_3'}>Tiago</option>
+                            <option value={'avatars_2_4'}>Sandra</option>
+                            <option value={'avatars_2_5'}>Rui</option>
+                            <option value={'avatars_2_6'}>Clara</option>
                             <option value={'avatars_2_7'}>Edu</option>
                             <option value={'avatars_2_8'}>Eduarda</option>
-                            <option value={'avatars_3_1'}>Avatar 16</option>
-                            <option value={'avatars_3_2'}>Avatar 17</option>
-                            <option value={'avatars_3_3'}>Avatar 18</option>
+                            <option value={'avatars_3_1'}>Carlos</option>
+                            <option value={'avatars_3_2'}>Marcos</option>
+                            <option value={'avatars_3_3'}>Samuel</option>
                             <option value={'avatars_3_4'}>Teixeira</option>
-                            <option value={'avatars_3_5'}>Avatar 20</option>
-                            <option value={'avatars_3_6'}>Avatar 21</option>
-                            <option value={'avatars_3_7'}>Avatar 22</option>
-                            <option value={'avatars_3_8'}>Avatar 23</option>
-                            <option value={'avatars_4_1'}>Avatar 24</option>
-                            <option value={'avatars_4_2'}>Avatar 25</option>
-                            <option value={'avatars_4_5'}>Avatar 26</option>
-                            <option value={'avatars_4_6'}>Avatar 27</option>
+                            <option value={'avatars_3_5'}>Filipe</option>
+                            <option value={'avatars_3_6'}>Rodrigo</option>
+                            <option value={'avatars_3_7'}>André</option>
+                            <option value={'avatars_3_8'}>Fernando</option>
+                            <option value={'avatars_4_1'}>Marta</option>
+                            <option value={'avatars_4_2'}>Andreia</option>
+                            <option value={'avatars_4_5'}>Isabela</option>
+                            <option value={'avatars_4_6'}>Ricardo</option>
                           </Select>
                         </Col>
                       </Row>
