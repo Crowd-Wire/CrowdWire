@@ -118,6 +118,11 @@ const useWorldEditorStore = create(
                     return { active };
                 });
             },
+            reset: () => {
+                return set(() => {
+                    return { ready: false, };
+                });
+            },
         })
     )
 );

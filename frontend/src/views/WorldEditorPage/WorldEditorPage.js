@@ -23,6 +23,7 @@ import useWorldUserStore from 'stores/useWorldUserStore';
 import { getSocket } from "services/socket.js";
 import WorldService from "services/WorldService.ts";
 import EditorNavbar from "./sections/EditorNavbar";
+import useWorldEditorStore from "stores/useWorldEditorStore.ts";
 
 
 const toast_props = {
@@ -180,8 +181,10 @@ class WorldEditorPage extends React.Component {
 
   componentWillUnmount = () => {
     // close socket on component unmount
-    if (useWorldUserStore.getState().world_user)
+    if (useWorldUserStore.getState().world_user) {
       getSocket(useWorldUserStore.getState().world_user.world_id).socket.close();
+    }
+    useWorldEditorStore.getState().reset();
   }
 
   gridRemoveTabs = (tabs, elemPath) => {
