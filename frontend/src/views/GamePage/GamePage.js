@@ -9,6 +9,8 @@ import styles from "assets/jss/my-kit-react/views/gamePageStyle.js";
 import WorldService from "../../services/WorldService.ts";
 import { toast } from 'react-toastify';
 import logo from '../../assets/crowdwire_white_logo.png';
+import interact from 'assets/img/interact.png';
+import move from 'assets/img/move.png';
 import useWorldUserStore from '../../stores/useWorldUserStore';
 import { useNavigate } from "react-router-dom";
 import { getSocket } from "../../services/socket.js";
@@ -173,8 +175,8 @@ const GamePage = (props) => {
             (
               <div className={classes.backgroundGradient}>
                 <div className={classes.center}>
-                  <Card style={{
-                    height: '50%',
+                  <img src={move} />
+                  <Card className={classes.card} style={{
                     minWidth: 400,
                     padding: 3,
                     background: 'rgba(255, 255, 255, 0.8)',
@@ -250,6 +252,7 @@ const GamePage = (props) => {
                       </div>
                     </CardBody>
                   </Card>
+                  <img src={interact} />
                 </div>
               </div>
             )
