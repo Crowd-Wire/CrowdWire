@@ -14,6 +14,7 @@ import { API_BASE } from "config";
 
 interface ObjectsTabState {
   filterType: string;
+  filterCollection: string;
   collectionObjects: Record<string, React.ReactNode[]>;
 }
 
@@ -34,6 +35,7 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
 
     this.state = {
       filterType: '',
+      filterCollection: '',
       collectionObjects: {},
     }
   }
@@ -54,6 +56,9 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
     const mapManager = new MapManager();
 
     const collectionObjects = {};
+    collectionObjects['Interactables'] = [];
+    collectionObjects['Collisibles'] = [];
+    collectionObjects['On Wall'] = [];
     for (const collection of mapManager.map.imageCollections) {
       if (!collection.name.startsWith('_')) {
         // Not private
@@ -68,7 +73,8 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
             backgroundRepeat: "no-repeat",
           };
           useWorldEditorStore.getState().addTile(image, { style });
-          objects.push(
+
+          const objElement = (
             <div
               key={gid}
               onClick={() => this.handleClick(image)}
@@ -79,7 +85,17 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
                 ...objectStyle,
               }}
             ></div>
-          );                   
+          );
+          objects.push(objElement);
+          const props = mapManager.objectProps[image]?.properties;
+          if (props) {
+            if (props.onWall)
+              collectionObjects['On Wall'].push(objElement);
+            if (props.collides)
+              collectionObjects['Collisibles'].push(objElement);              
+            if (props.interact)
+              collectionObjects['Interactables'].push(objElement);
+          }             
         }
         collectionObjects[collection.name] = objects;
       }
@@ -88,6 +104,10 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
   }
 
   handleSelectChange = (event: React.ChangeEvent<{ value: string }>) => {
+    this.setState({ filterCollection: event.target.value });
+  }
+
+  handleSelectChange2 = (event: React.ChangeEvent<{ value: string }>) => {
     this.setState({ filterType: event.target.value });
   }
 
@@ -104,18 +124,22 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
   }
 
   render() {
-    const { filterType, collectionObjects } = this.state;
+    const { filterType, filterCollection, collectionObjects } = this.state;
+    const typeOptions = ['On Wall', 'Collisibles', 'Interactables'];
 
     return (
       <>
         <TabHeader names={['Object', 'ObjectCollision']} Icon={CategoryTwoToneIcon}>
-          <TabSelect placeholder="Collection" value={filterType} options={Object.keys(collectionObjects)} handle={this.handleSelectChange} />
+          <TabSelect placeholder="Collection" value={filterCollection} options={Object.keys(collectionObjects).filter((n) => !typeOptions.includes(n))} handle={this.handleSelectChange} />
+          <TabSelect placeholder="Type" value={filterType} options={typeOptions} handle={this.handleSelectChange2} />
         </TabHeader>
 
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {
-          filterType ? 
-            collectionObjects[filterType] : Object.values(collectionObjects)
+          filterType && filterCollection ? new Set([...collectionObjects[filterType], ...collectionObjects[filterCollection]]) :
+          filterType ? collectionObjects[filterType] :
+          filterCollection ? collectionObjects[filterCollection] :
+          Object.values(collectionObjects)
         }
         </div>
       </>
