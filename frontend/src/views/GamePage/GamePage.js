@@ -144,7 +144,6 @@ const GamePage = (props) => {
     if (connecting && !reconnect) {
       reconnect = setInterval(() => {
         let socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket
-        console.log(socket)
         if (socket && socket.readyState === 1) {
           clearInterval(reconnect);
           reconnect = null;

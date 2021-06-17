@@ -6,19 +6,15 @@ export const consumeDataStream = async (consumerParameters: any, roomId: string,
   const { rooms } = useRoomStore.getState();
 
   if (!(roomId in rooms)) {
-    console.log("skipping consumeDataStream because room doesn't exist");
     return false;
   }
 
   let recvTransport: Transport = rooms[roomId].recvTransport;
 
   if (!recvTransport) {
-    console.log("skipping consumeDataStream because recvTransport is null");
     return false;
   }
   
-  console.log("new consumer" + peerId)
-  console.log(consumerParameters)
   const dataConsumer = await recvTransport.consumeData({
     ...consumerParameters,
     appData: {
@@ -29,6 +25,5 @@ export const consumeDataStream = async (consumerParameters: any, roomId: string,
 
   useConsumerStore.getState().addDataConsumer(dataConsumer, peerId, roomId);
 
-  console.log(useConsumerStore.getState())
   return true;
 };

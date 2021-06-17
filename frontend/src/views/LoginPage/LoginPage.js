@@ -84,7 +84,6 @@ class LoginPage extends React.Component {
     )
     .then(
       (res) => {
-        console.log(res)
         if(res.access_token!==undefined){
           this.notify("Auth");
           AuthenticationService.setToken(res,"AUTH");
@@ -122,7 +121,6 @@ class LoginPage extends React.Component {
   }
 
   handleGoogle = (response) => {
-    console.log(response.tokenId);
     AuthenticationService.googleAuth(response.tokenId)
     .then((res) => {
       if(res.ok)
@@ -136,7 +134,6 @@ class LoginPage extends React.Component {
   }
 
   handleGoogleFail = (response) =>{
-    console.log("fail")
   }
 
 

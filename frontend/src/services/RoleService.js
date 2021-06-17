@@ -57,8 +57,6 @@ class RoleService {
     }
 
     editRole(world_id, state, id) {
-        console.log(state)
-        console.log(id)
         return fetch(API_BASE + 'worlds/'+world_id+'/roles/'+id, {
             method: 'PUT',
             mode: 'cors',

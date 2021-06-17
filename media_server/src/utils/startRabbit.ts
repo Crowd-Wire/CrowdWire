@@ -164,10 +164,6 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 ) => {};
 
 export const startRabbit = async (handler: HandlerMap) => {
-  console.log(
-    "trying to connect to: ",
-    process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672"
-  );
   let conn: Connection;
   try {
     conn = await amqp.connect(process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672");
@@ -176,7 +172,6 @@ export const startRabbit = async (handler: HandlerMap) => {
     setTimeout(async () => await startRabbit(handler), retryInterval);
     return;
   }
-  console.log("rabbit connected");
   conn.on("close", async function (err: Error) {
     console.error("Rabbit connection closed with error: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
@@ -194,18 +189,16 @@ export const startRabbit = async (handler: HandlerMap) => {
       let pod = res.body.items[i];
       if (pod.metadata.name.includes('crowdwire-mediaserver')){
         media_server_counter++;
-        console.log("Found pod")
       }
     }
     
   }).catch((err: any) => {
-    console.log(err);
+    console.error(err);
     media_server_counter = 1;
   });
   const channel = await conn.createChannel();
   const sendQueue = "rest_api_queue";
   const receiveQueue = "media_server_" + String(media_server_counter);
-  console.log(receiveQueue)
   await Promise.all([
     channel.assertQueue(receiveQueue),
     channel.assertQueue(sendQueue),
@@ -224,19 +217,16 @@ export const startRabbit = async (handler: HandlerMap) => {
         let data: IncomingChannelMessageData<any> | undefined;
         try {
           data = JSON.parse(m);
-        } catch {console.log('error parsing json')}
+        } catch {console.error('Error parsing json')}
         // console.log(data.topic);
         if (data && data.topic && data.topic in handler) {
           const { d: handlerData, topic: operation, uid } = data;
           try {
-            console.log(operation);
-            
             await handler[operation as keyof HandlerMap](
               handlerData,
               uid,
               send,
               () => {
-                console.log(operation);
                 send({
                   topic: "error",
                   d:
@@ -246,7 +236,7 @@ export const startRabbit = async (handler: HandlerMap) => {
               }
             );
           } catch (err) {
-            console.log(operation, err);
+            console.error(operation, err);
             Sentry.captureException(err, { extra: { topic: operation } });
           }
         }

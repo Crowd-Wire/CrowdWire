@@ -61,10 +61,8 @@ class UpdatePassword extends React.Component {
                 
             }
             if(res.sub){
-                console.log("google auth");
                 this.setState({is_auth_google: true});
             }
-            console.log(res)
         }).catch((error) => {useAuthStore.getState().leave()});
     }
 
@@ -131,7 +129,7 @@ class UpdatePassword extends React.Component {
         )
         .catch(
             (error) => {
-                console.log(error);
+                console.error(error);
             }
         );
 

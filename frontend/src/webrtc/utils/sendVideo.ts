@@ -38,7 +38,7 @@ export const sendVideo = async (roomId:string = null) => {
       })
     } catch (err) {
       set({ cam: null, camStream: null });
-      console.log(err);
+      console.error(err);
     }
     return;
   }
@@ -48,7 +48,6 @@ export const sendVideo = async (roomId:string = null) => {
   }
   
   if (cam) {
-    console.log("creating producer...");
     for (const [ key, value ] of Object.entries(sendTransports)) {
       if (value && value.sendTransport) {
         await value.sendTransport.produce({
@@ -61,7 +60,7 @@ export const sendVideo = async (roomId:string = null) => {
           return
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
 
       }

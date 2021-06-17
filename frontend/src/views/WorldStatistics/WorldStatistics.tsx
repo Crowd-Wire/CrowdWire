@@ -72,7 +72,6 @@ export default function WorldStats() {
             return res.json();
         })
         .then((res) => {
-          console.log(res)
           if (res.total_users)
             setUsers(res.total_users)
           if (res.total_n_joins)
