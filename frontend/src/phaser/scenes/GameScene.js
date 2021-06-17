@@ -183,11 +183,11 @@ class GameScene extends Phaser.Scene {
         if (this.roomLayer) {
             const tile = this.roomLayer.getTileAtWorldXY(this.player.body.center.x, this.player.body.center.y);
             if (tile) {
-                const conferenceId = tile.properties.conference;
+                const conferenceId = tile.properties.conference + '-' + useWorldUserStore.getState().world_user.world_id;
                 if (useWorldUserStore.getState().world_user.in_conference != conferenceId) {
                     useWorldUserStore.getState().updateConference(conferenceId);
                     GameScene.inRangePlayers = new Set();
-                    this.player.ws.joinConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
+                    this.player.ws.joinConference(conferenceId);
                 }
             }
             else {
@@ -195,7 +195,7 @@ class GameScene extends Phaser.Scene {
                     const conferenceId = useWorldUserStore.getState().world_user.in_conference;
                     useConsumerStore.getState().closeRoom(conferenceId);
                     useWorldUserStore.getState().updateConference(null);
-                    this.player.ws.leaveConference(conferenceId + '-' + useWorldUserStore.getState().world_user.world_id);
+                    this.player.ws.leaveConference(conferenceId);
                 }
             }
         }
