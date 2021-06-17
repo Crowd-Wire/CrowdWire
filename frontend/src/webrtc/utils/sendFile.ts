@@ -24,7 +24,6 @@ export const sendFile = async (roomId:string = null) => {
 
   for (let i = 0; i<sendTransports.length; i++) {
     if (sendTransports[i]) {
-      console.log('producing data')
 
       var dataProducer = await sendTransports[i].produceData({
         appData: { mediaTag: "file" },
@@ -37,6 +36,5 @@ export const sendFile = async (roomId:string = null) => {
       dataProducers.push(dataProducer);
     }
   }
-  console.log(dataProducers)
   return dataProducers;
 };

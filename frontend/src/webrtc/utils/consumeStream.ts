@@ -8,24 +8,19 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
   const { rooms } = useRoomStore.getState();
 
   if (!(roomId in rooms)) {
-    console.log("skipping consumeStream because room doesn't exist");
     return false;
   }
 
   let recvTransport: Transport = rooms[roomId].recvTransport;
 
   if (!recvTransport) {
-    console.log("skipping consumeStream because recvTransport is null");
     return false;
   }
 
   if (!GameScene.inRangePlayers.has(peerId) && !useWorldUserStore.getState().world_user.in_conference) {
-    console.log("skipping consumeStream because player was not in range");
     return false;
   }
   
-  console.log("new consumer" + peerId)
-
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {

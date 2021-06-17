@@ -95,7 +95,6 @@ class RegisterPage extends React.Component {
 
 
     if(pass !== cpass){
-      console.log(this.state.passHelperText)
       this.setState({passHelperText: "Passwords do not match.",cPassHelperText: "Passwords do not match."})
       passed = false;
     }
@@ -113,7 +112,6 @@ class RegisterPage extends React.Component {
     else
       this.setState({emailHelperText:""});
     if(!name){
-      console.log("name required")
       this.setState({nameHelperText:"Name needed to register."});
       passed = false;
     }
@@ -121,7 +119,6 @@ class RegisterPage extends React.Component {
       this.setState({nameHelperText:""});
 
     if(dDate > new Date()){
-      console.log("date must be past")
       this.setState({birthdayHelperText:"Birthdays are in the past."});
       passed = false;
     }
@@ -145,7 +142,7 @@ class RegisterPage extends React.Component {
       )
     .catch(
       (error) => {
-        console.log(error);
+        console.error(error);
       }
     );
 

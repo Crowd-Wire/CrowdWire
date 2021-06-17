@@ -9,13 +9,11 @@ export async function createTransport(
   direction: "recv" | "send",
   transportOptions: TransportOptions
 ) {
-  console.log(`create ${direction} transport`);
   const { device, addTransport } = useRoomStore.getState();
   var socket = getSocket(useWorldUserStore.getState().world_user.world_id).socket;
 
   // ask the server to create a server-side transport object and send
   // us back the info we need to create a client-side transport
-  console.log("transport options", transportOptions);
   let transport =
     direction === "recv"
       ? await device!.createRecvTransport(transportOptions)
@@ -30,20 +28,17 @@ export async function createTransport(
       .getState()
       .addWsListener(`@connect-transport-${direction}-done`, (d) => {
         if (d.error) {
-          console.log(`connect-transport ${direction} failed`, d.error);
           if (d.error.includes("already called")) {
             callback();
           } else {
             errback();
           }
         } else {
-          console.log(`connect-transport ${direction} success`);
           callback();
         }
       });
       
     if (socket.readyState === WebSocket.OPEN) {
-      console.log('sending connect-transport')
       socket.send(JSON.stringify({
         topic: "@connect-transport",
         d: { roomId: _roomId, transportId: transportOptions.id, dtlsParameters, sctpParameters, direction },
@@ -58,7 +53,6 @@ export async function createTransport(
     transport.on(
       "produce",
       async ({ kind, rtpParameters, appData }, callback, errback) => {
-        console.log("transport produce event", appData.mediaTag);
         
         // check this paused option
         let paused = false;
@@ -67,10 +61,8 @@ export async function createTransport(
           .getState()
           .addWsListener(`@send-track-${direction}-done`, (d) => {
             if (d.error) {
-              console.log(`send-track ${direction} failed`, d.error);
               errback();
             } else {
-              console.log(`send-track-transport ${direction} success`);
               callback({ id: d.id });
             }
           });
@@ -101,10 +93,8 @@ export async function createTransport(
           .getState()
           .addWsListener(`@send-file-${direction}-done`, (d) => {
             if (d.error) {
-              console.log(`send-file ${direction} failed`, d.error);
               errback();
             } else {
-              console.log(`send-file-transport ${direction} success`);
               callback({ id: d.id });
             }
           });

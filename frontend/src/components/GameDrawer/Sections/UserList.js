@@ -11,6 +11,7 @@ import useWorldUserStore from 'stores/useWorldUserStore';
 import { wsend } from "services/socket.js";
 import { toast } from 'react-toastify';
 
+import { API_BASE } from 'config';
 
 const useContextMenu = () => {
   const [xPos, setXPos] = useState("0px");
@@ -82,7 +83,14 @@ const UserList = (props) => {
     {
       Object.keys(users).map((user_id, index) => (
         <div key={index} className={classes.user} >
-            <div className={classes.avatar}></div>
+            <div 
+              className={classes.avatar}
+              style={{
+                backgroundImage: `url(${API_BASE + 'static/characters/' + usePlayerStore.getState().users_info[user_id]?.avatar}.png)`,
+                backgroundPosition: 'center',
+              }}
+            >
+            </div>
             <div className={classes.content}>
               <div className={classes.username}>{usePlayerStore.getState().users_info[user_id]?.username}</div>
               {
@@ -101,7 +109,7 @@ const UserList = (props) => {
         </div>
       ))
     }
-    { showMenu ? (
+    { showMenu && false ? (
         <div
           className={"menu-container", classes.userMenu}
           style={{

@@ -37,7 +37,7 @@ export const sendVoice = async (roomId:string = null) => {
       })
     } catch (err) {
       set({ mic: null, micStream: null });
-      console.log(err);
+      console.error(err);
     }
     return;
   }
@@ -47,7 +47,6 @@ export const sendVoice = async (roomId:string = null) => {
   }
   
   if (mic) {
-    console.log("creating producer...");
     for (const [ key, value ] of Object.entries(sendTransports)) {
       if (value && value.sendTransport) {
         await value.sendTransport.produce({
@@ -60,7 +59,7 @@ export const sendVoice = async (roomId:string = null) => {
         .catch((err) => {
           set({ mic: null, micStream: null });
           removeProducer(key, 'mic');
-          console.log(err)
+          console.error(err)
         })
       }
     }

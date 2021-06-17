@@ -31,7 +31,6 @@ export default function UserReportCard(props) {
     }
 
     const handleReview = () => {
-        console.log(report.world_id, report.reporter, report.reported, !report.reviewed);
         ReportService.reviewUserReport(report.world_id, report.reporter, report.reported, !report.reviewed)
         .then((res) => {
             if(res.ok)

@@ -10,10 +10,23 @@ const mapEditorStyle = {
         backgroundImage: 'linear-gradient(to bottom right, #2B9BFD 4%, #71d1b9 90%)',
     },
     center: {
-        position: 'absolute',
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)'
+        justifyContent: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        height: '100%',
+        flexWrap: 'wrap',
+    },
+    card: {
+        margin: 0,
+        ['@media (min-width:767px)']: {
+            margin: '0 50px',
+        },
+        ['@media (min-width:1023px)']: {
+            margin: '0 150px'
+        },
+        ['@media (min-width:1439px)']: {
+            margin: '0 50px',
+        }
     },
     wrapper: {
         display: 'flex',

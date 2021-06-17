@@ -77,7 +77,6 @@ class ToolsTab extends Component<{}, ToolsTabState> {
   }
 
   handleActiveLayerChange = (layer: string) => {
-    console.log(layer)
     let activeButtons = [false, false, false, false];
     switch (layer) {
       case "Wall Layer":

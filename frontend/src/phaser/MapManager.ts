@@ -152,10 +152,8 @@ class MapManager {
                     obj.setData(properties);
                 }
             })
-        console.log(this.map)
         this.objectGroups = { 'Object': group, 'ObjectCollision': collisionGroup };
 
-        console.log(this.objectGroups)
         return this.objectGroups;
     }
 

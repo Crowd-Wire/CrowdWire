@@ -167,7 +167,7 @@ export default class RoomCall extends React.Component<{}, State> {
       }
       this.setNavigatorToStream();
     }).catch((err) => {
-      console.log(err)
+      console.error(err)
     });
   }
 

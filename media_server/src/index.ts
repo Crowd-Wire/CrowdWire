@@ -26,7 +26,6 @@ async function main() {
     });
   }
   // start mediasoup
-  console.log("starting mediasoup");
   let workers: {
     worker: Worker;
     router: Router;
@@ -36,7 +35,7 @@ async function main() {
   try {
     workers = await startMediasoup();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     throw err;
   }
   let workerIdx = 0;
@@ -415,7 +414,7 @@ async function main() {
       try {
         await transport.connect({ dtlsParameters, sctpParameters });
       } catch (e) {
-        console.log(e);
+        console.error(e);
         send({
           topic: `@connect-transport-${direction}-done` as const,
           uid,
@@ -439,8 +438,6 @@ async function main() {
         return;
       }
 
-      console.log("add-speaker", peerId);
-
       const { router } = rooms[roomId];
       const sendTransport = await createTransport("send", router, peerId);
       rooms[roomId].state[peerId].sendTransport?.close();
@@ -461,8 +458,6 @@ async function main() {
         rooms[roomId] = createRoom(send);
       }
 
-      console.log("join-as-new-speaker", peerId);
-      
       const { state, router } = rooms[roomId];
 
       if (state[peerId]) {
@@ -498,8 +493,6 @@ async function main() {
         rooms[roomId] = createRoom(send);
       }
       
-      console.log("join-as-new-peer", peerId);
-
       const { state, router } = rooms[roomId];
       const [recvTransport] = await Promise.all([
         createTransport("recv", router, peerId)

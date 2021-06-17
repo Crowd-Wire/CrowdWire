@@ -49,7 +49,7 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
         set({mediaStream: mediaStream, media: media})
       })
     } catch (err) {
-      console.log(err);
+      console.error(err);
       if (media) media.stop();
       if (mediaStream) mediaStream.getTracks().forEach(track => track.stop())
       set({media: null, mediaStream: null});
@@ -64,7 +64,6 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
   
   if (media) {
     try {
-      console.log("creating producer...");
       for (const [ key, value ] of Object.entries(sendTransports)) {
         if (value && value.sendTransport) {
           await value.sendTransport.produce({
@@ -76,7 +75,7 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
             addProducer(key, producer, 'media');
           })
           .catch((err) => {
-            console.log(err)
+            console.error(err)
             let { rooms } = useRoomStore.getState();
             if (Object.keys(rooms).length > 0) {
               for (const [key, value] of Object.entries(rooms)) {
@@ -92,7 +91,7 @@ export const sendMedia = async (to_create_new: boolean, roomId: string = null) =
       };
       return true;
     } catch (err) {
-      console.log(err)
+      console.error(err)
     }
   }
 };
