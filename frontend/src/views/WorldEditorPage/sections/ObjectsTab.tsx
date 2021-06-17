@@ -139,7 +139,7 @@ class ObjectsTab extends Component<{}, ObjectsTabState> {
           filterType && filterCollection ? new Set([...collectionObjects[filterType], ...collectionObjects[filterCollection]]) :
           filterType ? collectionObjects[filterType] :
           filterCollection ? collectionObjects[filterCollection] :
-          Object.values(collectionObjects)
+          Object.keys(collectionObjects).filter((n) => !typeOptions.includes(n)).map((n) => collectionObjects[n])
         }
         </div>
       </>

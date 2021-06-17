@@ -175,7 +175,7 @@ const GamePage = (props) => {
             (
               <div className={classes.backgroundGradient}>
                 <div className={classes.center}>
-                  <img src={move} />
+                  <img src={move} className={classes.img} />
                   <Card className={classes.card} style={{
                     minWidth: 400,
                     padding: 3,
@@ -252,7 +252,7 @@ const GamePage = (props) => {
                       </div>
                     </CardBody>
                   </Card>
-                  <img src={interact} />
+                  <img src={interact} className={classes.img} />
                 </div>
               </div>
             )
