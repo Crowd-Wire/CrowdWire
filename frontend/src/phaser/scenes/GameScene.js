@@ -238,7 +238,7 @@ class GameScene extends Phaser.Scene {
             } else if (this.interact === 'CHESS') {
                 useWorldUserStore.getState().setShowIFrame('https://www.chesshotel.com/pt/');
             } else if (this.interact === 'MATH_GAMES') {
-                useWorldUserStore.getState().setShowIFrame('http://138.68.191.32/');
+                useWorldUserStore.getState().setShowIFrame('https://garticphone.com/');
             } else if (this.interact === 'CROSS_WORDS') {
                 useWorldUserStore.getState().setShowIFrame('https://downforacross.com/');
             } else if (this.interact === 'SURVIVAL') {
