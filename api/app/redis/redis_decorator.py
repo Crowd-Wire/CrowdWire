@@ -82,11 +82,11 @@ async def clear_cache_by_model(model_name: str, *args, **kwargs):
     @param args: optional args passed
     @param kwargs: kwargs passed to filter Redis key we want to delete from cache
     """
-    keys = await redis_connector.scan_match(model_name)
-    for key in keys[1]:
+    keys = await redis_connector.scan_match_all(model_name)
+    for key in keys:
         deserialized_value = pickle.loads(key)
         saved_kwargs = deserialized_value['kwargs']
         intersect_kwargs = intersect(saved_kwargs, kwargs)
         if bool(intersect_kwargs):
-            logger.debug("Deleted from cache")
+            logger.info("Deleted from cache")
             await redis_connector.delete(key)
