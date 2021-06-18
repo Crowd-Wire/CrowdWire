@@ -36,13 +36,15 @@ class GameScene extends Phaser.Scene {
 
         this.map = mapManager.buildMap(this);
 
+        this.collisionLayers = []
+
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith('__Conference'))
                 this.roomLayer = layer.tilemapLayer.setVisible(false);
-            else if (layer.name.includes("Collision"))
+            else if (layer.name.includes("Collision")) {
                 // -1 makes all tiles on this layer collidable
-                this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name === "__Float")
+                this.collisionLayers.push(layer.tilemapLayer.setCollisionByExclusion([-1]));
+            } else if (layer.name === "__Float")
                 layer.tilemapLayer.setDepth(this.map.heightInPixels);
             else if (layer.name === "Float")
                 layer.tilemapLayer.setDepth(this.map.heightInPixels + 1);
@@ -338,7 +340,7 @@ class Player extends Phaser.GameObjects.Container {
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        scene.physics.add.collider(this, [scene.collisionLayer, scene.objectGroups['ObjectCollision']]);
+        scene.physics.add.collider(this, [...scene.collisionLayers, scene.objectGroups['ObjectCollision']]);
         
         let avatar_chosen_sprite = "avatars_1_1"
 
