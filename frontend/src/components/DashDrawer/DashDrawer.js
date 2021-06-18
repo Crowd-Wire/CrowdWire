@@ -90,7 +90,7 @@ const useStyles = makeStyles((theme) => ({
       width: '100%',
       height: '100%',
       backgroundColor: '#2B9BFD',
-      'clip-path': 'polygon(75% 50%, 100% 75%, 100% 25%)',
+      'clip-path': 'polygon(calc(100% - 10px) 50%, 100% 75%, 100% 25%)',
     }
   }
 }));
