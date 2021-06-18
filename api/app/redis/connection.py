@@ -473,15 +473,15 @@ class RedisConnector:
         for uid in await self.smembers(f"world:{world_id}:group:{group_id}"):
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
             await manager.send_personal_message({
-                    'topic': protocol.CLOSE_ROOM,
-                    'group': group_id
-                }, uid)
+                'topic': protocol.CLOSE_ROOM,
+                'group': group_id
+            }, uid)
         await self.delete(f"world:{world_id}:group:{group_id}")
         if user_id:
             await manager.send_personal_message({
-                    'topic': protocol.CLOSE_ROOM,
-                    'group': group_id
-                }, user_id)
+                'topic': protocol.CLOSE_ROOM,
+                'group': group_id
+            }, user_id)
 
     async def rem_users_from_user(self, world_id: str, user_id: str, lost_user_id: str, *lost_users_id: List[str]):
         lost_users_id = [lost_user_id, *lost_users_id]
