@@ -54,9 +54,6 @@ export const useRoomStore = create(
       normalizeRooms: (groups) => {
           set((s) => {
             for (const [key, value] of Object.entries(s.rooms)) {
-              console.log(key)
-              console.log(groups)
-              console.log(!groups.includes(key))
               if (!groups.includes(key)) {
                 useConsumerStore.getState().closeRoom(key);
               }
@@ -77,8 +74,6 @@ export const useRoomStore = create(
             if (room.sendTransport) {room.sendTransport.close()}
             delete s.rooms[roomId];
           }
-          console.log(roomId)
-          console.log(s.rooms)
           return {
             rooms: {
               ...s.rooms

@@ -57,7 +57,6 @@ async def send_groups_snapshot(world_id: str, user_id: str):
     to allow him to update his groups
     """
     user_groups = await redis_connector.smembers(f"world:{world_id}:user:{user_id}:groups")
-    logger.info(user_id)
     await manager.send_personal_message({'topic': 'GROUPS_SNAPSHOT', 'groups': user_groups}, user_id)
 
 
@@ -131,7 +130,6 @@ async def unwire_players(world_id: str, user_id: str, payload: dict):
         await handle_actions(await redis_connector.rem_groups_from_user(world_id, user_id, *rem_groups_id))
     if add_users_id:
         # add user to a new group with the still nearby users
-        logger.info(f'[UNWIRE] user {user_id} criou o grupo')
         next_group_id = await redis_connector.get_next_group()
         await handle_actions(await redis_connector.add_users_to_group(world_id, next_group_id, *[user_id, *add_users_id]))
 
@@ -357,7 +355,6 @@ async def add_speaker(world_id: str, room_id: str, user_id: str):
 
 async def destroy_room(world_id: str, room_id: str, media_server: str):
     payload = {'topic': "destroy-room", 'd': {'roomId': room_id}}
-    logger.info(media_server)
     await rabbit_handler.publish(payload, media_server)
 
 

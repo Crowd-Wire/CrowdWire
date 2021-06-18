@@ -144,7 +144,7 @@ export const getSocket = (worldId) => {
             //     console.log(`[RECV][${data.topic}]`, data);
             // else if (data.topic != "PLAYER_MOVEMENT")
             //     console.info(`[message] Data received for topic ${data.topic}`);
-            console.log(useRoomStore.getState().rooms)            
+
             switch (data.topic) {
                 case "SEND_MESSAGE":
                     useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
@@ -167,15 +167,12 @@ export const getSocket = (worldId) => {
                     usePlayerStore.getState().wirePlayers(data.ids, data.merge);
                     break;
                 case "UNWIRE_PLAYER":
-                    console.log(data)
                     usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
                     break;
                 case "CLOSE_ROOM":
-                    console.log(data)
                     useConsumerStore.getState().closeRoom(data.group);
                     break;
                 case "GROUPS_SNAPSHOT":
-                    console.log(data)
                     // usePlayerStore.getState().setGroups(data.groups);
                     useRoomStore.getState().normalizeRooms(data.groups);
                     break;
@@ -218,7 +215,7 @@ export const getSocket = (worldId) => {
                     // else check if player is in range
                     if (GameScene.inRangePlayers.has(data.d.peerId) || useWorldUserStore.getState().world_user.in_conference) {
                         const roomId = data.d.roomId;
-                        if (useRoomStore.getState().rooms[roomId].recvTransport) {
+                        if (useRoomStore.getState().rooms[roomId] && useRoomStore.getState().rooms[roomId].recvTransport) {
                             consumeStream(data.d.consumerParameters, roomId, data.d.peerId, data.d.kind );
                         } else {
                             consumerQueue = [...consumerQueue, { roomId: roomId, d: data.d }];
@@ -227,7 +224,7 @@ export const getSocket = (worldId) => {
                     break;
                 case "new-peer-data-producer":
                     const roomId = data.d.roomId;
-                    if (useRoomStore.getState().rooms[roomId].recvTransport) {
+                    if (useRoomStore.getState().rooms[roomId] && useRoomStore.getState().rooms[roomId].recvTransport) {
                         consumeDataStream(data.d.consumerParameters, roomId, data.d.peerId);
                     }
                     break;

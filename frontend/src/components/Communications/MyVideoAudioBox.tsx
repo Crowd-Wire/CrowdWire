@@ -155,8 +155,6 @@ export const MyVideoAudioBox: React.FC<MyVideoAudioBoxProps> = ({
       setAllowedToSpeak(useWorldUserStore.getState().world_user.role.talk_conference)
     };
     
-    console.log(in_conference)
-    console.log(hasRequested)
   }, [in_conference])
 
   useEffect(() => {

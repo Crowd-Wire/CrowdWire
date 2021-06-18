@@ -9,6 +9,7 @@ from app import schemas, models
 from uuid import uuid4
 from loguru import logger
 from app.core import strings
+from app.core.consts import WebsocketProtocol as protocol
 
 
 class RedisConnector:
@@ -18,13 +19,13 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
-        self.master = await aioredis.create_connection('redis://localhost/0')
+        # self.master = await aioredis.create_connection('redis://localhost/0')
         # await self.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
@@ -469,11 +470,21 @@ class RedisConnector:
         for gid in groups_id:
             await self.add_users_to_group(world_id, gid, user_id)
 
-    async def rem_group(self, world_id: str, group_id: str):
+    async def rem_group(self, world_id: str, group_id: str, user_id: str = None):
+        from app.websockets.connection_manager import manager
         """Remove group from world"""
         for uid in await self.smembers(f"world:{world_id}:group:{group_id}"):
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
+            await manager.send_personal_message({
+                    'topic': protocol.CLOSE_ROOM,
+                    'group': group_id
+                }, uid)
         await self.delete(f"world:{world_id}:group:{group_id}")
+        if user_id:
+            await manager.send_personal_message({
+                    'topic': protocol.CLOSE_ROOM,
+                    'group': group_id
+                }, user_id)
 
     async def rem_users_from_user(self, world_id: str, user_id: str, lost_user_id: str, *lost_users_id: List[str]):
         lost_users_id = [lost_user_id, *lost_users_id]
@@ -499,7 +510,7 @@ class RedisConnector:
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
             actions.append({'worldId': world_id, 'roomId': group_id})
             # remove group when one or none inner users
-            await self.rem_group(world_id, group_id)
+            await self.rem_group(world_id, group_id, user_id)
         else:
             # check if the group removed is now subgroup of another
             left_users = await self.get_group_users(world_id, group_id)
@@ -512,7 +523,7 @@ class RedisConnector:
                 if set(await self.get_group_users(world_id, igid)).issuperset(set(left_users)):
                     # remove redundant group
                     actions.append({'worldId': world_id, 'roomId': group_id})
-                    await self.rem_group(world_id, group_id)
+                    await self.rem_group(world_id, group_id, user_id)
                     break
 
         return actions

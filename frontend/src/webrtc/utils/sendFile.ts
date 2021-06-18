@@ -22,8 +22,6 @@ export const sendFile = async (roomId:string = null) => {
   if (Object.keys(sendTransports).length <= 0) {
     return;
   }
-
-  console.log(sendTransports)
   
   for (const [ key, value ] of Object.entries(sendTransports)) {
     if (value && value.sendTransport) {
