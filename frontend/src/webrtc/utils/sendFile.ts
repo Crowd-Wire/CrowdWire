@@ -1,5 +1,5 @@
 import { useRoomStore } from "../stores/useRoomStore";
-import { Transport } from "mediasoup-client/lib/Transport";
+import { Producer, Transport } from "mediasoup-client/lib/types";
 
 export const sendFile = async (roomId:string = null) => {
   const { rooms } = useRoomStore.getState();
@@ -8,32 +8,35 @@ export const sendFile = async (roomId:string = null) => {
   if (roomId && !(roomId in rooms))
     return dataProducers;
   
-  const sendTransports: Transport[] = [];
+  
+  let sendTransports: Record<string,
+    { recvTransport: Transport;
+      sendTransport: Transport;
+      micProducer: Producer;
+      camProducer: Producer;
+      mediaProducer: Producer;
+    }> = {};
+  
+  sendTransports = rooms;
 
-
-  if (roomId)
-    sendTransports.push(rooms[roomId].sendTransport)
-  else {
-    for (let value of Object.values(rooms))
-      sendTransports.push(value.sendTransport)
+  if (Object.keys(sendTransports).length <= 0) {
+    return;
   }
 
-  if (sendTransports.length <= 0) {
-    return dataProducers;
-  }
+  console.log(sendTransports)
+  
+  for (const [ key, value ] of Object.entries(sendTransports)) {
+    if (value && value.sendTransport) {
 
-  for (let i = 0; i<sendTransports.length; i++) {
-    if (sendTransports[i]) {
+        var dataProducer = await value.sendTransport.produceData({
+          appData: { mediaTag: "file" },
+        })
 
-      var dataProducer = await sendTransports[i].produceData({
-        appData: { mediaTag: "file" },
-      })
+        dataProducer.on("transportclose", () => {
+          dataProducer.close();
+        })
 
-      dataProducer.on("transportclose", () => {
-        dataProducer.close();
-      })
-
-      dataProducers.push(dataProducer);
+        dataProducers.push(dataProducer);
     }
   }
   return dataProducers;

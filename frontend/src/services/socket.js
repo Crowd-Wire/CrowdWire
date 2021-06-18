@@ -144,7 +144,7 @@ export const getSocket = (worldId) => {
             //     console.log(`[RECV][${data.topic}]`, data);
             // else if (data.topic != "PLAYER_MOVEMENT")
             //     console.info(`[message] Data received for topic ${data.topic}`);
-
+            console.log(useRoomStore.getState().rooms)            
             switch (data.topic) {
                 case "SEND_MESSAGE":
                     useMessageStore.getState().addMessage({from: data.from, text: data.text, date: data.date, to: data.to});
@@ -156,11 +156,6 @@ export const getSocket = (worldId) => {
                     let user_id = data.user_id;
                     useConsumerStore.getState().closePeer(user_id);
                     usePlayerStore.getState().disconnectPlayer(user_id);
-                    if (data.groups) {
-                        for (let i = 0; i < data.groups.length; i++) {
-                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
-                        }
-                    }
                     break;
                 case "PLAYER_MOVEMENT":
                     usePlayerStore.getState().movePlayer(data.user_id, data.position, data.velocity);
@@ -172,15 +167,17 @@ export const getSocket = (worldId) => {
                     usePlayerStore.getState().wirePlayers(data.ids, data.merge);
                     break;
                 case "UNWIRE_PLAYER":
+                    console.log(data)
                     usePlayerStore.getState().unwirePlayers(data.ids, data.merge);
-                    if (data.groups) {
-                        for (let i = 0; i < data.groups.length; i++) {
-                            useConsumerStore.getState().checkRoomToClose(data.groups[i].roomId);
-                        }
-                    }
+                    break;
+                case "CLOSE_ROOM":
+                    console.log(data)
+                    useConsumerStore.getState().closeRoom(data.group);
                     break;
                 case "GROUPS_SNAPSHOT":
-                    usePlayerStore.getState().setGroups(data.groups);
+                    console.log(data)
+                    // usePlayerStore.getState().setGroups(data.groups);
+                    useRoomStore.getState().normalizeRooms(data.groups);
                     break;
                 case "you-joined-as-speaker":
                     beforeJoinRoom(data.d.routerRtpCapabilities, data.d.roomId).then(() => {

@@ -18,14 +18,14 @@ class RedisConnector:
         self.master = None
 
     async def sentinel_connection(self):
-        logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
-        self.sentinel_pool = await aioredis.sentinel.create_sentinel(
-            [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
-            password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
-        self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
+        # logger.info(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)
+        # self.sentinel_pool = await aioredis.sentinel.create_sentinel(
+        #     [(settings.REDIS_SENTINEL_HOST, settings.REDIS_SENTINEL_PORT)],
+        #     password=settings.REDIS_SENTINEL_PASSWORD, timeout=2)
+        # self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
-        # self.master = await aioredis.create_connection('redis://localhost/0')
-        await self.execute('flushall')
+        self.master = await aioredis.create_connection('redis://localhost/0')
+        # await self.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -48,10 +48,6 @@ class RedisConnector:
     async def incrby(self, key: str, value: int):
         return await self.execute('incrby', key, value)
 
-    async def keys(self, matcher: str) -> List[str]:
-        """Scans keys that contain a matcher string"""
-        return await self.execute('keys', matcher)
-
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
         return await self.execute('scan', 0, 'match', f"*{matcher}*")
@@ -66,6 +62,7 @@ class RedisConnector:
         return all_keys
 
     async def hget(self, key: str, field: any):
+        # TODO: CHECK ENCODINGS!
         return await self.execute('hget', key, field)
 
     async def hset(self, key: str, field: str, value: any):
@@ -82,10 +79,6 @@ class RedisConnector:
     async def lpush(self, key: str, item: any):
         """Adds one item to a list"""
         return await self.execute('lpush', key, item)
-
-    async def rpop(self, key: str):
-        """Pops one item from the list"""
-        return await self.execute('rpop', key)
 
     async def llen(self, key: str):
         """Checks the length of the list"""
@@ -246,6 +239,7 @@ class RedisConnector:
         Checks World_User Data, if present, to be returned to REST API
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
+        # TODO: maybe check encoding instead of converting to string
         username = await self.hget(
             f"world:{str(world_id)}:{str(user_id)}", 'username')
         avatar = await self.hget(
@@ -277,6 +271,7 @@ class RedisConnector:
         Checks World_User Data if present
         @return: a schema of a World User taking into consideration Redis Stored Values
         """
+        # TODO: maybe check encoding instead of converting to string
         user_id = str(user_id)
         world_id = str(world_id)
         username = await self.hget(
@@ -290,7 +285,6 @@ class RedisConnector:
         if username and avatar and role:
             role = pickle.loads(role).__dict__
             return {
-                'user_id': user_id,
                 'username': pickle.loads(username),
                 'avatar': pickle.loads(avatar),
                 'role': {'role_id': role['role_id'], 'name': role['name']},

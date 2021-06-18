@@ -338,8 +338,8 @@ class Player extends Phaser.GameObjects.Container {
 
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
-        } else {
-            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id]?.avatar
+        } else if (usePlayerStore.getState().users_info[user_id]) {
+            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]

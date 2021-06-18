@@ -229,13 +229,16 @@ export const FileSharing: React.FC<FileSharingProps> = ({closeModal}) => {
       let add_files = []
 
       if ( ( myFiles.length + allFiles.length ) <= 3) {
+        console.log('sending file')
         sendFile().then((dataProducers) => {
+          console.log(dataProducers)
           for (let i=0; i<allFiles.length; i++) {
             allFiles[i].meta['owner'] = myUserId;
             myFiles.push(allFiles[i].file);
             add_files.push(allFiles[i].meta);
             allFiles[i].remove();
           }
+          console.log({ topic: "ADD_USER_FILES", 'files': add_files })
           wsend({ topic: "ADD_USER_FILES", 'files': add_files });
 
           useWsHandlerStore.getState().addWsListener(`DOWNLOAD_REQUEST`, (d) => {
