@@ -1,6 +1,6 @@
 # Kubernetes and Helm Charts
 
-In order to do deployments and increase the availability of our System, we decided to use Kubernetes. To manage the packaging of  the Kubernetes resources, we are using  [Helm]( https://helm.sh/). If you want to make use of our charts locally, do the following steps:
+To manage the packaging of  the Kubernetes resources, we are using  [Helm]( https://helm.sh/). If you want to make use of our charts locally, do the following steps. Before installing this chart please check the `README.md`file present on the previous directory, with some deployment notes.
 
 ```
 $cd charts
@@ -10,7 +10,7 @@ $helm dep build
 $helm install crowdwire  .
 ```
 
-To observe the initialization of all resources(Pods, Deployments, Services, etc), use the following command:
+To observe the initialization of all Pods, use the following command:
 
 ```
 kubectl get all -o wide 
@@ -24,6 +24,7 @@ This is the structure of our Charts: An Umbrella Chart containing all our micros
 ├── subcharts
 │   ├── api
 │   ├── frontend
+|	├── mediaserver
 │   ├── postgresql
 │   ├── rabbitmq
 │   └── redis

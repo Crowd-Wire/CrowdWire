@@ -8,6 +8,7 @@ import Tab from "@material-ui/core/Tab";
 import Card from "components/Card/Card.js";
 import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
+import CloseIcon from '@material-ui/icons/Close';
 
 import { useDrag } from "react-dnd";
 
@@ -59,18 +60,18 @@ const GameUITabs = (props) => {
                   wrapper: classes.tabWrapper
                 }}
                 key={key}
-                label={prop.tabName}
+                label={
+                  <>
+                    {prop.tabName}
+                    {/* {value === key && <CloseIcon onClick={() => console.log('close')} />} */}
+                  </>
+                }
               />
           ))}
         </Tabs>
       </CardHeader>
       <CardBody classes={{ cardBody: classes.cardBody }} >
-        {tabs.map((prop, key) => {
-          if (key === value) {
-            return <div key={key}>{prop.tabContent}</div>;
-          }
-          return null;
-        })}
+        {tabs[value].tabContent}
       </CardBody>
     </Card>
   )

@@ -1,30 +1,26 @@
 import { Transport } from "mediasoup-client/lib/Transport";
-import GameScene from "phaser/GameScene";
+import GameScene from "phaser/scenes/GameScene.js";
 import { useConsumerStore } from "../stores/useConsumerStore";
 import { useRoomStore } from "../stores/useRoomStore";
+import useWorldUserStore from "../../stores/useWorldUserStore";
 
 export const consumeStream = async (consumerParameters: any, roomId: string, peerId: string, kind: string) => {
   const { rooms } = useRoomStore.getState();
-  
+
   if (!(roomId in rooms)) {
-    console.log("skipping consumeStream because room doesnt exist");
     return false;
   }
 
   let recvTransport: Transport = rooms[roomId].recvTransport;
 
   if (!recvTransport) {
-    console.log("skipping consumeStream because recvTransport is null");
     return false;
   }
 
-  if (!GameScene.inRangePlayers.has(peerId)) {
-    console.log("skipping consumeStream because player not in range");
+  if (!GameScene.inRangePlayers.has(peerId) && !useWorldUserStore.getState().world_user.in_conference) {
     return false;
   }
   
-  console.log("new consumer" + peerId)
-
   const consumer = await recvTransport.consume({
     ...consumerParameters,
     appData: {
@@ -41,7 +37,6 @@ export const consumeStream = async (consumerParameters: any, roomId: string, pee
     useConsumerStore.getState().addAudioToggle(peerId, consumerParameters.producerPaused)
   else if (kind === 'video')
     useConsumerStore.getState().addVideoToggle(peerId, consumerParameters.producerPaused);
-  
-  console.log(useConsumerStore.getState())
+
   return true;
 };

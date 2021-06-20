@@ -7,7 +7,7 @@ from .connection import redis_connector
 from loguru import logger
 
 
-def cache(model: str):
+def cache(model: str, expire_minutes: int = 60):
     def decorator(func):
         def setup_args(_kwargs: dict) -> dict:
             """
@@ -24,11 +24,8 @@ def cache(model: str):
             function_name = func.__name__
             # remove DB session's as arguments to our Redis Key
             copy_kwargs = setup_args(kwargs)
-            logger.info(function_name)
-            logger.info(args)
-            logger.info(kwargs)
             key_data = {
-                'model': f"{function_name}-Entity",
+                'model': f"{model}-Entity",
                 'function_name': function_name,
                 'args': args,
                 'kwargs': copy_kwargs
@@ -49,14 +46,13 @@ def cache(model: str):
                 }
                 if data:
                     await redis_connector.set(key, pickle.dumps(value))
+                    await redis_connector.setexpire(key, expire_minutes)
 
             return data, message
 
         async def clear(*args, **kwargs):
             function_name = func.__name__
             copy_kwargs = setup_args(kwargs)
-            logger.info(args)
-            logger.info(kwargs)
             key_data = {
                 'model': model,
                 'function_name': function_name,
@@ -86,11 +82,11 @@ async def clear_cache_by_model(model_name: str, *args, **kwargs):
     @param args: optional args passed
     @param kwargs: kwargs passed to filter Redis key we want to delete from cache
     """
-    keys = await redis_connector.scan_match(model_name)
-    for key in keys[1]:
+    keys = await redis_connector.scan_match_all(model_name)
+    for key in keys:
         deserialized_value = pickle.loads(key)
         saved_kwargs = deserialized_value['kwargs']
         intersect_kwargs = intersect(saved_kwargs, kwargs)
         if bool(intersect_kwargs):
-            logger.debug("Deleted from cache")
+            logger.info("Deleted from cache")
             await redis_connector.delete(key)

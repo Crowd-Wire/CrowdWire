@@ -5,10 +5,14 @@ import {
   MediaKind,
   RtpCapabilities,
   RtpParameters,
+  SctpStreamParameters,
+  SctpParameters,
 } from "mediasoup/lib/types";
 import { MediaSendDirection } from "src/types";
 import { TransportOptions } from "./createTransport";
 import { Consumer } from "./createConsumer";
+import { DataConsumer } from "./createDataConsumer";
+
 
 const retryInterval = 5000;
 export interface HandlerDataMap {
@@ -34,9 +38,18 @@ export interface HandlerDataMap {
     rtpCapabilities: RtpCapabilities;
     appData: any;
   };
+  "@send-file": {
+    roomId: string;
+    peerId: string;
+    transportId: string;
+    direction: MediaSendDirection;
+    sctpStreamParameters: SctpStreamParameters;
+    appData: any;
+  };
   "@connect-transport": {
     roomId: string;
     dtlsParameters: DtlsParameters;
+    sctpParameters: SctpParameters;
     peerId: string;
     direction: MediaSendDirection;
   };
@@ -69,6 +82,7 @@ export type HandlerMap = {
 };
 
 type SendTrackDoneOperationName = `@send-track-${MediaSendDirection}-done`;
+type SendFileDoneOperationName = `@send-file-${MediaSendDirection}-done`;
 type ConnectTransportDoneOperationName = `@connect-transport-${MediaSendDirection}-done`;
 
 type OutgoingMessageDataMap = {
@@ -88,15 +102,15 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId: string;
   };
-  close_consumer: {
-    producerId: string;
-    roomId: string;
-  };
   "new-peer-producer": {
     roomId: string;
     peerId: string;
     kind: string;
   } & Consumer;
+  "new-peer-data-producer": {
+    roomId: string;
+    peerId: string;
+  } & DataConsumer;
   you_left_room: {
     roomId: string;
     kicked: boolean;
@@ -111,7 +125,7 @@ type OutgoingMessageDataMap = {
     peerId: string;
     routerRtpCapabilities: RtpCapabilities;
     recvTransportOptions: TransportOptions;
-    sendTransportOptions: TransportOptions;
+    //sendTransportOptions: TransportOptions;
   };
 } & {
   [Key in SendTrackDoneOperationName]: {
@@ -120,8 +134,14 @@ type OutgoingMessageDataMap = {
     roomId: string;
     peerId?: string;
   };
-} &
-  {
+} & {
+  [Key in SendFileDoneOperationName]: {
+    error?: string;
+    id?: string;
+    roomId: string;
+    peerId?: string;
+  };
+} & {
     [Key in ConnectTransportDoneOperationName]: {
       error?: string;
       roomId: string;
@@ -144,10 +164,6 @@ export let send = <Key extends keyof OutgoingMessageDataMap>(
 ) => {};
 
 export const startRabbit = async (handler: HandlerMap) => {
-  console.log(
-    "trying to connect to: ",
-    process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672"
-  );
   let conn: Connection;
   try {
     conn = await amqp.connect(process.env.RABBITMQ_URL || "amqp://user:bitnami@crowdwire-rabbitmq:5672");
@@ -156,14 +172,33 @@ export const startRabbit = async (handler: HandlerMap) => {
     setTimeout(async () => await startRabbit(handler), retryInterval);
     return;
   }
-  console.log("rabbit connected");
   conn.on("close", async function (err: Error) {
     console.error("Rabbit connection closed with error: ", err);
     setTimeout(async () => await startRabbit(handler), retryInterval);
   });
+
+  const k8s = require('@kubernetes/client-node');
+
+  const kc = new k8s.KubeConfig();
+  kc.loadFromDefault();
+  
+  const k8sApi = kc.makeApiClient(k8s.CoreV1Api);
+  let media_server_counter = 0;
+  await k8sApi.listNamespacedPod('default').then(async function(res: any)  {
+  for(let i =0; i< res.body.items.length; i ++){
+      let pod = res.body.items[i];
+      if (pod.metadata.name.includes('crowdwire-mediaserver')){
+        media_server_counter++;
+      }
+    }
+    
+  }).catch((err: any) => {
+    console.error(err);
+    media_server_counter = 1;
+  });
   const channel = await conn.createChannel();
   const sendQueue = "rest_api_queue";
-  const receiveQueue = "media_server_queue";
+  const receiveQueue = "media_server_" + String(media_server_counter);
   await Promise.all([
     channel.assertQueue(receiveQueue),
     channel.assertQueue(sendQueue),
@@ -182,19 +217,16 @@ export const startRabbit = async (handler: HandlerMap) => {
         let data: IncomingChannelMessageData<any> | undefined;
         try {
           data = JSON.parse(m);
-        } catch {console.log('error parsing json')}
+        } catch {console.error('Error parsing json')}
         // console.log(data.topic);
         if (data && data.topic && data.topic in handler) {
           const { d: handlerData, topic: operation, uid } = data;
           try {
-            console.log(operation);
-            
             await handler[operation as keyof HandlerMap](
               handlerData,
               uid,
               send,
               () => {
-                console.log(operation);
                 send({
                   topic: "error",
                   d:
@@ -204,7 +236,7 @@ export const startRabbit = async (handler: HandlerMap) => {
               }
             );
           } catch (err) {
-            console.log(operation, err);
+            console.error(operation, err);
             Sentry.captureException(err, { extra: { topic: operation } });
           }
         }

@@ -3,35 +3,13 @@
 
 2. if you want to change the dimensions of the slides you will need to edit the slideWidth variable here 👇 and the $slide-width variable in the CSS.
 ************************************/
-import React, { useState } from 'react';
-import Carousel from "react-grid-carousel";
-import styled from 'styled-components';
+import React from 'react';
+import { API_BASE } from "config";
 
-const randomImageUrl = 'https://picsum.photos/800/600?random='
 
-const Item = styled.div`
-  background-image: ${({ img }) => `url(${img})`};
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  width: 100%;
-  height: 200px;
-`
-
-const AvatarCarousel = () => {
-    const [cols, setCols] = useState(1)
-    const [rows, setRows] = useState(1)
-    const [gap, setGap] = useState(10)
-    const [pages, setPages] = useState(3)
-
+const AvatarCarousel = ({ avatar }) => {
     return (
-      <Carousel cols={cols} rows={rows} gap={gap}>
-        {[...Array(cols * rows * pages)].map((_, i) => (
-          <Carousel.Item key={i}>
-            <Item img={randomImageUrl + i} />
-          </Carousel.Item>
-        ))}
-      </Carousel>
+        <img key={avatar} src={API_BASE + "static/characters/" + avatar + '.png'} style={{width: 130}}/>
     );
 };
 

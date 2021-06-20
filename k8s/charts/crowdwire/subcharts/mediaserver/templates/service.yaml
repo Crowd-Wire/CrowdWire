@@ -4,11 +4,18 @@ metadata:
   name: {{ include "mediaserver.fullname" . }}
   labels:
     {{- include "mediaserver.labels" . | nindent 4 }}
+  annotations:
+   metallb.universe.tf/allow-shared-ip: crowdwire
 spec:
-  type: {{ .Values.service.type }}
+  type: LoadBalancer
+  #loadBalancerIP: 193.136.92.151
+  loadBalancerIP: 10.0.12.47
   ports:
-    - port: {{ .Values.service.port }}
+    - name : tcp
+      port: {{ .Values.service.port }}
       targetPort: 3001
       protocol: TCP
+
   selector:
     {{- include "mediaserver.selectorLabels" . | nindent 4 }}
+    

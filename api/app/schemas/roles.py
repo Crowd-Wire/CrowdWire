@@ -1,12 +1,14 @@
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing_extensions import Annotated
 
 
 class RoleBase(BaseModel):
     world_id: Optional[int] = None
-    name: Optional[str] = None
+    name: Annotated[Optional[str], Field(max_length=50)] = None
     is_default: Optional[bool]
+    interact: Optional[bool]
     walk: Optional[bool]
     talk: Optional[bool]
     talk_conference: Optional[bool]
@@ -20,7 +22,7 @@ class RoleBase(BaseModel):
 
 class RoleCreate(RoleBase):
     world_id: int
-    name: str
+    name: Annotated[str, Field(max_length=50)]
 
 
 class RoleUpdate(RoleBase):

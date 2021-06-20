@@ -12,7 +12,7 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import FormLabel from '@material-ui/core/FormLabel';
 import TagService from 'services/TagService';
-
+import useAuthStore from 'stores/useAuthStore.ts';
 let wName = "";
 let maxUsers = -1;
 let tag_array = [];
@@ -28,7 +28,7 @@ export default function WorldDetails(props){
             let arr = [];
             res.forEach(tag => arr.push(tag.name)); 
             setTags(arr);
-          })
+          }).catch((error) => {useAuthStore.getState().leave()})
       }, [])
 
     const [accessibility, setAccessibility] = React.useState("false");
@@ -89,9 +89,9 @@ export default function WorldDetails(props){
     }
     return(
         <Row style={{height:"100%", width:"100%"}}>
-            <Col xs={2} sm={1} md={1}></Col>
-            <Col xs={8} sm={5} md={5} style={{minWidth:"270px"}}>
-                <div style={{height:"100%",width:"100%", borderRadius:"8px", backgroundColor:"white"}}>
+            <Col xs={2} sm={1} md={2} lg={3}></Col>
+            <Col xs={8} sm={11} md={8} lg={6} style={{minWidth:"270px", background: 'white'}}>
+                <div style={{height:"100%",width:"100%", borderRadius:"8px"}}>
                     <Row style={{height:"20px"}}/>
                     <Row style={{marginLeft:"auto", marginRight:"auto"}}>
                         <Typography variant="h5" style={{marginLeft:"auto", marginRight:"auto"}}>World Details</Typography>
@@ -122,8 +122,8 @@ export default function WorldDetails(props){
                             <div style={{width:"100%", marginRight:"auto"}}>
                             <FormLabel component="legend">Allow guests</FormLabel>
                                 <RadioGroup row name="guests" onChange={onChangeGuests}>
-                                <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Allow" />
-                                <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Deny" />
+                                <FormControlLabel checked={guests === "false"} value={"false"} control={<Radio />} label="Deny" />
+                                <FormControlLabel checked={guests === "true"} value={"true"}  control={<Radio />} label="Allow" />
                             </RadioGroup>
                             </div>
                         </Col>
@@ -177,7 +177,7 @@ export default function WorldDetails(props){
                     </Row>
                     <Row style={{marginLeft:"30px", marginTop:"20px", marginRight:"30px", marginBottom:"30px"}}>
                         <Button onClick={creation} variant="contained" color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
-                            Create Map
+                            Create World
                         </Button>
                     </Row>
                 </div>

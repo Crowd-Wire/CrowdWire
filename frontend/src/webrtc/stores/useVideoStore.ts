@@ -6,15 +6,17 @@ export const useVideoStore = create(
     {
       camStream: null as MediaStream | null,
       cam: null as MediaStreamTrack | null,
-      camProducer: null as any | null,
     },
     (set) => ({
-      nullify: () =>
-        set({
-          cam: null,
-          camStream: null,
-          camProducer: null,
-        }),
+      nullify: () => {
+        set((s) => {
+          if (s.camStream) s.camStream.getTracks().forEach(track => track.stop())
+          return {
+            cam: null,
+            camStream: null,
+          }
+        })
+      },
       set,
     })
   )

@@ -1,4 +1,4 @@
-import { Consumer } from "mediasoup-client/lib/types";
+import { Consumer, DataConsumer } from "mediasoup-client/lib/types";
 import create from "zustand";
 import { combine } from "zustand/middleware";
 import { useRoomStore } from "./useRoomStore";
@@ -8,11 +8,12 @@ export const useConsumerStore = create(
     {
       consumerMap: {} as Record<
         string,
-        { 
+        {
           roomId: string;
           consumerAudio: Consumer;
           consumerVideo: Consumer;
           consumerMedia: Consumer;
+          dataConsumer: DataConsumer;
           volume: number;
           active: boolean;
           videoToggle: boolean;
@@ -36,12 +37,39 @@ export const useConsumerStore = create(
             : s
         );
       },
+      addDataConsumer: (c: DataConsumer, userId: string, roomId: any) => {
+        set((s) => {
+          let ori_consumer : {
+            roomId: string;
+            consumerAudio: Consumer;
+            consumerVideo: Consumer;
+            consumerMedia: Consumer;
+            dataConsumer: DataConsumer;
+            volume: number;
+            active: boolean;
+            videoToggle: boolean;
+            audioToggle: boolean;
+          } = {roomId: roomId, consumerAudio: null, consumerMedia: null, consumerVideo: null, dataConsumer: null,
+            volume: null, active: null, videoToggle: null, audioToggle: null};
+          let consumer_map = {...s.consumerMap};
+          if (consumer_map[userId]) {
+            consumer_map[userId].dataConsumer = c;
+          } else{
+            ori_consumer.dataConsumer = c;
+            consumer_map[userId] = ori_consumer;
+          }
+          return {
+            consumerMap: consumer_map,
+          }
+        });
+      },
       add: (c: Consumer, roomId:string, userId: string, kind: string) =>
         set((s) => {
           let volume = 100;
           let consumerAudio = null;
           let consumerVideo = null;
           let consumerMedia = null;
+          let dataConsumer = null;
           let videoToggle = false;
           let audioToggle = false;
           
@@ -55,6 +83,7 @@ export const useConsumerStore = create(
           if (userId in s.consumerMap) {
             const x = s.consumerMap[userId];
             volume = x.volume;
+            dataConsumer = x.dataConsumer;
             videoToggle = x.videoToggle;
             audioToggle = x.audioToggle;
             if (kind === "audio") {
@@ -78,6 +107,7 @@ export const useConsumerStore = create(
                 consumerAudio,
                 consumerVideo,
                 consumerMedia,
+                dataConsumer,
                 volume,
                 active: false,
                 videoToggle,
@@ -167,11 +197,15 @@ export const useConsumerStore = create(
               if (value.consumerMedia && !value.consumerMedia.closed) {
                 value.consumerMedia.close()
               }
+              if (value.dataConsumer && !value.dataConsumer.closed) {
+                value.dataConsumer.close()
+              }
               to_del_users.push(key)
             };
           }
           to_del_users.forEach((x) => delete s.consumerMap[x])
-
+          useRoomStore.getState().removeRoom(roomId);
+          
           return {
             consumerMap: {
               ...s.consumerMap
@@ -181,13 +215,27 @@ export const useConsumerStore = create(
       checkRoomToClose: (roomId) =>
         set((s) => {
           let to_close = true;
-          for (const [key, value] of Object.entries(s.consumerMap)) {
+          for (const value of Object.values(s.consumerMap)) {
             if (value.roomId == roomId) {
               to_close = false;
               break;
             };
           }
           if (to_close) useRoomStore.getState().removeRoom(roomId);
+          return {
+            consumerMap: {
+              ...s.consumerMap
+            },
+          }
+        }),
+      closeDataConsumers: () =>
+        set((s) => {
+          for (const [key, value] of Object.entries(s.consumerMap)) {
+            if (value.dataConsumer) {
+              value.dataConsumer.close()
+              s.consumerMap[key].dataConsumer = null;
+            };
+          }
           return {
             consumerMap: {
               ...s.consumerMap
@@ -207,10 +255,13 @@ export const useConsumerStore = create(
             if (user.consumerMedia && !user.consumerMedia.closed) {
               user.consumerMedia.close()
             }
+            if (user.dataConsumer && !user.dataConsumer.closed) {
+              user.dataConsumer.close()
+            }
             delete s.consumerMap[userId];
             useConsumerStore.getState().checkRoomToClose(user.roomId);
           }
-          console.log(s.consumerMap)
+
           return {
             consumerMap: {
               ...s.consumerMap

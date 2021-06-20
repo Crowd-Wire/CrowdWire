@@ -1,54 +1,63 @@
 import React, {Component} from "react";
-import { Typography } from "@material-ui/core";
+import { Navigate } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import WorldService from "services/WorldService";
+import WorldService from "services/WorldService.ts";
 import DeleteIcon from '@material-ui/icons/Delete';
-import Carousel from 'components/AvatarCarousel/AvatarCarousel.js';
-import TextField from '@material-ui/core/TextField';
+import { ReportWorldCard } from 'components/ReportWorldCard/ReportWorldCard'
+import ReportIcon from '@material-ui/icons/Report';
+import BuildIcon from '@material-ui/icons/Build';
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import Button from "components/CustomButtons/Button.js";
+import { withRouter } from "utils/wrapper";
+import useAuthStore from "stores/useAuthStore.ts";
+
+
 class DashboardStats extends Component{
     
     constructor(props){
         super(props);
         this.state = {
             show: false,
-            dialog:false
+            nav: false,
+            open: false,
+            page: false,
+            guest: useAuthStore.getState().guest_uuid
         }
+        this.navigate = props.navigate;
+        this.params = props.params;
     }
-    
+
+   
     transition = React.forwardRef(function Transition(props, ref) {
         return <Slide direction="up" ref={ref} {...props} />;
     });
-
-    actionButtons = {
-        marginRight:"10px",
+    
+    handleClickOpen = () => {
+        this.setState({open: true});        
     };
-    descText = {
-        marginLeft:"5%",
-        color:"white",
-    };
-
-    titleText = {
-        marginLeft:"5%"
+    
+    handleClose = () => {
+        this.setState({open: false});        
     };
     
     hideModal = () => {
-        console.log("false now");
         this.setState({show: false});        
+    }
+
+    changePage = () => {
+        this.setState({stats: true})
     }
 
     hideModalandDelete = () => {
         WorldService.deleteWorld(this.props.details.world_id);
-        console.log("false now");
         this.setState({show: false});
         let hist = createBrowserHistory();
         hist.back();
@@ -57,42 +66,62 @@ class DashboardStats extends Component{
     showModal = () => {
         this.setState({show: true});        
     }
-
-
-    hideDialog = () => {
-        console.log("false now");
-        this.setState({dialog: false});        
-    }
-
-    showDialog = () => {
-        this.setState({dialog: true});        
-    }
     
+    showWorldManagement = () => {
+        this.setState({nav:true});
+    }
     render(){
-        console.log(this.props.details);
+        if(this.state.nav){
+            return <Navigate to={"/world/"+this.props.details.world_id+"/settings"}></Navigate>
+        }
+        if (this.state.stats){
+            return <Navigate to={"/world/"+this.props.details.world_id+"/statistics"}></Navigate>
+        }
         return(
             <>    
-                <div style={{height:"fit-content",borderRadius:"15px", width:"100%",}}>
-                    <br/>
-                    <Row style={{width:"100%",height:"90%"}}>
-                        <Col xs={12} sm={10} md={6} style={{marginBottom:"1%"}}>
-                            <Row>
-
-                                    <Button variant="success" className={this.actionButtons} style={{marginLeft:"5%",color:"black"}}>Enter Map</Button>
-                                    <Button variant="primary" className={this.actionButtons}>Edit Map</Button>
-                                    <Button variant="primary " className={this.actionButtons} onClick={() => {this.showDialog()}}>Manage Map</Button>
-
-                            </Row>
-                            <Row style={{marginTop:"50px"}}>
-                                <Typography variant="body1" className={this.descText}>{this.props.details.description ? this.props.details.description : "No description available for this world"}</Typography>
-                            </Row>
-                        </Col>
-                        <Col xs={12} sm={10} md={4} style={{borderRadius:"15px"}}>
-                            <Row>
-                                <Button variant="danger" onClick={() => {this.showModal()}} style={{marginLeft:"auto"}}>Delete World</Button>
-                            </Row>
-                        </Col>
+                <div style={{width: "100%", paddingLeft: 15}}>
+                    { this.props.isCreator || this.props.canManage ? 
+                        <Row sm={12}>
+                            {/* <Link to={"/world/"+this.props.details.world_id+"/statistics"}> */}
+                            <Button color="warning" onClick={() => this.changePage()} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Check Statistics</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
+                    { this.props.canManage ? 
+                        <Row sm={12}>
+                            <Button color="primary" onClick={() => {this.showWorldManagement()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><AssignmentIcon/>Manage World</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
+                    { this.props.isCreator ? 
+                        <Row sm={12}>
+                            <Button color="primary" onClick={() => this.navigate('/world/' + this.params.id + '/editor')} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}><BuildIcon/>Edit World</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
+                    { !this.state.guest ?
+                    <Row sm={12}>
+                        <Button color="github" onClick={() => {this.handleClickOpen()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                            <span style={{fontWeight: 500, fontSize: '0.9rem'}}><ReportIcon/>Report World</span>
+                        </Button>
+                        <ReportWorldCard open={this.state.open} closeModal={this.handleClose}
+                            world_name={this.props.details.name} world_id={this.props.details.world_id} inside_world={false}/>
                     </Row>
+                    : '' }
+                    { this.props.isCreator ? 
+                        <Row sm={12}>
+                            <Button color="danger" onClick={() => {this.showModal()}} style={{ marginLeft: "auto", marginRight: "auto", width: 180}} round>
+                                <span style={{fontWeight: 500, fontSize: '0.9rem'}}>Delete World</span>
+                            </Button>
+                        </Row>
+                    : ''
+                    }
                 </div>
                 <Dialog
                     open={this.state.show}
@@ -128,41 +157,9 @@ class DashboardStats extends Component{
                         </Col>
                     </DialogActions>
                 </Dialog>
-
-                <Dialog
-                    open={this.state.dialog}
-                    TransitionComponent={this.transition}
-                    keepMounted
-                    aria-labelledby="alert-dialog-slide-title"
-                    aria-describedby="alert-dialog-slide-description"
-                    maxWidth="xl"
-                >
-                    <DialogContent style={{minWidth:"400px"}}>
-                    <DialogTitle id="alert-dialog-slide-description" style={{marginLeft:"auto", marginRight:"auto", textAlign:"center"}}>
-                        World Profile
-                    </DialogTitle>
-                        <Col>
-                            <Row style={{marginBottom:"15px"}}>
-                                <Col>
-                                    <Carousel/>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <TextField style={{marginLeft:"auto", marginRight:"auto"}} id="outlined-basic" label="username" variant="outlined" />
-                            </Row>
-                        </Col>
-                    </DialogContent>
-                    <DialogActions>
-                        <Row style={{marginLeft:"auto", marginRight:"auto"}}>
-                            <Button onClick={this.hideDialog} color="primary" style={{marginLeft:"auto", marginRight:"auto"}}>
-                                Disagree
-                            </Button>
-                        </Row>
-                    </DialogActions>
-                </Dialog>
             </>
         );
     }
 }
 
-export default (DashboardStats);
+export default withRouter(DashboardStats);

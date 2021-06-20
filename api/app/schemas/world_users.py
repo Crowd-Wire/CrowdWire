@@ -1,14 +1,17 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator, UUID4
-from typing import Optional, Union
+from pydantic import BaseModel, validator, UUID4, Field
+from typing import Optional, Union, Dict
+
+from typing_extensions import Annotated
+
 from app.core.consts import AVATARS_LIST
 from app.schemas import RoleInDB
 
 
 class World_UserBase(BaseModel):
-    avatar: Optional[str] = None
-    username: Optional[str] = None
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     status: Optional[int] = None
     user_id: Optional[int] = None
     world_id: Optional[int] = None
@@ -31,15 +34,24 @@ class World_UserCreate(World_UserBase):
     world_id: int
 
 
-class World_UserUpdate(World_UserBase):
-    pass
+class World_UserUpdate(BaseModel):
+    username: Annotated[Optional[str], Field(max_length=50)] = None
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    status: Optional[int]
+
+    @validator("avatar")
+    def validate_avatar(cls, v):
+        if v is not None and v not in AVATARS_LIST:
+            raise ValueError("Avatar name not Valid!")
+        return v
 
 
 # Base Schema to retrieve data from DB
 class World_UserInDBBase(BaseModel):
-    # user_id is an UUID1 for Guest Users
-    user_id: Optional[Union[int, UUID4]]
+    # user_id is an UUID4 for Guest Users
+    user_id: Optional[Union[UUID4, int]]
     world_id: int
+    status: Optional[int]
 
     class Config:
         orm_mode = True
@@ -47,8 +59,8 @@ class World_UserInDBBase(BaseModel):
 
 # Return Normal User's data when Joining World
 class World_UserInDB(World_UserInDBBase):
-    avatar: Optional[str]
-    username: Optional[str]
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     role_id: int
 
 
@@ -56,9 +68,14 @@ class World_UserInDB(World_UserInDBBase):
 # instead of only the id, useful to avoid more
 # requests to the API
 class World_UserWithRoleInDB(World_UserInDBBase):
-    avatar: Optional[str]
-    username: Optional[str]
+    avatar: Annotated[Optional[str], Field(max_length=50)] = None
+    username: Annotated[Optional[str], Field(max_length=50)] = None
     role: RoleInDB
+    last_pos: Optional[Dict[str, float]] = {}
+
+
+class World_UserWithRoleAndMap(World_UserWithRoleInDB):
+    world_map: bytes
 
 
 # Return Data for Statistics

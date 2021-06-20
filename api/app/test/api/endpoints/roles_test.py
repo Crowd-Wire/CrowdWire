@@ -25,7 +25,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             mock_access.return_value = Role(role_id=1, world_id=1), ""
             with patch("app.crud.crud_roles.CRUDRole.get_world_roles") as mock_get:
                 mock_get.return_value = [Role(role_id=1, world_id=1), Role(role_id=2, world_id=1)] , ""
@@ -46,7 +46,7 @@ class TestRoles(TestCase):
 
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             mock_access.return_value = None, "error"
 
             response = client.get(
@@ -131,7 +131,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             mock_access.return_value = None, "error"
 
             response = client.put(
@@ -163,7 +163,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             with patch("app.crud.crud_roles.CRUDRole.get_by_role_id_and_world_id") as mock_put:
 
                 mock_access.return_value = User(user_id=1), ""
@@ -185,7 +185,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             with patch("app.crud.crud_roles.CRUDRole.get_by_role_id_and_world_id") as mock_retrieve:
                 with patch("app.crud.crud_roles.CRUDRole.update") as mock_put:
 
@@ -224,7 +224,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             mock_access.return_value = None, "error"
 
             response = client.delete(
@@ -241,7 +241,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             with patch("app.crud.crud_roles.CRUDRole.remove") as mock_rem:
                 mock_access.return_value = User(user_id=1), ""
                 mock_rem.return_value = None, "error"
@@ -261,7 +261,7 @@ class TestRoles(TestCase):
         """
         app.dependency_overrides[get_current_user] = override_dependency_user
 
-        with patch("app.crud.crud_roles.CRUDRole.can_acess_world_roles") as mock_access:
+        with patch("app.crud.crud_roles.CRUDRole.can_access_world_roles") as mock_access:
             with patch("app.crud.crud_roles.CRUDRole.remove") as mock_rem:
                 mock_access.return_value = User(user_id=1), ""
                 mock_rem.return_value = Role(world_id=1, role_id=1), ""

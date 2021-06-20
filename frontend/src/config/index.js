@@ -3,7 +3,7 @@ export let API_BASE = null;
 export let URL_BASE = null;
 console.log(window.REACT_APP_RUNNING_MODE);
 if (window.REACT_APP_RUNNING_MODE != null && window.REACT_APP_RUNNING_MODE == 'production'){
-    let HOST = "crowdwire.duckdns.org"
+    let HOST = "atnog-crowdwire1.av.it.pt"
     console.log("host " + HOST)
     WS_BASE = `wss://${HOST}/api/v1`
     API_BASE = `https://${HOST}/api/v1/`
