@@ -16,7 +16,6 @@ You can explore in detail the documentation of the Project through the  [**Proje
 
 | Email               | Password |
 | ------------------- | -------- |
-| user@example.com    | string   |
 | speaker@example.com | string   |
 
 ## How to Run
