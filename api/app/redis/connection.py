@@ -9,6 +9,7 @@ from app import schemas, models
 from uuid import uuid4
 from loguru import logger
 from app.core import strings
+from app.core.consts import WebsocketProtocol as protocol
 
 
 class RedisConnector:
@@ -25,7 +26,7 @@ class RedisConnector:
         self.master = await self.sentinel_pool.master_for(settings.REDIS_MASTER)
         # uncomment this to reset redis everytime
         # self.master = await aioredis.create_connection('redis://localhost/0')
-        await self.execute('flushall')
+        # await self.execute('flushall')
 
         if not (await redis_connector.key_exists('media_server_1')):
             await redis_connector.hset('media_server_1', 'num_rooms', 0)
@@ -47,10 +48,6 @@ class RedisConnector:
 
     async def incrby(self, key: str, value: int):
         return await self.execute('incrby', key, value)
-
-    async def keys(self, matcher: str) -> List[str]:
-        """Scans keys that contain a matcher string"""
-        return await self.execute('keys', matcher)
 
     async def scan_match(self, matcher: str) -> List[Union[str, List[str]]]:
         """Scans keys that contain a matcher string"""
@@ -82,10 +79,6 @@ class RedisConnector:
     async def lpush(self, key: str, item: any):
         """Adds one item to a list"""
         return await self.execute('lpush', key, item)
-
-    async def rpop(self, key: str):
-        """Pops one item from the list"""
-        return await self.execute('rpop', key)
 
     async def llen(self, key: str):
         """Checks the length of the list"""
@@ -290,7 +283,6 @@ class RedisConnector:
         if username and avatar and role:
             role = pickle.loads(role).__dict__
             return {
-                'user_id': user_id,
                 'username': pickle.loads(username),
                 'avatar': pickle.loads(avatar),
                 'role': {'role_id': role['role_id'], 'name': role['name']},
@@ -475,11 +467,21 @@ class RedisConnector:
         for gid in groups_id:
             await self.add_users_to_group(world_id, gid, user_id)
 
-    async def rem_group(self, world_id: str, group_id: str):
+    async def rem_group(self, world_id: str, group_id: str, user_id: str = None):
+        from app.websockets.connection_manager import manager
         """Remove group from world"""
         for uid in await self.smembers(f"world:{world_id}:group:{group_id}"):
             await self.srem(f"world:{world_id}:user:{uid}:groups", group_id)
+            await manager.send_personal_message({
+                'topic': protocol.CLOSE_ROOM,
+                'group': group_id
+            }, uid)
         await self.delete(f"world:{world_id}:group:{group_id}")
+        if user_id:
+            await manager.send_personal_message({
+                'topic': protocol.CLOSE_ROOM,
+                'group': group_id
+            }, user_id)
 
     async def rem_users_from_user(self, world_id: str, user_id: str, lost_user_id: str, *lost_users_id: List[str]):
         lost_users_id = [lost_user_id, *lost_users_id]
@@ -505,7 +507,7 @@ class RedisConnector:
         if await self.scard(f"world:{world_id}:group:{group_id}") <= 1:
             actions.append({'worldId': world_id, 'roomId': group_id})
             # remove group when one or none inner users
-            await self.rem_group(world_id, group_id)
+            await self.rem_group(world_id, group_id, user_id)
         else:
             # check if the group removed is now subgroup of another
             left_users = await self.get_group_users(world_id, group_id)
@@ -518,7 +520,7 @@ class RedisConnector:
                 if set(await self.get_group_users(world_id, igid)).issuperset(set(left_users)):
                     # remove redundant group
                     actions.append({'worldId': world_id, 'roomId': group_id})
-                    await self.rem_group(world_id, group_id)
+                    await self.rem_group(world_id, group_id, user_id)
                     break
 
         return actions

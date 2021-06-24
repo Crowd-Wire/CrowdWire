@@ -2,6 +2,7 @@ import create from "zustand";
 import { combine } from "zustand/middleware";
 import { Device } from "mediasoup-client";
 import { detectDevice, Producer, Transport } from "mediasoup-client/lib/types";
+import { useConsumerStore } from "./useConsumerStore";
 
 export const getDevice = () => {
   try {
@@ -50,6 +51,18 @@ export const useRoomStore = create(
             device: s.device,
           }
         }),
+      normalizeRooms: (groups) => {
+          set((s) => {
+            for (const [key, value] of Object.entries(s.rooms)) {
+              if (!groups.includes(key)) {
+                useConsumerStore.getState().closeRoom(key);
+              }
+            }
+            return {
+              ...s,
+            }
+          })
+        },
       removeRoom: (roomId: string) =>
         set((s) => {
           let room = s.rooms[roomId];

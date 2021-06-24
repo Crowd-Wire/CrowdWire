@@ -62,14 +62,14 @@ export default function UserPermissions(props) {
   };
 
   const deleteRole = () => {
-    if(props.world_id.length===1){
+    if(props.world_id.length!==0){
       props.setRoles([]);
       RoleService.deleteRole(props.world_id, props.roleId);
     }
   }
 
   const saveInfo = () => {
-    if(props.world_id.length===1)
+    if(props.world_id.length!==0)
       RoleService.editRole(props.world_id,newState,props.roleId)
       .then((res)=>{
         

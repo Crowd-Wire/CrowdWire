@@ -24,6 +24,7 @@ class GameScene extends Phaser.Scene {
 
     remotePlayers = {};
     ws = getSocket(useWorldUserStore.getState().world_user.world_id);
+    prevTime = 0;
 
     constructor() {
         super(sceneConfig);
@@ -35,13 +36,15 @@ class GameScene extends Phaser.Scene {
 
         this.map = mapManager.buildMap(this);
 
+        this.collisionLayers = []
+
         this.map.layers.forEach((layer) => {
             if (layer.name.startsWith('__Conference'))
                 this.roomLayer = layer.tilemapLayer.setVisible(false);
-            else if (layer.name.includes("Collision"))
+            else if (layer.name.includes("Collision")) {
                 // -1 makes all tiles on this layer collidable
-                this.collisionLayer = layer.tilemapLayer.setCollisionByExclusion([-1]);
-            else if (layer.name === "__Float")
+                this.collisionLayers.push(layer.tilemapLayer.setCollisionByExclusion([-1]));
+            } else if (layer.name === "__Float")
                 layer.tilemapLayer.setDepth(this.map.heightInPixels);
             else if (layer.name === "Float")
                 layer.tilemapLayer.setDepth(this.map.heightInPixels + 1);
@@ -263,9 +266,11 @@ class GameScene extends Phaser.Scene {
     updateRangePlayers = () => {
         if (useWorldUserStore.getState().world_user.in_conference == null) {
             // Detect surrounding players
+
             const bodies = this.physics
                 .overlapCirc(this.player.body.center.x, this.player.body.center.y, 150)
                 .filter((b) => b.gameObject instanceof RemotePlayer);
+                
             if (bodies.length != GameScene.inRangePlayers.size) {
                 const rangePlayers = bodies.map((b) => b.gameObject.id);
                 if (rangePlayers.length > GameScene.inRangePlayers.size) {
@@ -305,7 +310,10 @@ class GameScene extends Phaser.Scene {
     update(time, delta) {
         this.player.update();
         this.updateDepth();
-        this.updateRangePlayers();
+        if (this.prevTime + 300*GameScene.inRangePlayers.size < time) {
+            this.updateRangePlayers();
+            this.prevTime = time;
+        }
         this.updateInteract();
     }
 }
@@ -332,14 +340,14 @@ class Player extends Phaser.GameObjects.Container {
         // add container to the scene
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        scene.physics.add.collider(this, [scene.collisionLayer, scene.objectGroups['ObjectCollision']]);
+        scene.physics.add.collider(this, [...scene.collisionLayers, scene.objectGroups['ObjectCollision']]);
         
         let avatar_chosen_sprite = "avatars_1_1"
 
         if (user_id == null) {
             avatar_chosen_sprite = useWorldUserStore.getState().world_user.avatar
-        } else {
-            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id]?.avatar
+        } else if (usePlayerStore.getState().users_info[user_id]) {
+            avatar_chosen_sprite = usePlayerStore.getState().users_info[user_id].avatar
         }
         let avatar_chosen = avatar_chosen_sprite.split('_')
         const avatar_sprite_sheet = avatar_chosen[0] + "_" + avatar_chosen[1]
